@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javadocOptions>
+  <docletArtifacts>
+    <docletArtifact />
+  </docletArtifacts>
+  <tagletArtifacts>
+    <tagletArtifact />
+    <tagletArtifact>
+      <groupId>org.cytoscape</groupId>
+      <artifactId>taglets</artifactId>
+      <version>3.0.0-alpha1</version>
+    </tagletArtifact>
+  </tagletArtifacts>
+  <links>
+    <link>http://download.oracle.com/javase/6/docs/api/</link>
+    <link>http://cytoscape.wodaklab.org/javadoc/</link>
+  </links>
+  <javadocResourcesDirectory>src/main/javadoc</javadocResourcesDirectory>
+</javadocOptions>
