@@ -82,6 +82,8 @@ public class TestGraphics implements GLEventListener {
 	public TestGraphics() {
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
+		
+		// TODO: add default constant speeds for camera movement
 		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0), new Vector3(0, 1, 0), 0.04, 0.003, 0.01, 0.01);
 	}
 	
