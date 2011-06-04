@@ -25,5 +25,7 @@
 			</props>
 		</constructor-arg>
 		<constructor-arg ref="cyApplicationManagerRef"/>
+		<constructor-arg ref="cyNetworkManagerRef"/>
+		<constructor-arg ref="cyNetworkViewManagerRef"/>
 	</bean>
 </beans>

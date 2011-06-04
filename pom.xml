@@ -18,7 +18,7 @@
 	<name>${bundle.symbolicName} [${bundle.namespace}]</name>
 	<packaging>bundle</packaging>
 	<dependencies>
-<dependency>
+		<dependency>
 			<groupId>cytoscape-temp</groupId>
 			<artifactId>gluegen-gl</artifactId>
 			<version>2.0-b23-20110303</version>
@@ -245,6 +245,115 @@
 		</dependency>
 	
 	
+	
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-animation-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-awt-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-collada-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-core-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-effects-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-extras-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-jogl-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-lwjgl-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-swt-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-terrain-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>ardor3d-ui-0.7</artifactId>
+			<version>0.7</version>
+		</dependency>
+	
+	
+		<dependency>
+    		<groupId>cytoscape-temp</groupId>
+   		 	<artifactId>guava-r09</artifactId>
+   		 	<version>r09</version>
+		</dependency>	
+	
+	
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>AppleJavaExtensions</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>jinput</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lwjgl-debug</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lwjgl</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lwjgl_test</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lwjgl_util</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lwjgl_util_applet</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>cytoscape-temp</groupId>
+			<artifactId>lzma</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+
+	
+	
+	
         <dependency>
             <groupId>org.cytoscape</groupId>
             <artifactId>model-api</artifactId>
@@ -299,7 +408,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
-						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Bundle-Version>${project.version}</Bundle-Version>
 						<_include>-osgi.bnd</_include>
 					</instructions>
 				</configuration>

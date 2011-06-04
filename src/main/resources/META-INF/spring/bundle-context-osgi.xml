@@ -9,6 +9,12 @@
 	<osgi:reference id="cyApplicationManagerRef"
 		interface="org.cytoscape.session.CyApplicationManager" />
 	
+	<osgi:reference id="cyNetworkManagerRef"
+		interface="org.cytoscape.model.CyNetworkManager" />
+	
+	<osgi:reference id="cyNetworkViewManagerRef"
+	    interface="org.cytoscape.view.model.CyNetworkViewManager" />
+	
 	<!-- Exported Services -->
 	<osgi:service id="sampleActionService" ref="sampleAction"
 		interface="org.cytoscape.application.swing.CyAction"/>
