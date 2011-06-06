@@ -30,7 +30,7 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 
 public class TestGraphics implements GLEventListener {
 
-	private static final int NODE_COUNT = 3;
+	private static final int NODE_COUNT = 2;
 	private static final int EDGE_COUNT = 0;
 	private static final float LARGE_SPHERE_RADIUS = 1.0f; // 1.5f
 	private static final float SMALL_SPHERE_RADIUS = 0.125f; // 0.015f
@@ -82,9 +82,10 @@ public class TestGraphics implements GLEventListener {
 	public TestGraphics() {
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
-		
+
 		// TODO: add default constant speeds for camera movement
-		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0), new Vector3(0, 1, 0), 0.04, 0.003, 0.01, 0.01);
+		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
+				new Vector3(0, 1, 0), 0.04, 0.003, 0.01, 0.01, 0.4);
 	}
 	
 	public KeyListener getKeyListener() {
@@ -151,33 +152,33 @@ public class TestGraphics implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		checkInput();
-		
+
 		GL2 gl = drawable.getGL().getGL2();
 
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
-		
+
 		Vector3 position = camera.getPosition();
 		Vector3 target = camera.getTarget();
 		Vector3 up = camera.getUp();
-		
+
 		// System.out.println(position + " " + target + " " + up);
-		
+
 		GLU glu = new GLU();
-		glu.gluLookAt(position.x(), position.y(), position.z(),
-				target.x(), target.y(), target.z(),
-				up.x(), up.y(), up.z());
-		
-		// gl.glRotated(direction.angle(current) * 180 / Math.PI, normal.x(), normal.y(), normal.z());
+		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
+				target.y(), target.z(), up.x(), up.y(), up.z());
+
+		// gl.glRotated(direction.angle(current) * 180 / Math.PI, normal.x(),
+		// normal.y(), normal.z());
 		// gl.glTranslated(-camera.x(), -camera.y(), -camera.z());
-		
+
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, FloatBuffer.wrap(lightPosition));
-		
-		
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
+				FloatBuffer.wrap(lightPosition));
+
 		gl.glColor3f(0.6f, 0.6f, 0.6f);
 		gl.glTranslatef(0.0f, 0.0f, -6.0f);
-			
+
 		gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
 		gl.glColor3f(0.53f, 0.53f, 0.55f);
@@ -202,7 +203,7 @@ public class TestGraphics implements GLEventListener {
 			}
 			
 			if (pressed.contains(KeyEvent.VK_C)) {
-				camera.setSpeed(0.04, 0.003, 0.01, 0.1);
+				camera.setSpeed(0.04, 0.003, 0.01, 0.1, 0.4);
 				camera.moveTo(0, 0, 2);
 			}
 			
@@ -244,23 +245,49 @@ public class TestGraphics implements GLEventListener {
 				
 			} else {
 			
-				/*
-				if (held.contains(KeyEvent.VK_LEFT)) {
-					camera.turnLeft();
+				if (pressed.contains(KeyEvent.VK_B)) {
+					System.out.println("number of networks: "
+							+ networkManager.getNetworkSet().size());
+					System.out.println("current network: "
+							+ applicationManager.getCurrentNetwork());
+					if (applicationManager.getCurrentNetwork() != null) {
+						System.out
+								.println("number of nodes in current network: "
+										+ applicationManager
+												.getCurrentNetwork()
+												.getNodeList().size());
+					}
+					System.out.println("current network view: "
+							+ applicationManager.getCurrentNetworkView());
+					if (applicationManager.getCurrentNetworkView() != null) {
+						// System.out.println("number of nodes in current network: "
+						// +
+						// applicationManager.getCurrentNetworkView().getNodeView(null).getVisualProperty(null));
+						System.out
+								.println("number of views in current network: "
+										+ applicationManager
+												.getCurrentNetworkView()
+												.getNodeViews().size());
+					}
+
+					System.out.println("supported visual properties: "
+							+ applicationManager.getCurrentRenderingEngine()
+									.getVisualLexicon()
+									.getAllVisualProperties());
 				}
 				
-				if (held.contains(KeyEvent.VK_RIGHT)) {
+				if (held.contains(KeyEvent.VK_N)) {
 					camera.turnRight();
 				}
 				
-				if (held.contains(KeyEvent.VK_UP)) {
+				if (held.contains(KeyEvent.VK_M)) {
 					camera.turnUp();
 				}
 				
-				if (held.contains(KeyEvent.VK_DOWN)) {
+				if (held.contains(KeyEvent.VK_COMMA)) {
 					camera.turnDown();
 				}
-				*/
+
 			
 			}
 			
@@ -291,10 +318,14 @@ public class TestGraphics implements GLEventListener {
 			keys.update();
 		}
 		
-		if (mouse.hasMoved()) {
+		if (mouse.hasMoved() || mouse.hasNew()) {
 			if (mouse.getHeld().contains(MouseEvent.BUTTON1)) {
 				camera.turnRight(mouse.dX());
 				camera.turnUp(mouse.dY());
+			}
+			
+			if (mouse.dWheel() != 0) {
+				camera.zoomOut((double) mouse.dWheel());
 			}
 			
 			mouse.update();

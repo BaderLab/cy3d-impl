@@ -7,21 +7,28 @@ public class SimpleCamera {
 	private Vector3 position;
 	private Vector3 target;
 	
+	private double minDistance = 2;
+	private double maxDistance = 40;
+	
 	private double distance;
 	private double moveSpeed;
 	private double turnSpeed;
 	private double orbitSpeed;
 	private double rollSpeed;
+	private double zoomSpeed;
 	
 	public SimpleCamera() {
 		this(new Vector3(0, 0, 10), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 	}
 	
+	// TODO: provide constants for default values
 	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up) {
-		this(position, target, up, 0.01, 0.002, 0.002, 0.1);
+		this(position, target, up, 0.01, 0.002, 0.002, 0.1, 0.4);
 	}
-	
-	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up, double moveSpeed, double turnSpeed, double orbitSpeed, double rollSpeed) {
+
+	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up,
+			double moveSpeed, double turnSpeed, double orbitSpeed,
+			double rollSpeed, double zoomSpeed) {
 		this.position = new Vector3(position);
 		this.target = new Vector3(target);
 		this.up = new Vector3(up);
@@ -38,13 +45,16 @@ public class SimpleCamera {
 		this.turnSpeed = turnSpeed;
 		this.orbitSpeed = orbitSpeed;
 		this.rollSpeed = rollSpeed;
+		this.zoomSpeed = zoomSpeed;
 	}
-	
-	public void setSpeed(double moveSpeed, double turnSpeed, double orbitSpeed, double rollSpeed) {
+
+	public void setSpeed(double moveSpeed, double turnSpeed, double orbitSpeed,
+			double rollSpeed, double zoomSpeed) {
 		this.moveSpeed = moveSpeed;
 		this.turnSpeed = turnSpeed;
 		this.orbitSpeed = orbitSpeed;
 		this.rollSpeed = rollSpeed;
+		this.zoomSpeed = zoomSpeed;
 	}
 	
 	public Vector3 getPosition() {
@@ -189,6 +199,22 @@ public class SimpleCamera {
 		roll(-rollSpeed);
 	}
 	
+	public void zoomIn() {
+		zoom(zoomSpeed);
+	}
+	
+	public void zoomOut() {
+		zoom(-zoomSpeed);
+	}
+	
+	public void zoomIn(double multiplier) {
+		zoom(multiplier * zoomSpeed);
+	}
+	
+	public void zoomOut(double multiplier) {
+		zoom(multiplier * -zoomSpeed);
+	}
+	
 	private void move(Vector3 direction, double multiplier) {
 		Vector3 offset = new Vector3(direction.multiply(multiplier));
 		
@@ -264,5 +290,19 @@ public class SimpleCamera {
 		
 		left = up.cross(direction);
 		left.normalizeLocal();
-	}	
+	}
+	
+	// TODO: This method does not snap distance values to certain nearest values
+	private void zoom(double amount) {
+		distance -= amount;
+		if (distance > maxDistance) {
+			distance = maxDistance;
+		} else if (distance < minDistance) {
+			distance = minDistance;
+		}
+		
+		Vector3 newPosition = direction.multiply(-distance);
+		newPosition.addLocal(target);
+		position.set(newPosition);
+	}
 }
