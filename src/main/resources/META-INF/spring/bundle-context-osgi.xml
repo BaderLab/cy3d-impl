@@ -14,8 +14,32 @@
 	
 	<osgi:reference id="cyNetworkViewManagerRef"
 	    interface="org.cytoscape.view.model.CyNetworkViewManager" />
+	    
+	   <osgi:reference id="cyRenderingEngineManagerRef"
+	    interface="org.cytoscape.view.presentation.RenderingEngineManager" />
 	
 	<!-- Exported Services -->
 	<osgi:service id="sampleActionService" ref="sampleAction"
 		interface="org.cytoscape.application.swing.CyAction"/>
+
+	<osgi:service id="windRenderingEngineFactoryService" ref="windRenderingEngineFactory">
+		<osgi:interfaces>
+			<value>org.cytoscape.view.presentation.RenderingEngineFactory</value>
+		</osgi:interfaces>
+		<osgi:service-properties>
+			<entry key="serviceType" value="presentationFactory" />
+			<entry key="id" value="Wind" />
+		</osgi:service-properties>
+	</osgi:service>
+	
+	<osgi:service id="windVisualLexiconService" ref="windVisualLexicon">
+		<osgi:interfaces>
+			<value>org.cytoscape.view.model.VisualLexicon</value>
+		</osgi:interfaces>
+		<osgi:service-properties>
+			<entry key="serviceType" value="visualLexicon" />
+			<entry key="id" value="Wind" />
+		</osgi:service-properties>
+	</osgi:service>
+
 </beans>

@@ -27,6 +27,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import org.cytoscape.session.CyApplicationManager;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.presentation.RenderingEngineManager;
 
 public class TestGraphics implements GLEventListener {
 
@@ -78,6 +79,7 @@ public class TestGraphics implements GLEventListener {
 	private CyApplicationManager applicationManager;
 	private CyNetworkManager networkManager;
 	private CyNetworkViewManager networkViewManager;
+	private RenderingEngineManager renderingEngineManager;
 	
 	public TestGraphics() {
 		keys = new KeyboardMonitor();
@@ -106,10 +108,12 @@ public class TestGraphics implements GLEventListener {
 	
 	public void setManagers(CyApplicationManager applicationManager,
 			CyNetworkManager networkManager,
-			CyNetworkViewManager networkViewManager) {
+			CyNetworkViewManager networkViewManager,
+			RenderingEngineManager renderingEngineManager) {
 		this.applicationManager = applicationManager;
 		this.networkManager = networkManager;
 		this.networkViewManager = networkViewManager;
+		this.renderingEngineManager = renderingEngineManager;
 	}
 	
 	public static void main(String[] args) {
@@ -260,9 +264,6 @@ public class TestGraphics implements GLEventListener {
 					System.out.println("current network view: "
 							+ applicationManager.getCurrentNetworkView());
 					if (applicationManager.getCurrentNetworkView() != null) {
-						// System.out.println("number of nodes in current network: "
-						// +
-						// applicationManager.getCurrentNetworkView().getNodeView(null).getVisualProperty(null));
 						System.out
 								.println("number of views in current network: "
 										+ applicationManager
@@ -270,22 +271,27 @@ public class TestGraphics implements GLEventListener {
 												.getNodeViews().size());
 					}
 
-					System.out.println("supported visual properties: "
-							+ applicationManager.getCurrentRenderingEngine()
-									.getVisualLexicon()
-									.getAllVisualProperties());
+					// System.out.println("supported visual properties: "
+					//		+ applicationManager.getCurrentRenderingEngine()
+					//				.getVisualLexicon()
+					//				.getAllVisualProperties());
 				}
 				
-				if (held.contains(KeyEvent.VK_N)) {
-					camera.turnRight();
+				if (pressed.contains(KeyEvent.VK_N)) {
+					System.out.println("current rendering engine: "
+							+ applicationManager.getCurrentRenderingEngine().getClass().getName());
 				}
 				
-				if (held.contains(KeyEvent.VK_M)) {
-					camera.turnUp();
+				if (pressed.contains(KeyEvent.VK_M)) {
+					System.out.println("Old rendering engine: " + applicationManager.getCurrentRenderingEngine());
+					
+					renderingEngineManager.removeRenderingEngine(applicationManager.getCurrentRenderingEngine());
+					
+					System.out.println("New rendering engine: " + applicationManager.getCurrentRenderingEngine());
 				}
 				
-				if (held.contains(KeyEvent.VK_COMMA)) {
-					camera.turnDown();
+				if (pressed.contains(KeyEvent.VK_COMMA)) {
+					
 				}
 
 			

@@ -14,6 +14,7 @@ import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.session.CyApplicationManager;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.presentation.RenderingEngineManager;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -21,17 +22,20 @@ public class SampleAction extends AbstractCyAction {
 	private CyApplicationManager applicationManager;
 	private CyNetworkManager networkManager;
 	private CyNetworkViewManager networkViewManager;
+	private RenderingEngineManager renderingEngineManager;
 	
 	private KeyboardMonitor keyboard;
 	private MouseMonitor mouse;
 	
 	public SampleAction(Map<String, String> properties, CyApplicationManager applicationManager,
-			CyNetworkManager networkManager, CyNetworkViewManager networkViewManager) {
+			CyNetworkManager networkManager, CyNetworkViewManager networkViewManager, 
+			RenderingEngineManager renderingEngineManager) {
 		super(properties, applicationManager);
 		
 		this.applicationManager = applicationManager;
 		this.networkManager = networkManager;
 		this.networkViewManager = networkViewManager;
+		this.renderingEngineManager = renderingEngineManager;
 		
 		//System.out.println("number of networks: " + networkManager.getNetworkSet().size());
 		//System.out.println("current network: " + applicationManager.getCurrentNetwork());
@@ -51,7 +55,8 @@ public class SampleAction extends AbstractCyAction {
 		GLCanvas canvas = new GLCanvas(capabilities);
 
 		TestGraphics graphics = new TestGraphics();
-		graphics.setManagers(applicationManager, networkManager, networkViewManager);
+		graphics.setManagers(applicationManager, networkManager, networkViewManager, renderingEngineManager);
+		// applicationManager.
 
 		canvas.addGLEventListener(graphics);
 		graphics.getKeyListener();
