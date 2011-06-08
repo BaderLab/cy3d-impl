@@ -87,7 +87,7 @@ public class Graphics implements GLEventListener {
 
 		// TODO: add default constant speeds for camera movement
 		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
-				new Vector3(0, 1, 0), 0.04, 0.003, 0.01, 0.01, 0.4);
+				new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
 		
 		this.networkView = networkView;
 		this.visualLexicon = visualLexicon;
@@ -209,80 +209,99 @@ public class Graphics implements GLEventListener {
 				
 			} else {
 			
-				if (pressed.contains(KeyEvent.VK_B)) {
-					System.out.println("number of networks: "
-							+ networkManager.getNetworkSet().size());
-					System.out.println("current network: "
-							+ applicationManager.getCurrentNetwork());
-					if (applicationManager.getCurrentNetwork() != null) {
-						System.out
-								.println("number of nodes in current network: "
-										+ applicationManager
-												.getCurrentNetwork()
-												.getNodeList().size());
-					}
-					System.out.println("current network view: "
-							+ applicationManager.getCurrentNetworkView());
-					if (applicationManager.getCurrentNetworkView() != null) {
-						System.out
-								.println("number of views in current network: "
-										+ applicationManager
-												.getCurrentNetworkView()
-												.getNodeViews().size());
-					}
-
-					// System.out.println("supported visual properties: "
-					//		+ applicationManager.getCurrentRenderingEngine()
-					//				.getVisualLexicon()
-					//				.getAllVisualProperties());
+				if (held.contains(KeyEvent.VK_LEFT)) {
+					camera.turnLeft(4);
 				}
 				
-				if (pressed.contains(KeyEvent.VK_N)) {
-					System.out.println("current rendering engine: "
-							+ applicationManager.getCurrentRenderingEngine().getClass().getName());
-					
-					System.out.println("number of rendering engines: "
-							+ renderingEngineManager.getAllRenderingEngines().size());
-					
-					
+				if (held.contains(KeyEvent.VK_RIGHT)) {
+					camera.turnRight(4);
 				}
 				
-				if (pressed.contains(KeyEvent.VK_M)) {
-					System.out.println("Old rendering engine: " + applicationManager.getCurrentRenderingEngine());
-					
-					renderingEngineManager.removeRenderingEngine(applicationManager.getCurrentRenderingEngine());
-					
-					System.out.println("New rendering engine: " + applicationManager.getCurrentRenderingEngine());
+				if (held.contains(KeyEvent.VK_UP)) {
+					camera.turnUp(4);
 				}
 				
-				if (pressed.contains(KeyEvent.VK_COMMA)) {
-					System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
-					
-					for (CyNetworkView view : networkViewManager.getNetworkViewSet()) {
-						System.out.println("current model: " + view.getModel());
-						System.out.println("current model suid: " + view.getModel().getSUID());
-						System.out.println("current suid: " + view.getSUID());	
-					}
+				if (held.contains(KeyEvent.VK_DOWN)) {
+					camera.turnDown(4);
 				}
-
-				if (pressed.contains(KeyEvent.VK_H)) {
-					System.out.println("visualLexicon: " + visualLexicon);
-					
-					float x, y, z;
-					if (visualLexicon != null) {
-						
-						for (View<CyNode> nodeView : networkView.getNodeViews()) {
-							x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue();
-							y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue();
-							z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue();
-							
-							System.out.println("Node found at " + x + ", " + y + ", " + z);
-						}
-					
-					}
-				}
-
 			
+			}
+			
+			if (pressed.contains(KeyEvent.VK_B)) {
+				System.out.println("number of networks: "
+						+ networkManager.getNetworkSet().size());
+				System.out.println("current network: "
+						+ applicationManager.getCurrentNetwork());
+				if (applicationManager.getCurrentNetwork() != null) {
+					System.out
+							.println("number of nodes in current network: "
+									+ applicationManager
+											.getCurrentNetwork()
+											.getNodeList().size());
+				}
+				System.out.println("current network view: "
+						+ applicationManager.getCurrentNetworkView());
+				if (applicationManager.getCurrentNetworkView() != null) {
+					System.out
+							.println("number of views in current network: "
+									+ applicationManager
+											.getCurrentNetworkView()
+											.getNodeViews().size());
+				}
+
+				// System.out.println("supported visual properties: "
+				//		+ applicationManager.getCurrentRenderingEngine()
+				//				.getVisualLexicon()
+				//				.getAllVisualProperties());
+			}
+			
+			if (pressed.contains(KeyEvent.VK_N)) {
+				System.out.println("current rendering engine: "
+						+ applicationManager.getCurrentRenderingEngine().getClass().getName());
+				
+				System.out.println("number of rendering engines: "
+						+ renderingEngineManager.getAllRenderingEngines().size());
+				
+				
+			}
+			
+			if (pressed.contains(KeyEvent.VK_M)) {
+				System.out.println("Old rendering engine: " + applicationManager.getCurrentRenderingEngine());
+				
+				renderingEngineManager.removeRenderingEngine(applicationManager.getCurrentRenderingEngine());
+				
+				System.out.println("New rendering engine: " + applicationManager.getCurrentRenderingEngine());
+			}
+			
+			if (pressed.contains(KeyEvent.VK_COMMA)) {
+				System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
+				
+				for (CyNetworkView view : networkViewManager.getNetworkViewSet()) {
+					System.out.println("current model: " + view.getModel());
+					System.out.println("current model suid: " + view.getModel().getSUID());
+					System.out.println("current suid: " + view.getSUID());	
+				}
+			}
+
+			if (pressed.contains(KeyEvent.VK_H)) {
+				System.out.println("visualLexicon: " + visualLexicon);
+				
+				float x, y, z;
+				if (visualLexicon != null) {
+					
+					for (View<CyNode> nodeView : networkView.getNodeViews()) {
+						x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue();
+						y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue();
+						z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue();
+						
+						System.out.println("Node found at " + x + ", " + y + ", " + z);
+					}
+				
+				}
+			}
+			
+			if (pressed.contains(KeyEvent.VK_J)) {
+				System.out.println("number of nodes: " + networkView.getNodeViews().size());
 			}
 			
 			if (held.contains(KeyEvent.VK_W)) {
@@ -329,19 +348,14 @@ public class Graphics implements GLEventListener {
 	private void drawNodes(GL2 gl) {
 		float x, y, z;
 		
-		if (visualLexicon != null) {
-		
-			for (View<CyNode> nodeView : networkView.getNodeViews()) {
-				x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue() / 200.0f;
-				y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue() / 200.0f;
-				z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue() / 200.0f;
-				
-				gl.glTranslatef(x, y, z);
-				gl.glCallList(nodeListIndex);
-				gl.glTranslatef(-x, -y, -z);
-				
-			}
-		
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+			x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue() / 200.0f;
+			y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue() / 200.0f;
+			z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue() / 200.0f;
+			
+			gl.glTranslatef(x, y, z);
+			gl.glCallList(nodeListIndex);
+			gl.glTranslatef(-x, -y, -z);		
 		}
 	}
 
