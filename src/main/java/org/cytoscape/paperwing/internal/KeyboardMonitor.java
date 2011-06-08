@@ -1,11 +1,13 @@
 package org.cytoscape.paperwing.internal;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Set;
 import java.util.TreeSet;
 
 
-public class KeyboardMonitor implements KeyListener {
+public class KeyboardMonitor implements KeyListener, FocusListener {
 
 	private TreeSet<Integer> justPressed;
 	private TreeSet<Integer> keysDown;
@@ -67,6 +69,19 @@ public class KeyboardMonitor implements KeyListener {
 		justPressed.clear();
 		justReleased.clear();
 		hasNew = false;
+	}
+
+	@Override
+	public void focusGained(FocusEvent event) {
+		
+	}
+
+	@Override
+	public void focusLost(FocusEvent event) {
+		// Release all keys
+		justReleased.addAll(keysDown);
+		keysDown.clear();
+		hasNew = true;
 	}
 	
 

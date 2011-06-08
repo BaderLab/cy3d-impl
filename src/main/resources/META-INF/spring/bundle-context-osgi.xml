@@ -28,7 +28,17 @@
 		</osgi:interfaces>
 		<osgi:service-properties>
 			<entry key="serviceType" value="presentationFactory" />
-			<entry key="id" value="Wind" />
+			<entry key="id" value="wind" />
+		</osgi:service-properties>
+	</osgi:service>
+	
+	<osgi:service id="windMapRenderingEngineFactoryService" ref="windMapRenderingEngineFactory">
+		<osgi:interfaces>
+			<value>org.cytoscape.view.presentation.RenderingEngineFactory</value>
+		</osgi:interfaces>
+		<osgi:service-properties>
+			<entry key="serviceType" value="presentationFactory" />
+			<entry key="id" value="windMap" />
 		</osgi:service-properties>
 	</osgi:service>
 	
@@ -38,7 +48,7 @@
 		</osgi:interfaces>
 		<osgi:service-properties>
 			<entry key="serviceType" value="visualLexicon" />
-			<entry key="id" value="Wind" />
+			<entry key="id" value="wind" />
 		</osgi:service-properties>
 	</osgi:service>
 

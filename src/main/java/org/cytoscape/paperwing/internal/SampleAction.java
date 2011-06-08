@@ -59,7 +59,6 @@ public class SampleAction extends AbstractCyAction {
 		// applicationManager.
 
 		canvas.addGLEventListener(graphics);
-		graphics.getKeyListener();
 		frame.add(canvas);
 
 		frame.addWindowListener(new WindowAdapter() {
@@ -72,11 +71,7 @@ public class SampleAction extends AbstractCyAction {
 
 		frame.setVisible(true);
 		
-		frame.addKeyListener(graphics.getKeyListener());
-		canvas.addKeyListener(graphics.getKeyListener());
-		canvas.addMouseListener(graphics.getMouseListener());
-		canvas.addMouseMotionListener(graphics.getMouseMotionListener());
-		canvas.addMouseWheelListener(graphics.getMouseWheelListener());
+		graphics.trackInput(canvas);
 		
 		FPSAnimator animator = new FPSAnimator(60);
 		animator.add(canvas);

@@ -1,4 +1,5 @@
 package org.cytoscape.paperwing.internal;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -26,6 +27,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 import org.cytoscape.session.CyApplicationManager;
 import org.cytoscape.model.CyNetworkManager;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 
@@ -41,9 +43,6 @@ public class TestGraphics implements GLEventListener {
 	private static final int NODE_STACKS_DETAIL = 24;
 	private static final int EDGE_SLICES_DETAIL = 3;
 	private static final int EDGE_STACKS_DETAIL = 1;
-
-	private DrawnNode[] nodes;
-	private DrawnEdge[] edges;
 
 	private class DrawnNode {
 		public float x;
@@ -61,6 +60,9 @@ public class TestGraphics implements GLEventListener {
 		public float rotateAngle;
 		public float length;
 	}
+	
+	private DrawnNode[] nodes;
+	private DrawnEdge[] edges;
 
 	private int nodeListIndex;
 	private int edgeListIndex;
@@ -81,6 +83,15 @@ public class TestGraphics implements GLEventListener {
 	private CyNetworkViewManager networkViewManager;
 	private RenderingEngineManager renderingEngineManager;
 	
+	static {
+		
+	}
+	
+	public static void initSingleton() {
+		GLProfile.initSingleton(false);
+		System.out.println("initSingleton called");
+	}
+	
 	public TestGraphics() {
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
@@ -90,20 +101,14 @@ public class TestGraphics implements GLEventListener {
 				new Vector3(0, 1, 0), 0.04, 0.003, 0.01, 0.01, 0.4);
 	}
 	
-	public KeyListener getKeyListener() {
-		return keys;
-	}
-	
-	public MouseListener getMouseListener() {
-		return mouse;
-	}
-	
-	public MouseMotionListener getMouseMotionListener() {
-		return mouse;
-	}
-	
-	public MouseWheelListener getMouseWheelListener() {
-		return mouse;
+	public void trackInput(Component component) {
+		component.addMouseListener(mouse);
+		component.addMouseMotionListener(mouse);
+		component.addMouseWheelListener(mouse);
+		component.addFocusListener(mouse);
+		
+		component.addKeyListener(keys);
+		component.addFocusListener(keys);
 	}
 	
 	public void setManagers(CyApplicationManager applicationManager,
@@ -130,7 +135,6 @@ public class TestGraphics implements GLEventListener {
 		TestGraphics graphics = new TestGraphics();
 
 		canvas.addGLEventListener(graphics);
-		graphics.getKeyListener();
 		frame.add(canvas);
 
 		frame.addWindowListener(new WindowAdapter() {
@@ -142,15 +146,12 @@ public class TestGraphics implements GLEventListener {
 
 		frame.setVisible(true);
 		
-		frame.addKeyListener(graphics.getKeyListener());
-		canvas.addKeyListener(graphics.getKeyListener());
-		canvas.addMouseListener(graphics.getMouseListener());
-		canvas.addMouseMotionListener(graphics.getMouseMotionListener());
-		canvas.addMouseWheelListener(graphics.getMouseWheelListener());
+		graphics.trackInput(frame.getContentPane());
 		
 		FPSAnimator animator = new FPSAnimator(60);
 		animator.add(canvas);
 		animator.start();
+		// animator.pause()
 	}
 
 	@Override
@@ -280,6 +281,11 @@ public class TestGraphics implements GLEventListener {
 				if (pressed.contains(KeyEvent.VK_N)) {
 					System.out.println("current rendering engine: "
 							+ applicationManager.getCurrentRenderingEngine().getClass().getName());
+					
+					System.out.println("number of rendering engines: "
+							+ renderingEngineManager.getAllRenderingEngines().size());
+					
+					
 				}
 				
 				if (pressed.contains(KeyEvent.VK_M)) {
@@ -291,7 +297,13 @@ public class TestGraphics implements GLEventListener {
 				}
 				
 				if (pressed.contains(KeyEvent.VK_COMMA)) {
+					System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
 					
+					for (CyNetworkView view : networkViewManager.getNetworkViewSet()) {
+						System.out.println("current model: " + view.getModel());
+						System.out.println("current model suid: " + view.getModel().getSUID());
+						System.out.println("current suid: " + view.getSUID());	
+					}
 				}
 
 			
@@ -325,7 +337,7 @@ public class TestGraphics implements GLEventListener {
 		}
 		
 		if (mouse.hasMoved() || mouse.hasNew()) {
-			if (mouse.getHeld().contains(MouseEvent.BUTTON1)) {
+			if (keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
 				camera.turnRight(mouse.dX());
 				camera.turnUp(mouse.dY());
 			}

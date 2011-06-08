@@ -1,6 +1,8 @@
 package org.cytoscape.paperwing.internal;
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,7 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 
-public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWheelListener, FocusListener {
 	private int prevX;
 	private int prevY;
 	private int currentX;
@@ -143,6 +145,19 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Override
+	public void focusGained(FocusEvent event) {
+	}
+
+	@Override
+	public void focusLost(FocusEvent event) {
+		// Release all keys
+		justReleased.addAll(buttonsDown);
+		buttonsDown.clear();
+		ignoreNext = true;
+		hasNew = true;
 	}
 	
 
