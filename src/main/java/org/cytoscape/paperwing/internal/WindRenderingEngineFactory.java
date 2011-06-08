@@ -38,7 +38,8 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		
-		TestGraphics.initSingleton();
+		// TestGraphics.initSingleton();
+		Graphics.initSingleton();
 		WindRenderingEngine.setNetworkViewManager(networkViewManager);
 	}
 	

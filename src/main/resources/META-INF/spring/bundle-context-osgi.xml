@@ -15,7 +15,7 @@
 	<osgi:reference id="cyNetworkViewManagerRef"
 	    interface="org.cytoscape.view.model.CyNetworkViewManager" />
 	    
-	   <osgi:reference id="cyRenderingEngineManagerRef"
+	<osgi:reference id="cyRenderingEngineManagerRef"
 	    interface="org.cytoscape.view.presentation.RenderingEngineManager" />
 	
 	<!-- Exported Services -->

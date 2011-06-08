@@ -55,6 +55,8 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			System.out.println("Setting up canvas..");
 			setUpCanvas(container);
 		}
+		
+		System.out.println("Provided visualLexicon: " + visualLexicon);
 	}
 	
 	public static void setNetworkViewManager(CyNetworkViewManager networkViewManager) {
@@ -77,7 +79,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			// TODO: check whether to use GLCanvas or GLJPanel
 			GLJPanel panel = new GLJPanel(capabilities);
 			
-			TestGraphics graphics = new TestGraphics();
+			Graphics graphics = new Graphics(networkView, visualLexicon);
 
 			panel.addGLEventListener(graphics);
 	

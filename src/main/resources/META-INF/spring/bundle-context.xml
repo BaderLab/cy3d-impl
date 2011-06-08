@@ -30,6 +30,10 @@
 		<constructor-arg ref="cyRenderingEngineManagerRef"/>
 	</bean>
 	
+	<bean name="windVisualLexicon"
+		class="org.cytoscape.paperwing.internal.WindVisualLexicon">
+	</bean>
+	
 	<bean name="windRenderingEngineFactory"
 		class="org.cytoscape.paperwing.internal.WindRenderingEngineFactory">
 		<constructor-arg ref="cyNetworkViewManagerRef"/>
@@ -42,10 +46,6 @@
 		<constructor-arg ref="cyNetworkViewManagerRef"/>
 		<constructor-arg ref="cyRenderingEngineManagerRef"/>
 		<constructor-arg ref="windVisualLexicon"/>
-	</bean>
-	
-	<bean name="windVisualLexicon"
-		class="org.cytoscape.paperwing.internal.WindVisualLexicon">
 	</bean>
 
 </beans>
