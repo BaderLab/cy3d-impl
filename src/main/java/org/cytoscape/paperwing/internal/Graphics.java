@@ -1,7 +1,10 @@
 package org.cytoscape.paperwing.internal;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Set;
 
 import javax.media.opengl.GL;
@@ -52,6 +55,7 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private DrawnNode[] nodes;
+	private DrawnNode testNode = new DrawnNode();
 	private DrawnEdge[] edges;
 
 	private int nodeListIndex;
@@ -60,6 +64,8 @@ public class Graphics implements GLEventListener {
 	private long startTime;
 	private long endTime;
 	private int framesElapsed = 0;
+	private int screenHeight;
+	private int screenWidth;
 
 	private int nodeSeed = 556;
 	private int edgeSeed = 556;
@@ -115,9 +121,11 @@ public class Graphics implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		checkInput();
-
+		
+		//drawable.swapBuffers();
 		GL2 gl = drawable.getGL().getGL2();
+		
+		checkInput(gl);
 
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
@@ -137,11 +145,11 @@ public class Graphics implements GLEventListener {
 		// gl.glTranslated(-camera.x(), -camera.y(), -camera.z());
 
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
-				FloatBuffer.wrap(lightPosition));
+		//gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
+		//		FloatBuffer.wrap(lightPosition));
 
 		gl.glColor3f(0.6f, 0.6f, 0.6f);
-		gl.glTranslatef(0.0f, 0.0f, -6.0f);
+		// gl.glTranslatef(0.0f, 0.0f, -6.0f);
 
 		gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
@@ -151,7 +159,7 @@ public class Graphics implements GLEventListener {
 		framesElapsed++;
 	}
 	
-	private void checkInput() {
+	private void checkInput(GL2 gl) {
 		if (keys.hasHeld() || keys.hasNew()) {
 			Set<Integer> pressed = keys.getPressed();
 			Set<Integer> held = keys.getHeld();
@@ -167,8 +175,8 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (pressed.contains(KeyEvent.VK_C)) {
-				camera.setSpeed(0.04, 0.003, 0.01, 0.1, 0.4);
-				camera.moveTo(0, 0, 2);
+				camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
+						new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
 			}
 			
 			if (pressed.contains(KeyEvent.VK_SPACE)) {
@@ -334,15 +342,140 @@ public class Graphics implements GLEventListener {
 		if (mouse.hasMoved() || mouse.hasNew()) {
 			if (keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
 				camera.turnRight(mouse.dX());
-				camera.turnUp(mouse.dY());
+				camera.turnDown(mouse.dY());
 			}
 			
 			if (mouse.dWheel() != 0) {
 				camera.zoomOut((double) mouse.dWheel());
 			}
 			
+			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
+				// Hnear = 2 * tan(fov / 2) * nearDist
+				// in our case: 
+				//   fov = 45 deg
+				//   nearDist = 0.2
+				
+				double fieldOfView = Math.PI / 4;
+				double nearDistance = 0.2;
+				
+				
+				double nearPlaneHeight = 2 * Math.tan(fieldOfView / 2) * nearDistance;
+				double nearPlaneWidth = nearPlaneHeight * screenWidth / screenHeight;
+				
+				double percentMouseOffsetX = (double) (mouse.x() - screenWidth) / screenWidth + 0.5;
+				double percentMouseOffsetY = (double) (mouse.y() - screenHeight) / screenHeight + 0.5;
+				
+				// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
+				percentMouseOffsetY = -percentMouseOffsetY;
+				
+				double nearX = percentMouseOffsetX * nearPlaneWidth;
+				double nearY = percentMouseOffsetY * nearPlaneHeight;
+				
+				// Obtain the near plane position vector
+				Vector3 nearPosition;
+				nearPosition = new Vector3(camera.getDirection());
+				nearPosition.multiplyLocal(nearDistance);
+				
+				nearPosition.addLocal(camera.getPosition());
+				nearPosition.addLocal(camera.getUp().multiply(nearY));
+				nearPosition.addLocal(camera.getLeft().multiply(-nearX)); // Note that nearX is positive to the right
+				
+				// Obtain the projection direction vector
+				Vector3 projectionDirection = nearPosition.subtract(camera.getPosition());
+				projectionDirection.normalizeLocal();
+				
+				double angle = projectionDirection.angle(camera.getDirection());
+				double projectionDistance = (camera.getDistance()) / Math.cos(angle);
+				
+				Vector3 projection = projectionDirection.multiply(projectionDistance);
+				// projection.addLocal(camera.getPosition());
+				// projection.addLocal(camera.getPosition().subtract(eye));
+				projection.addLocal(camera.getPosition());
+				
+				/*
+				testNode.x = (float) projection.x();
+				testNode.y = (float) projection.y();
+				testNode.z = (float) projection.z();
+				*/
+				
+				// testNode.x = (float) nearPosition.x();
+				// testNode.y = (float) nearPosition.y();
+				// testNode.z = (float) nearPosition.z();
+				
+				// testNode.x = (float) eye.x();
+				// testNode.y = (float) eye.y();
+				// testNode.z = (float) eye.z();
+				
+				/*
+				System.out.println("percentMouseOffsetX: " + percentMouseOffsetX);
+				System.out.println("percentMouseOffsetY: " + percentMouseOffsetY);
+				System.out.println("nearX: " + nearX);
+				System.out.println("nearY: " + nearY);
+				*/
+				
+				// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
+				
+				performPick(gl, mouse.x(), mouse.y());
+			}
+			
 			mouse.update();
 		}
+	}
+	
+	private void performPick(GL2 gl, double x, double y) {
+		IntBuffer buffer = ByteBuffer.allocateDirect(256).asIntBuffer();
+		// int buffer[] = new int[256];
+		IntBuffer viewport = IntBuffer.allocate(4);
+		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
+		
+		gl.glSelectBuffer(256, buffer);
+	    gl.glRenderMode(GL2.GL_SELECT);
+	    gl.glInitNames();
+	    
+	    gl.glMatrixMode(GL2.GL_PROJECTION);
+	    gl.glPushMatrix();
+	    
+	    GLU glu = new GLU();
+	    gl.glLoadIdentity();
+	
+	    // System.out.println("viewport: " + viewport.get(0) + ", " + viewport.get(1) + 
+	    //		", " + viewport.get(2) + ", " + viewport.get(3));
+	    glu.gluPickMatrix(x, screenHeight - y, 2, 2, viewport);
+	    glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f, 50.0f);
+	    
+	    // don't think this ortho call is needed
+	    // gl.glOrtho(0.0, 8.0, 0.0, 8.0, -0.5, 2.5);
+	    
+	    //draw start
+	    gl.glMatrixMode(GL2.GL_MODELVIEW);
+	    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+	    gl.glLoadIdentity();
+	    
+	    //gl.glPushMatrix();
+		Vector3 position = camera.getPosition();
+		Vector3 target = camera.getTarget();
+		Vector3 up = camera.getUp();
+
+		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
+				target.y(), target.z(), up.x(), up.y(), up.z());
+
+		drawNodes(gl);
+		drawEdges(gl);
+		
+		//gl.glPopMatrix();
+	    //draw end
+		
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+	    gl.glPopMatrix();
+	    
+	    gl.glMatrixMode(GL2.GL_MODELVIEW);
+	    
+	    // not sure if this is needed
+	    // gl.glFlush();
+
+	    int hits = gl.glRenderMode(GL2.GL_RENDER);
+	    
+	    System.out.println("Number of hits: " + hits);
 	}
 
 	private void drawNodes(GL2 gl) {
@@ -357,6 +490,11 @@ public class Graphics implements GLEventListener {
 			gl.glCallList(nodeListIndex);
 			gl.glTranslatef(-x, -y, -z);		
 		}
+		
+		// Draw the testNode
+		gl.glTranslatef(testNode.x, testNode.y, testNode.z);
+		// gl.glCallList(nodeListIndex);
+		gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
 
 	private void drawEdges(GL2 gl) {
@@ -488,6 +626,9 @@ public class Graphics implements GLEventListener {
 
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
+		
+		screenHeight = height;
+		screenWidth = width;
 	}
 	
 	/*

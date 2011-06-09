@@ -56,8 +56,16 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 		return hasMoved;
 	}
 	
+	public int x() {
+		return currentX;
+	}
+	
 	public int dX() {
 		return currentX - prevX;
+	}
+	
+	public int y() {
+		return currentY;
 	}
 	
 	public int dY() {

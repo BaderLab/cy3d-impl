@@ -77,6 +77,10 @@ public class SimpleCamera {
 		return direction;
 	}
 	
+	public double getDistance() {
+		return distance;
+	}
+	
 	public void moveLeft() {
 		move(left, moveSpeed);
 	}
@@ -128,11 +132,11 @@ public class SimpleCamera {
 	}
 	
 	public void turnUp(double multiplier) {
-		turnVertical(multiplier * turnSpeed);
+		turnVertical(multiplier * -turnSpeed);
 	}
 	
 	public void turnDown(double multiplier) {
-		turnVertical(multiplier * -turnSpeed);
+		turnVertical(multiplier * turnSpeed);
 	}
 	
 	public void turnLeft() {
@@ -144,11 +148,11 @@ public class SimpleCamera {
 	}
 	
 	public void turnUp() {
-		turnVertical(turnSpeed);
+		turnVertical(-turnSpeed);
 	}
 	
 	public void turnDown() {
-		turnVertical(-turnSpeed);
+		turnVertical(turnSpeed);
 	}
 	
 	public void orbitLeft(double multiplier) {
