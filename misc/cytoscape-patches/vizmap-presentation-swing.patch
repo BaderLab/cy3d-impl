@@ -1,0 +1,24 @@
+### Eclipse Workspace Patch 1.0
+#P vizmap-gui-impl
+Index: src/main/resources/META-INF/spring/bundle-context-osgi-vizmapper.xml
+===================================================================
+--- src/main/resources/META-INF/spring/bundle-context-osgi-vizmapper.xml	(revision 25654)
++++ src/main/resources/META-INF/spring/bundle-context-osgi-vizmapper.xml	(working copy)
+@@ -53,12 +53,12 @@
+ 		interface="org.cytoscape.view.vizmap.VisualStyleFactory" />
+ 
+ 	<!-- For now, use DING rendering engine only. -->
+-	<osgi:reference id="dingVisualLexiconServiceRef"
+-		interface="org.cytoscape.view.model.VisualLexicon" filter="(id=ding)" />
++	<osgi:reference id="windVisualLexiconServiceRef"
++		interface="org.cytoscape.view.model.VisualLexicon" filter="(id=wind)" />
+ 
+-	<osgi:reference id="dingRenderingEngineFactoryServiceRef"
++	<osgi:reference id="windRenderingEngineFactoryServiceRef"
+ 		interface="org.cytoscape.view.presentation.RenderingEngineFactory"
+-		filter="(id=ding)" />
++		filter="(id=wind)" />
+ 
+ 	<!-- Visual Mapping Manager Service -->
+ 	<osgi:reference id="vmmServiceRef"
+#P presentation-impl
