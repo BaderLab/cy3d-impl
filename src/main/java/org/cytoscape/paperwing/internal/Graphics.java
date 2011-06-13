@@ -3,6 +3,7 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Set;
@@ -69,6 +70,8 @@ public class Graphics implements GLEventListener {
 
 	private int nodeSeed = 556;
 	private int edgeSeed = 556;
+	private int selected = -1;
+	private int hovered = -1;
 	
 	private KeyboardMonitor keys;
 	private MouseMonitor mouse;
@@ -93,7 +96,7 @@ public class Graphics implements GLEventListener {
 
 		// TODO: add default constant speeds for camera movement
 		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
-				new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
+				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4);
 		
 		this.networkView = networkView;
 		this.visualLexicon = visualLexicon;
@@ -145,8 +148,8 @@ public class Graphics implements GLEventListener {
 		// gl.glTranslated(-camera.x(), -camera.y(), -camera.z());
 
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-		//gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
-		//		FloatBuffer.wrap(lightPosition));
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
+				FloatBuffer.wrap(lightPosition));
 
 		gl.glColor3f(0.6f, 0.6f, 0.6f);
 		// gl.glTranslatef(0.0f, 0.0f, -6.0f);
@@ -349,7 +352,7 @@ public class Graphics implements GLEventListener {
 				camera.zoomOut((double) mouse.dWheel());
 			}
 			
-			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
+			if (mouse.getPressed().contains(MouseEvent.BUTTON1) || true) {
 				// Hnear = 2 * tan(fov / 2) * nearDist
 				// in our case: 
 				//   fov = 45 deg
@@ -415,15 +418,26 @@ public class Graphics implements GLEventListener {
 				
 				// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
 				
-				performPick(gl, mouse.x(), mouse.y());
+				int result = performPick(gl, mouse.x(), mouse.y());
+
+				hovered = result;
+				
+				if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
+					selected = result;
+				}
+				
 			}
 			
 			mouse.update();
 		}
 	}
 	
-	private void performPick(GL2 gl, double x, double y) {
-		IntBuffer buffer = ByteBuffer.allocateDirect(256).asIntBuffer();
+	private int performPick(GL2 gl, double x, double y) {
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(256);
+		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		// byteBuffer.
+		IntBuffer buffer = byteBuffer.asIntBuffer();
+		
 		// int buffer[] = new int[256];
 		IntBuffer viewport = IntBuffer.allocate(4);
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
@@ -459,6 +473,7 @@ public class Graphics implements GLEventListener {
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
 
+		gl.glPushName(-1);
 		drawNodes(gl);
 		drawEdges(gl);
 		
@@ -475,20 +490,58 @@ public class Graphics implements GLEventListener {
 
 	    int hits = gl.glRenderMode(GL2.GL_RENDER);
 	    
-	    System.out.println("Number of hits: " + hits);
+	    // System.out.println("Number of hits: " + hits);
+	    int selected;
+	    
+	    if (hits > 0) {
+	    	int max = buffer.get(2);
+	    	selected = buffer.get(3);
+	    	
+	    	for (int i = 0; i < hits; i++) {
+	    		
+	    		if (buffer.get(i * 4 + 2) < max) {
+	    			max = buffer.get(i * 4 + 2);
+	    	    	selected = buffer.get(i * 4 + 3);
+	    		}
+	    	}
+	    } else {
+	    	selected = -1;
+	    }
+	    
+	    return selected;
+    	
 	}
 
 	private void drawNodes(GL2 gl) {
 		float x, y, z;
+		int index;
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue() / 200.0f;
 			y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue() / 200.0f;
 			z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue() / 200.0f;
 			
+			index = nodeView.getModel().getIndex();
+			gl.glLoadName(index);
+			// gl.glLoadName(33);
+			
 			gl.glTranslatef(x, y, z);
-			gl.glCallList(nodeListIndex);
-			gl.glTranslatef(-x, -y, -z);		
+			
+			if (index == selected) {
+				gl.glColor3f(0.52f, 0.70f, 0.52f);
+				gl.glScalef(1.1f, 1.1f, 1.1f);
+				gl.glCallList(nodeListIndex);
+				gl.glScalef(1/1.1f, 1/1.1f, 1/1.1f);
+				gl.glColor3f(0.73f, 0.73f, 0.73f);
+			} else if (index == hovered) {
+				gl.glColor3f(0.52f, 0.52f, 0.70f);
+				gl.glCallList(nodeListIndex);
+				gl.glColor3f(0.73f, 0.73f, 0.73f);
+			} else {
+				gl.glCallList(nodeListIndex);
+			}
+			
+			gl.glTranslatef(-x, -y, -z);
 		}
 		
 		// Draw the testNode
@@ -549,6 +602,9 @@ public class Graphics implements GLEventListener {
 		//generateEdges();
 		startTime = System.nanoTime();
 		createDisplayLists(gl);
+		
+		// Correct lightning for scaling certain models
+		gl.glEnable(GL2.GL_NORMALIZE);
 	}
 
 	private void createDisplayLists(GL2 gl) {
