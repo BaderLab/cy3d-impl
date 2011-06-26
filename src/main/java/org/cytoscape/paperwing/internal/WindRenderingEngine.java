@@ -165,4 +165,9 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 		//return new ImageIcon();
 	}
 
+	public void printCanvas(java.awt.Graphics graphics) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
