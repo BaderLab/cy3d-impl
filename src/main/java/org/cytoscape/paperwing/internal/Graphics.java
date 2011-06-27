@@ -560,9 +560,9 @@ public class Graphics implements GLEventListener {
 		// Draw the testNode
 		gl.glTranslatef(testNode.x, testNode.y, testNode.z);
 		// gl.glCallList(nodeListIndex);
-		GLUT glut = new GLUT();
-		glut.glutSolidCylinder(EDGE_RADIUS, 1,
-				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
+		// GLUT glut = new GLUT();
+		// glut.glutSolidCylinder(EDGE_RADIUS, 1,
+		//		EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
 		gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
 
@@ -576,7 +576,7 @@ public class Graphics implements GLEventListener {
 
 			sourceView = networkView.getNodeView(edgeView.getModel().getSource());
 			targetView = networkView.getNodeView(edgeView.getModel().getTarget());
-			
+		
 			x1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
 			y1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
 			z1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
