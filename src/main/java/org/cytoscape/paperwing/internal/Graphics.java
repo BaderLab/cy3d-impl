@@ -18,6 +18,7 @@ import javax.media.opengl.glu.GLUquadric;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 import org.cytoscape.session.CyApplicationManager;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
@@ -30,12 +31,18 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 public class Graphics implements GLEventListener {
 
 	private static final float LARGE_SPHERE_RADIUS = 1.0f; // 1.5f
-	private static final float SMALL_SPHERE_RADIUS = 0.125f; // 0.015f
-	private static final float EDGE_RADIUS = 0.008f;
-
+	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
+	private static final float EDGE_RADIUS = 0.018f;
+	
+	/*
+	 * This value controls distance scaling when converting from node
+	 * coordinates to drawing coordinates
+	 */
+	private static final float DISTANCE_SCALE = 178.0f; 
+	
 	private static final int NODE_SLICES_DETAIL = 24;
 	private static final int NODE_STACKS_DETAIL = 24;
-	private static final int EDGE_SLICES_DETAIL = 3;
+	private static final int EDGE_SLICES_DETAIL = 12;
 	private static final int EDGE_STACKS_DETAIL = 1;
 
 	private class DrawnNode {
@@ -170,7 +177,7 @@ public class Graphics implements GLEventListener {
 			
 			if (pressed.contains(KeyEvent.VK_SPACE)) {
 				endTime = System.nanoTime();
-	
+
 				double duration = (endTime - startTime) / Math.pow(10, 9);
 				double frameRate = framesElapsed / duration;
 				System.out.println("Average fps over " + duration + " seconds: "
@@ -395,11 +402,13 @@ public class Graphics implements GLEventListener {
 				// projection.addLocal(camera.getPosition().subtract(eye));
 				projection.addLocal(camera.getPosition());
 				
-				/*
-				testNode.x = (float) projection.x();
-				testNode.y = (float) projection.y();
-				testNode.z = (float) projection.z();
-				*/
+				if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
+					/*
+					testNode.x = (float) projection.x();
+					testNode.y = (float) projection.y();
+					testNode.z = (float) projection.z();
+					*/
+				}
 				
 				// testNode.x = (float) nearPosition.x();
 				// testNode.y = (float) nearPosition.y();
@@ -424,6 +433,8 @@ public class Graphics implements GLEventListener {
 				
 				if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 					selected = result;
+					
+					System.out.println("Selected: " + selected);
 				}
 				
 			}
@@ -475,7 +486,7 @@ public class Graphics implements GLEventListener {
 
 		gl.glPushName(-1);
 		drawNodes(gl);
-		drawEdges(gl);
+		//drawEdges(gl);
 		
 		//gl.glPopMatrix();
 	    //draw end
@@ -493,7 +504,9 @@ public class Graphics implements GLEventListener {
 	    // System.out.println("Number of hits: " + hits);
 	    int selected;
 	    
-	    if (hits > 0) {
+		if (hits > 0) {
+			// The variable max helps keep track of the polygon that is closest
+			// to the front of the screen
 	    	int max = buffer.get(2);
 	    	selected = buffer.get(3);
 	    	
@@ -517,9 +530,9 @@ public class Graphics implements GLEventListener {
 		int index;
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue() / 200.0f;
-			y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue() / 200.0f;
-			z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue() / 200.0f;
+			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
+			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
+			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
 			
 			index = nodeView.getModel().getIndex();
 			gl.glLoadName(index);
@@ -547,10 +560,33 @@ public class Graphics implements GLEventListener {
 		// Draw the testNode
 		gl.glTranslatef(testNode.x, testNode.y, testNode.z);
 		// gl.glCallList(nodeListIndex);
+		GLUT glut = new GLUT();
+		glut.glutSolidCylinder(EDGE_RADIUS, 1,
+				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
 		gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
 
 	private void drawEdges(GL2 gl) {
+		View<CyNode> sourceView;
+		View<CyNode> targetView;
+		
+		float x1, x2, y1, y2, z1, z2;
+		
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+
+			sourceView = networkView.getNodeView(edgeView.getModel().getSource());
+			targetView = networkView.getNodeView(edgeView.getModel().getTarget());
+			
+			x1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
+			y1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
+			z1 = sourceView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
+		
+			x2 = targetView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
+			y2 = targetView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
+			z2 = targetView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
+		
+			drawSingleEdge(gl, x1, y1, z1, x2, y2, z2);
+		}
 
 		/*
 		// gl.glColor3f(0.9f, 0.1f, 0.1f);
@@ -571,6 +607,27 @@ public class Graphics implements GLEventListener {
 			gl.glTranslatef(-edges[i].x, -edges[i].y, -edges[i].z);
 		}
 		*/
+	}
+	
+	private void drawSingleEdge(GL2 gl, float x1, float y1, float z1, float x2,
+			float y2, float z2) {
+		gl.glPushMatrix();
+		
+		gl.glTranslatef(x1, y1, z1);
+		
+		Vector3 current = new Vector3(0, 0, 1);
+		Vector3 direction = new Vector3(x2 - x1, y2 - y1, z2 - z1);
+		
+		Vector3 rotateAxis = current.cross(direction);
+
+		// TODO: Consider using a Vector3f object for just floats
+		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
+				rotateAxis.z());
+		
+		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
+		gl.glCallList(edgeListIndex);
+		
+		gl.glPopMatrix();
 	}
 
 	private void drawNodesEdges(GL2 gl) {

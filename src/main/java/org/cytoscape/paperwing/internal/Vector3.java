@@ -103,6 +103,10 @@ public class Vector3 {
 		}
 	}
 	
+	public double magnitude() {
+		return Math.sqrt(x * x + y * y + z * z);
+	}
+	
 	public void normalizeLocal() {
 		double length = Math.sqrt(x * x + y * y + z * z);
 		if (length > Double.MIN_NORMAL) {

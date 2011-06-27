@@ -33,72 +33,15 @@ public class WindMapRenderingEngineFactory implements RenderingEngineFactory<CyN
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
+		
+		// TestGraphics.initSingleton();
+		Graphics.initSingleton();
+		WindRenderingEngine.setNetworkViewManager(networkViewManager);
 	}
 	
 	@Override
 	public RenderingEngine<CyNetwork> getInstance(
 			Object container, View<CyNetwork> viewModel) {
-
-		if (container instanceof JComponent) {
-			System.out.println("map getInstance called");
-			
-			JComponent component = (JComponent) container;
-			// component.removeAll();
-			// System.out.println("number of components in container after remove: " + component.getComponents().length);
-			
-			// Use the system's default version of OpenGL
-			GLProfile profile = GLProfile.getDefault();
-			
-			// TODO: changed true to false, check for performance difference
-			// GLProfile.initSingleton(false);
-
-			GLCapabilities capabilities = new GLCapabilities(profile);
-
-			// TODO: check whether to use GLCanvas or GLJPanel
-			// GLCanvas canvas = new GLCanvas(capabilities);
-			GLJPanel canvas = new GLJPanel(capabilities);
-			// canvas.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-			TestGraphics graphics = new TestGraphics();
-
-			canvas.addGLEventListener(graphics);
-	
-			if (container instanceof JInternalFrame) {
-				JInternalFrame frame = (JInternalFrame) container;
-				Container pane = frame.getContentPane();
-				
-				graphics.trackInput(pane);
-				
-				/*
-				JPanel panel = new JPanel();
-				panel.setLayout(new BorderLayout());
-				panel.add(canvas, BorderLayout.CENTER);
-				component.add(panel, BorderLayout.CENTER);
-				*/
-				
-				pane.setLayout(new BorderLayout());
-				pane.add(canvas, BorderLayout.CENTER);
-				
-				// TODO: check if this line needed
-				pane.setVisible(true);
-			} else {
-				graphics.trackInput(component);
-				// graphics.trackInput(canvas);
-				
-				component.setLayout(new BorderLayout());
-				// component.add(canvas, BorderLayout.CENTER);
-			}
-			
-			graphics.setManagers(null, null, networkViewManager, renderingEngineManager);
-			
-			//FPSAnimator animator = new FPSAnimator(60);
-			//animator.add(canvas);
-			//animator.start();
-			
-			// Animator animator = new Animator(canvas);
-			// animator.setRunAsFastAsPossible(true);
-			// animator.start();
-		}
 		
 		/* For code below, seems that NetworkViewManager does not contain references to all available NetworkViews
 		 */
@@ -117,21 +60,17 @@ public class WindMapRenderingEngineFactory implements RenderingEngineFactory<CyN
 			System.out.println("current model: " + view.getModel());
 			System.out.println("current model suid: " + view.getModel().getSUID());
 			System.out.println("current suid: " + view.getSUID());
-			
-			
+				
 		}
-		// viewModel.getModel().
-		
-		System.out.println("Returning networkView: " + networkView);
 		*/
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		WindRenderingEngine engine = new WindRenderingEngine(networkViewManager, viewModel, visualLexicon);
+		WindRenderingEngine engine = new WindRenderingEngine(container, viewModel, visualLexicon);
 		System.out.println("map returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);
 		
+		System.out.println("map engine active?: " + engine.isActive());
 		
-		// TODO Auto-generated method stub
 		return engine;
 	}
 
