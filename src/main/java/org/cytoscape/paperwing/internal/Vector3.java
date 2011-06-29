@@ -73,7 +73,9 @@ public class Vector3 {
 		// TODO: Check if alternative is needed to prevent NaN
 		double cosArgument = (x * other.x + y * other.y + z * other.z)/Math.sqrt(lengthSquare * otherLengthSquare);
 		
-		if (cosArgument >= 1) {
+		if (Double.isNaN(cosArgument)) {
+			return 0;
+		} else if (cosArgument >= 1) {
 			return 0;
 		} else if (cosArgument <= -1) {
 			return Math.PI;

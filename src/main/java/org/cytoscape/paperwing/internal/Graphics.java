@@ -700,27 +700,29 @@ public class Graphics implements GLEventListener {
 			// Extend by c * tan(theta/2)
 			extend2 = EDGE_RADIUS * Math.tan(currentAngle / 2);
 	
-			// TODO: Find alternative
-			if (Double.isNaN(extend2)) {
-				extend2 = 0;
-			}
-			
-//			if (framesElapsed == 2) {
-//				System.out.println("Segment: " + i);
-//				System.out.println("Current segment angle: " + currentAngle);
-//				System.out.println("Current extend1: " + extend1);
-//				System.out.println("Current extend2: " + extend2);
-//			}
 			
 			direction = points[i + 1].subtract(points[i]);
 			direction.normalizeLocal();
-			drawSingleEdge(gl, 
-					points[i].subtract(direction.multiply(extend1)),
-			 		points[i + 1].add(direction.multiply(extend2)));
+	
+			if (framesElapsed == 2) {
+				System.out.println("Segment: " + i);
+				System.out.println("Current segment angle: " + currentAngle);
+				System.out.println("Current extend1: " + extend1);
+				System.out.println("Current extend2: " + extend2);
+				System.out.println("Current p0: " + p0);
+				System.out.println("Current p1: " + p1);
+				System.out.println("Current p2: " + p2);
+				System.out.println("Current direction: " + direction);
+				
+			}
 			
 //			drawSingleEdge(gl, 
-//					points[i],
-//					points[i + 1]);
+//					points[i].subtract(direction.multiply(extend1)),
+//			 		points[i + 1].add(direction.multiply(extend2)));
+			
+			drawSingleEdge(gl, 
+					points[i],
+					points[i + 1]);
 			
 			extend1 = extend2;
 		}
