@@ -44,6 +44,10 @@ public class Vector3 {
 		z = other.z;
 	}
 	
+	public Vector3 add(Vector3 other) {
+		return new Vector3(x + other.x, y + other.y, z + other.z);
+	}
+	
 	public void addLocal(Vector3 other) {
 		x += other.x;
 		y += other.y;
@@ -66,14 +70,26 @@ public class Vector3 {
 		double lengthSquare = x * x + y * y + z * z;
 		double otherLengthSquare = other.x * other.x + other.y * other.y + other.z * other.z;
 		
-		double angle = Math.acos((x * other.x + y * other.y + z * other.z)/Math.sqrt(lengthSquare * otherLengthSquare));
+		// TODO: Check if alternative is needed to prevent NaN
+		double cosArgument = (x * other.x + y * other.y + z * other.z)/Math.sqrt(lengthSquare * otherLengthSquare);
 		
-		return angle;
+		if (cosArgument >= 1) {
+			return 0;
+		} else if (cosArgument <= -1) {
+			return Math.PI;
+		} else {
+			return Math.acos(cosArgument);
+		}
 	}
 	
 	public Vector3 cross(Vector3 other) {
 		return new Vector3(y * other.z - z * other.y,
 				z * other.x - x * other.z, x * other.y - y * other.x);
+	}
+	
+	public Vector3 cross(double x, double y, double z) {
+		return new Vector3(this.y * z - this.z * y,
+				this.z * x - this.x * z, this.x * y - this.y * x);
 	}
 	
 	public double dot(Vector3 other) {
@@ -92,6 +108,12 @@ public class Vector3 {
 		x = scalar * x;
 		y = scalar * y;
 		z = scalar * z;
+	}
+	
+	public void divideLocal(double scalar) {
+		x = x / scalar;
+		y = y / scalar;
+		z = z / scalar;
 	}
 	
 	public Vector3 normalize() {

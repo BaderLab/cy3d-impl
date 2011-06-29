@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -33,6 +34,10 @@ public class Graphics implements GLEventListener {
 	private static final float LARGE_SPHERE_RADIUS = 1.0f; // 1.5f
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
 	private static final float EDGE_RADIUS = 0.018f;
+	
+	private static final float EDGE_CURVE_DISTANCE = 0.7f;
+	private static final float EDGE_CURVE_FACTOR = 0.31f;
+	private static final int EDGES_PER_RADIUS = 3;
 	
 	/*
 	 * This value controls distance scaling when converting from node
@@ -68,7 +73,7 @@ public class Graphics implements GLEventListener {
 
 	private int nodeListIndex;
 	private int edgeListIndex;
-
+	
 	private long startTime;
 	private long endTime;
 	private int framesElapsed = 0;
@@ -182,6 +187,9 @@ public class Graphics implements GLEventListener {
 				double frameRate = framesElapsed / duration;
 				System.out.println("Average fps over " + duration + " seconds: "
 						+ frameRate);
+				
+				startTime = System.nanoTime();
+				framesElapsed = 0;
 			}
 			
 			if (pressed.contains(KeyEvent.VK_C)) {
@@ -323,11 +331,11 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (held.contains(KeyEvent.VK_W)) {
-				camera.moveForward();
+				camera.moveUp();
 			}
 			
 			if (held.contains(KeyEvent.VK_S)) {
-				camera.moveBackward();
+				camera.moveDown();
 			}
 			
 			if (held.contains(KeyEvent.VK_A)) {
@@ -339,11 +347,11 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (held.contains(KeyEvent.VK_Q)) {
-				camera.moveDown();
+				camera.moveBackward();
 			}
 			
 			if (held.contains(KeyEvent.VK_E)) {
-				camera.moveUp();
+				camera.moveForward();
 			}
 			
 			keys.update();
@@ -570,6 +578,182 @@ public class Graphics implements GLEventListener {
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
 		
+		int nodeCount = networkView.getModel().getNodeCount();
+		
+		int sourceIndex;
+		int targetIndex;
+		
+		// A unique identifier (as far as this method is concerned) for each pair of nodes
+		long pairIdentifier;
+		
+		TreeMap<Long, Integer> pairs = new TreeMap<Long, Integer>();
+		
+		// Points 0 and 2 represent endpoints of the quadratic Bezier curve, while
+		// point 1 represents the approach point
+		Vector3 p0 = new Vector3();
+		Vector3 p1 = new Vector3();
+		Vector3 p2 = new Vector3();
+		
+		Vector3 p1Offset;
+		Vector3 direction;
+		
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+
+			sourceView = networkView.getNodeView(edgeView.getModel().getSource());
+			targetView = networkView.getNodeView(edgeView.getModel().getTarget());
+			sourceIndex = sourceView.getModel().getIndex();
+			targetIndex = targetView.getModel().getIndex();
+			
+			// These indices rely on CyNode's guarantee that NodeIndex < NumOfNodes
+			assert sourceIndex < nodeCount;
+			assert targetIndex < nodeCount;
+			
+			// Identify this pair of nodes so we'll know if we've drawn an edge between them before
+			if (sourceIndex > targetIndex) {
+				pairIdentifier = nodeCount * targetIndex + targetIndex;
+			} else {
+				pairIdentifier = nodeCount * sourceIndex + sourceIndex;
+			}
+			
+			// Have we visited an edge between these nodes before?
+			if (pairs.containsKey(pairIdentifier)) {
+				pairs.put(pairIdentifier, pairs.get(pairIdentifier) + 1);
+			} else {
+				pairs.put(pairIdentifier, 1);
+			}
+		
+			// Find p0, p1, p2 for the Bezier curve
+			p0.set(sourceView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+					sourceView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+					sourceView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+			p0.divideLocal(DISTANCE_SCALE);
+			
+			p2.set(targetView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+					targetView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+					targetView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+			p2.divideLocal(DISTANCE_SCALE);
+			
+			p1 = p0.add(p2);
+			p1.divideLocal(2);
+			
+			direction = p2.subtract(p0);
+			p1Offset = direction.cross(0, 1, 0);
+			p1Offset.normalizeLocal();
+			p1Offset.multiplyLocal(EDGE_CURVE_FACTOR * Math.sqrt(direction.magnitude()));
+			
+			p1.addLocal(p1Offset);
+			p1.rotate(direction, 2 * Math.PI * (pairs.get(pairIdentifier) - 1) / EDGES_PER_RADIUS);
+	
+			drawQuadraticEdge(gl, p0, p1, p2, 5);
+		}
+	}
+	
+	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments) {
+		// Equation for Quadratic Bezier curve:
+		// B(t) = (1 - t)^2P0 + 2(1 - t)tP1 + t^2P2, t in [0, 1]
+		
+		double parameter;
+		
+		Vector3 current;
+		Vector3[] points = new Vector3[numSegments + 1];
+		double[] pointAngle = new double[numSegments + 1];
+		
+		Vector3 lastDirection = null;
+		Vector3 currentDirection;
+		
+		points[0] = new Vector3(p0);
+		for (int i = 1; i < numSegments; i++) {
+			// Obtain points along the Bezier curve
+			parameter = (double) i / numSegments;
+			
+			current = p0.multiply(Math.pow(1 - parameter, 2));
+			current.addLocal(p1.multiply(2 * (1 - parameter) * parameter));
+			current.addLocal(p2.multiply(parameter * parameter));
+			
+			points[i] = new Vector3(current);
+			
+			// Obtain the angle between the ith and (i - 1)th segment, for i in the open interval (1, numSegments)
+			currentDirection = points[i].subtract(points[i - 1]);
+			if (lastDirection != null) {
+				// Note that this loop can only find the angle at the (i - 1)th point
+				pointAngle[i - 1] = lastDirection.angle(currentDirection);
+			}
+			lastDirection = currentDirection;
+		}
+		
+		// Obtain the angle between the last 2 segments, if there is more than 1 segment
+		if (numSegments > 1) {
+			pointAngle[numSegments - 1] = p2.subtract(points[numSegments - 1]).angle(lastDirection);
+		}
+		points[numSegments] = new Vector3(p2);
+		
+		double currentAngle;
+		double extend1 = 0;
+		double extend2;
+		Vector3 direction;
+		for (int i = 0; i < numSegments; i++) {
+			currentAngle = pointAngle[i + 1];
+			
+			// currentAngle is likely calculated from an acos operation
+			assert (!Double.isNaN(currentAngle));
+			
+			// Extend by c * tan(theta/2)
+			extend2 = EDGE_RADIUS * Math.tan(currentAngle / 2);
+	
+			// TODO: Find alternative
+			if (Double.isNaN(extend2)) {
+				extend2 = 0;
+			}
+			
+//			if (framesElapsed == 2) {
+//				System.out.println("Segment: " + i);
+//				System.out.println("Current segment angle: " + currentAngle);
+//				System.out.println("Current extend1: " + extend1);
+//				System.out.println("Current extend2: " + extend2);
+//			}
+			
+			direction = points[i + 1].subtract(points[i]);
+			direction.normalizeLocal();
+			drawSingleEdge(gl, 
+					points[i].subtract(direction.multiply(extend1)),
+			 		points[i + 1].add(direction.multiply(extend2)));
+			
+//			drawSingleEdge(gl, 
+//					points[i],
+//					points[i + 1]);
+			
+			extend1 = extend2;
+		}
+		
+		
+	}
+	
+	private void drawQuadraticEdgeOld(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments) {
+		// Equation for Quadratic Bezier curve:
+		// B(t) = (1 - t)^2P0 + 2(1 - t)tP1 + t^2P2, t in [0, 1]
+		
+		double parameter;
+		
+		Vector3 current = p0;
+		Vector3 next;
+		
+		for (int i = 1; i < numSegments; i++) {
+			parameter = (double) i / numSegments;
+			
+			next = p0.multiply(Math.pow(1 - parameter, 2));
+			next.addLocal(p1.multiply(2 * (1 - parameter) * parameter));
+			next.addLocal(p2.multiply(parameter * parameter));
+			
+			drawSingleEdge(gl, current, next);
+			
+			current = next;
+		}
+	}
+	
+	private void drawEdgesOld(GL2 gl) {
+		View<CyNode> sourceView;
+		View<CyNode> targetView;
+		
 		float x1, x2, y1, y2, z1, z2;
 		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
@@ -585,48 +769,27 @@ public class Graphics implements GLEventListener {
 			y2 = targetView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
 			z2 = targetView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
 		
-			drawSingleEdge(gl, x1, y1, z1, x2, y2, z2);
+			// drawSingleEdge(gl, x1, y1, z1, x2, y2, z2);
 		}
-
-		/*
-		// gl.glColor3f(0.9f, 0.1f, 0.1f);
-		for (int i = 0; i < EDGE_COUNT; i++) {
-			gl.glTranslatef(edges[i].x, edges[i].y, edges[i].z);
-			gl.glRotatef(edges[i].rotateAngle, edges[i].rotateAxisX,
-					edges[i].rotateAxisY, edges[i].rotateAxisZ);
-			gl.glScalef(1.0f, 1.0f, edges[i].length);
-			gl.glCallList(edgeListIndex);
-			gl.glScalef(1.0f, 1.0f, 1.0f / edges[i].length);
-			// glut.glutSolidCylinder(EDGE_RADIUS, edges[i].length,
-			// EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
-
-			// gl.glCallList(nodeListIndex);
-			// Undo the transformation operations we performed above
-			gl.glRotatef(-edges[i].rotateAngle, edges[i].rotateAxisX,
-					edges[i].rotateAxisY, edges[i].rotateAxisZ);
-			gl.glTranslatef(-edges[i].x, -edges[i].y, -edges[i].z);
-		}
-		*/
 	}
 	
-	private void drawSingleEdge(GL2 gl, float x1, float y1, float z1, float x2,
-			float y2, float z2) {
+	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end) {
 		gl.glPushMatrix();
 		
-		gl.glTranslatef(x1, y1, z1);
+		// TODO: Consider using a Vector3f object for just floats, to use translatef instead of translated
+		gl.glTranslated(start.x(), start.y(), start.z());
 		
 		Vector3 current = new Vector3(0, 0, 1);
-		Vector3 direction = new Vector3(x2 - x1, y2 - y1, z2 - z1);
+		Vector3 direction = end.subtract(start);
 		
 		Vector3 rotateAxis = current.cross(direction);
 
-		// TODO: Consider using a Vector3f object for just floats
 		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
 				rotateAxis.z());
 		
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
 		gl.glCallList(edgeListIndex);
-		
+	
 		gl.glPopMatrix();
 	}
 
@@ -667,7 +830,7 @@ public class Graphics implements GLEventListener {
 	private void createDisplayLists(GL2 gl) {
 		nodeListIndex = gl.glGenLists(1);
 		edgeListIndex = gl.glGenLists(1);
-
+		
 		GLUT glut = new GLUT();
 		GLU glu = new GLU();
 
@@ -685,8 +848,6 @@ public class Graphics implements GLEventListener {
 		gl.glNewList(edgeListIndex, GL2.GL_COMPILE);
 		glu.gluCylinder(quadric, EDGE_RADIUS, EDGE_RADIUS, 1.0,
 				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
-		// glut.glutSolidCylinder(EDGE_RADIUS, 1.0f, EDGE_SLICES_DETAIL,
-		// EDGE_STACKS_DETAIL);
 		gl.glEndList();
 	}
 
