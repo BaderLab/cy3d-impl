@@ -6,8 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -20,6 +22,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 import org.cytoscape.session.CyApplicationManager;
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
@@ -33,10 +36,12 @@ public class Graphics implements GLEventListener {
 
 	private static final float LARGE_SPHERE_RADIUS = 1.0f; // 1.5f
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
+	private static final float MINIMUM_EDGE_DRAW_DISTANCE_SQUARED = Float.MIN_NORMAL; // 0.015f
+	
 	private static final float EDGE_RADIUS = 0.018f;
 	
 	private static final float EDGE_CURVE_DISTANCE = 0.7f;
-	private static final float EDGE_CURVE_FACTOR = 0.31f;
+	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
 	private static final int EDGES_PER_RADIUS = 3;
 	
 	/*
@@ -45,9 +50,9 @@ public class Graphics implements GLEventListener {
 	 */
 	private static final float DISTANCE_SCALE = 178.0f; 
 	
-	private static final int NODE_SLICES_DETAIL = 24;
-	private static final int NODE_STACKS_DETAIL = 24;
-	private static final int EDGE_SLICES_DETAIL = 12;
+	private static final int NODE_SLICES_DETAIL = 10; // 24, 24, 12 used to be default values for slices/stacks/slices
+	private static final int NODE_STACKS_DETAIL = 10;
+	private static final int EDGE_SLICES_DETAIL = 4;
 	private static final int EDGE_STACKS_DETAIL = 1;
 
 	private class DrawnNode {
@@ -74,6 +79,8 @@ public class Graphics implements GLEventListener {
 	private int nodeListIndex;
 	private int edgeListIndex;
 	
+	private int pointerListIndex;
+	
 	private long startTime;
 	private long endTime;
 	private int framesElapsed = 0;
@@ -82,8 +89,12 @@ public class Graphics implements GLEventListener {
 
 	private int nodeSeed = 556;
 	private int edgeSeed = 556;
-	private int selected = -1;
-	private int hovered = -1;
+	
+	private LinkedHashSet<CyNode> selectedNodes;
+	private TreeSet<Integer> selectedNodeIndices;
+	
+	private static final int NO_INDEX = -1; // Value representing that no node index is being held
+	private int hovered = NO_INDEX;
 	
 	private KeyboardMonitor keys;
 	private MouseMonitor mouse;
@@ -112,6 +123,9 @@ public class Graphics implements GLEventListener {
 		
 		this.networkView = networkView;
 		this.visualLexicon = visualLexicon;
+		
+		selectedNodes = new LinkedHashSet<CyNode>();
+		selectedNodeIndices = new TreeSet<Integer>();
 	}
 	
 	public void trackInput(Component component) {
@@ -159,6 +173,22 @@ public class Graphics implements GLEventListener {
 		// normal.y(), normal.z());
 		// gl.glTranslated(-camera.x(), -camera.y(), -camera.z());
 
+		double distance = target.distance(position);
+		Vector3 leftPointer = target.add(camera.getLeft().multiply(distance / 2));
+		Vector3 rightPointer = target.subtract(camera.getLeft().multiply(distance / 2));
+		
+		gl.glPushMatrix();
+		gl.glTranslated(leftPointer.x(), leftPointer.y(), leftPointer.z());
+		gl.glColor3f(1.0f, 0.0f, 0.0f);
+		gl.glCallList(pointerListIndex);
+		gl.glPopMatrix();
+		
+		gl.glPushMatrix();
+		gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
+		gl.glColor3f(1.0f, 0.0f, 0.0f);
+		gl.glCallList(pointerListIndex);
+		gl.glPopMatrix();
+		
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 				FloatBuffer.wrap(lightPosition));
@@ -168,7 +198,9 @@ public class Graphics implements GLEventListener {
 
 		gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
-		gl.glColor3f(0.53f, 0.53f, 0.55f);
+		gl.glColor3f(0.51f, 0.51f, 0.53f);
+		//gl.glColor3f(0.53f, 0.53f, 0.55f);
+		//gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawEdges(gl);
 
 		framesElapsed++;
@@ -197,7 +229,7 @@ public class Graphics implements GLEventListener {
 						new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
 			}
 			
-			if (pressed.contains(KeyEvent.VK_SPACE)) {
+			if (pressed.contains(KeyEvent.VK_SPACE) && false) {
 				System.out.println("===");
 				System.out.print("direction: " + camera.getDirection());
 				System.out.print(", left: " + camera.getLeft());
@@ -327,7 +359,37 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (pressed.contains(KeyEvent.VK_J)) {
-				System.out.println("number of nodes: " + networkView.getNodeViews().size());
+				CyNode hoverNode = networkView.getModel().getNode(hovered);
+				
+				if (hoverNode != null) {
+					
+					for (CyNode node : selectedNodes) {
+						networkView.getModel().addEdge(node, hoverNode, false);
+						
+						// TODO: Not sure if this call is needed
+						networkView.updateView();
+					};
+				}
+			}
+			
+			if (pressed.contains(KeyEvent.VK_O)) {
+				CyNode hoverNode = networkView.getModel().getNode(hovered);
+				
+				if (hoverNode != null && selectedNodes.size() == 1) {
+					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
+					View<CyNode> selectView = hoverView;
+					for (CyNode node : selectedNodes) {selectView = networkView.getNodeView(node);};
+					
+					Vector3 hover = new Vector3(hoverView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+							hoverView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+							hoverView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+					
+					Vector3 select = new Vector3(selectView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+							selectView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+							selectView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+					
+					System.out.println("Distance: " + hover.distance(select)/DISTANCE_SCALE);
+				}
 			}
 			
 			if (held.contains(KeyEvent.VK_W)) {
@@ -354,11 +416,31 @@ public class Graphics implements GLEventListener {
 				camera.moveForward();
 			}
 			
+			if (pressed.contains(KeyEvent.VK_DELETE)) {
+				LinkedHashSet<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
+				
+				for (CyNode node : selectedNodes) {
+					// TODO: Check if use of Type.ANY for any edge is correct
+					// TODO: Check if this addAll method properly skips adding edges already in the edgesToBeRemovedList
+					edgesToBeRemoved.addAll(networkView.getModel().getAdjacentEdgeList(node, Type.ANY));
+				}
+				
+				if (!networkView.getModel().removeNodes(selectedNodes)) {
+					System.out.println("Failed to deleted nodes: " + selectedNodes);;
+				} else {
+					// Remove edges attached to the node
+					networkView.getModel().removeEdges(edgesToBeRemoved);
+					
+					// TODO: Not sure if this call is needed
+					networkView.updateView();
+				}	
+			}
+			
 			keys.update();
 		}
 		
 		if (mouse.hasMoved() || mouse.hasNew()) {
-			if (keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+			if (keys.getHeld().contains(KeyEvent.VK_ALT)) {
 				camera.turnRight(mouse.dX());
 				camera.turnDown(mouse.dY());
 			}
@@ -367,84 +449,124 @@ public class Graphics implements GLEventListener {
 				camera.zoomOut((double) mouse.dWheel());
 			}
 			
-			if (mouse.getPressed().contains(MouseEvent.BUTTON1) || true) {
-				// Hnear = 2 * tan(fov / 2) * nearDist
-				// in our case: 
-				//   fov = 45 deg
-				//   nearDist = 0.2
-				
-				double fieldOfView = Math.PI / 4;
-				double nearDistance = 0.2;
-				
-				
-				double nearPlaneHeight = 2 * Math.tan(fieldOfView / 2) * nearDistance;
-				double nearPlaneWidth = nearPlaneHeight * screenWidth / screenHeight;
-				
-				double percentMouseOffsetX = (double) (mouse.x() - screenWidth) / screenWidth + 0.5;
-				double percentMouseOffsetY = (double) (mouse.y() - screenHeight) / screenHeight + 0.5;
-				
-				// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
-				percentMouseOffsetY = -percentMouseOffsetY;
-				
-				double nearX = percentMouseOffsetX * nearPlaneWidth;
-				double nearY = percentMouseOffsetY * nearPlaneHeight;
-				
-				// Obtain the near plane position vector
-				Vector3 nearPosition;
-				nearPosition = new Vector3(camera.getDirection());
-				nearPosition.multiplyLocal(nearDistance);
-				
-				nearPosition.addLocal(camera.getPosition());
-				nearPosition.addLocal(camera.getUp().multiply(nearY));
-				nearPosition.addLocal(camera.getLeft().multiply(-nearX)); // Note that nearX is positive to the right
-				
-				// Obtain the projection direction vector
-				Vector3 projectionDirection = nearPosition.subtract(camera.getPosition());
-				projectionDirection.normalizeLocal();
-				
-				double angle = projectionDirection.angle(camera.getDirection());
-				double projectionDistance = (camera.getDistance()) / Math.cos(angle);
-				
-				Vector3 projection = projectionDirection.multiply(projectionDistance);
-				// projection.addLocal(camera.getPosition());
-				// projection.addLocal(camera.getPosition().subtract(eye));
-				projection.addLocal(camera.getPosition());
-				
-				if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
-					/*
-					testNode.x = (float) projection.x();
-					testNode.y = (float) projection.y();
-					testNode.z = (float) projection.z();
-					*/
-				}
-				
-				// testNode.x = (float) nearPosition.x();
-				// testNode.y = (float) nearPosition.y();
-				// testNode.z = (float) nearPosition.z();
-				
-				// testNode.x = (float) eye.x();
-				// testNode.y = (float) eye.y();
-				// testNode.z = (float) eye.z();
-				
-				/*
-				System.out.println("percentMouseOffsetX: " + percentMouseOffsetX);
-				System.out.println("percentMouseOffsetY: " + percentMouseOffsetY);
-				System.out.println("nearX: " + nearX);
-				System.out.println("nearY: " + nearY);
-				*/
-				
-				// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
-				
-				int result = performPick(gl, mouse.x(), mouse.y());
+			// Perform calculations for real-time node picking:
+			//-------------------------------------------------
+			
+			// Hnear = 2 * tan(fov / 2) * nearDist
+			// in our case: 
+			//   fov = 45 deg
+			//   nearDist = 0.2
+			
+			double fieldOfView = Math.PI / 4;
+			double nearDistance = 0.2;
+			
+			double nearPlaneHeight = 2 * Math.tan(fieldOfView / 2) * nearDistance;
+			double nearPlaneWidth = nearPlaneHeight * screenWidth / screenHeight;
+			
+			double percentMouseOffsetX = (double) (mouse.x() - screenWidth) / screenWidth + 0.5;
+			double percentMouseOffsetY = (double) (mouse.y() - screenHeight) / screenHeight + 0.5;
+			
+			// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
+			percentMouseOffsetY = -percentMouseOffsetY;
+			
+			double nearX = percentMouseOffsetX * nearPlaneWidth;
+			double nearY = percentMouseOffsetY * nearPlaneHeight;
+			
+			// Obtain the near plane position vector
+			Vector3 nearPosition;
+			nearPosition = new Vector3(camera.getDirection());
+			nearPosition.multiplyLocal(nearDistance);
+			
+			nearPosition.addLocal(camera.getPosition());
+			nearPosition.addLocal(camera.getUp().multiply(nearY));
+			nearPosition.addLocal(camera.getLeft().multiply(-nearX)); // Note that nearX is positive to the right
+			
+			// Obtain the projection direction vector
+			Vector3 projectionDirection = nearPosition.subtract(camera.getPosition());
+			projectionDirection.normalizeLocal();
+			
+			double angle = projectionDirection.angle(camera.getDirection());
+			double projectionDistance = (camera.getDistance()) / Math.cos(angle);
+			
+			Vector3 projection = projectionDirection.multiply(projectionDistance);
+			// projection.addLocal(camera.getPosition());
+			// projection.addLocal(camera.getPosition().subtract(eye));
+			projection.addLocal(camera.getPosition());
+			
+			// Code for testing functionality of converting mouse coordinates to 3D coordinates
+			/*
+			testNode.x = (float) projection.x();
+			testNode.y = (float) projection.y();
+			testNode.z = (float) projection.z();
+			*/
+			
+			// testNode.x = (float) nearPosition.x();
+			// testNode.y = (float) nearPosition.y();
+			// testNode.z = (float) nearPosition.z();
+			
+			// testNode.x = (float) eye.x();
+			// testNode.y = (float) eye.y();
+			// testNode.z = (float) eye.z();
+			
+			/*
+			System.out.println("percentMouseOffsetX: " + percentMouseOffsetX);
+			System.out.println("percentMouseOffsetY: " + percentMouseOffsetY);
+			System.out.println("nearX: " + nearX);
+			System.out.println("nearY: " + nearY);
+			*/
+			
+			// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
+			
+			int result = performPick(gl, mouse.x(), mouse.y());
 
-				hovered = result;
+			hovered = result;
+			
+			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 				
-				if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
-					selected = result;
+				// If control was pressed, prepare to add a node
+				if (keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 					
-					System.out.println("Selected: " + selected);
+					CyNode added = networkView.getModel().addNode();
+					networkView.updateView();
+					
+					View<CyNode> viewAdded = networkView.getNodeView(added);
+					
+					// TODO: Maybe throw an exception if viewAdded is null
+					if (viewAdded != null) {
+						viewAdded.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, projection.x() * DISTANCE_SCALE);
+						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, projection.y() * DISTANCE_SCALE);
+						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, projection.z() * DISTANCE_SCALE);
+						
+						// Update the hovered node
+						// TODO: This might not be needed if the node were added through some way other than the mouse
+						hovered = added.getIndex();
+					}
+				// Otherwise, prepare to select the node currently under the mouse cursor
+				} else {
+					CyNode picked = networkView.getModel().getNode(result);
+					
+					// TODO: Perhaps throw exception if the node was found to be null, ie. invalid index
+					// Note though the above case could also be caused by picked == NO_INDEX
+					if (picked != null) {
+			
+						// If the user did not hold down shift, unselect other nodes
+						if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+							
+							selectedNodes.clear();
+							selectedNodeIndices.clear();
+						}
+						
+						if (selectedNodes.contains(picked)) {
+							selectedNodes.remove(picked);
+							selectedNodeIndices.remove(picked.getIndex());
+						} else {
+							selectedNodes.add(picked);
+							selectedNodeIndices.add(picked.getIndex());
+						}
+						
+						System.out.println("Selected node index: " + picked.getIndex());
+					}
 				}
-				
 			}
 			
 			mouse.update();
@@ -492,7 +614,7 @@ public class Graphics implements GLEventListener {
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
 
-		gl.glPushName(-1);
+		gl.glPushName(NO_INDEX);
 		drawNodes(gl);
 		//drawEdges(gl);
 		
@@ -526,7 +648,7 @@ public class Graphics implements GLEventListener {
 	    		}
 	    	}
 	    } else {
-	    	selected = -1;
+	    	selected = NO_INDEX;
 	    }
 	    
 	    return selected;
@@ -548,7 +670,7 @@ public class Graphics implements GLEventListener {
 			
 			gl.glTranslatef(x, y, z);
 			
-			if (index == selected) {
+			if (selectedNodeIndices.contains(index)) {
 				gl.glColor3f(0.52f, 0.70f, 0.52f);
 				gl.glScalef(1.1f, 1.1f, 1.1f);
 				gl.glCallList(nodeListIndex);
@@ -639,16 +761,23 @@ public class Graphics implements GLEventListener {
 			direction = p2.subtract(p0);
 			p1Offset = direction.cross(0, 1, 0);
 			p1Offset.normalizeLocal();
-			p1Offset.multiplyLocal(EDGE_CURVE_FACTOR * Math.sqrt(direction.magnitude()));
+			
+			// Shift the square root graph one to the left and one down to get smoother curves
+			p1Offset.multiplyLocal(EDGE_CURVE_FACTOR * (Math.sqrt(direction.magnitude() + 1) - 1));
 			
 			p1.addLocal(p1Offset);
 			p1.rotate(direction, 2 * Math.PI * (pairs.get(pairIdentifier) - 1) / EDGES_PER_RADIUS);
-	
-			drawQuadraticEdge(gl, p0, p1, p2, 5);
+		
+			drawQuadraticEdge(gl, p0, p1, p2, 4);		
 		}
 	}
 	
 	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments) {
+		// TODO: Allow the minimum distance to be changed
+		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
+			return;
+		}
+		
 		// Equation for Quadratic Bezier curve:
 		// B(t) = (1 - t)^2P0 + 2(1 - t)tP1 + t^2P2, t in [0, 1]
 		
@@ -700,21 +829,19 @@ public class Graphics implements GLEventListener {
 			// Extend by c * tan(theta/2)
 			extend2 = EDGE_RADIUS * Math.tan(currentAngle / 2);
 	
-			
 			direction = points[i + 1].subtract(points[i]);
 			direction.normalizeLocal();
 	
-			if (framesElapsed == 2) {
-				System.out.println("Segment: " + i);
-				System.out.println("Current segment angle: " + currentAngle);
-				System.out.println("Current extend1: " + extend1);
-				System.out.println("Current extend2: " + extend2);
-				System.out.println("Current p0: " + p0);
-				System.out.println("Current p1: " + p1);
-				System.out.println("Current p2: " + p2);
-				System.out.println("Current direction: " + direction);
-				
-			}
+//			if (framesElapsed == 2) {
+//				System.out.println("Segment: " + i);
+//				System.out.println("Current segment angle: " + currentAngle);
+//				System.out.println("Current extend1: " + extend1);
+//				System.out.println("Current extend2: " + extend2);
+//				System.out.println("Current p0: " + p0);
+//				System.out.println("Current p1: " + p1);
+//				System.out.println("Current p2: " + p2);
+//				System.out.println("Current direction: " + direction);
+//			}
 			
 //			drawSingleEdge(gl, 
 //					points[i].subtract(direction.multiply(extend1)),
@@ -723,6 +850,24 @@ public class Graphics implements GLEventListener {
 			drawSingleEdge(gl, 
 					points[i],
 					points[i + 1]);
+
+//			if (framesElapsed == 3) {
+//				if (points[i].subtract(direction.multiply(extend1)).magnitude() > 100) {
+//					System.out.println("points[i]: " + points[i].subtract(direction.multiply(extend1)));
+//				}
+//				
+//				if (points[i + 1].add(direction.multiply(extend2)).magnitude() > 100) {
+//					System.out.println("points[i + 1]: " + points[i + 1].add(direction.multiply(extend2)));
+//					System.out.println("extend2 info, Segment: " + i);
+//					System.out.println("Current segment angle: " + currentAngle);
+//					System.out.println("Current extend1: " + extend1);
+//					System.out.println("Current extend2: " + extend2);
+//					System.out.println("Current p0: " + p0);
+//					System.out.println("Current p1: " + p1);
+//					System.out.println("Current p2: " + p2);
+//					System.out.println("Current direction: " + direction);
+//				}
+//			}
 			
 			extend1 = extend2;
 		}
@@ -832,6 +977,7 @@ public class Graphics implements GLEventListener {
 	private void createDisplayLists(GL2 gl) {
 		nodeListIndex = gl.glGenLists(1);
 		edgeListIndex = gl.glGenLists(1);
+		pointerListIndex = gl.glGenLists(1);
 		
 		GLUT glut = new GLUT();
 		GLU glu = new GLU();
@@ -847,9 +993,22 @@ public class Graphics implements GLEventListener {
 		// NODE_STACKS_DETAIL);
 		gl.glEndList();
 
+		GLUquadric quadric2 = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(quadric2, GLU.GLU_FILL);
+		glu.gluQuadricNormals(quadric2, GLU.GLU_SMOOTH); // TODO: Experiment with GLU_FLAT for efficiency
+		
 		gl.glNewList(edgeListIndex, GL2.GL_COMPILE);
-		glu.gluCylinder(quadric, EDGE_RADIUS, EDGE_RADIUS, 1.0,
+		glu.gluCylinder(quadric2, EDGE_RADIUS, EDGE_RADIUS, 1.0,
 				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
+		gl.glEndList();
+		
+		GLUquadric pointerQuadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(pointerQuadric, GLU.GLU_LINE);
+		glu.gluQuadricNormals(pointerQuadric, GLU.GLU_NONE);
+		
+		gl.glNewList(pointerListIndex, GL2.GL_COMPILE);
+		glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4,
+				4);
 		gl.glEndList();
 	}
 

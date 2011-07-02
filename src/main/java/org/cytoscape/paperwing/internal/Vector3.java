@@ -74,6 +74,9 @@ public class Vector3 {
 		double cosArgument = (x * other.x + y * other.y + z * other.z)/Math.sqrt(lengthSquare * otherLengthSquare);
 		
 		if (Double.isNaN(cosArgument)) {
+			System.out.println("cosArgument NaN");
+			System.out.println("lengthSquare: " + lengthSquare);
+			System.out.println("otherLengthSquare: " + otherLengthSquare);
 			return 0;
 		} else if (cosArgument >= 1) {
 			return 0;
@@ -145,6 +148,10 @@ public class Vector3 {
 	// Obtain distance between position vectors
 	public double distance(Vector3 other) {
 		return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2));
+	}
+	
+	public double distanceSquared(Vector3 other) {
+		return Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2);
 	}
 	
 	// Project the vector onto the plane passing through the origin, perpendicular to the given normal
