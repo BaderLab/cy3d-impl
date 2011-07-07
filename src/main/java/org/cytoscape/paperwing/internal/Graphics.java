@@ -55,27 +55,6 @@ public class Graphics implements GLEventListener {
 	private static final int EDGE_SLICES_DETAIL = 4;
 	private static final int EDGE_STACKS_DETAIL = 1;
 
-	private class DrawnNode {
-		public float x;
-		public float y;
-		public float z;
-	}
-
-	private class DrawnEdge {
-		public float x;
-		public float y;
-		public float z;
-		public float rotateAxisX;
-		public float rotateAxisY;
-		public float rotateAxisZ;
-		public float rotateAngle;
-		public float length;
-	}
-	
-	private DrawnNode[] nodes;
-	private DrawnNode testNode = new DrawnNode();
-	private DrawnEdge[] edges;
-
 	private int nodeListIndex;
 	private int edgeListIndex;
 	
@@ -91,10 +70,23 @@ public class Graphics implements GLEventListener {
 	private int edgeSeed = 556;
 	
 	private LinkedHashSet<CyNode> selectedNodes;
-	private TreeSet<Integer> selectedNodeIndices;
+	private LinkedHashSet<CyEdge> selectedEdges;
 	
-	private static final int NO_INDEX = -1; // Value representing that no node index is being held
-	private int hovered = NO_INDEX;
+	private TreeSet<Integer> selectedNodeIndices;
+	private TreeSet<Integer> selectedEdgeIndices;
+	
+	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
+	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
+	private int hoveredNode = NO_INDEX;
+	private int hoveredEdge = NO_INDEX;
+	
+	private static enum StateModifier {
+	    HOVERED, SELECTED, NORMAL, ENLARGED
+	}
+	
+	private static final int NO_TYPE = -1;
+	private static final int NODE_TYPE = 0;
+	private static final int EDGE_TYPE = 1;
 	
 	private KeyboardMonitor keys;
 	private MouseMonitor mouse;
@@ -107,6 +99,8 @@ public class Graphics implements GLEventListener {
 	
 	private CyNetworkView networkView;
 	private VisualLexicon visualLexicon;
+	
+	private boolean latch_1;
 	
 	public static void initSingleton() {
 		GLProfile.initSingleton(false);
@@ -125,7 +119,10 @@ public class Graphics implements GLEventListener {
 		this.visualLexicon = visualLexicon;
 		
 		selectedNodes = new LinkedHashSet<CyNode>();
+		selectedEdges = new LinkedHashSet<CyEdge>();
+		
 		selectedNodeIndices = new TreeSet<Integer>();
+		selectedEdgeIndices = new TreeSet<Integer>();
 	}
 	
 	public void trackInput(Component component) {
@@ -190,8 +187,8 @@ public class Graphics implements GLEventListener {
 		gl.glPopMatrix();
 		
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
-				FloatBuffer.wrap(lightPosition));
+//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
+//				FloatBuffer.wrap(lightPosition));
 
 		gl.glColor3f(0.6f, 0.6f, 0.6f);
 		// gl.glTranslatef(0.0f, 0.0f, -6.0f);
@@ -201,7 +198,7 @@ public class Graphics implements GLEventListener {
 		gl.glColor3f(0.51f, 0.51f, 0.53f);
 		//gl.glColor3f(0.53f, 0.53f, 0.55f);
 		//gl.glColor3f(0.73f, 0.73f, 0.73f);
-		drawEdges(gl);
+		drawEdges(gl, StateModifier.NORMAL);
 
 		framesElapsed++;
 	}
@@ -237,6 +234,10 @@ public class Graphics implements GLEventListener {
 				System.out.print("position: " + camera.getPosition());
 				System.out.println(", target: " + camera.getTarget());
 				System.out.println("===");
+			}
+			
+			if (pressed.contains(KeyEvent.VK_1)) {
+				latch_1 = true;
 			}
 			
 			if (held.contains(KeyEvent.VK_Z)) {
@@ -359,7 +360,7 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (pressed.contains(KeyEvent.VK_J)) {
-				CyNode hoverNode = networkView.getModel().getNode(hovered);
+				CyNode hoverNode = networkView.getModel().getNode(hoveredNode);
 				
 				if (hoverNode != null) {
 					
@@ -373,7 +374,7 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (pressed.contains(KeyEvent.VK_O)) {
-				CyNode hoverNode = networkView.getModel().getNode(hovered);
+				CyNode hoverNode = networkView.getModel().getNode(hoveredNode);
 				
 				if (hoverNode != null && selectedNodes.size() == 1) {
 					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
@@ -426,14 +427,17 @@ public class Graphics implements GLEventListener {
 				}
 				
 				if (!networkView.getModel().removeNodes(selectedNodes)) {
-					System.out.println("Failed to deleted nodes: " + selectedNodes);;
+					// do nothing
 				} else {
 					// Remove edges attached to the node
 					networkView.getModel().removeEdges(edgesToBeRemoved);
-					
-					// TODO: Not sure if this call is needed
-					networkView.updateView();
-				}	
+				}
+				
+				// Remove selected edges
+				networkView.getModel().removeEdges(selectedEdges);
+				
+				// TODO: Not sure if this call is needed
+				networkView.updateView();
 			}
 			
 			keys.update();
@@ -516,10 +520,22 @@ public class Graphics implements GLEventListener {
 			*/
 			
 			// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
-			
-			int result = performPick(gl, mouse.x(), mouse.y());
 
-			hovered = result;
+			int[] pickResult = performPick(gl, mouse.x(), mouse.y());
+			int pickType = pickResult[0];
+			int pickIndex = pickResult[1];
+			
+			if (pickType == NODE_TYPE) {
+				hoveredNode = pickResult[1];
+				hoveredEdge = NO_INDEX;
+			} else if (pickType == EDGE_TYPE) {
+				hoveredNode = NO_INDEX;
+				hoveredEdge = pickResult[1];
+			} else {
+				// Note that if these 2 lines are removed, hovering will be "sticky" in that hovering remains unless a new object is hovered
+				hoveredNode = NO_INDEX;
+				hoveredEdge = NO_INDEX;
+			}
 			
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 				
@@ -537,34 +553,58 @@ public class Graphics implements GLEventListener {
 						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, projection.y() * DISTANCE_SCALE);
 						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, projection.z() * DISTANCE_SCALE);
 						
-						// Update the hovered node
+						// Set the node to be hovered
 						// TODO: This might not be needed if the node were added through some way other than the mouse
-						hovered = added.getIndex();
+						hoveredNode = added.getIndex();
 					}
-				// Otherwise, prepare to select the node currently under the mouse cursor
+				// Otherwise, prepare to select the node or edge currently under the mouse cursor
 				} else {
-					CyNode picked = networkView.getModel().getNode(result);
+					// If the user did not hold down shift, unselect other objects
+					if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+						selectedNodes.clear();
+						selectedEdges.clear();
+						
+						selectedNodeIndices.clear();
+						selectedEdgeIndices.clear();
+						
+						// System.out.println("Selection reset");
+					}
 					
-					// TODO: Perhaps throw exception if the node was found to be null, ie. invalid index
-					// Note though the above case could also be caused by picked == NO_INDEX
-					if (picked != null) {
-			
-						// If the user did not hold down shift, unselect other nodes
-						if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+					if (pickType == NODE_TYPE) {
+						CyNode picked = networkView.getModel().getNode(pickIndex);
+						
+						// TODO: Possibly throw exception if the node was found to be null, ie. invalid index
+						if (picked != null) {
+				
+							if (selectedNodes.contains(picked)) {
+								selectedNodes.remove(picked);
+								selectedNodeIndices.remove(picked.getIndex());
+							} else {
+								selectedNodes.add(picked);
+								selectedNodeIndices.add(picked.getIndex());
+							}
 							
-							selectedNodes.clear();
-							selectedNodeIndices.clear();
+							// ystem.out.println("Selected node index: " + picked.getIndex());
 						}
+					} else if (pickType == EDGE_TYPE) {
+						CyEdge picked = networkView.getModel().getEdge(pickIndex);
 						
-						if (selectedNodes.contains(picked)) {
-							selectedNodes.remove(picked);
-							selectedNodeIndices.remove(picked.getIndex());
-						} else {
-							selectedNodes.add(picked);
-							selectedNodeIndices.add(picked.getIndex());
+						// TODO: Possibly throw exception if the edge was found to be null, ie. invalid index
+						if (picked != null) {
+					
+							if (selectedEdges.contains(picked)) {
+								selectedEdges.remove(picked);
+								selectedEdgeIndices.remove(picked.getIndex());
+							} else {
+								selectedEdges.add(picked);
+								selectedEdgeIndices.add(picked.getIndex());
+							}
+							
+							// System.out.println("Selected edge index: " + picked.getIndex());
 						}
+					} else {
 						
-						System.out.println("Selected node index: " + picked.getIndex());
+						// System.out.println("Nothing selected");
 					}
 				}
 			}
@@ -573,13 +613,11 @@ public class Graphics implements GLEventListener {
 		}
 	}
 	
-	private int performPick(GL2 gl, double x, double y) {
+	private int[] performPick(GL2 gl, double x, double y) {
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(256);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		// byteBuffer.
 		IntBuffer buffer = byteBuffer.asIntBuffer();
 		
-		// int buffer[] = new int[256];
 		IntBuffer viewport = IntBuffer.allocate(4);
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
 		
@@ -593,15 +631,13 @@ public class Graphics implements GLEventListener {
 	    GLU glu = new GLU();
 	    gl.glLoadIdentity();
 	
-	    // System.out.println("viewport: " + viewport.get(0) + ", " + viewport.get(1) + 
-	    //		", " + viewport.get(2) + ", " + viewport.get(3));
 	    glu.gluPickMatrix(x, screenHeight - y, 2, 2, viewport);
 	    glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f, 50.0f);
 	    
 	    // don't think this ortho call is needed
 	    // gl.glOrtho(0.0, 8.0, 0.0, 8.0, -0.5, 2.5);
 	    
-	    //draw start
+	    // -Begin Drawing-
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 	    gl.glLoadIdentity();
@@ -614,12 +650,25 @@ public class Graphics implements GLEventListener {
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
 
+		gl.glPushName(NODE_TYPE);
 		gl.glPushName(NO_INDEX);
-		drawNodes(gl);
-		//drawEdges(gl);
 		
-		//gl.glPopMatrix();
-	    //draw end
+		// Render nodes for picking
+		drawNodes(gl);
+		
+		gl.glPopName();
+		gl.glPopName();
+		
+		gl.glPushName(EDGE_TYPE);
+		gl.glPushName(NO_INDEX);
+		
+		// Render edges for picking
+		drawEdges(gl, StateModifier.ENLARGED);
+		
+		gl.glPopName();
+		gl.glPopName();
+		
+		// -End Drawing-
 		
 		gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glPopMatrix();
@@ -633,26 +682,41 @@ public class Graphics implements GLEventListener {
 	    
 	    // System.out.println("Number of hits: " + hits);
 	    int selected;
+	    int selectedType;
+	    
+	    // Current hit record is size 5 because we have (numNames, minZ, maxZ, name1, name2) for
+	    // indices 0-4 respectively
+	    int sizeOfHitRecord = 5;
 	    
 		if (hits > 0) {
 			// The variable max helps keep track of the polygon that is closest
 			// to the front of the screen
 	    	int max = buffer.get(2);
-	    	selected = buffer.get(3);
+	    	int maxType = buffer.get(3);
+	    	
+	    	selectedType = buffer.get(3);
+	    	selected = buffer.get(4);
 	    	
 	    	for (int i = 0; i < hits; i++) {
 	    		
-	    		if (buffer.get(i * 4 + 2) < max) {
-	    			max = buffer.get(i * 4 + 2);
-	    	    	selected = buffer.get(i * 4 + 3);
+	    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+	    			max = buffer.get(i * sizeOfHitRecord + 2);
+	    			maxType = buffer.get(i * sizeOfHitRecord + 3);
+	    			
+	    			selectedType = buffer.get(i * sizeOfHitRecord + 3); // We have that name1 represents the object type
+	    			selected = buffer.get(i * sizeOfHitRecord + 4); // name2 represents the object index
 	    		}
 	    	}
 	    } else {
+	    	selectedType = NO_TYPE;
 	    	selected = NO_INDEX;
 	    }
-	    
-	    return selected;
-    	
+		
+		int[] result = new int[2];
+		result[0] = selectedType;
+		result[1] = selected;
+		
+	    return result;
 	}
 
 	private void drawNodes(GL2 gl) {
@@ -668,35 +732,34 @@ public class Graphics implements GLEventListener {
 			gl.glLoadName(index);
 			// gl.glLoadName(33);
 			
+			gl.glPushMatrix();
 			gl.glTranslatef(x, y, z);
 			
 			if (selectedNodeIndices.contains(index)) {
 				gl.glColor3f(0.52f, 0.70f, 0.52f);
 				gl.glScalef(1.1f, 1.1f, 1.1f);
 				gl.glCallList(nodeListIndex);
-				gl.glScalef(1/1.1f, 1/1.1f, 1/1.1f);
-				gl.glColor3f(0.73f, 0.73f, 0.73f);
-			} else if (index == hovered) {
+			} else if (index == hoveredNode) {
 				gl.glColor3f(0.52f, 0.52f, 0.70f);
 				gl.glCallList(nodeListIndex);
-				gl.glColor3f(0.73f, 0.73f, 0.73f);
 			} else {
+				gl.glColor3f(0.73f, 0.73f, 0.73f);
 				gl.glCallList(nodeListIndex);
 			}
 			
-			gl.glTranslatef(-x, -y, -z);
+			gl.glPopMatrix();
 		}
 		
 		// Draw the testNode
-		gl.glTranslatef(testNode.x, testNode.y, testNode.z);
+		// gl.glTranslatef(testNode.x, testNode.y, testNode.z);
 		// gl.glCallList(nodeListIndex);
 		// GLUT glut = new GLUT();
 		// glut.glutSolidCylinder(EDGE_RADIUS, 1,
 		//		EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
-		gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
+		// gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
 
-	private void drawEdges(GL2 gl) {
+	private void drawEdges(GL2 gl, StateModifier generalModifier) {
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
 		
@@ -719,29 +782,36 @@ public class Graphics implements GLEventListener {
 		Vector3 p1Offset;
 		Vector3 direction;
 		
+		int edgeIndex;
+		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-
+			
 			sourceView = networkView.getNodeView(edgeView.getModel().getSource());
 			targetView = networkView.getNodeView(edgeView.getModel().getTarget());
 			sourceIndex = sourceView.getModel().getIndex();
 			targetIndex = targetView.getModel().getIndex();
+			
+			edgeIndex = edgeView.getModel().getIndex();
 			
 			// These indices rely on CyNode's guarantee that NodeIndex < NumOfNodes
 			assert sourceIndex < nodeCount;
 			assert targetIndex < nodeCount;
 			
 			// Identify this pair of nodes so we'll know if we've drawn an edge between them before
-			if (sourceIndex > targetIndex) {
-				pairIdentifier = nodeCount * targetIndex + targetIndex;
-			} else {
-				pairIdentifier = nodeCount * sourceIndex + sourceIndex;
-			}
+			pairIdentifier = ((long) Integer.MAX_VALUE + 1) * sourceIndex + targetIndex; // TODO: Check if this is a safe calculation
+
+			// Unused; this will remove distinguishment between source and target nodes
+//			if (sourceIndex > targetIndex) {
+//				pairIdentifier = nodeCount * sourceIndex + targetIndex;
+//			} else {
+//				pairIdentifier = nodeCount * targetIndex + sourceIndex;
+//			}
 			
 			// Have we visited an edge between these nodes before?
 			if (pairs.containsKey(pairIdentifier)) {
 				pairs.put(pairIdentifier, pairs.get(pairIdentifier) + 1);
 			} else {
-				pairs.put(pairIdentifier, 1);
+				pairs.put(pairIdentifier, 0);
 			}
 		
 			// Find p0, p1, p2 for the Bezier curve
@@ -762,17 +832,57 @@ public class Graphics implements GLEventListener {
 			p1Offset = direction.cross(0, 1, 0);
 			p1Offset.normalizeLocal();
 			
+			// Multiplier controlling distance between curve point p1 and the straight line between the nodes p0 and p2
+			int distanceMultiplier = (int) Math.sqrt(pairs.get(pairIdentifier));
+			
+			int radiusEdgeCount = distanceMultiplier * 2 + 1;
+			
+			// Multiplier controlling rotation about the p0p2 vector axis
+			int rotationMultiplier = pairs.get(pairIdentifier);
+			
 			// Shift the square root graph one to the left and one down to get smoother curves
-			p1Offset.multiplyLocal(EDGE_CURVE_FACTOR * (Math.sqrt(direction.magnitude() + 1) - 1));
+			p1Offset.multiplyLocal(distanceMultiplier * EDGE_CURVE_FACTOR * (Math.sqrt(direction.magnitude() + 1) - 1)); //TODO: Check if sqrt is needed
+			
+			if (distanceMultiplier % 2 == 1) {
+				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * rotationMultiplier / radiusEdgeCount);
+			} else {
+				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * rotationMultiplier / radiusEdgeCount + Math.PI);
+			}
 			
 			p1.addLocal(p1Offset);
-			p1.rotate(direction, 2 * Math.PI * (pairs.get(pairIdentifier) - 1) / EDGES_PER_RADIUS);
+			
+			if (latch_1) {
+				System.out.println("Source index: " + sourceIndex);
+				System.out.println("Source target: " + targetIndex);
+				System.out.println("pairs.get(pairIdentifier): " + pairs.get(pairIdentifier));
+				System.out.println("pairIdentifier: " + pairIdentifier);
+			}
 		
-			drawQuadraticEdge(gl, p0, p1, p2, 4);		
+			// Load name for edge picking
+			gl.glLoadName(edgeIndex);
+			
+			StateModifier modifier; 
+			if (generalModifier == StateModifier.ENLARGED) {
+				modifier = StateModifier.ENLARGED;
+			} else if (selectedEdgeIndices.contains(edgeIndex)) {
+				modifier = StateModifier.SELECTED;
+			} else if (edgeIndex == hoveredEdge) {
+				modifier = StateModifier.HOVERED;
+			} else {
+				modifier = StateModifier.NORMAL;
+			}
+			
+			if (distanceMultiplier == 0) {
+				drawQuadraticEdge(gl, p0, p1, p2, 1, modifier);
+			} else {
+				drawQuadraticEdge(gl, p0, p1, p2, 5, modifier);
+			}
 		}
+		
+		latch_1 = false;
 	}
 	
-	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments) {
+	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, StateModifier modifier) {
 		// TODO: Allow the minimum distance to be changed
 		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
 			return;
@@ -849,7 +959,8 @@ public class Graphics implements GLEventListener {
 			
 			drawSingleEdge(gl, 
 					points[i],
-					points[i + 1]);
+					points[i + 1],
+					modifier);
 
 //			if (framesElapsed == 3) {
 //				if (points[i].subtract(direction.multiply(extend1)).magnitude() > 100) {
@@ -875,28 +986,6 @@ public class Graphics implements GLEventListener {
 		
 	}
 	
-	private void drawQuadraticEdgeOld(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments) {
-		// Equation for Quadratic Bezier curve:
-		// B(t) = (1 - t)^2P0 + 2(1 - t)tP1 + t^2P2, t in [0, 1]
-		
-		double parameter;
-		
-		Vector3 current = p0;
-		Vector3 next;
-		
-		for (int i = 1; i < numSegments; i++) {
-			parameter = (double) i / numSegments;
-			
-			next = p0.multiply(Math.pow(1 - parameter, 2));
-			next.addLocal(p1.multiply(2 * (1 - parameter) * parameter));
-			next.addLocal(p2.multiply(parameter * parameter));
-			
-			drawSingleEdge(gl, current, next);
-			
-			current = next;
-		}
-	}
-	
 	private void drawEdgesOld(GL2 gl) {
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
@@ -920,7 +1009,7 @@ public class Graphics implements GLEventListener {
 		}
 	}
 	
-	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end) {
+	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, StateModifier modifier) {
 		gl.glPushMatrix();
 		
 		// TODO: Consider using a Vector3f object for just floats, to use translatef instead of translated
@@ -935,7 +1024,21 @@ public class Graphics implements GLEventListener {
 				rotateAxis.z());
 		
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
-		gl.glCallList(edgeListIndex);
+		
+		if (modifier == StateModifier.ENLARGED) {
+			gl.glScalef(1.6f, 1.6f, 1.0f);
+			gl.glCallList(edgeListIndex);
+		} else if (modifier == StateModifier.SELECTED) {
+			gl.glColor3f(0.45f, 0.65f, 0.45f);
+			gl.glScalef(1.1f, 1.1f, 1.0f);
+			gl.glCallList(edgeListIndex);
+		} else if (modifier == StateModifier.HOVERED) {
+			gl.glColor3f(0.43f, 0.43f, 0.70f);
+			gl.glCallList(edgeListIndex);
+		} else {
+			gl.glColor3f(0.73f, 0.73f, 0.73f);
+			gl.glCallList(edgeListIndex);
+		}
 	
 		gl.glPopMatrix();
 	}
