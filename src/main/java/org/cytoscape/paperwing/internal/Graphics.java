@@ -1140,14 +1140,14 @@ public class Graphics implements GLEventListener {
 		glu.gluQuadricDrawStyle(pointerQuadric, GLU.GLU_LINE);
 		glu.gluQuadricNormals(pointerQuadric, GLU.GLU_NONE);
 		
-		float axisLength = 0.055f;
-		float overHang = 0.0275f;
-		float radius = 0.003f;
+		float axisLength = 0.062f;
+		float overHang = 0.031f;
+		float radius = 0.0025f;
 		
 		gl.glNewList(pointerListIndex, GL2.GL_COMPILE);
 		// glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4, 4);
 		
-		gl.glColor3f(0.83f, 0.73f, 0.72f);
+		gl.glColor3f(0.93f, 0.73f, 0.72f);
 		
 		// Draw X axis
 		gl.glTranslatef(-overHang, 0.0f, 0.0f);
