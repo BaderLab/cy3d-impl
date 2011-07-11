@@ -51,6 +51,8 @@ public class KeyboardMonitor implements KeyListener, FocusListener {
 			keysDown.add(key);
 			hasNew = true;
 		}
+		
+		event.consume();
 	}
 
 	@Override
@@ -58,6 +60,8 @@ public class KeyboardMonitor implements KeyListener, FocusListener {
 		justReleased.add(event.getKeyCode());
 		keysDown.remove(event.getKeyCode());
 		hasNew = true;
+		
+		event.consume();
 	}
 	
 	@Override

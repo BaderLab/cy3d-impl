@@ -102,8 +102,8 @@ public class Graphics implements GLEventListener {
 	
 	private boolean latch_1;
 	
-	private Vector3 currentSelectProjection;
-	private Vector3 previousSelectProjection;
+	private Vector3 currentSelectedProjection;
+	private Vector3 previousSelectedProjection;
 	private double selectProjectionDistance;
 
 	private class PickResult {
@@ -172,6 +172,13 @@ public class Graphics implements GLEventListener {
 
 		// System.out.println(position + " " + target + " " + up);
 
+//		Vector3 projection = projectMouseCoordinates(camera.getDistance());
+//		gl.glPushMatrix();
+//		gl.glTranslated(projection.x(), projection.y(), -camera.getDistance());
+//		gl.glColor3f(0.85f, 0.85f, 0.83f);
+//		gl.glCallList(pointerListIndex);
+//		gl.glPopMatrix();
+		
 		GLU glu = new GLU();
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
@@ -185,14 +192,12 @@ public class Graphics implements GLEventListener {
 		Vector3 rightPointer = target.subtract(camera.getLeft().multiply(distance / 2));
 		
 		gl.glPushMatrix();
-		gl.glTranslated(leftPointer.x(), leftPointer.y(), leftPointer.z());
-		gl.glColor3f(1.0f, 0.0f, 0.0f);
-		gl.glCallList(pointerListIndex);
-		gl.glPopMatrix();
+		//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
 		
-		gl.glPushMatrix();
-		gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
-		gl.glColor3f(1.0f, 0.0f, 0.0f);
+		Vector3 projection = projectMouseCoordinates(camera.getDistance());
+		
+		gl.glTranslated(projection.x(), projection.y(), projection.z());
+		gl.glColor3f(0.85f, 0.85f, 0.83f);
 		gl.glCallList(pointerListIndex);
 		gl.glPopMatrix();
 		
@@ -214,11 +219,19 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private void checkInput(GL2 gl) {
+		
+		// Project mouse coordinates into 3d space for mouse interactions
+		// --------------------------------------------------------------
+		
+		Vector3 projection = projectMouseCoordinates(camera.getDistance());
+
+		
 		if (keys.hasHeld() || keys.hasNew()) {
 			Set<Integer> pressed = keys.getPressed();
 			Set<Integer> held = keys.getHeld();
 			Set<Integer> released = keys.getReleased();
 			
+			// Display FPS
 			if (pressed.contains(KeyEvent.VK_SPACE)) {
 				endTime = System.nanoTime();
 
@@ -231,23 +244,67 @@ public class Graphics implements GLEventListener {
 				framesElapsed = 0;
 			}
 			
+			// Reset Camera to default
 			if (pressed.contains(KeyEvent.VK_C)) {
 				camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
 						new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
 			}
 			
+			// Debug-related boolean
 			if (pressed.contains(KeyEvent.VK_1)) {
 				latch_1 = true;
 			}
 			
+			// Roll camera clockwise
 			if (held.contains(KeyEvent.VK_Z)) {
 				camera.rollClockwise();
 			}
 			
+			// Roll camera clockwise
 			if (held.contains(KeyEvent.VK_X)) {
 				camera.rollCounterClockwise();
 			}
 			
+			// Create edges between nodes
+			if (pressed.contains(KeyEvent.VK_J)) {
+				CyNode hoverNode = networkView.getModel().getNode(hoverNodeIndex);
+				
+				if (hoverNode != null) {
+					
+					for (CyNode node : selectedNodes) {
+						networkView.getModel().addEdge(node, hoverNode, false);
+						
+						// TODO: Not sure if this call is needed
+						networkView.updateView();
+					};
+				}
+			}
+			
+			// Delete selected edges/nodes
+			if (pressed.contains(KeyEvent.VK_DELETE)) {
+				LinkedHashSet<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
+				
+				for (CyNode node : selectedNodes) {
+					// TODO: Check if use of Type.ANY for any edge is correct
+					// TODO: Check if this addAll method properly skips adding edges already in the edgesToBeRemovedList
+					edgesToBeRemoved.addAll(networkView.getModel().getAdjacentEdgeList(node, Type.ANY));
+				}
+				
+				if (!networkView.getModel().removeNodes(selectedNodes)) {
+					// do nothing
+				} else {
+					// Remove edges attached to the node
+					networkView.getModel().removeEdges(edgesToBeRemoved);
+				}
+				
+				// Remove selected edges
+				networkView.getModel().removeEdges(selectedEdges);
+				
+				// TODO: Not sure if this call is needed
+				networkView.updateView();
+			}
+			
+			// If shift is pressed, perform orbit camera movement
 			if (held.contains(KeyEvent.VK_SHIFT)) {
 			
 				if (held.contains(KeyEvent.VK_LEFT)) {
@@ -265,7 +322,8 @@ public class Graphics implements GLEventListener {
 				if (held.contains(KeyEvent.VK_DOWN)) {
 					camera.orbitDown();
 				}
-				
+			
+			// Otherwise, turn camera in a first-person like fashion
 			} else {
 			
 				if (held.contains(KeyEvent.VK_LEFT)) {
@@ -286,112 +344,27 @@ public class Graphics implements GLEventListener {
 			
 			}
 			
-			if (pressed.contains(KeyEvent.VK_M)) {
-				System.out.println("number of networks: "
-						+ networkManager.getNetworkSet().size());
-				System.out.println("current network: "
-						+ applicationManager.getCurrentNetwork());
-				if (applicationManager.getCurrentNetwork() != null) {
-					System.out
-							.println("number of nodes in current network: "
-									+ applicationManager
-											.getCurrentNetwork()
-											.getNodeList().size());
-				}
-				System.out.println("current network view: "
-						+ applicationManager.getCurrentNetworkView());
-				if (applicationManager.getCurrentNetworkView() != null) {
-					System.out
-							.println("number of views in current network: "
-									+ applicationManager
-											.getCurrentNetworkView()
-											.getNodeViews().size());
-				}
-
-				// System.out.println("supported visual properties: "
-				//		+ applicationManager.getCurrentRenderingEngine()
-				//				.getVisualLexicon()
-				//				.getAllVisualProperties());
-			}
-			
-			if (pressed.contains(KeyEvent.VK_B)) {
-				System.out.println("current rendering engine: "
-						+ applicationManager.getCurrentRenderingEngine().getClass().getName());
+			// Create a new node
+			if (pressed.contains(KeyEvent.VK_N)) {
+				CyNode added = networkView.getModel().addNode();
+				networkView.updateView();
 				
-				System.out.println("number of rendering engines: "
-						+ renderingEngineManager.getAllRenderingEngines().size());
+				View<CyNode> viewAdded = networkView.getNodeView(added);
 				
-				
-			}
-			
-			if (pressed.contains(KeyEvent.VK_M)) {
-				System.out.println("Old rendering engine: " + applicationManager.getCurrentRenderingEngine());
-				
-				renderingEngineManager.removeRenderingEngine(applicationManager.getCurrentRenderingEngine());
-				
-				System.out.println("New rendering engine: " + applicationManager.getCurrentRenderingEngine());
-			}
-			
-			if (pressed.contains(KeyEvent.VK_COMMA)) {
-				System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
-				
-				for (CyNetworkView view : networkViewManager.getNetworkViewSet()) {
-					System.out.println("current model: " + view.getModel());
-					System.out.println("current model suid: " + view.getModel().getSUID());
-					System.out.println("current suid: " + view.getSUID());	
-				}
-			}
-
-			if (pressed.contains(KeyEvent.VK_H)) {
-				System.out.println("visualLexicon: " + visualLexicon);
-				
-				float x, y, z;
-				if (visualLexicon != null) {
+				// TODO: Maybe throw an exception if viewAdded is null
+				if (viewAdded != null) {
+					viewAdded.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, projection.x() * DISTANCE_SCALE);
+					viewAdded.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, projection.y() * DISTANCE_SCALE);
+					viewAdded.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, projection.z() * DISTANCE_SCALE);
 					
-					for (View<CyNode> nodeView : networkView.getNodeViews()) {
-						x = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)).floatValue();
-						y = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)).floatValue();
-						z = ((Double) nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)).floatValue();
-						
-						System.out.println("Node found at " + x + ", " + y + ", " + z);
-					}
-				
+					// Set the node to be hovered
+					// TODO: This might not be needed if the node were added through some way other than the mouse
+					hoverNodeIndex = added.getIndex();
 				}
 			}
 			
-			if (pressed.contains(KeyEvent.VK_J)) {
-				CyNode hoverNode = networkView.getModel().getNode(hoverNodeIndex);
-				
-				if (hoverNode != null) {
-					
-					for (CyNode node : selectedNodes) {
-						networkView.getModel().addEdge(node, hoverNode, false);
-						
-						// TODO: Not sure if this call is needed
-						networkView.updateView();
-					};
-				}
-			}
-			
-			if (pressed.contains(KeyEvent.VK_O)) {
-				CyNode hoverNode = networkView.getModel().getNode(hoverNodeIndex);
-				
-				if (hoverNode != null && selectedNodes.size() == 1) {
-					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
-					View<CyNode> selectView = hoverView;
-					for (CyNode node : selectedNodes) {selectView = networkView.getNodeView(node);};
-					
-					Vector3 hover = new Vector3(hoverView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-							hoverView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-							hoverView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-					
-					Vector3 select = new Vector3(selectView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-							selectView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-							selectView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-					
-					System.out.println("Distance: " + hover.distance(select)/DISTANCE_SCALE);
-				}
-			}
+			// Camera translational movement
+			// -----------------------------
 			
 			if (held.contains(KeyEvent.VK_W)) {
 				camera.moveUp();
@@ -417,31 +390,57 @@ public class Graphics implements GLEventListener {
 				camera.moveForward();
 			}
 			
-			if (pressed.contains(KeyEvent.VK_DELETE)) {
-				LinkedHashSet<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
+			
+			// Debug - display distance between 2 nodes
+			if (pressed.contains(KeyEvent.VK_O)) {
+				CyNode hoverNode = networkView.getModel().getNode(hoverNodeIndex);
 				
-				for (CyNode node : selectedNodes) {
-					// TODO: Check if use of Type.ANY for any edge is correct
-					// TODO: Check if this addAll method properly skips adding edges already in the edgesToBeRemovedList
-					edgesToBeRemoved.addAll(networkView.getModel().getAdjacentEdgeList(node, Type.ANY));
+				if (hoverNode != null && selectedNodes.size() == 1) {
+					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
+					View<CyNode> selectView = hoverView;
+					for (CyNode node : selectedNodes) {selectView = networkView.getNodeView(node);};
+					
+					Vector3 hover = new Vector3(hoverView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+							hoverView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+							hoverView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+					
+					Vector3 select = new Vector3(selectView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+							selectView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+							selectView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+					
+					System.out.println("Distance: " + hover.distance(select)/DISTANCE_SCALE);
 				}
-				
-				if (!networkView.getModel().removeNodes(selectedNodes)) {
-					// do nothing
-				} else {
-					// Remove edges attached to the node
-					networkView.getModel().removeEdges(edgesToBeRemoved);
-				}
-				
-				// Remove selected edges
-				networkView.getModel().removeEdges(selectedEdges);
-				
-				// TODO: Not sure if this call is needed
-				networkView.updateView();
 			}
 			
 			keys.update();
 		}
+		
+		
+		// Perform picking-related operations
+		// ----------------------------------
+		
+		PickResult pickResult = performPick(gl, mouse.x(), mouse.y());
+		int pickType = pickResult.type;
+		int pickIndex = pickResult.index;
+		
+		if (pickType == NODE_TYPE) {
+			hoverNodeIndex = pickIndex;
+			hoverEdgeIndex = NO_INDEX;
+		} else if (pickType == EDGE_TYPE) {
+			hoverNodeIndex = NO_INDEX;
+			hoverEdgeIndex = pickIndex;
+		} else {
+			// Note that if these 2 lines are removed, hovering will be "sticky" in that hovering remains unless a new object is hovered
+			hoverNodeIndex = NO_INDEX;
+			hoverEdgeIndex = NO_INDEX;
+		}
+		
+		
+		if (keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+			hoverNodeIndex = NO_INDEX;
+			hoverEdgeIndex = NO_INDEX;
+		}
+		
 		
 		if (mouse.hasMoved() || mouse.hasNew()) {
 			
@@ -454,177 +453,64 @@ public class Graphics implements GLEventListener {
 			// Varying distance between camera and camera's target point
 			if (mouse.dWheel() != 0) {
 				camera.zoomOut((double) mouse.dWheel());
-			}
-			
-//			// Project mouse coordinates into 3d space for mouse interactions
-//			// --------------------------------------------------------------
-//			
-//			// Hnear = 2 * tan(fov / 2) * nearDist
-//			// in our case: 
-//			//   fov = 45 deg
-//			//   nearDist = 0.2
-//			
-//			double fieldOfView = Math.PI / 4;
-//			double nearDistance = 0.2;
-//			
-//			double nearPlaneHeight = 2 * Math.tan(fieldOfView / 2) * nearDistance;
-//			double nearPlaneWidth = nearPlaneHeight * screenWidth / screenHeight;
-//			
-//			double percentMouseOffsetX = (double) (mouse.x() - screenWidth) / screenWidth + 0.5;
-//			double percentMouseOffsetY = (double) (mouse.y() - screenHeight) / screenHeight + 0.5;
-//			
-//			// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
-//			percentMouseOffsetY = -percentMouseOffsetY;
-//			
-//			double nearX = percentMouseOffsetX * nearPlaneWidth;
-//			double nearY = percentMouseOffsetY * nearPlaneHeight;
-//			
-//			// Obtain the near plane position vector
-//			Vector3 nearPosition;
-//			nearPosition = new Vector3(camera.getDirection());
-//			nearPosition.multiplyLocal(nearDistance);
-//			
-//			nearPosition.addLocal(camera.getPosition());
-//			nearPosition.addLocal(camera.getUp().multiply(nearY));
-//			nearPosition.addLocal(camera.getLeft().multiply(-nearX)); // Note that nearX is positive to the right
-//			
-//			// Obtain the projection direction vector
-//			Vector3 projectionDirection = nearPosition.subtract(camera.getPosition());
-//			projectionDirection.normalizeLocal();
-//			
-//			double angle = projectionDirection.angle(camera.getDirection());
-//			double projectionDistance = (camera.getDistance()) / Math.cos(angle);
-//			
-//			Vector3 projection = projectionDirection.multiply(projectionDistance);
-//			// projection.addLocal(camera.getPosition());
-//			// projection.addLocal(camera.getPosition().subtract(eye));
-//			projection.addLocal(camera.getPosition());
-			
-			Vector3 projection = projectMouseCoordinates(camera.getDistance());
-			
-//			// Store the result for use for mouse-difference related calculations
-//			previousMouseProjection = currentMouseProjection;
-//			currentMouseProjection = projection;
-			
-			
-			// Code for testing functionality of converting mouse coordinates to 3D coordinates
-			/*
-			testNode.x = (float) projection.x();
-			testNode.y = (float) projection.y();
-			testNode.z = (float) projection.z();
-			*/
-			
-			// testNode.x = (float) nearPosition.x();
-			// testNode.y = (float) nearPosition.y();
-			// testNode.z = (float) nearPosition.z();
-			
-			// testNode.x = (float) eye.x();
-			// testNode.y = (float) eye.y();
-			// testNode.z = (float) eye.z();
-			
-			/*
-			System.out.println("percentMouseOffsetX: " + percentMouseOffsetX);
-			System.out.println("percentMouseOffsetY: " + percentMouseOffsetY);
-			System.out.println("nearX: " + nearX);
-			System.out.println("nearY: " + nearY);
-			*/
-			
-			// System.out.println("Mouse is at: (" + mouse.x() + ", " + mouse.y() + ")");
-						
-		
-			
-			// Perform picking-related operations
-			// ----------------------------------
-			
-			PickResult pickResult = performPick(gl, mouse.x(), mouse.y());
-			int pickType = pickResult.type;
-			int pickIndex = pickResult.index;
-			
-			if (pickType == NODE_TYPE) {
-				hoverNodeIndex = pickIndex;
-				hoverEdgeIndex = NO_INDEX;
-			} else if (pickType == EDGE_TYPE) {
-				hoverNodeIndex = NO_INDEX;
-				hoverEdgeIndex = pickIndex;
-			} else {
-				// Note that if these 2 lines are removed, hovering will be "sticky" in that hovering remains unless a new object is hovered
-				hoverNodeIndex = NO_INDEX;
-				hoverEdgeIndex = NO_INDEX;
-			}
-			
-			
-			
-			// If the left button was clicked, prepare to add, or select nodes/edges
-			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 				
-				// If control was pressed, prepare to add a node
-				if (keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
-					
-					CyNode added = networkView.getModel().addNode();
-					networkView.updateView();
-					
-					View<CyNode> viewAdded = networkView.getNodeView(added);
-					
-					// TODO: Maybe throw an exception if viewAdded is null
-					if (viewAdded != null) {
-						viewAdded.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, projection.x() * DISTANCE_SCALE);
-						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, projection.y() * DISTANCE_SCALE);
-						viewAdded.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, projection.z() * DISTANCE_SCALE);
-						
-						// Set the node to be hovered
-						// TODO: This might not be needed if the node were added through some way other than the mouse
-						hoverNodeIndex = added.getIndex();
-					}
-				// Otherwise, prepare to select the node or edge currently under the mouse cursor
-				} else {
-					// If the user did not hold down shift, unselect other objects
-					if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
-						selectedNodes.clear();
-						selectedEdges.clear();
-						
-						selectedNodeIndices.clear();
-						selectedEdgeIndices.clear();
-						
-						// System.out.println("Selection reset");
-					}
-					
-					if (pickType == NODE_TYPE) {
-						CyNode picked = networkView.getModel().getNode(pickIndex);
-						
-						// TODO: Possibly throw exception if the node was found to be null, ie. invalid index
-						if (picked != null) {
-				
-							if (selectedNodes.contains(picked)) {
-								selectedNodes.remove(picked);
-								selectedNodeIndices.remove(picked.getIndex());
-							} else {
-								selectedNodes.add(picked);
-								selectedNodeIndices.add(picked.getIndex());
-							}
-							
-							System.out.println("Selected node index: " + picked.getIndex());
-						}
-					} else if (pickType == EDGE_TYPE) {
-						CyEdge picked = networkView.getModel().getEdge(pickIndex);
-						
-						// TODO: Possibly throw exception if the edge was found to be null, ie. invalid index
-						if (picked != null) {
-					
-							if (selectedEdges.contains(picked)) {
-								selectedEdges.remove(picked);
-								selectedEdgeIndices.remove(picked.getIndex());
-							} else {
-								selectedEdges.add(picked);
-								selectedEdgeIndices.add(picked.getIndex());
-							}
-							
-							System.out.println("Selected edge index: " + picked.getIndex());
-						}
-					} else {
-						
-						// System.out.println("Nothing selected");
-					}
+				if (!selectedNodes.isEmpty()) {
+					// TODO: Check if this is a suitable place to put this, as it helps to make node dragging smoother
+					selectProjectionDistance = findSelectionMidpoint().distance(camera.getPosition());
 				}
+			}
+			
+			// If the left button was clicked, prepare to select nodes/edges
+			if (mouse.getPressed().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+				
+				// If the user did not hold down shift, unselect other objects
+				if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+					selectedNodes.clear();
+					selectedEdges.clear();
+					
+					selectedNodeIndices.clear();
+					selectedEdgeIndices.clear();
+					
+					// System.out.println("Selection reset");
+				}
+				
+				if (pickType == NODE_TYPE) {
+					CyNode picked = networkView.getModel().getNode(pickIndex);
+					
+					// TODO: Possibly throw exception if the node was found to be null, ie. invalid index
+					if (picked != null) {
+			
+						if (selectedNodes.contains(picked)) {
+							selectedNodes.remove(picked);
+							selectedNodeIndices.remove(picked.getIndex());
+						} else {
+							selectedNodes.add(picked);
+							selectedNodeIndices.add(picked.getIndex());
+						}
+						
+						System.out.println("Selected node index: " + picked.getIndex());
+					}
+				} else if (pickType == EDGE_TYPE) {
+					CyEdge picked = networkView.getModel().getEdge(pickIndex);
+					
+					// TODO: Possibly throw exception if the edge was found to be null, ie. invalid index
+					if (picked != null) {
+				
+						if (selectedEdges.contains(picked)) {
+							selectedEdges.remove(picked);
+							selectedEdgeIndices.remove(picked.getIndex());
+						} else {
+							selectedEdges.add(picked);
+							selectedEdgeIndices.add(picked.getIndex());
+						}
+						
+						System.out.println("Selected edge index: " + picked.getIndex());
+					}
+				} else {
+					
+					// System.out.println("Nothing selected");
+				}
+				
 			}
 			
 			
@@ -635,14 +521,14 @@ public class Graphics implements GLEventListener {
 				// Store the result for use for mouse-difference related calculations
 				selectProjectionDistance = findSelectionMidpoint().distance(camera.getPosition());
 				
-				previousSelectProjection = projectMouseCoordinates(selectProjectionDistance);
+				previousSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
 			// } else if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectProjection != null) {
-			} else if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectProjection != null) {
+			} else if ((selectedNodes.size() == 1 || keys.getHeld().contains(KeyEvent.VK_CONTROL)) && mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectedProjection != null) {
 				View<CyNode> nodeView;
 				Vector3 projectionDisplacement;
 				
-				currentSelectProjection = projectMouseCoordinates(selectProjectionDistance);
-				projectionDisplacement = currentSelectProjection.subtract(previousSelectProjection);
+				currentSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
+				projectionDisplacement = currentSelectedProjection.subtract(previousSelectedProjection);
 				
 				double x, y, z;
 				
@@ -663,7 +549,7 @@ public class Graphics implements GLEventListener {
 					}
 				}
 				
-				previousSelectProjection = currentSelectProjection;
+				previousSelectedProjection = currentSelectedProjection;
 			}
 			
 			
@@ -672,6 +558,7 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private Vector3 projectMouseCoordinates(double planeDistance) {
+		
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
 		
@@ -746,7 +633,7 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private PickResult performPick(GL2 gl, double x, double y) {
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(256);
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1028);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		IntBuffer buffer = byteBuffer.asIntBuffer();
 		
@@ -831,6 +718,8 @@ public class Graphics implements GLEventListener {
 	    	
 	    	for (int i = 0; i < hits; i++) {
 	    		
+	    		// TODO: place check here so we don't go out of bounds (the Maximum Size was set at declaration of ByteBuffer)
+	    		
 	    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
 	    			max = buffer.get(i * sizeOfHitRecord + 2);
 	    			maxType = buffer.get(i * sizeOfHitRecord + 3);
@@ -891,6 +780,7 @@ public class Graphics implements GLEventListener {
 		// gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
 
+	// This method will draw all edges
 	private void drawEdges(GL2 gl, DrawStateModifier generalModifier) {
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
@@ -1221,29 +1111,63 @@ public class Graphics implements GLEventListener {
 		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
 		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
 
+		// Draw Node
+		// ---------
+		
 		gl.glNewList(nodeListIndex, GL2.GL_COMPILE);
 		glu.gluSphere(quadric, SMALL_SPHERE_RADIUS, NODE_SLICES_DETAIL,
 				NODE_STACKS_DETAIL);
 		// glut.glutSolidSphere(SMALL_SPHERE_RADIUS, NODE_SLICES_DETAIL,
 		// NODE_STACKS_DETAIL);
 		gl.glEndList();
-
-		GLUquadric quadric2 = glu.gluNewQuadric();
-		glu.gluQuadricDrawStyle(quadric2, GLU.GLU_FILL);
-		glu.gluQuadricNormals(quadric2, GLU.GLU_SMOOTH); // TODO: Experiment with GLU_FLAT for efficiency
+		
+		// Draw Standard-Length Edge
+		// -------------------------
+		
+		GLUquadric edgeQuadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(edgeQuadric, GLU.GLU_FILL);
+		glu.gluQuadricNormals(edgeQuadric, GLU.GLU_SMOOTH); // TODO: Experiment with GLU_FLAT for efficiency
 		
 		gl.glNewList(edgeListIndex, GL2.GL_COMPILE);
-		glu.gluCylinder(quadric2, EDGE_RADIUS, EDGE_RADIUS, 1.0,
+		glu.gluCylinder(edgeQuadric, EDGE_RADIUS, EDGE_RADIUS, 1.0,
 				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
 		gl.glEndList();
+		
+		// Draw Pointer
+		// ------------
 		
 		GLUquadric pointerQuadric = glu.gluNewQuadric();
 		glu.gluQuadricDrawStyle(pointerQuadric, GLU.GLU_LINE);
 		glu.gluQuadricNormals(pointerQuadric, GLU.GLU_NONE);
 		
+		float axisLength = 0.055f;
+		float overHang = 0.0225f;
+		float radius = 0.003f;
+		
 		gl.glNewList(pointerListIndex, GL2.GL_COMPILE);
-		glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4,
-				4);
+		// glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4, 4);
+		
+		// gl.glColor3f(0.73f, 0.73f, 0.72f);
+		
+		// Draw X axis
+		gl.glTranslatef(-overHang, 0.0f, 0.0f);
+		gl.glRotatef(90, 0, 1, 0);
+		glu.gluCylinder(edgeQuadric, radius, radius, axisLength, 4, 1);
+		gl.glRotatef(-90, 0, 1, 0);
+		gl.glTranslatef(overHang, 0.0f, 0.0f);
+		
+		// Draw Y axis
+		gl.glTranslatef(0.0f, -overHang, 0.0f);
+		gl.glRotatef(-90, 1, 0, 0);
+		glu.gluCylinder(edgeQuadric, radius, radius, axisLength, 4, 1);
+		gl.glRotatef(90, 1, 0, 0);
+		gl.glTranslatef(0.0f, overHang, 0.0f);
+		
+		// Draw Z axis
+		gl.glTranslatef(0.0f, 0.0f, -overHang);
+		glu.gluCylinder(edgeQuadric, radius, radius, axisLength, 4, 1);
+		gl.glTranslatef(0.0f, 0.0f, overHang);
+		
 		gl.glEndList();
 	}
 

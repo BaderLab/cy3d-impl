@@ -92,7 +92,6 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 			prevY = currentY;
 			ignoreNext = false;
 		}
-		
 	}
 
 	@Override
