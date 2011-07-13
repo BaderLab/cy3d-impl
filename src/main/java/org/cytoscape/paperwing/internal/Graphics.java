@@ -59,6 +59,7 @@ public class Graphics implements GLEventListener {
 	private int edgeListIndex;
 	
 	private int pointerListIndex;
+	private int selectionBoxListIndex;
 	
 	private long startTime;
 	private long endTime;
@@ -74,6 +75,15 @@ public class Graphics implements GLEventListener {
 	
 	private TreeSet<Integer> selectedNodeIndices;
 	private TreeSet<Integer> selectedEdgeIndices;
+	
+	private static int NULL_COORDINATE = Integer.MIN_VALUE;
+	
+	private int selectTopLeftX;
+	private int selectTopLeftY;
+	
+	private int selectBottomRightX;
+	private int selectBottomRightY;
+	
 	
 	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
 	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
@@ -111,6 +121,11 @@ public class Graphics implements GLEventListener {
 		public int index;
 	}
 	
+	private class PickResults {
+		public LinkedHashSet<Integer> nodeIndices;
+		public LinkedHashSet<Integer> edgeIndices;
+	}
+	
 	public static void initSingleton() {
 		GLProfile.initSingleton(false);
 		System.out.println("initSingleton called");
@@ -133,6 +148,11 @@ public class Graphics implements GLEventListener {
 		selectedNodeIndices = new TreeSet<Integer>();
 		selectedEdgeIndices = new TreeSet<Integer>();
 
+		selectTopLeftX = NULL_COORDINATE;
+		selectTopLeftY = NULL_COORDINATE;
+		
+		selectBottomRightX = NULL_COORDINATE;
+		selectBottomRightY = NULL_COORDINATE;
 	}
 	
 	public void trackInput(Component component) {
@@ -161,8 +181,10 @@ public class Graphics implements GLEventListener {
 		//drawable.swapBuffers();
 		GL2 gl = drawable.getGL().getGL2();
 		
+		// Check input
 		checkInput(gl);
 
+		// Reset scene
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
 
@@ -171,7 +193,8 @@ public class Graphics implements GLEventListener {
 		Vector3 up = camera.getUp();
 
 		// System.out.println(position + " " + target + " " + up);
-
+		
+		
 //		Vector3 projection = projectMouseCoordinates(camera.getDistance());
 //		gl.glPushMatrix();
 //		gl.glTranslated(projection.x(), projection.y(), -camera.getDistance());
@@ -183,13 +206,9 @@ public class Graphics implements GLEventListener {
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
 
-		// gl.glRotated(direction.angle(current) * 180 / Math.PI, normal.x(),
-		// normal.y(), normal.z());
-		// gl.glTranslated(-camera.x(), -camera.y(), -camera.z());
 
-		double distance = target.distance(position);
-		Vector3 leftPointer = target.add(camera.getLeft().multiply(distance / 2));
-		Vector3 rightPointer = target.subtract(camera.getLeft().multiply(distance / 2));
+		// Draw mouse reticle
+		// ------------------
 		
 		gl.glPushMatrix();
 		//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
@@ -197,17 +216,56 @@ public class Graphics implements GLEventListener {
 		Vector3 projection = projectMouseCoordinates(camera.getDistance());
 		
 		gl.glTranslated(projection.x(), projection.y(), projection.z());
-		gl.glColor3f(0.85f, 0.85f, 0.83f);
+		gl.glColor3f(0.93f, 0.23f, 0.32f);
 		gl.glCallList(pointerListIndex);
 		gl.glPopMatrix();
+		
+		
+		// Draw selection box
+		// ------------------
+		
+		if (selectTopLeftX != NULL_COORDINATE && selectTopLeftY != NULL_COORDINATE 
+				&& selectBottomRightX != NULL_COORDINATE && selectBottomRightY != NULL_COORDINATE) {
+			
+			double projectDistance = 0.5;
+			
+			Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, projectDistance);
+			Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, projectDistance);
+			
+			Vector3 topRight = projectMouseCoordinates(selectBottomRightX, selectTopLeftY, projectDistance);
+			Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, projectDistance);
+
+			gl.glColor3f(1.0f, 0.7f, 0.7f);
+			drawSingleEdge(gl, topLeft, bottomLeft, DrawStateModifier.NORMAL);
+			drawSingleEdge(gl, bottomLeft, bottomRight, DrawStateModifier.NORMAL);
+			drawSingleEdge(gl, bottomRight, topRight, DrawStateModifier.NORMAL);
+			drawSingleEdge(gl, topRight, topLeft, DrawStateModifier.NORMAL);
+
+
+//			
+//			gl.glLineWidth(3.0f);
+//			gl.glBegin(GL2.GL_LINE_LOOP);
+//			
+//				gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
+//				gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
+//				gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
+//				gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
+//				
+//			gl.glEnd();
+//			gl.glLineWidth(1.0f);
+		}
+		
+		// Control light positioning
+		// -------------------------
 		
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 //		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 //				FloatBuffer.wrap(lightPosition));
 
-		gl.glColor3f(0.6f, 0.6f, 0.6f);
-		// gl.glTranslatef(0.0f, 0.0f, -6.0f);
 
+		// Draw nodes and edges
+		// --------------------
+		
 		gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
 		gl.glColor3f(0.51f, 0.51f, 0.53f);
@@ -460,6 +518,7 @@ public class Graphics implements GLEventListener {
 				}
 			}
 			
+			
 			// If the left button was clicked, prepare to select nodes/edges
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				
@@ -473,6 +532,17 @@ public class Graphics implements GLEventListener {
 					
 					// System.out.println("Selection reset");
 				}
+			
+				// Prepare to perform drag selection
+				// ---------------------------------
+				
+				selectTopLeftX = mouse.x();
+				selectTopLeftY = mouse.y();
+				
+				selectBottomRightX = NULL_COORDINATE;
+				selectBottomRightY = NULL_COORDINATE;
+				
+				// ----------------------------------
 				
 				if (pickType == NODE_TYPE) {
 					CyNode picked = networkView.getModel().getNode(pickIndex);
@@ -513,6 +583,27 @@ public class Graphics implements GLEventListener {
 				
 			}
 			
+			// Drag selection; moving the box
+			if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+				selectBottomRightX = mouse.x();
+				selectBottomRightY = mouse.y();
+			}
+			
+			// Drag selection; selecting contents of the box
+			if (mouse.getReleased().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+				selectBottomRightX = mouse.x();
+				selectBottomRightY = mouse.y();
+				
+				System.out.println("Selection from (" + selectTopLeftX + ", " + selectTopLeftY + ") to "
+						+ "(" + selectBottomRightX + ", " + selectBottomRightY + ")");
+				
+				selectTopLeftX = NULL_COORDINATE;
+				selectTopLeftY = NULL_COORDINATE;
+				
+				selectBottomRightX = NULL_COORDINATE;
+				selectBottomRightY = NULL_COORDINATE;
+				
+			}
 			
 			// Drag-move selected nodes using projected cursor location
 			// --------------------------------------------------------
@@ -558,6 +649,10 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private Vector3 projectMouseCoordinates(double planeDistance) {
+		return projectMouseCoordinates(mouse.x(), mouse.y(), planeDistance);
+	}
+	
+	private Vector3 projectMouseCoordinates(int x, int y, double planeDistance) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
@@ -573,8 +668,8 @@ public class Graphics implements GLEventListener {
 		double nearPlaneHeight = 2 * Math.tan(fieldOfView / 2) * nearDistance;
 		double nearPlaneWidth = nearPlaneHeight * screenWidth / screenHeight;
 		
-		double percentMouseOffsetX = (double) (mouse.x() - screenWidth) / screenWidth + 0.5;
-		double percentMouseOffsetY = (double) (mouse.y() - screenHeight) / screenHeight + 0.5;
+		double percentMouseOffsetX = (double) (x - screenWidth) / screenWidth + 0.5;
+		double percentMouseOffsetY = (double) (y - screenHeight) / screenHeight + 0.5;
 		
 		// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
 		percentMouseOffsetY = -percentMouseOffsetY;
@@ -633,14 +728,16 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private PickResult performPick(GL2 gl, double x, double y) {
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1028);
+		int bufferSize = 512;
+		
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize + 1);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		IntBuffer buffer = byteBuffer.asIntBuffer();
 		
 		IntBuffer viewport = IntBuffer.allocate(4);
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
 		
-		gl.glSelectBuffer(256, buffer);
+		gl.glSelectBuffer(bufferSize, buffer);
 	    gl.glRenderMode(GL2.GL_SELECT);
 	    gl.glInitNames();
 	    
@@ -656,7 +753,8 @@ public class Graphics implements GLEventListener {
 	    // don't think this ortho call is needed
 	    // gl.glOrtho(0.0, 8.0, 0.0, 8.0, -0.5, 2.5);
 	    
-	    // -Begin Drawing-
+	    // --Begin Drawing--
+	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 	    gl.glLoadIdentity();
@@ -687,7 +785,7 @@ public class Graphics implements GLEventListener {
 		gl.glPopName();
 		gl.glPopName();
 		
-		// -End Drawing-
+		// --End Drawing--
 		
 		gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glPopMatrix();
@@ -716,10 +814,20 @@ public class Graphics implements GLEventListener {
 	    	selectedType = buffer.get(3);
 	    	selectedIndex = buffer.get(4);
 	    	
+//	    	// Check for out of bounds exceptions
+//	    	if (hits * sizeOfHitRecord >= bufferSize) {
+//	    		System.out.println(hits * sizeOfHitRecord + " exceeds picking buffer size " + bufferSize
+//	    				+ ". Truncating extra hits..");
+//	    		
+//	    		// TODO: Check if this is needed
+//	    		
+//	    		// Perform truncation to prevent error if not enough room to store all records
+//	    		hits = bufferSize / sizeOfHitRecord;
+//	    		
+//	    	}
+	    	
 	    	for (int i = 0; i < hits; i++) {
-	    		
-	    		// TODO: place check here so we don't go out of bounds (the Maximum Size was set at declaration of ByteBuffer)
-	    		
+	    	
 	    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
 	    			max = buffer.get(i * sizeOfHitRecord + 2);
 	    			maxType = buffer.get(i * sizeOfHitRecord + 3);
@@ -1065,6 +1173,7 @@ public class Graphics implements GLEventListener {
 		gl.glPopMatrix();
 	}
 
+
 	private void drawNodesEdges(GL2 gl) {
 		gl.glCallList(edgeListIndex);
 		gl.glCallList(nodeListIndex);
@@ -1097,6 +1206,12 @@ public class Graphics implements GLEventListener {
 		
 		// Correct lightning for scaling certain models
 		gl.glEnable(GL2.GL_NORMALIZE);
+		
+		// Enable blending
+		// ---------------
+		
+		// gl.glEnable(GL2.GL_BLEND);
+		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	private void createDisplayLists(GL2 gl) {
@@ -1140,14 +1255,12 @@ public class Graphics implements GLEventListener {
 		glu.gluQuadricDrawStyle(pointerQuadric, GLU.GLU_LINE);
 		glu.gluQuadricNormals(pointerQuadric, GLU.GLU_NONE);
 		
-		float axisLength = 0.060f;
-		float overHang = 0.030f;
-		float radius = 0.0025f;
+		float axisLength = 0.056f;
+		float overHang = 0.028f;
+		float radius = 0.002f;
 		
 		gl.glNewList(pointerListIndex, GL2.GL_COMPILE);
 		// glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4, 4);
-		
-		gl.glColor3f(0.93f, 0.23f, 0.32f);
 		
 		// Draw X axis
 		gl.glTranslatef(-overHang, 0.0f, 0.0f);
@@ -1169,6 +1282,17 @@ public class Graphics implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, overHang);
 		
 		gl.glEndList();
+		
+		// Draw Selection Box
+		// ------------------
+		
+		GLUquadric selectionBoxQuadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(selectionBoxQuadric, GLU.GLU_LINE);
+		glu.gluQuadricNormals(selectionBoxQuadric, GLU.GLU_NONE);
+//		
+//		gl.glNewList(edgeListIndex, GL2.GL_COMPILE);
+//		//gl.glColo
+//		gl.glEndList();
 	}
 
 	private void initLighting(GLAutoDrawable drawable) {
