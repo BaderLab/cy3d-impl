@@ -78,6 +78,7 @@ public class Graphics implements GLEventListener {
 	
 	private static int NULL_COORDINATE = Integer.MIN_VALUE;
 	
+	private boolean dragSelectMode;
 	private int selectTopLeftX;
 	private int selectTopLeftY;
 	
@@ -87,8 +88,10 @@ public class Graphics implements GLEventListener {
 	
 	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
 	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
-	private int hoverNodeIndex = NO_INDEX;
-	private int hoverEdgeIndex = NO_INDEX;
+	private int hoverNodeIndex;
+	private int hoverEdgeIndex;
+	
+	// private LinkedHashSet<CyNode>
 	
 	private static enum DrawStateModifier {
 	    HOVERED, SELECTED, NORMAL, ENLARGED
@@ -122,8 +125,8 @@ public class Graphics implements GLEventListener {
 	}
 	
 	private class PickResults {
-		public LinkedHashSet<Integer> nodeIndices;
-		public LinkedHashSet<Integer> edgeIndices;
+		public LinkedHashSet<Integer> nodeIndices = new LinkedHashSet<Integer>();
+		public LinkedHashSet<Integer> edgeIndices = new LinkedHashSet<Integer>();
 	}
 	
 	public static void initSingleton() {
@@ -148,6 +151,10 @@ public class Graphics implements GLEventListener {
 		selectedNodeIndices = new TreeSet<Integer>();
 		selectedEdgeIndices = new TreeSet<Integer>();
 
+		hoverNodeIndex = NO_INDEX;
+		hoverEdgeIndex = NO_INDEX;
+		
+		dragSelectMode = false;
 		selectTopLeftX = NULL_COORDINATE;
 		selectTopLeftY = NULL_COORDINATE;
 		
@@ -224,10 +231,11 @@ public class Graphics implements GLEventListener {
 		// Draw selection box
 		// ------------------
 		
-		if (selectTopLeftX != NULL_COORDINATE && selectTopLeftY != NULL_COORDINATE 
-				&& selectBottomRightX != NULL_COORDINATE && selectBottomRightY != NULL_COORDINATE) {
-			
-			double projectDistance = 0.5;
+//		if (selectTopLeftX != NULL_COORDINATE && selectTopLeftY != NULL_COORDINATE 
+//				&& selectBottomRightX != NULL_COORDINATE && selectBottomRightY != NULL_COORDINATE) {
+		
+		if (dragSelectMode) {
+			double projectDistance = 2;
 			
 			Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, projectDistance);
 			Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, projectDistance);
@@ -477,28 +485,30 @@ public class Graphics implements GLEventListener {
 		// Perform picking-related operations
 		// ----------------------------------
 		
-		PickResult pickResult = performPick(gl, mouse.x(), mouse.y());
-		int pickType = pickResult.type;
-		int pickIndex = pickResult.index;
+		PickResults pickResults = performPick(gl, mouse.x(), mouse.y(), 2, 2, false);
 		
-		if (pickType == NODE_TYPE) {
-			hoverNodeIndex = pickIndex;
-			hoverEdgeIndex = NO_INDEX;
-		} else if (pickType == EDGE_TYPE) {
-			hoverNodeIndex = NO_INDEX;
-			hoverEdgeIndex = pickIndex;
-		} else {
-			// Note that if these 2 lines are removed, hovering will be "sticky" in that hovering remains unless a new object is hovered
-			hoverNodeIndex = NO_INDEX;
-			hoverEdgeIndex = NO_INDEX;
+		int newHoverNodeIndex = NO_INDEX;
+		int newHoverEdgeIndex = NO_INDEX;
+		
+		for (Integer nodeIndex : pickResults.nodeIndices) {
+			newHoverNodeIndex = nodeIndex;
 		}
 		
+		for (Integer edgeIndex : pickResults.edgeIndices) {
+			newHoverEdgeIndex = edgeIndex;
+		}
+	
+		// Make sure only 1 object is selected for single selection
+		assert pickResults.nodeIndices.size() + pickResults.edgeIndices.size() <= 1;
+		assert false;
 		
 		if (keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 			hoverNodeIndex = NO_INDEX;
 			hoverEdgeIndex = NO_INDEX;
+		} else {
+			hoverNodeIndex = newHoverNodeIndex;
+			hoverEdgeIndex = newHoverEdgeIndex;
 		}
-		
 		
 		if (mouse.hasMoved() || mouse.hasNew()) {
 			
@@ -544,8 +554,8 @@ public class Graphics implements GLEventListener {
 				
 				// ----------------------------------
 				
-				if (pickType == NODE_TYPE) {
-					CyNode picked = networkView.getModel().getNode(pickIndex);
+				if (newHoverNodeIndex != NO_INDEX) {
+					CyNode picked = networkView.getModel().getNode(newHoverNodeIndex);
 					
 					// TODO: Possibly throw exception if the node was found to be null, ie. invalid index
 					if (picked != null) {
@@ -560,8 +570,8 @@ public class Graphics implements GLEventListener {
 						
 						System.out.println("Selected node index: " + picked.getIndex());
 					}
-				} else if (pickType == EDGE_TYPE) {
-					CyEdge picked = networkView.getModel().getEdge(pickIndex);
+				} else if (newHoverEdgeIndex != NO_INDEX) {
+					CyEdge picked = networkView.getModel().getEdge(newHoverEdgeIndex);
 					
 					// TODO: Possibly throw exception if the edge was found to be null, ie. invalid index
 					if (picked != null) {
@@ -587,6 +597,14 @@ public class Graphics implements GLEventListener {
 			if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				selectBottomRightX = mouse.x();
 				selectBottomRightY = mouse.y();
+				
+				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1 
+						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1) {
+					
+					dragSelectMode = true;
+				} else {
+					dragSelectMode = false;
+				}
 			}
 			
 			// Drag selection; selecting contents of the box
@@ -594,14 +612,52 @@ public class Graphics implements GLEventListener {
 				selectBottomRightX = mouse.x();
 				selectBottomRightY = mouse.y();
 				
-				System.out.println("Selection from (" + selectTopLeftX + ", " + selectTopLeftY + ") to "
-						+ "(" + selectBottomRightX + ", " + selectBottomRightY + ")");
-				
+				if (Math.abs(selectTopLeftX - selectBottomRightX) < 1 
+						&& Math.abs(selectTopLeftY - selectBottomRightY) < 1) {
+					
+					dragSelectMode = false;
+				} else {
+					
+	//				System.out.println("Selection from (" + selectTopLeftX + ", " + selectTopLeftY + ") to "
+	//						+ "(" + selectBottomRightX + ", " + selectBottomRightY + ")");
+					
+					PickResults results = performPick(gl, (selectTopLeftX + selectBottomRightX)/2, 
+							(selectTopLeftY + selectBottomRightY)/2, 
+							Math.abs(selectTopLeftX - selectBottomRightX),
+							Math.abs(selectTopLeftY - selectBottomRightY), true);
+					
+					CyNode node;
+					for (Integer nodeIndex : results.nodeIndices) {
+						node = networkView.getModel().getNode(nodeIndex);
+						
+						if (node != null) {
+							selectedNodes.add(node);
+							selectedNodeIndices.add(nodeIndex);
+						} else {
+							System.out.println("Null node found for index " + nodeIndex + " in drag selection, ignoring..");
+						}
+					}
+					
+					CyEdge edge;
+					for (Integer edgeIndex : results.edgeIndices) {
+						edge = networkView.getModel().getEdge(edgeIndex);
+						
+						if (edge != null) {
+							selectedEdges.add(edge);
+							selectedEdgeIndices.add(edgeIndex);
+						} else {
+							System.out.println("Null edge found for index " + edgeIndex + " in drag selection, ignoring..");
+						}
+					}
+				}
+					
 				selectTopLeftX = NULL_COORDINATE;
 				selectTopLeftY = NULL_COORDINATE;
 				
 				selectBottomRightX = NULL_COORDINATE;
 				selectBottomRightY = NULL_COORDINATE;
+				
+				dragSelectMode = false;
 				
 			}
 			
@@ -614,7 +670,7 @@ public class Graphics implements GLEventListener {
 				
 				previousSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
 			// } else if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectProjection != null) {
-			} else if ((selectedNodes.size() == 1 || keys.getHeld().contains(KeyEvent.VK_CONTROL)) && mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectedProjection != null) {
+			} else if (keys.getHeld().contains(KeyEvent.VK_CONTROL) && mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectedProjection != null) {
 				View<CyNode> nodeView;
 				Vector3 projectionDisplacement;
 				
@@ -727,17 +783,21 @@ public class Graphics implements GLEventListener {
 		return result;
 	}
 	
-	private PickResult performPick(GL2 gl, double x, double y) {
-		int bufferSize = 512;
+	private PickResults performPick(GL2 gl, int x, int y, int width, int height, boolean selectAll) {
+		int bufferSize = 1024;
 		
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize + 1);
+		if (selectAll) {
+			bufferSize = 1024;
+		}
+		
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		IntBuffer buffer = byteBuffer.asIntBuffer();
 		
 		IntBuffer viewport = IntBuffer.allocate(4);
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
 		
-		gl.glSelectBuffer(bufferSize, buffer);
+		gl.glSelectBuffer(bufferSize/4, buffer);
 	    gl.glRenderMode(GL2.GL_SELECT);
 	    gl.glInitNames();
 	    
@@ -747,7 +807,7 @@ public class Graphics implements GLEventListener {
 	    GLU glu = new GLU();
 	    gl.glLoadIdentity();
 	
-	    glu.gluPickMatrix(x, screenHeight - y, 2, 2, viewport);
+	    glu.gluPickMatrix(x, screenHeight - y, width, height, viewport);
 	    glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f, 50.0f);
 	    
 	    // don't think this ortho call is needed
@@ -805,6 +865,8 @@ public class Graphics implements GLEventListener {
 	    // indices 0-4 respectively
 	    int sizeOfHitRecord = 5;
 	    
+	    PickResults results = new PickResults();
+	    
 		if (hits > 0) {
 			// The variable max helps keep track of the polygon that is closest
 			// to the front of the screen
@@ -826,26 +888,41 @@ public class Graphics implements GLEventListener {
 //	    		
 //	    	}
 	    	
-	    	for (int i = 0; i < hits; i++) {
-	    	
-	    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
-	    			max = buffer.get(i * sizeOfHitRecord + 2);
-	    			maxType = buffer.get(i * sizeOfHitRecord + 3);
+	    	// Drag-selection; select all
+	    	if (selectAll) {
+	    		for (int i = 0; i < hits; i++) {
+			    	
+	    			selectedType = buffer.get(i * sizeOfHitRecord + 3);
+	    			selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
 	    			
-	    			selectedType = buffer.get(i * sizeOfHitRecord + 3); // We have that name1 represents the object type
-	    			selectedIndex = buffer.get(i * sizeOfHitRecord + 4); // name2 represents the object index
-	    		}
-	    	}
-	    } else {
-	    	selectedType = NO_TYPE;
-	    	selectedIndex = NO_INDEX;
+	    			if (selectedType == NODE_TYPE) {
+						results.nodeIndices.add(selectedIndex);
+					} else if (selectedType == EDGE_TYPE) {
+						results.edgeIndices.add(selectedIndex);
+					}
+		    	}
+			// Single selection
+			} else {
+		    	for (int i = 0; i < hits; i++) {
+		    	
+		    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+		    			max = buffer.get(i * sizeOfHitRecord + 2);
+		    			maxType = buffer.get(i * sizeOfHitRecord + 3);
+		    			
+		    			selectedType = buffer.get(i * sizeOfHitRecord + 3); // We have that name1 represents the object type
+		    			selectedIndex = buffer.get(i * sizeOfHitRecord + 4); // name2 represents the object index		
+		    		}
+		    	}
+	    	
+		    	if (selectedType == NODE_TYPE) {
+					results.nodeIndices.add(selectedIndex);
+				} else if (selectedType == EDGE_TYPE) {
+					results.edgeIndices.add(selectedIndex);
+				}
+			}
 	    }
 		
-		PickResult result = new PickResult();
-		result.type = selectedType;
-		result.index = selectedIndex;
-	
-	    return result;
+	    return results;
 	}
 
 	private void drawNodes(GL2 gl) {
