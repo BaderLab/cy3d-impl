@@ -787,7 +787,7 @@ public class Graphics implements GLEventListener {
 		int bufferSize = 1024;
 		
 		if (selectAll) {
-			bufferSize = 1024;
+			bufferSize = 8128;
 		}
 		
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize);
