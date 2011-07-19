@@ -34,6 +34,12 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class Graphics implements GLEventListener {
 
+	/*
+	 * This value controls distance scaling when converting from node
+	 * coordinates to drawing coordinates
+	 */
+	private static final float DISTANCE_SCALE = 178.0f; 
+	
 	private static final float LARGE_SPHERE_RADIUS = 1.0f; // 1.5f
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
 	private static final float MINIMUM_EDGE_DRAW_DISTANCE_SQUARED = Float.MIN_NORMAL; // 0.015f
@@ -44,22 +50,25 @@ public class Graphics implements GLEventListener {
 	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
 	private static final int EDGES_PER_RADIUS = 3;
 	
-	/*
-	 * This value controls distance scaling when converting from node
-	 * coordinates to drawing coordinates
-	 */
-	private static final float DISTANCE_SCALE = 178.0f; 
-	
 	private static final int NODE_SLICES_DETAIL = 10; // 24, 24, 12 used to be default values for slices/stacks/slices
 	private static final int NODE_STACKS_DETAIL = 10;
 	private static final int EDGE_SLICES_DETAIL = 4;
 	private static final int EDGE_STACKS_DETAIL = 1;
 
+	private static final float SELECT_BORDER_RADIUS = 0.0025f;
+	
+	private static final int SELECT_BORDER_SLICES_DETAIL = 7;
+	private static final int SELECT_BORDER_STACKS_DETAIL = 1;
+	
+	private static final double SELECT_BORDER_DISTANCE = 0.92;
+	
+	
+	
 	private int nodeListIndex;
 	private int edgeListIndex;
 	
 	private int pointerListIndex;
-	private int selectionBoxListIndex;
+	private int selectBorderListIndex;
 	
 	private long startTime;
 	private long endTime;
@@ -94,7 +103,7 @@ public class Graphics implements GLEventListener {
 	// private LinkedHashSet<CyNode>
 	
 	private static enum DrawStateModifier {
-	    HOVERED, SELECTED, NORMAL, ENLARGED
+	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER
 	}
 	
 	 private static final int NO_TYPE = -1;
@@ -217,16 +226,17 @@ public class Graphics implements GLEventListener {
 		// Draw mouse reticle
 		// ------------------
 		
-		gl.glPushMatrix();
-		//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
-		
-		Vector3 projection = projectMouseCoordinates(camera.getDistance());
-		
-		gl.glTranslated(projection.x(), projection.y(), projection.z());
-		gl.glColor3f(0.93f, 0.23f, 0.32f);
-		gl.glCallList(pointerListIndex);
-		gl.glPopMatrix();
-		
+		if (!dragSelectMode) {
+			gl.glPushMatrix();
+			//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
+			
+			Vector3 projection = projectMouseCoordinates(camera.getDistance());
+			
+			gl.glTranslated(projection.x(), projection.y(), projection.z());
+			gl.glColor3f(0.93f, 0.23f, 0.32f);
+			gl.glCallList(pointerListIndex);
+			gl.glPopMatrix();
+		}
 		
 		// Draw selection box
 		// ------------------
@@ -235,21 +245,9 @@ public class Graphics implements GLEventListener {
 //				&& selectBottomRightX != NULL_COORDINATE && selectBottomRightY != NULL_COORDINATE) {
 		
 		if (dragSelectMode) {
-			double projectDistance = 2;
 			
-			Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, projectDistance);
-			Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, projectDistance);
+			drawSelectionBox(gl, SELECT_BORDER_DISTANCE);
 			
-			Vector3 topRight = projectMouseCoordinates(selectBottomRightX, selectTopLeftY, projectDistance);
-			Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, projectDistance);
-
-			gl.glColor3f(1.0f, 0.7f, 0.7f);
-			drawSingleEdge(gl, topLeft, bottomLeft, DrawStateModifier.NORMAL);
-			drawSingleEdge(gl, bottomLeft, bottomRight, DrawStateModifier.NORMAL);
-			drawSingleEdge(gl, bottomRight, topRight, DrawStateModifier.NORMAL);
-			drawSingleEdge(gl, topRight, topLeft, DrawStateModifier.NORMAL);
-
-
 //			
 //			gl.glLineWidth(3.0f);
 //			gl.glBegin(GL2.GL_LINE_LOOP);
@@ -326,7 +324,7 @@ public class Graphics implements GLEventListener {
 				camera.rollClockwise();
 			}
 			
-			// Roll camera clockwise
+			// Roll camera counter-clockwise
 			if (held.contains(KeyEvent.VK_X)) {
 				camera.rollCounterClockwise();
 			}
@@ -500,9 +498,8 @@ public class Graphics implements GLEventListener {
 	
 		// Make sure only 1 object is selected for single selection
 		assert pickResults.nodeIndices.size() + pickResults.edgeIndices.size() <= 1;
-		assert false;
 		
-		if (keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+		if (keys.getHeld().contains(KeyEvent.VK_CONTROL) || dragSelectMode) {
 			hoverNodeIndex = NO_INDEX;
 			hoverEdgeIndex = NO_INDEX;
 		} else {
@@ -612,11 +609,8 @@ public class Graphics implements GLEventListener {
 				selectBottomRightX = mouse.x();
 				selectBottomRightY = mouse.y();
 				
-				if (Math.abs(selectTopLeftX - selectBottomRightX) < 1 
-						&& Math.abs(selectTopLeftY - selectBottomRightY) < 1) {
-					
-					dragSelectMode = false;
-				} else {
+				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1 
+						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1) {
 					
 	//				System.out.println("Selection from (" + selectTopLeftX + ", " + selectTopLeftY + ") to "
 	//						+ "(" + selectBottomRightX + ", " + selectBottomRightY + ")");
@@ -1232,7 +1226,10 @@ public class Graphics implements GLEventListener {
 		
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
 		
-		if (modifier == DrawStateModifier.ENLARGED) {
+		if (modifier == DrawStateModifier.NORMAL) {
+			gl.glColor3f(0.73f, 0.73f, 0.73f);
+			gl.glCallList(edgeListIndex);
+		} else if (modifier == DrawStateModifier.ENLARGED) {
 			gl.glScalef(1.6f, 1.6f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.SELECTED) {
@@ -1242,15 +1239,40 @@ public class Graphics implements GLEventListener {
 		} else if (modifier == DrawStateModifier.HOVERED) {
 			gl.glColor3f(0.45f, 0.45f, 0.70f);
 			gl.glCallList(edgeListIndex);
+		} else if (modifier == DrawStateModifier.SELECT_BORDER) {
+			gl.glColor3f(0.70f, 0.38f, 0.64f);
+			gl.glCallList(selectBorderListIndex);
 		} else {
-			gl.glColor3f(0.73f, 0.73f, 0.73f);
-			gl.glCallList(edgeListIndex);
+			// Invalid modifier found
 		}
 	
 		gl.glPopMatrix();
 	}
 
+	private void drawSelectionBox(GL2 gl, double drawDistance) {
+		Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, drawDistance);
+		Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, drawDistance);
+		
+		Vector3 topRight = projectMouseCoordinates(selectBottomRightX, selectTopLeftY, drawDistance);
+		Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, drawDistance);
 
+		
+		drawSingleSelectionEdge(gl, topLeft, topRight);
+		drawSingleSelectionEdge(gl, topLeft, bottomLeft);
+		
+		drawSingleSelectionEdge(gl, topRight, bottomRight);
+		drawSingleSelectionEdge(gl, bottomLeft, bottomRight);
+		
+	}
+	
+	private void drawSingleSelectionEdge(GL2 gl, Vector3 originalStart, Vector3 originalEnd) {
+		Vector3 offset = originalEnd.subtract(originalStart);
+		offset.normalizeLocal();
+		offset.multiplyLocal(SELECT_BORDER_RADIUS/2);
+		
+		drawSingleEdge(gl, originalStart.subtract(offset), originalEnd.add(offset), DrawStateModifier.SELECT_BORDER);
+	}
+	
 	private void drawNodesEdges(GL2 gl) {
 		gl.glCallList(edgeListIndex);
 		gl.glCallList(nodeListIndex);
@@ -1295,6 +1317,8 @@ public class Graphics implements GLEventListener {
 		nodeListIndex = gl.glGenLists(1);
 		edgeListIndex = gl.glGenLists(1);
 		pointerListIndex = gl.glGenLists(1);
+		
+		selectBorderListIndex = gl.glGenLists(1);
 		
 		GLUT glut = new GLUT();
 		GLU glu = new GLU();
@@ -1360,16 +1384,20 @@ public class Graphics implements GLEventListener {
 		
 		gl.glEndList();
 		
-		// Draw Selection Box
-		// ------------------
+		// Draw Selection Box Border
+		// -------------------------
 		
-		GLUquadric selectionBoxQuadric = glu.gluNewQuadric();
-		glu.gluQuadricDrawStyle(selectionBoxQuadric, GLU.GLU_LINE);
-		glu.gluQuadricNormals(selectionBoxQuadric, GLU.GLU_NONE);
-//		
-//		gl.glNewList(edgeListIndex, GL2.GL_COMPILE);
-//		//gl.glColo
-//		gl.glEndList();
+		GLUquadric selectBorderQuadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(selectBorderQuadric, GLU.GLU_FILL);
+		glu.gluQuadricNormals(selectBorderQuadric, GLU.GLU_SMOOTH);
+
+		gl.glNewList(selectBorderListIndex, GL2.GL_COMPILE);
+		glu.gluCylinder(selectBorderQuadric, SELECT_BORDER_RADIUS, SELECT_BORDER_RADIUS, 1.0,
+				SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
+		gl.glEndList();
+		
+		
+		
 	}
 
 	private void initLighting(GLAutoDrawable drawable) {

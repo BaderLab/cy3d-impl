@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Image;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
@@ -104,7 +106,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			
 			animator = new FPSAnimator(60);
 			animator.add(panel);
-
+			
 			focus.addFocusListener(new FocusListener() {
 
 				@Override
