@@ -1653,156 +1653,222 @@ public class Graphics implements GLEventListener {
 	
 	public void generalLayout() {
 		
-		// Find the central node
-		// ---------------------
+		LinkedHashSet<CyNode> totalNodesToVisit = new LinkedHashSet<CyNode>();
+		totalNodesToVisit.addAll(networkView.getModel().getNodeList());
 		
-		// Approach: Use node with most edges
+		Vector3 currentCentralLocation = new Vector3();
+		Vector3 nextCentralLocation = new Vector3();
 		
-		HashSet<CyNode> plantedNodes = new HashSet<CyNode>();
+		double greatestDistanceSquared = -1;
 		
-		CyNetwork network = networkView.getModel();
+		// System.out.println("Initial total: " + totalNodesToVisit.size());
 		
-		CyNode centerNode = null;
-		int highestNeighborCount = -1;
-		int neighbourCount;
-		
-		for (CyNode node : network.getNodeList()) {
-			neighbourCount = network.getNeighborList(node, Type.ANY).size();
-			
-			if (centerNode == null) {
-				centerNode = node;
-				highestNeighborCount = neighbourCount;
-			} else {
-				if (neighbourCount > highestNeighborCount) {
-					centerNode = node;
-					highestNeighborCount = neighbourCount;
-				}
-			}
-		}
-		
-		// Mark as planted
-		plantedNodes.add(centerNode);
-		
-		// Plant the center node
-		// ---------------------
-		
-		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 0.0);
-		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 0.0);
-		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 0.0);
-		
-		// Plant the first neighbors
-		// -------------------------
-		
-		// Idea: 2nd and further neighbors arranged in an x degree cone 
-		// facing outwards from the last edge
-	
-		HashMap<CyNode, Vector3> outwardDirections = new HashMap<CyNode, Vector3>();
-		
-		
-		double nodeDistance = 0.6 * DISTANCE_SCALE;
-		
-		LinkedHashSet<CyNode> firstNeighbors = new LinkedHashSet<CyNode>();
-		
-		// Removes duplicates as well
-		firstNeighbors.addAll(network.getNeighborList(centerNode, Type.ANY));
-		
-		int firstNeighborCount = firstNeighbors.size();
-		
-		double rotation = 0; 
-		
-		if (firstNeighborCount > 0) {
-			rotation = Math.PI * 2 / firstNeighborCount;
-		}
-		
-		Vector3 current = new Vector3(0, 0, 0);
-		Vector3 offset = new Vector3(0, 1, 0);
-		offset.multiplyLocal(nodeDistance);
-		
-		for (CyNode firstNeighbor : firstNeighbors) {
-			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
-					offset.x() + current.x());
-			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
-					offset.y() + current.y());
-			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
-					offset.z() + current.z());
-			
-			outwardDirections.put(firstNeighbor, offset);
-			
-			offset = offset.rotate(new Vector3(0, 0, 1), rotation);
-			
-			// Mark as planted
-			plantedNodes.add(firstNeighbor);
-		}
-	
-	
-		// Plant the next neighbors
-		// ------------------------
-		
-		double conicalAngle = 0.51;
-		double outwardProjectionDistance = nodeDistance;
-		
-		LinkedHashSet<CyNode> currentNeighbors = firstNeighbors;
-		LinkedHashSet<CyNode> nextToVisit = new LinkedHashSet<CyNode>();
 		
 		do {
 			
-			nodeDistance *= 1.1;
+			// Find the central node
+			// ---------------------
 			
-			for (CyNode currentNeighbor : currentNeighbors) {
+			// Approach: Use node with most edges
+			
+			LinkedHashSet<CyNode> plantedNodes = new LinkedHashSet<CyNode>();
+			
+			CyNetwork network = networkView.getModel();
+			
+			CyNode centerNode = null;
+			int highestNeighborCount = -1;
+			int neighbourCount;
+			
+			for (CyNode node : totalNodesToVisit) {
+				neighbourCount = network.getNeighborList(node, Type.ANY).size();
 				
-				LinkedHashSet<CyNode> nextNeighbors = new LinkedHashSet<CyNode>();
-				
-				// This will also remove redundant nodes from the getNeighborList result
-				nextNeighbors.addAll(network.getNeighborList(currentNeighbor, Type.ANY));
-				
-				Vector3 outwardOffset = outwardDirections.get(currentNeighbor);
-				outwardOffset.normalizeLocal();
-				outwardOffset.multiplyLocal(outwardProjectionDistance);
-				
-				Vector3 perpendicularOffset = outwardOffset.cross(new Vector3(0, 0, 1));
-				perpendicularOffset.multiplyLocal(nodeDistance * Math.tan(conicalAngle));
-				
-				double conicalRotation = 0;
-				
-				if (nextNeighbors.size() > 0) {
-					conicalRotation = 2 * Math.PI / nextNeighbors.size();
-				}
-				
-				for (CyNode nextNeighbor : nextNeighbors) {
-					
-					if (!plantedNodes.contains(nextNeighbor)) {
-						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
-								perpendicularOffset.x() + outwardOffset.x() + 
-								networkView.getNodeView(currentNeighbor).
-								getVisualProperty(RichVisualLexicon.NODE_X_LOCATION));
-						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION,
-								perpendicularOffset.y() + outwardOffset.y() + 
-								networkView.getNodeView(currentNeighbor).
-								getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION));
-						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION,
-								perpendicularOffset.z() + outwardOffset.z() + 
-								networkView.getNodeView(currentNeighbor).
-								getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-						
-						outwardDirections.put(nextNeighbor, perpendicularOffset.add(outwardOffset));
-						
-						perpendicularOffset = perpendicularOffset.rotate(outwardOffset, conicalRotation);
-						
-						// Mark as planted
-						plantedNodes.add(nextNeighbor);
-						
-						nextToVisit.add(nextNeighbor);
+				if (centerNode == null) {
+					centerNode = node;
+					highestNeighborCount = neighbourCount;
+				} else {
+					if (neighbourCount > highestNeighborCount) {
+						centerNode = node;
+						highestNeighborCount = neighbourCount;
 					}
 				}
 			}
 			
-			currentNeighbors.clear();
-			currentNeighbors.addAll(nextToVisit);
+			// Mark as planted
+			plantedNodes.add(centerNode);
 			
-			nextToVisit.clear();
+			// Plant the center node
+			// ---------------------
 			
-		} while (!currentNeighbors.isEmpty());
+			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, currentCentralLocation.x());
+			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, currentCentralLocation.y());
+			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, currentCentralLocation.z());
+			
+			// Plant the first neighbors
+			// -------------------------
+			
+			// Idea: 2nd and further neighbors arranged in an x degree cone 
+			// facing outwards from the last edge
 		
+			HashMap<CyNode, Vector3> outwardDirections = new HashMap<CyNode, Vector3>();
+			
+			
+			double nodeDistance = 1.03 * DISTANCE_SCALE;
+			
+			LinkedHashSet<CyNode> firstNeighbors = new LinkedHashSet<CyNode>();
+			
+			// Removes duplicates as well
+			firstNeighbors.addAll(network.getNeighborList(centerNode, Type.ANY));
+			
+			int firstNeighborCount = firstNeighbors.size();
+			
+			double rotation = 0; 
+			
+			if (firstNeighborCount > 0) {
+				rotation = Math.PI * 2 / firstNeighborCount;
+			}
+			
+			Vector3 current = currentCentralLocation; // TODO: Simplify this part of the code
+			Vector3 offset = new Vector3(0, 1, 0);
+			offset.multiplyLocal(nodeDistance);
+			
+			// Pre-rotation
+			// offset = offset.rotate(new Vector3(0, 0, 1), Math.random() * 2 * Math.PI);
+			
+			for (CyNode firstNeighbor : firstNeighbors) {
+				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
+						offset.x() + current.x());
+				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
+						offset.y() + current.y());
+				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
+						offset.z() + current.z());
+				
+				outwardDirections.put(firstNeighbor, offset);
+				
+				offset = offset.rotate(new Vector3(0, 0, 1), rotation);
+				
+				// Mark as planted
+				plantedNodes.add(firstNeighbor);
+				
+				// Check for greatest distance
+				// ===========================
+				
+				Vector3 usedLocation = offset.add(current);
+				
+				if (usedLocation.distanceSquared(currentCentralLocation) > greatestDistanceSquared) {
+					greatestDistanceSquared = usedLocation.distanceSquared(currentCentralLocation);
+					
+					nextCentralLocation = usedLocation.subtract(currentCentralLocation).normalize().multiply(3.4).add(usedLocation);
+				}
+			}
+		
+		
+			// Plant the next neighbors
+			// ------------------------
+			
+			double conicalAngle = 0.51;
+			double outwardProjectionDistance = nodeDistance;
+			
+			LinkedHashSet<CyNode> currentNeighbors = firstNeighbors;
+			LinkedHashSet<CyNode> nextToVisit = new LinkedHashSet<CyNode>();
+			
+			do {
+				
+				for (CyNode currentNeighbor : currentNeighbors) {
+					
+					LinkedHashSet<CyNode> nextNeighbors = new LinkedHashSet<CyNode>();
+					
+					// This will also remove redundant nodes from the getNeighborList result
+					nextNeighbors.addAll(network.getNeighborList(currentNeighbor, Type.ANY));
+					
+					Vector3 outwardOffset = outwardDirections.get(currentNeighbor);
+					outwardOffset.normalizeLocal();
+					outwardOffset.multiplyLocal(outwardProjectionDistance);
+					
+					Vector3 perpendicularOffset = outwardOffset.cross(new Vector3(0, 0, 1));
+					perpendicularOffset.normalizeLocal();
+					perpendicularOffset.multiplyLocal(nodeDistance * Math.tan(conicalAngle));
+					
+					double conicalRotation = 0;
+					
+					if (nextNeighbors.size() > 0) {
+						conicalRotation = 2 * Math.PI / nextNeighbors.size();
+					}
+					
+					for (CyNode nextNeighbor : nextNeighbors) {
+						
+						if (!plantedNodes.contains(nextNeighbor)) {
+							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
+									perpendicularOffset.x() + outwardOffset.x() + 
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_X_LOCATION));
+							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION,
+									perpendicularOffset.y() + outwardOffset.y() + 
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION));
+							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION,
+									perpendicularOffset.z() + outwardOffset.z() + 
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+							
+							outwardDirections.put(nextNeighbor, perpendicularOffset.add(outwardOffset));
+							
+							perpendicularOffset = perpendicularOffset.rotate(outwardOffset, conicalRotation);
+							
+							// Mark as planted
+							plantedNodes.add(nextNeighbor);
+							
+							nextToVisit.add(nextNeighbor);
+							
+							// Check for greatest distance
+							// ===========================
+							
+							Vector3 currentNeighborLocation = new Vector3(
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+									networkView.getNodeView(currentNeighbor).
+									getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+									
+							Vector3 usedLocation = perpendicularOffset.add(outwardOffset).add(currentNeighborLocation);
+							
+							if (usedLocation.distanceSquared(currentCentralLocation) > greatestDistanceSquared) {
+								greatestDistanceSquared = usedLocation.distanceSquared(currentCentralLocation);
+								
+								nextCentralLocation = usedLocation.subtract(currentCentralLocation).normalize().multiply(3.4).add(usedLocation);
+							}
+						}
+					}
+				}
+				
+				currentNeighbors.clear();
+				currentNeighbors.addAll(nextToVisit);
+				
+				nextToVisit.clear();
+				
+			} while (!currentNeighbors.isEmpty());
+			
+			// System.out.println("planted so far: " + plantedNodes.size());
+			totalNodesToVisit.removeAll(plantedNodes);
+			// System.out.println("total after remove: " + totalNodesToVisit.size());
+			
+			
+			double greatestDistance = Math.sqrt(greatestDistanceSquared) * 0.75;
+			
+			// currentCentralLocation.set(nextCentralLocation);
+			currentCentralLocation.addLocal(0, 
+					(Math.random() * 2 * greatestDistance + greatestDistance) * 1.25,
+					0);
+			
+			if (greatestDistanceSquared < 0.2) {
+				currentCentralLocation.addLocal(new Vector3(0.6, -0.6, 0));
+			}
+			
+			greatestDistanceSquared = -1;
+		} while (!totalNodesToVisit.isEmpty());
+	
+		camera.moveTo(findAveragePosition(networkView.getModel().getNodeList())
+				.subtract(camera.getDirection().multiply(camera.getDistance())));
 	}
 	
 	/*
