@@ -64,12 +64,12 @@ public class Graphics implements GLEventListener {
 	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
 	private static final int EDGES_PER_RADIUS = 3;
 	
-	private static final int QUADRATIC_EDGE_SEGMENTS = 5;
+	private static int QUADRATIC_EDGE_SEGMENTS = 5;
 	
-	private static final int NODE_SLICES_DETAIL = 10; //10, 10, 4 // 24, 24, 12 used to be default values for slices/stacks/slices
-	private static final int NODE_STACKS_DETAIL = 10;
-	private static final int EDGE_SLICES_DETAIL = 4;
-	private static final int EDGE_STACKS_DETAIL = 1;
+	private static int NODE_SLICES_DETAIL = 10; //10, 10, 4 // 24, 24, 12 used to be default values for slices/stacks/slices
+	private static int NODE_STACKS_DETAIL = 10;
+	private static int EDGE_SLICES_DETAIL = 4;
+	private static int EDGE_STACKS_DETAIL = 1;
 
 	private static final float SELECT_BORDER_RADIUS = 0.0027f;
 	private static final int SELECT_BORDER_SLICES_DETAIL = 7;
@@ -148,6 +148,7 @@ public class Graphics implements GLEventListener {
 	private TextRenderer textRenderer;
 	
 	private boolean latch_1;
+	private boolean lowerQuality = false;
 	
 	private Vector3 currentSelectedProjection;
 	private Vector3 previousSelectedProjection;
@@ -381,6 +382,30 @@ public class Graphics implements GLEventListener {
 			// Debug-related boolean
 			if (pressed.contains(KeyEvent.VK_1)) {
 				latch_1 = true;
+			}
+			
+			if (pressed.contains(KeyEvent.VK_L)) {
+				if (!lowerQuality) {
+					lowerQuality = true;
+					
+					QUADRATIC_EDGE_SEGMENTS = 3;
+					NODE_SLICES_DETAIL = 6;
+				    NODE_STACKS_DETAIL = 6;
+					EDGE_SLICES_DETAIL = 3;
+					EDGE_STACKS_DETAIL = 1;
+					
+					createDisplayLists(gl);
+				} else {
+					lowerQuality = false;
+					
+					QUADRATIC_EDGE_SEGMENTS = 5;
+					NODE_SLICES_DETAIL = 10;
+				    NODE_STACKS_DETAIL = 10;
+					EDGE_SLICES_DETAIL = 4;
+					EDGE_STACKS_DETAIL = 1;
+					
+					createDisplayLists(gl);
+				}
 			}
 			
 			// Roll camera clockwise
