@@ -1853,12 +1853,12 @@ public class Graphics implements GLEventListener {
 			// System.out.println("total after remove: " + totalNodesToVisit.size());
 			
 			
-			double greatestDistance = Math.sqrt(greatestDistanceSquared) * 0.75;
+			double greatestDistance = Math.sqrt(greatestDistanceSquared) * 1.5;
 			
 			// currentCentralLocation.set(nextCentralLocation);
-			currentCentralLocation.addLocal(0, 
-					(Math.random() * 2 * greatestDistance + greatestDistance) * 1.25,
-					0);
+			currentCentralLocation.addLocal((Math.random() * 2 * greatestDistance - greatestDistance) * 1.65, 
+					(Math.random() * 2 * greatestDistance - greatestDistance) * 1.65,
+					(Math.random() * 2 * greatestDistance - greatestDistance) * 0.02);
 			
 			if (greatestDistanceSquared < 0.2) {
 				currentCentralLocation.addLocal(new Vector3(0.6, -0.6, 0));
