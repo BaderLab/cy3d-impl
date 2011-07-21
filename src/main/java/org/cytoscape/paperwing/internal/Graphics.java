@@ -1869,6 +1869,7 @@ public class Graphics implements GLEventListener {
 	
 		camera.moveTo(findAveragePosition(networkView.getModel().getNodeList())
 				.subtract(camera.getDirection().multiply(camera.getDistance())));
+		camera.zoomOut(20);
 	}
 	
 	/*
