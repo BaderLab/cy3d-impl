@@ -64,7 +64,9 @@ public class Graphics implements GLEventListener {
 	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
 	private static final int EDGES_PER_RADIUS = 3;
 	
-	private static final int NODE_SLICES_DETAIL = 10; // 24, 24, 12 used to be default values for slices/stacks/slices
+	private static final int QUADRATIC_EDGE_SEGMENTS = 5;
+	
+	private static final int NODE_SLICES_DETAIL = 10; //10, 10, 4 // 24, 24, 12 used to be default values for slices/stacks/slices
 	private static final int NODE_STACKS_DETAIL = 10;
 	private static final int EDGE_SLICES_DETAIL = 4;
 	private static final int EDGE_STACKS_DETAIL = 1;
@@ -1219,7 +1221,7 @@ public class Graphics implements GLEventListener {
 			if (distanceMultiplier == 0) {
 				drawQuadraticEdge(gl, p0, p1, p2, 1, modifier);
 			} else {
-				drawQuadraticEdge(gl, p0, p1, p2, 5, modifier);
+				drawQuadraticEdge(gl, p0, p1, p2, QUADRATIC_EDGE_SEGMENTS, modifier);
 			}
 		}
 		
@@ -1244,6 +1246,43 @@ public class Graphics implements GLEventListener {
 	 * 			a modifier to change the appearance of the edge object
 	 */
 	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier) {
+		// TODO: Allow the minimum distance to be changed
+		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
+			return;
+		}
+		
+		// Equation for Quadratic Bezier curve:
+		// B(t) = (1 - t)^2P0 + 2(1 - t)tP1 + t^2P2, t in [0, 1]
+		
+		double parameter;
+		
+		Vector3 current;
+		Vector3[] points = new Vector3[numSegments + 1];
+		
+		points[0] = new Vector3(p0);
+		for (int i = 1; i < numSegments; i++) {
+			// Obtain points along the Bezier curve
+			parameter = (double) i / numSegments;
+			
+			current = p0.multiply(Math.pow(1 - parameter, 2));
+			current.addLocal(p1.multiply(2 * (1 - parameter) * parameter));
+			current.addLocal(p2.multiply(parameter * parameter));
+			
+			points[i] = new Vector3(current);
+		}
+		
+		points[numSegments] = new Vector3(p2);
+		
+		for (int i = 0; i < numSegments; i++) {
+			
+			drawSingleEdge(gl, 
+					points[i],
+					points[i + 1],
+					modifier);
+		}		
+	}
+	
+	private void drawQuadraticEdgeOld(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier) {
 		// TODO: Allow the minimum distance to be changed
 		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
 			return;
