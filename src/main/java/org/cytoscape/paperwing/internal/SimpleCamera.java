@@ -238,11 +238,8 @@ public class SimpleCamera {
 		newTarget.addLocal(position);
 		target.set(newTarget);
 		
-		left = left.projectNormal(direction);
+		left.set(up.cross(direction));
 		left.normalizeLocal();
-		
-		// TODO: Check if this line is needed to maintain up, direction, and left are perpendicular
-		// up.set(direction.cross(left));
 	}
 	
 	private void turnVertical(double angle) {
@@ -253,11 +250,86 @@ public class SimpleCamera {
 		newTarget.addLocal(position);
 		target.set(newTarget);
 		
+		up.set(direction.cross(left));
+		up.normalizeLocal();
+	}
+	
+	private void turnHorizontal2(double angle) {
+		Vector3 targetOffset = new Vector3();
+		
+		if (distance > 1) {
+			targetOffset.set(target.subtract(position));
+		} else {
+			targetOffset.set(direction);
+		}
+		
+		targetOffset = targetOffset.rotate(up, angle);
+		direction.set(targetOffset.normalize());
+		
+		Vector3 newTarget = position.add(targetOffset);
+		target.set(newTarget);
+		
+		left.set(up.cross(direction));
+		left.normalizeLocal();
+	}
+	
+	private void turnVertical2(double angle) {
+		Vector3 targetOffset = new Vector3();
+		
+		if (distance > 1) {
+			targetOffset.set(target.subtract(position));
+		} else {
+			targetOffset.set(direction);
+		}
+		
+		targetOffset = targetOffset.rotate(left, angle);
+		direction.set(targetOffset.normalize());
+		
+		Vector3 newTarget = position.add(targetOffset);
+		target.set(newTarget);
+		
+		up.set(direction.cross(left));
+		up.normalizeLocal();
+	}
+	
+	private void turnHorizontalOld(double angle) {
+		direction = direction.rotate(up, angle);
+		direction.normalizeLocal();
+		
+		Vector3 newTarget = direction.multiply(distance);
+		newTarget.addLocal(position);
+		target.set(newTarget);
+		
+		left.set(up.cross(direction));
+		left.normalizeLocal();
+		
+		/*
+		left = left.projectNormal(direction);
+		left.normalizeLocal();
+		
+		// TODO: Check if this line is needed to maintain up, direction, and left are perpendicular
+		up.set(direction.cross(left));
+		*/
+	}
+	
+	private void turnVerticalOld(double angle) {
+		direction = direction.rotate(left, angle);
+		direction.normalizeLocal();
+		
+		Vector3 newTarget = direction.multiply(distance);
+		newTarget.addLocal(position);
+		target.set(newTarget);
+		
+		up.set(direction.cross(left));
+		up.normalizeLocal();
+		
+		/*
 		up = up.projectNormal(direction);
 		up.normalizeLocal();
 		
 		// TODO: Check if this line is needed to maintain up, direction, and left are perpendicular
-		// left.set(up.cross(direction));
+		left.set(up.cross(direction));
+		*/
 	}
 	
 	private void orbitHorizontal(double angle) {

@@ -74,6 +74,7 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		System.out.println("Engine active?: " + engine.isActive());
+		System.out.println("getRendringEngine result: " + renderingEngineManager.getRendringEngine(viewModel));
 		
 		return engine;
 	}

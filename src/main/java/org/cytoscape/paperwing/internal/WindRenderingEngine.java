@@ -40,6 +40,8 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	private FPSAnimator animator;
 	
+	protected Graphics graphics;
+	
 	private boolean active;
 	
 	public WindRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
@@ -84,7 +86,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			// TODO: check whether to use GLCanvas or GLJPanel
 			GLJPanel panel = new GLJPanel(capabilities);
 			
-			Graphics graphics = new Graphics(networkView, visualLexicon);
+			graphics = new Graphics(networkView, visualLexicon);
 
 			panel.addGLEventListener(graphics);
 	
@@ -129,7 +131,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			active = true;
 		}
 	}
-	
+
 	@Override
 	public View<CyNetwork> getViewModel() {
 		return viewModel;

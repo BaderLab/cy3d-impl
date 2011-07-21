@@ -65,11 +65,12 @@ public class WindMapRenderingEngineFactory implements RenderingEngineFactory<CyN
 		*/
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		WindRenderingEngine engine = new WindRenderingEngine(container, viewModel, visualLexicon);
+		WindMapRenderingEngine engine = new WindMapRenderingEngine(container, viewModel, visualLexicon);
 		System.out.println("map returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		System.out.println("map engine active?: " + engine.isActive());
+		System.out.println("getRendringEngine result: " + renderingEngineManager.getRendringEngine(viewModel));
 		
 		return engine;
 	}

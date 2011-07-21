@@ -1,12 +1,22 @@
 package org.cytoscape.paperwing.internal;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -18,11 +28,14 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
+
+import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 import org.cytoscape.session.CyApplicationManager;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
@@ -30,6 +43,7 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class Graphics implements GLEventListener {
@@ -55,19 +69,20 @@ public class Graphics implements GLEventListener {
 	private static final int EDGE_SLICES_DETAIL = 4;
 	private static final int EDGE_STACKS_DETAIL = 1;
 
-	private static final float SELECT_BORDER_RADIUS = 0.0025f;
-	
+	private static final float SELECT_BORDER_RADIUS = 0.0027f;
 	private static final int SELECT_BORDER_SLICES_DETAIL = 7;
 	private static final int SELECT_BORDER_STACKS_DETAIL = 1;
 	
-	private static final double SELECT_BORDER_DISTANCE = 0.92;
+	private static final double SELECT_BORDER_DISTANCE = 0.91;
 	
-	
+	private static final double RETICLE_DISTANCE = 0.06;
+	private static final double RETICLE_RADIUS = 0.012;
+	private static final double RETICLE_LENGTH = 0.03;;
 	
 	private int nodeListIndex;
 	private int edgeListIndex;
 	
-	private int pointerListIndex;
+	private int reticleListIndex;
 	private int selectBorderListIndex;
 	
 	private long startTime;
@@ -84,6 +99,12 @@ public class Graphics implements GLEventListener {
 	
 	private TreeSet<Integer> selectedNodeIndices;
 	private TreeSet<Integer> selectedEdgeIndices;
+
+	private LinkedHashSet<CyNode> dragHoveredNodes;
+	private LinkedHashSet<CyEdge> dragHoveredEdges;
+	
+	private TreeSet<Integer> dragHoveredNodeIndices;
+	private TreeSet<Integer> dragHoveredEdgeIndices;
 	
 	private static int NULL_COORDINATE = Integer.MIN_VALUE;
 	
@@ -103,7 +124,7 @@ public class Graphics implements GLEventListener {
 	// private LinkedHashSet<CyNode>
 	
 	private static enum DrawStateModifier {
-	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER
+	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER, RETICLE
 	}
 	
 	 private static final int NO_TYPE = -1;
@@ -121,6 +142,8 @@ public class Graphics implements GLEventListener {
 	
 	private CyNetworkView networkView;
 	private VisualLexicon visualLexicon;
+	
+	private TextRenderer textRenderer;
 	
 	private boolean latch_1;
 	
@@ -169,6 +192,8 @@ public class Graphics implements GLEventListener {
 		
 		selectBottomRightX = NULL_COORDINATE;
 		selectBottomRightY = NULL_COORDINATE;
+		
+		textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 36));
 	}
 	
 	public void trackInput(Component component) {
@@ -227,15 +252,46 @@ public class Graphics implements GLEventListener {
 		// ------------------
 		
 		if (!dragSelectMode) {
-			gl.glPushMatrix();
+			//gl.glPushMatrix();
 			//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
 			
 			Vector3 projection = projectMouseCoordinates(camera.getDistance());
 			
-			gl.glTranslated(projection.x(), projection.y(), projection.z());
-			gl.glColor3f(0.93f, 0.23f, 0.32f);
-			gl.glCallList(pointerListIndex);
+			Vector3 leftOffset = camera.getLeft().multiply(RETICLE_DISTANCE);
+			Vector3 upOffset = camera.getUp().multiply(RETICLE_DISTANCE);
+			
+			Vector3 left = projection.add(leftOffset);
+			Vector3 right = projection.subtract(leftOffset);
+			Vector3 top = projection.add(upOffset);
+			Vector3 bottom = projection.subtract(upOffset);
+			
+			gl.glColor3f(0.6f, 0.4f, 0.4f);
+			
+			gl.glPushMatrix();
+			setUpFacingTransformation(gl, left, leftOffset.multiply(-1));
+			gl.glCallList(reticleListIndex);
 			gl.glPopMatrix();
+			
+			gl.glPushMatrix();
+			setUpFacingTransformation(gl, right, leftOffset);
+			gl.glCallList(reticleListIndex);
+			gl.glPopMatrix();
+			
+			gl.glPushMatrix();
+			setUpFacingTransformation(gl, top, upOffset.multiply(-1));
+			gl.glCallList(reticleListIndex);
+			gl.glPopMatrix();
+			
+			gl.glPushMatrix();
+			setUpFacingTransformation(gl, bottom, upOffset);
+			gl.glCallList(reticleListIndex);
+			gl.glPopMatrix();
+			
+			//gl.glTranslated(projection.x(), projection.y(), projection.z());
+			//gl.glColor3f(0.93f, 0.23f, 0.32f);
+			
+			//gl.glCallList(pointerListIndex);
+			//gl.glPopMatrix();
 		}
 		
 		// Draw selection box
@@ -246,7 +302,7 @@ public class Graphics implements GLEventListener {
 		
 		if (dragSelectMode) {
 			
-			drawSelectionBox(gl, SELECT_BORDER_DISTANCE);
+			drawSelectBox(gl, SELECT_BORDER_DISTANCE);
 			
 //			
 //			gl.glLineWidth(3.0f);
@@ -279,6 +335,8 @@ public class Graphics implements GLEventListener {
 		//gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawEdges(gl, DrawStateModifier.NORMAL);
 
+		drawNodeNames(gl);
+		
 		framesElapsed++;
 	}
 	
@@ -312,6 +370,10 @@ public class Graphics implements GLEventListener {
 			if (pressed.contains(KeyEvent.VK_C)) {
 				camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
 						new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
+			}
+			
+			if (pressed.contains(KeyEvent.VK_K)) {
+				generalLayout();
 			}
 			
 			// Debug-related boolean
@@ -521,7 +583,7 @@ public class Graphics implements GLEventListener {
 				
 				if (!selectedNodes.isEmpty()) {
 					// TODO: Check if this is a suitable place to put this, as it helps to make node dragging smoother
-					selectProjectionDistance = findSelectionMidpoint().distance(camera.getPosition());
+					selectProjectionDistance = findAveragePosition(selectedNodes).distance(camera.getPosition());
 				}
 			}
 			
@@ -596,7 +658,14 @@ public class Graphics implements GLEventListener {
 				selectBottomRightY = mouse.y();
 				
 				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1 
-						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1) {
+						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1 &&
+						selectTopLeftX != NULL_COORDINATE && 
+						selectTopLeftY != NULL_COORDINATE) {
+					
+//					PickResults results = performPick(gl, (selectTopLeftX + selectBottomRightX)/2, 
+//							(selectTopLeftY + selectBottomRightY)/2, 
+//							Math.abs(selectTopLeftX - selectBottomRightX),
+//							Math.abs(selectTopLeftY - selectBottomRightY), true);
 					
 					dragSelectMode = true;
 				} else {
@@ -605,7 +674,8 @@ public class Graphics implements GLEventListener {
 			}
 			
 			// Drag selection; selecting contents of the box
-			if (mouse.getReleased().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+			if (mouse.getReleased().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)
+					&& dragSelectMode) {
 				selectBottomRightX = mouse.x();
 				selectBottomRightY = mouse.y();
 				
@@ -660,7 +730,7 @@ public class Graphics implements GLEventListener {
 			
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty()) {
 				// Store the result for use for mouse-difference related calculations
-				selectProjectionDistance = findSelectionMidpoint().distance(camera.getPosition());
+				selectProjectionDistance = findAveragePosition(selectedNodes).distance(camera.getPosition());
 				
 				previousSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
 			// } else if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !selectedNodes.isEmpty() && previousSelectProjection != null) {
@@ -691,6 +761,9 @@ public class Graphics implements GLEventListener {
 				}
 				
 				previousSelectedProjection = currentSelectedProjection;
+				
+				selectTopLeftX = NULL_COORDINATE;
+				selectTopLeftY = NULL_COORDINATE;
 			}
 			
 			
@@ -702,6 +775,20 @@ public class Graphics implements GLEventListener {
 		return projectMouseCoordinates(mouse.x(), mouse.y(), planeDistance);
 	}
 	
+	/**
+	 * Converts 2D mouse coordinates to 3D coordinates, where the coordinate for the
+	 * 3rd dimension is specified by the distance between the camera and the plane
+	 * which intersects a line passing through the eye and the cursor location
+	 * 
+	 * @param x
+	 * 			x window coordinate of the mouse
+	 * @param y
+	 * 			y window coordinate of the mouse
+	 * @param planeDistance
+	 * 			the distance between the camera and the intersecting plane
+	 * @return
+	 * 			the 3D position of the mouse
+	 */
 	private Vector3 projectMouseCoordinates(int x, int y, double planeDistance) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
@@ -751,28 +838,43 @@ public class Graphics implements GLEventListener {
 		return projection;
 	}
 	
-	private Vector3 findSelectionMidpoint() {
-		if (selectedNodes.isEmpty()) {
+	
+	/**
+	 * Obtain the average position of a set of nodes, where each node has the same
+	 * weight in the average
+	 * 
+	 * @param nodes
+	 * 				the {@link Collection} of nodes
+	 * @return
+	 * 				the average position
+	 */
+	private Vector3 findAveragePosition(Collection<CyNode> nodes) {
+		if (nodes.isEmpty()) {
 			return null;
 		}
 		
-		View<CyNode> nodeView;
 		double x = 0;
 		double y = 0;
 		double z = 0;
 		
-		for (CyNode node : selectedNodes) {
-			// TODO: This relies on an efficient traversal of selected nodes, as well
+		View<CyNode> nodeView;
+		
+		for (CyNode node : nodes) {
+			// TODO: This relies on an efficient traversal of nodes, as well
 			// as efficient retrieval from the networkView object
 			nodeView = networkView.getNodeView(node);
 			
-			x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-			y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-			z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+			if (nodeView != null) {
+				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+			} else {
+				System.out.println("Node with no view found: " + node + ", index: " + node.getIndex());
+			}
 		}
 		
 		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(DISTANCE_SCALE * selectedNodes.size());
+		result.divideLocal(DISTANCE_SCALE * nodes.size());
 		
 		return result;
 	}
@@ -958,6 +1060,47 @@ public class Graphics implements GLEventListener {
 		//		EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
 		// gl.glTranslatef(-testNode.x, -testNode.y, -testNode.z);
 	}
+	
+	private void drawNodeNames(GL2 gl) {
+		float x, y, z;
+		
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
+			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
+			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
+			
+			gl.glLoadName(NO_INDEX);
+			
+			float offsetDistance = -0.05f;
+			x += camera.getDirection().x() * offsetDistance;
+			y += camera.getDirection().y() * offsetDistance;
+			z += camera.getDirection().z() * offsetDistance;
+			
+			String text = "node: " + nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL);
+			x += camera.getLeft().x() * (textRenderer.getBounds(text).getWidth() / 2);
+			y += camera.getLeft().y() * (textRenderer.getBounds(text).getWidth() / 2);
+			z += camera.getLeft().z() * (textRenderer.getBounds(text).getWidth() / 2);
+			
+			x -= camera.getUp().x() * (textRenderer.getBounds(text).getHeight() / 2);
+			y -= camera.getUp().y() * (textRenderer.getBounds(text).getHeight() / 2);
+			z -= camera.getUp().z() * (textRenderer.getBounds(text).getHeight() / 2);
+			
+			gl.glPushMatrix();
+			
+			setUpFacingTransformation(gl, new Vector3(x, y, z), camera.getDirection().multiply(-1));
+			
+			gl.glRotated(camera.getUp().angle(new Vector3(0, 0, 1)), camera.getDirection().x(), camera.getDirection().y(), camera.getDirection().z());
+			
+			textRenderer.begin3DRendering();
+			textRenderer.draw3D(text, 0, 0, 0, 0.002f);
+			textRenderer.end3DRendering();
+			
+			gl.glPopMatrix();
+		}
+		
+		
+		
+	}
 
 	// This method will draw all edges
 	private void drawEdges(GL2 gl, DrawStateModifier generalModifier) {
@@ -1083,6 +1226,23 @@ public class Graphics implements GLEventListener {
 		latch_1 = false;
 	}
 	
+	
+	/**
+	 * Draws an edge shaped around a quadratic Bezier curve
+	 * 
+	 * @param gl
+	 * 			{@link GL2} rendering object
+	 * @param p0
+	 * 			the starting point, p0
+	 * @param p1
+	 * 			the approach point, p1
+	 * @param p2
+	 * 			the end point, p2
+	 * @param numSegments
+	 * 			the number of straight-line segments used to approximate the Bezier curve
+	 * @param modifier
+	 * 			a modifier to change the appearance of the edge object
+	 */
 	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier) {
 		// TODO: Allow the minimum distance to be changed
 		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
@@ -1210,19 +1370,46 @@ public class Graphics implements GLEventListener {
 		}
 	}
 	
+	/** 
+	 * Set up matrix transformations such that the position is equal to the location vector 
+	 * and the z-axis is in the direction of the given direction
+	 * 
+	 * @param gl
+	 * 			{@link GL2} rendering object
+	 * @param location
+	 * 			desired position
+	 * @param direction
+	 * 			desired direction, does not have to be a unit vector
+	 * 			
+	 */
+	private void setUpFacingTransformation(GL2 gl, Vector3 location, Vector3 direction) {
+		gl.glTranslated(location.x(), location.y(), location.z());
+		
+		Vector3 current = new Vector3(0, 0, 1);
+		Vector3 rotateAxis = current.cross(direction);
+		
+		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
+				rotateAxis.z());
+	}
+	
+	/**
+	 * Draws a single edge-like graphics object
+	 * 
+	 * @param gl
+	 * 			{@link GL2} rendering object
+	 * @param start
+	 * 			start location
+	 * @param end
+	 * 			end location
+	 * @param modifier
+	 * 			a modifier to vary the appearance of the output
+	 */
 	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, DrawStateModifier modifier) {
 		gl.glPushMatrix();
 		
-		// TODO: Consider using a Vector3f object for just floats, to use translatef instead of translated
-		gl.glTranslated(start.x(), start.y(), start.z());
-		
-		Vector3 current = new Vector3(0, 0, 1);
 		Vector3 direction = end.subtract(start);
 		
-		Vector3 rotateAxis = current.cross(direction);
-
-		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
-				rotateAxis.z());
+		setUpFacingTransformation(gl, start, direction);
 		
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
 		
@@ -1240,7 +1427,7 @@ public class Graphics implements GLEventListener {
 			gl.glColor3f(0.45f, 0.45f, 0.70f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.SELECT_BORDER) {
-			gl.glColor3f(0.70f, 0.38f, 0.64f);
+			gl.glColor3f(0.72f, 0.31f, 0.40f);
 			gl.glCallList(selectBorderListIndex);
 		} else {
 			// Invalid modifier found
@@ -1249,7 +1436,15 @@ public class Graphics implements GLEventListener {
 		gl.glPopMatrix();
 	}
 
-	private void drawSelectionBox(GL2 gl, double drawDistance) {
+	/**
+	 * Draw the drag selection box
+	 * 
+	 * @param gl
+	 * 			{@link GL2} rendering object
+	 * @param drawDistance
+	 * 			the distance from the camera to draw the box
+	 */
+	private void drawSelectBox(GL2 gl, double drawDistance) {
 		Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, drawDistance);
 		Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, drawDistance);
 		
@@ -1257,15 +1452,26 @@ public class Graphics implements GLEventListener {
 		Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, drawDistance);
 
 		
-		drawSingleSelectionEdge(gl, topLeft, topRight);
-		drawSingleSelectionEdge(gl, topLeft, bottomLeft);
+		drawSingleSelectEdge(gl, topLeft, topRight);
+		drawSingleSelectEdge(gl, topLeft, bottomLeft);
 		
-		drawSingleSelectionEdge(gl, topRight, bottomRight);
-		drawSingleSelectionEdge(gl, bottomLeft, bottomRight);
+		drawSingleSelectEdge(gl, topRight, bottomRight);
+		drawSingleSelectEdge(gl, bottomLeft, bottomRight);
 		
 	}
 	
-	private void drawSingleSelectionEdge(GL2 gl, Vector3 originalStart, Vector3 originalEnd) {
+	/**
+	 * Draws an edge-like object for the border of the selection box; calculations are made so that
+	 * the corners of the box are sharp
+	 * 
+	 * @param gl
+	 * 			{@link GL2} rendering object
+	 * @param originalStart
+	 * 			the intended start position for this edge, before corrections
+	 * @param originalEnd
+	 * 			the intended end position for this edge, before corrections
+	 */
+	private void drawSingleSelectEdge(GL2 gl, Vector3 originalStart, Vector3 originalEnd) {
 		Vector3 offset = originalEnd.subtract(originalStart);
 		offset.normalizeLocal();
 		offset.multiplyLocal(SELECT_BORDER_RADIUS/2);
@@ -1316,7 +1522,7 @@ public class Graphics implements GLEventListener {
 	private void createDisplayLists(GL2 gl) {
 		nodeListIndex = gl.glGenLists(1);
 		edgeListIndex = gl.glGenLists(1);
-		pointerListIndex = gl.glGenLists(1);
+		reticleListIndex = gl.glGenLists(1);
 		
 		selectBorderListIndex = gl.glGenLists(1);
 		
@@ -1349,38 +1555,22 @@ public class Graphics implements GLEventListener {
 				EDGE_SLICES_DETAIL, EDGE_STACKS_DETAIL);
 		gl.glEndList();
 		
-		// Draw Pointer
-		// ------------
+		// Draw a line for the reticle
+		// -----------------------------
 		
-		GLUquadric pointerQuadric = glu.gluNewQuadric();
-		glu.gluQuadricDrawStyle(pointerQuadric, GLU.GLU_LINE);
-		glu.gluQuadricNormals(pointerQuadric, GLU.GLU_NONE);
+		GLUquadric reticleQuadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(reticleQuadric, GLU.GLU_FILL);
+		glu.gluQuadricNormals(reticleQuadric, GLU.GLU_SMOOTH);
 		
 		float axisLength = 0.056f;
 		float overHang = 0.028f;
 		float radius = 0.002f;
 		
-		gl.glNewList(pointerListIndex, GL2.GL_COMPILE);
+		gl.glNewList(reticleListIndex, GL2.GL_COMPILE);
 		// glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4, 4);
 		
-		// Draw X axis
-		gl.glTranslatef(-overHang, 0.0f, 0.0f);
-		gl.glRotatef(90, 0, 1, 0);
-		glu.gluCylinder(pointerQuadric, radius, radius, axisLength, 4, 1);
-		gl.glRotatef(-90, 0, 1, 0);
-		gl.glTranslatef(overHang, 0.0f, 0.0f);
-		
-		// Draw Y axis
-		gl.glTranslatef(0.0f, -overHang, 0.0f);
-		gl.glRotatef(-90, 1, 0, 0);
-		glu.gluCylinder(pointerQuadric, radius, radius, axisLength, 4, 1);
-		gl.glRotatef(90, 1, 0, 0);
-		gl.glTranslatef(0.0f, overHang, 0.0f);
-		
-		// Draw Z axis
-		gl.glTranslatef(0.0f, 0.0f, -overHang);
-		glu.gluCylinder(pointerQuadric, radius, radius, axisLength, 4, 1);
-		gl.glTranslatef(0.0f, 0.0f, overHang);
+		glu.gluCylinder(reticleQuadric, RETICLE_RADIUS, RETICLE_RADIUS, RETICLE_LENGTH,
+				SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
 		
 		gl.glEndList();
 		
@@ -1454,17 +1644,185 @@ public class Graphics implements GLEventListener {
 		screenWidth = width;
 	}
 	
+	public void provideCentralView() {
+		camera.moveTo(findAveragePosition(networkView.getModel().getNodeList()));
+		camera.moveBackward();
+		camera.zoomOut(50);
+		// camera.
+	}
+	
+	public void generalLayout() {
+		
+		// Find the central node
+		// ---------------------
+		
+		// Approach: Use node with most edges
+		
+		HashSet<CyNode> plantedNodes = new HashSet<CyNode>();
+		
+		CyNetwork network = networkView.getModel();
+		
+		CyNode centerNode = null;
+		int highestNeighborCount = -1;
+		int neighbourCount;
+		
+		for (CyNode node : network.getNodeList()) {
+			neighbourCount = network.getNeighborList(node, Type.ANY).size();
+			
+			if (centerNode == null) {
+				centerNode = node;
+				highestNeighborCount = neighbourCount;
+			} else {
+				if (neighbourCount > highestNeighborCount) {
+					centerNode = node;
+					highestNeighborCount = neighbourCount;
+				}
+			}
+		}
+		
+		// Mark as planted
+		plantedNodes.add(centerNode);
+		
+		// Plant the center node
+		// ---------------------
+		
+		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 0.0);
+		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 0.0);
+		networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 0.0);
+		
+		// Plant the first neighbors
+		// -------------------------
+		
+		// Idea: 2nd and further neighbors arranged in an x degree cone 
+		// facing outwards from the last edge
+	
+		HashMap<CyNode, Vector3> outwardDirections = new HashMap<CyNode, Vector3>();
+		
+		
+		double nodeDistance = 0.6 * DISTANCE_SCALE;
+		
+		LinkedHashSet<CyNode> firstNeighbors = new LinkedHashSet<CyNode>();
+		
+		// Removes duplicates as well
+		firstNeighbors.addAll(network.getNeighborList(centerNode, Type.ANY));
+		
+		int firstNeighborCount = firstNeighbors.size();
+		
+		double rotation = 0; 
+		
+		if (firstNeighborCount > 0) {
+			rotation = Math.PI * 2 / firstNeighborCount;
+		}
+		
+		Vector3 current = new Vector3(0, 0, 0);
+		Vector3 offset = new Vector3(0, 1, 0);
+		offset.multiplyLocal(nodeDistance);
+		
+		for (CyNode firstNeighbor : firstNeighbors) {
+			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
+					offset.x() + current.x());
+			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
+					offset.y() + current.y());
+			networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
+					offset.z() + current.z());
+			
+			outwardDirections.put(firstNeighbor, offset);
+			
+			offset = offset.rotate(new Vector3(0, 0, 1), rotation);
+			
+			// Mark as planted
+			plantedNodes.add(firstNeighbor);
+		}
+	
+	
+		// Plant the next neighbors
+		// ------------------------
+		
+		double conicalAngle = 0.51;
+		double outwardProjectionDistance = nodeDistance;
+		
+		LinkedHashSet<CyNode> currentNeighbors = firstNeighbors;
+		LinkedHashSet<CyNode> nextToVisit = new LinkedHashSet<CyNode>();
+		
+		do {
+			
+			nodeDistance *= 1.1;
+			
+			for (CyNode currentNeighbor : currentNeighbors) {
+				
+				LinkedHashSet<CyNode> nextNeighbors = new LinkedHashSet<CyNode>();
+				
+				// This will also remove redundant nodes from the getNeighborList result
+				nextNeighbors.addAll(network.getNeighborList(currentNeighbor, Type.ANY));
+				
+				Vector3 outwardOffset = outwardDirections.get(currentNeighbor);
+				outwardOffset.normalizeLocal();
+				outwardOffset.multiplyLocal(outwardProjectionDistance);
+				
+				Vector3 perpendicularOffset = outwardOffset.cross(new Vector3(0, 0, 1));
+				perpendicularOffset.multiplyLocal(nodeDistance * Math.tan(conicalAngle));
+				
+				double conicalRotation = 0;
+				
+				if (nextNeighbors.size() > 0) {
+					conicalRotation = 2 * Math.PI / nextNeighbors.size();
+				}
+				
+				for (CyNode nextNeighbor : nextNeighbors) {
+					
+					if (!plantedNodes.contains(nextNeighbor)) {
+						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
+								perpendicularOffset.x() + outwardOffset.x() + 
+								networkView.getNodeView(currentNeighbor).
+								getVisualProperty(RichVisualLexicon.NODE_X_LOCATION));
+						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION,
+								perpendicularOffset.y() + outwardOffset.y() + 
+								networkView.getNodeView(currentNeighbor).
+								getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION));
+						networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION,
+								perpendicularOffset.z() + outwardOffset.z() + 
+								networkView.getNodeView(currentNeighbor).
+								getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+						
+						outwardDirections.put(nextNeighbor, perpendicularOffset.add(outwardOffset));
+						
+						perpendicularOffset = perpendicularOffset.rotate(outwardOffset, conicalRotation);
+						
+						// Mark as planted
+						plantedNodes.add(nextNeighbor);
+						
+						nextToVisit.add(nextNeighbor);
+					}
+				}
+			}
+			
+			currentNeighbors.clear();
+			currentNeighbors.addAll(nextToVisit);
+			
+			nextToVisit.clear();
+			
+		} while (!currentNeighbors.isEmpty());
+		
+	}
+	
 	/*
-	// Draw X axis gl.glTranslatef(-overhang, 0.0f, 0.0f);
-	gl.glRotatef(90, 0, 1, 0); gl.glColor3f(1.0f, 0.0f, 0.0f);
-	glut.glutSolidCylinder(0.005f, axisLength, 6, 3); gl.glRotatef(-90, 0, 1, 0); gl.glTranslatef(overhang, 0.0f, 0.0f);
+	// Draw X axis
+	gl.glTranslatef(-overHang, 0.0f, 0.0f);
+	gl.glRotatef(90, 0, 1, 0);
+	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
+	gl.glRotatef(-90, 0, 1, 0);
+	gl.glTranslatef(overHang, 0.0f, 0.0f);
 	
-	// Draw Y axis gl.glTranslatef(0.0f, -overhang, 0.0f);
-	gl.glRotatef(-90, 1, 0, 0); gl.glColor3f(0.0f, 1.0f, 0.0f);
-	glut.glutSolidCylinder(0.005f, axisLength, 6, 3); gl.glRotatef(90, 1, 0, 0); gl.glTranslatef(0.0f, overhang, 0.0f);
+	// Draw Y axis
+	gl.glTranslatef(0.0f, -overHang, 0.0f);
+	gl.glRotatef(-90, 1, 0, 0);
+	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
+	gl.glRotatef(90, 1, 0, 0);
+	gl.glTranslatef(0.0f, overHang, 0.0f);
 	
-	// Draw Z axis gl.glTranslatef(0.0f, 0.0f, -overhang);
-	gl.glColor3f(0.0f, 0.0f, 1.0f); glut.glutSolidCylinder(0.005f,
-	axisLength, 6, 3); gl.glTranslatef(0.0f, 0.0f, overhang);
+	// Draw Z axis
+	gl.glTranslatef(0.0f, 0.0f, -overHang);
+	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
+	gl.glTranslatef(0.0f, 0.0f, overHang);
 	*/
 }
