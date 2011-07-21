@@ -149,6 +149,7 @@ public class Graphics implements GLEventListener {
 	
 	private boolean latch_1;
 	private boolean lowerQuality = false;
+	private boolean skipHover = false;
 	
 	private Vector3 currentSelectedProjection;
 	private Vector3 previousSelectedProjection;
@@ -338,7 +339,7 @@ public class Graphics implements GLEventListener {
 		//gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawEdges(gl, DrawStateModifier.NORMAL);
 
-		drawNodeNames(gl);
+		// drawNodeNames(gl);
 		
 		framesElapsed++;
 	}
@@ -406,6 +407,10 @@ public class Graphics implements GLEventListener {
 					
 					createDisplayLists(gl);
 				}
+			}
+			
+			if (pressed.contains(KeyEvent.VK_P)) {
+				skipHover = !skipHover;
 			}
 			
 			// Roll camera clockwise
@@ -572,7 +577,12 @@ public class Graphics implements GLEventListener {
 		// Perform picking-related operations
 		// ----------------------------------
 		
-		PickResults pickResults = performPick(gl, mouse.x(), mouse.y(), 2, 2, false);
+		PickResults pickResults;
+		if (skipHover) {
+			pickResults = new PickResults();
+		} else {
+			pickResults = performPick(gl, mouse.x(), mouse.y(), 2, 2, false);
+		}
 		
 		int newHoverNodeIndex = NO_INDEX;
 		int newHoverEdgeIndex = NO_INDEX;
