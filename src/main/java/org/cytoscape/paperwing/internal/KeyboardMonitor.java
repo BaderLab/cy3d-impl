@@ -3,23 +3,24 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 
 public class KeyboardMonitor implements KeyListener, FocusListener {
 
-	private TreeSet<Integer> justPressed;
-	private TreeSet<Integer> keysDown;
-	private TreeSet<Integer> justReleased;
+	private Set<Integer> justPressed;
+	private Set<Integer> keysDown;
+	private Set<Integer> justReleased;
 	
 	private boolean hasNew = false;
 	private boolean hasHeld = false;
 	
 	public KeyboardMonitor() {
-		justPressed = new TreeSet<Integer>();
-		keysDown = new TreeSet<Integer>();
-		justReleased = new TreeSet<Integer>();
+		justPressed = new HashSet<Integer>();
+		keysDown = new HashSet<Integer>();
+		justReleased = new HashSet<Integer>();
 	}
 	
 	public boolean hasNew() {

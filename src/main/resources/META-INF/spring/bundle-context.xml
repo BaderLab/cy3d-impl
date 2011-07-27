@@ -39,6 +39,7 @@
 		<constructor-arg ref="cyNetworkViewManagerRef"/>
 		<constructor-arg ref="cyRenderingEngineManagerRef"/>
 		<constructor-arg ref="windVisualLexicon"/>
+		<constructor-arg ref="cyServiceRegistrarRef"/>
 	</bean>
 	
 	<bean name="windMapRenderingEngineFactory"
@@ -46,6 +47,7 @@
 		<constructor-arg ref="cyNetworkViewManagerRef"/>
 		<constructor-arg ref="cyRenderingEngineManagerRef"/>
 		<constructor-arg ref="windVisualLexicon"/>
+		<constructor-arg ref="cyServiceRegistrarRef"/>
 	</bean>
 
 </beans>

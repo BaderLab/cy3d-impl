@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,14 +25,14 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 	
 	private boolean ignoreNext;
 	
-	private TreeSet<Integer> justPressed;
-	private TreeSet<Integer> buttonsDown;
-	private TreeSet<Integer> justReleased;
+	private Set<Integer> justPressed;
+	private Set<Integer> buttonsDown;
+	private Set<Integer> justReleased;
 	
 	public MouseMonitor() {
-		justPressed = new TreeSet<Integer>();
-		buttonsDown = new TreeSet<Integer>();
-		justReleased = new TreeSet<Integer>();
+		justPressed = new HashSet<Integer>();
+		buttonsDown = new HashSet<Integer>();
+		justReleased = new HashSet<Integer>();
 		
 		ignoreNext = true;
 	}
@@ -142,16 +143,6 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 		wheelChange = 0;
 		prevX = currentX;
 		prevY = currentY;
-		
-		Robot r;
-		try {
-			r = new Robot();
-			// r.mouseMove(800, 500);
-		} catch (AWTException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 
 	@Override

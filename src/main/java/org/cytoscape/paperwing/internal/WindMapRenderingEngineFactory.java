@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Properties;
 
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
@@ -13,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -20,6 +22,7 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -29,14 +32,20 @@ public class WindMapRenderingEngineFactory implements RenderingEngineFactory<CyN
 	private RenderingEngineManager renderingEngineManager;
 	private final VisualLexicon visualLexicon;
 	
-	public WindMapRenderingEngineFactory(CyNetworkViewManager networkViewManager, RenderingEngineManager renderingEngineManager, VisualLexicon lexicon) {	
+	private CyServiceRegistrar serviceRegistrar;
+	
+	public WindMapRenderingEngineFactory(CyNetworkViewManager networkViewManager,
+			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
+			CyServiceRegistrar serviceRegistrar) {	
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		
+		this.serviceRegistrar = serviceRegistrar;
+		
 		// TestGraphics.initSingleton();
 		Graphics.initSingleton();
-		WindRenderingEngine.setNetworkViewManager(networkViewManager);
+		WindMapRenderingEngine.setNetworkViewManager(networkViewManager);
 	}
 	
 	@Override
@@ -70,7 +79,9 @@ public class WindMapRenderingEngineFactory implements RenderingEngineFactory<CyN
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		System.out.println("map engine active?: " + engine.isActive());
-		System.out.println("getRendringEngine result: " + renderingEngineManager.getRendringEngine(viewModel));
+
+		serviceRegistrar.registerService(engine.getEngineRemovedListener(), 
+				RenderingEngineAboutToBeRemovedListener.class, new Properties());
 		
 		return engine;
 	}

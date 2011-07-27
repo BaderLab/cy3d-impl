@@ -18,6 +18,11 @@
 	<osgi:reference id="cyRenderingEngineManagerRef"
 	    interface="org.cytoscape.view.presentation.RenderingEngineManager" />
 	
+	<!-- This import will be used for event-listener pairs -->
+	<osgi:reference id="cyServiceRegistrarRef"
+		interface="org.cytoscape.service.util.CyServiceRegistrar">
+	</osgi:reference>
+	
 	<!-- Exported Services -->
 	<osgi:service id="sampleActionService" ref="sampleAction"
 		interface="org.cytoscape.application.swing.CyAction"/>

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Properties;
 
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
@@ -16,6 +17,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -23,6 +25,7 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
 
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -33,10 +36,16 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private RenderingEngineManager renderingEngineManager;
 	private final VisualLexicon visualLexicon;
 	
-	public WindRenderingEngineFactory(CyNetworkViewManager networkViewManager, RenderingEngineManager renderingEngineManager, VisualLexicon lexicon) {	
+	private CyServiceRegistrar serviceRegistrar;
+	
+	public WindRenderingEngineFactory(CyNetworkViewManager networkViewManager,
+			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
+			CyServiceRegistrar serviceRegistrar) {	
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
+		
+		this.serviceRegistrar = serviceRegistrar;
 		
 		// TestGraphics.initSingleton();
 		Graphics.initSingleton();
@@ -74,7 +83,11 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		System.out.println("Engine active?: " + engine.isActive());
-		System.out.println("getRendringEngine result: " + renderingEngineManager.getRendringEngine(viewModel));
+		
+		System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
+				+ ", " + RenderingEngineAboutToBeRemovedListener.class);
+		serviceRegistrar.registerService(engine.getEngineRemovedListener(), 
+				RenderingEngineAboutToBeRemovedListener.class, new Properties());
 		
 		return engine;
 	}

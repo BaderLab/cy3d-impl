@@ -10,6 +10,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.util.Properties;
 
 import javax.media.opengl.GLCapabilities;
@@ -27,6 +30,8 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
+import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedEvent;
+import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -44,12 +49,16 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	private boolean active;
 	
+	private RenderingEngine<CyNetwork> selfPointer;
+	
 	public WindRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
 		// this.networkView = networkView;
 	
 		this.viewModel = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.active = false;
+		
+		selfPointer = this;
 		
 		if (networkViewManager != null) {
 			this.networkView = networkViewManager.getNetworkView(viewModel.getModel().getSUID());
@@ -61,6 +70,22 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 		}
 		
 		System.out.println("Provided visualLexicon: " + visualLexicon);
+	}
+	
+	public RenderingEngineAboutToBeRemovedListener getEngineRemovedListener() {
+		return new RenderingEngineAboutToBeRemovedListener(){
+
+			@Override
+			public void handleEvent(RenderingEngineAboutToBeRemovedEvent evt) {
+				System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
+				System.out.println("Current engine: " + selfPointer);
+				
+				if (evt.getRenderingEngine() == selfPointer) {
+					System.out.println("Rendering engine about to be removed, stopping animator");
+					animator.stop();
+				}
+			}
+		};
 	}
 	
 	public static void setNetworkViewManager(CyNetworkViewManager networkViewManager) {
