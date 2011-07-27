@@ -73,6 +73,9 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	}
 	
 	public RenderingEngineAboutToBeRemovedListener getEngineRemovedListener() {
+		
+		System.out.println("getEngineRemovedListener call");
+		
 		return new RenderingEngineAboutToBeRemovedListener(){
 
 			@Override
