@@ -1,0 +1,82 @@
+General functions
+=================
+Space: FPS
+
+C: Reset camera
+K: General layout (unused)
+1: Debug function
+
+O: Debug, display distance between single selected node and hovered node
+
+Performance adjustment functions
+================================
+L: Lower graphics quality to improve FPS
+P: Skip real-time picking (mouse hovering) to improve FPS
+
+Node, edge creation/deletion
+============================
+J: Create an edge between selected nodes and the hovered node
+Delete: Deletes selected nodes/edges
+
+N: Create new node under mouse cursor
+	-The node will be placed on the plane intersecting the target point, also perpendicular to the camera
+
+Definition: Target point
+------------------------
+-This non-fixed point is such that the camera always points exactly at the target point.
+	Its distance to the camera is variable, and the camera's direction vector is parallel
+	to the target point's position vector subtract the camera's position vector
+-This point is useful for mouse interactions, as we could specify a plane that passes through
+	this target point that is also perpendicular to the camera's direction vector
+
+
+Varying distance between target point and camera
+================================================
+Mouse wheel up/down: Vary distance between camera and target point
+
+Camera, target point movement
+=============================
+W/S: Move camera and target point up/down
+A/D: Move camera and target point left/right
+Q/E: Move camera and target point backward/forwards
+
+Z: Roll camera clockwise
+X: Roll camera counter-clockwise
+
+Shift + Arrow Keys: Orbit camera around current target point
+	-This moves the camera along the surface of a sphere with radius equal to the
+	distance between the camera and the target point, centered at the target point
+
+Arrow Keys: Turn camera
+	-The camera itself will not move, the target point will move along the surface
+	of a sphere centered at where the camera is
+
+Node selection
+--------------
+-Hover the mouse cursor over an edge or node to cause it to turn BLUE.
+-Click on an edge or node to select it, turning it GREEN.
+
+Multiple selection
+------------------
+-Hold SHIFT and click on additional nodes/edges to select them.
+
+Drag selection
+--------------
+-Drag the mouse cursor to create a selection rectangle, selecting all nodes/edges
+	inside the rectangle upon mouse button release.
+
+Mouse camera turning
+--------------------
+-Hold ALT and move the mouse cursor to turn the camera in a first-person like fashion.
+
+Node drag movement
+------------------
+-Hold CTRL and drag the mouse cursor to move all currently selected nodes along
+	the plane intersecting the target point, perpendicular to the camera. The
+	nodes will move in the same direction as the mouse cursor.
+
+
+
+
+
+
