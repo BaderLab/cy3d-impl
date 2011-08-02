@@ -76,7 +76,67 @@ Node drag movement
 	nodes will move in the same direction as the mouse cursor.
 
 
+Supported Visual Properties
+
+For Nodes:
+
+VisualProperty<Double> NODE_X_LOCATION
+VisualProperty<Double> NODE_Y_LOCATION
+VisualProperty<Double> NODE_Z_LOCATION
+
+To be supported
+
+VisualProperty<Paint> NODE_PAINT
+VisualProperty<Paint> NODE_FILL_COLOR
+
+VisualProperty<Double> NODE_SIZE
+
+VisualProperty<Boolean> NODE_VISIBLE
+VisualProperty<Boolean> NODE_SELECTED
+
+VisualProperty<NodeShape> NODE_SHAPE
+
+VisualProperty<Paint> NODE_SELECTED_PAINT
 
 
+VisualProperty<Paint> NODE_LABEL_COLOR
+VisualProperty<String> NODE_LABEL
 
+(Not sure about these)
+VisualProperty<Double> NODE_WIDTH
+VisualProperty<Double> NODE_HEIGHT
+
+VisualProperty<Paint> NODE_BORDER_PAINT
+VisualProperty<String> NODE_TOOLTIP
+VisualProperty<Double> NODE_BORDER_WIDTH
+	
+VisualProperty<Font> NODE_LABEL_FONT_FACE
+VisualProperty<Integer> NODE_LABEL_FONT_SIZE
+
+VisualProperty<Integer> NODE_TRANSPARENCY
+
+
+For edges
+
+VisualProperty<Paint> EDGE_PAINT
+
+VisualProperty<Double> EDGE_WIDTH
+
+VisualProperty<Boolean> EDGE_VISIBLE
+VisualProperty<Boolean> EDGE_SELECTED
+
+VisualProperty<Paint> EDGE_SELECTED_PAINT
+VisualProperty<Paint> EDGE_UNSELECTED_PAINT
+
+VisualProperty<Paint> EDGE_STROKE_SELECTED_PAINT
+VisualProperty<Paint> EDGE_STROKE_UNSELECTED_PAINT
+
+
+VisualProperty<String> EDGE_LABEL
+
+VisualProperty<Font> EDGE_LABEL_FONT_FACE
+VisualProperty<Integer> EDGE_LABEL_FONT_SIZE
+VisualProperty<Paint> EDGE_LABEL_COLOR
+
+VisualProperty<String> EDGE_TOOLTIP
 

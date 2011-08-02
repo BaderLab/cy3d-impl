@@ -1,4 +1,5 @@
 package org.cytoscape.paperwing.internal;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -285,9 +286,9 @@ public class Graphics implements GLEventListener {
 		// Draw nodes and edges
 		// --------------------
 		
-		gl.glColor3f(0.73f, 0.73f, 0.73f);
+		// gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
-		gl.glColor3f(0.51f, 0.51f, 0.53f);
+		// gl.glColor3f(0.51f, 0.51f, 0.53f);
 		drawEdges(gl, DrawStateModifier.NORMAL);
 		
 		framesElapsed++;
@@ -991,9 +992,21 @@ public class Graphics implements GLEventListener {
 	}
 
 	private void drawNodes(GL2 gl) {
+//		VisualProperty<Paint> NODE_PAINT
+//		VisualProperty<Paint> NODE_FILL_COLOR
+//
+//		VisualProperty<Double> NODE_SIZE
+//
+//		VisualProperty<Boolean> NODE_VISIBLE
+//		VisualProperty<Boolean> NODE_SELECTED
+//
+//		VisualProperty<NodeShape> NODE_SHAPE
+//
+//		VisualProperty<Paint> NODE_SELECTED_PAINT
+		
 		float x, y, z;
 		int index;
-		
+		networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
 			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
@@ -1006,17 +1019,27 @@ public class Graphics implements GLEventListener {
 			gl.glPushMatrix();
 			gl.glTranslatef(x, y, z);
 			
+			gl.glScalef(nodeView.getVisualProperty(MinimalVisualLexicon.NODE_WIDTH).floatValue() / DISTANCE_SCALE, 
+					nodeView.getVisualProperty(MinimalVisualLexicon.NODE_HEIGHT).floatValue() / DISTANCE_SCALE, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_DEPTH).floatValue() / DISTANCE_SCALE);
+			
 			if (selectedNodeIndices.contains(index)) {
 				gl.glColor3f(0.52f, 0.70f, 0.52f);
 				gl.glScalef(1.1f, 1.1f, 1.1f);
-				gl.glCallList(nodeListIndex);
 			} else if (index == hoverNodeIndex) {
 				gl.glColor3f(0.52f, 0.52f, 0.70f);
-				gl.glCallList(nodeListIndex);
 			} else {
-				gl.glColor3f(0.73f, 0.73f, 0.73f);
-				gl.glCallList(nodeListIndex);
+				Color color = (Color) nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
+
+				gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
+
+				// System.out.println("Color: " + color.getRed() / 255.0f + ", " + color.getGreen() / 255.0f + ", " + color.getBlue() / 255.0f);
+				
+				// gl.glColor3f(0.73f, 0.73f, 0.73f);
+				
 			}
+			
+			gl.glCallList(nodeListIndex);
 			
 			gl.glPopMatrix();
 		}
