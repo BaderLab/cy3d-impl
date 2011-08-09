@@ -1160,9 +1160,9 @@ public class Graphics implements GLEventListener {
 			}
 			
 			if (distanceMultiplier == 0) {
-				drawQuadraticEdge(gl, p0, p1, p2, 1, modifier);
+				drawQuadraticEdge(gl, p0, p1, p2, 1, modifier, edgeView);
 			} else {
-				drawQuadraticEdge(gl, p0, p1, p2, QUADRATIC_EDGE_SEGMENTS, modifier);
+				drawQuadraticEdge(gl, p0, p1, p2, QUADRATIC_EDGE_SEGMENTS, modifier, edgeView);
 			}
 		}
 		
@@ -1186,7 +1186,7 @@ public class Graphics implements GLEventListener {
 	 * @param modifier
 	 * 			a modifier to change the appearance of the edge object
 	 */
-	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier) {
+	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier, View<CyEdge> edgeView) {
 		// TODO: Allow the minimum distance to be changed
 		if (p0.distanceSquared(p2) < MINIMUM_EDGE_DRAW_DISTANCE_SQUARED) {
 			return;
@@ -1219,7 +1219,8 @@ public class Graphics implements GLEventListener {
 			drawSingleEdge(gl, 
 					points[i],
 					points[i + 1],
-					modifier);
+					modifier,
+					edgeView);
 		}		
 	}
 	
@@ -1257,7 +1258,7 @@ public class Graphics implements GLEventListener {
 	 * @param modifier
 	 * 			a modifier to vary the appearance of the output
 	 */
-	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, DrawStateModifier modifier) {
+	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, DrawStateModifier modifier, View<CyEdge> edgeView) {
 		gl.glPushMatrix();
 		
 		Vector3 direction = end.subtract(start);
@@ -1329,7 +1330,23 @@ public class Graphics implements GLEventListener {
 		offset.normalizeLocal();
 		offset.multiplyLocal(SELECT_BORDER_RADIUS/2);
 		
-		drawSingleEdge(gl, originalStart.subtract(offset), originalEnd.add(offset), DrawStateModifier.SELECT_BORDER);
+		Vector3 newStart = originalStart.subtract(offset);
+		Vector3 newEnd = originalEnd.add(offset);
+		
+		gl.glPushMatrix();
+		
+		Vector3 direction = newEnd.subtract(newStart);
+		
+		setUpFacingTransformation(gl, newStart, direction);
+		
+		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
+		
+		
+		gl.glColor3f(0.72f, 0.31f, 0.40f);
+		gl.glCallList(selectBorderListIndex);
+
+		
+		gl.glPopMatrix();
 	}
 	
 	@Override
