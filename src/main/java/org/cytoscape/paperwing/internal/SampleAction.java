@@ -11,7 +11,7 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFrame;
 
 import org.cytoscape.application.swing.AbstractCyAction;
-import org.cytoscape.session.CyApplicationManager;
+import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.presentation.RenderingEngineManager;
