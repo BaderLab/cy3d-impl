@@ -146,15 +146,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			// TODO: check whether to use GLCanvas or GLJPanel
 			GLJPanel panel = new GLJPanel(capabilities);
 			
-			graphics = new Graphics(networkView, visualLexicon) {
-				
-				@Override
-				public void dispose(GLAutoDrawable drawable) {
-					animator.stop();
-					
-					super.dispose(drawable);
-				}
-			};
+			graphics = new Graphics(networkView, visualLexicon);
 
 			panel.addGLEventListener(graphics);
 	

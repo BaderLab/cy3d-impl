@@ -1765,11 +1765,16 @@ public class Graphics implements GLEventListener {
 		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
 		
+		// Older default values
+		// float[] specularReflection = { 0.5f, 0.5f, 0.5f, 1.0f };
+		// gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
+		// FloatBuffer.wrap(specularReflection));
+		// gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 40);
 		
-		float[] specularReflection = { 0.5f, 0.5f, 0.5f, 1.0f };
+		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
-		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 40);
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 31);
 	}
 
 	@Override
