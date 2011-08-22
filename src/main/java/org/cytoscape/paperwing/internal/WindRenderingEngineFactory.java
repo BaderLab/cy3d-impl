@@ -70,9 +70,10 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		// System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
 		// 		+ ", " + RenderingEngineAboutToBeRemovedListener.class);
-		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
-				NetworkAboutToBeDestroyedListener.class, 
-				new Properties());
+		
+//		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
+//				NetworkAboutToBeDestroyedListener.class, 
+//				new Properties());
 		
 		return engine;
 	}

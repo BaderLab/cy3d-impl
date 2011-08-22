@@ -68,9 +68,9 @@ public class WindMapRenderingEngineFactory implements
 		
 		//System.out.println("map engine active?: " + engine.isActive());
 
-		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
-				NetworkAboutToBeDestroyedListener.class, 
-				new Properties());
+//		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
+//				NetworkAboutToBeDestroyedListener.class, 
+//				new Properties());
 		
 		return engine;
 	}
