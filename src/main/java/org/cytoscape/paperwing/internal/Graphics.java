@@ -30,6 +30,8 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
+import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.gl2.GLUT;
 
@@ -47,113 +49,246 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
+/** The main class for the Wind rendering engines responsible for
+ * creating graphics with the use of the JOGL (Java OpenGL) library
+ * 
+ * @author Paperwing (Yue Dong)
+ */
 public class Graphics implements GLEventListener {
 
-	/*
+	/**
 	 * This value controls distance scaling when converting from node
 	 * coordinates to drawing coordinates
 	 */
 	private static final float DISTANCE_SCALE = 178.0f; 
 	
+	/** The default radius of the spherical nodes */
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
-	private static final float MINIMUM_EDGE_DRAW_DISTANCE_SQUARED = Float.MIN_NORMAL; // 0.015f
 	
+	/** The minimum distance between nodes required for an edge to be drawn */
+	private static final float MINIMUM_EDGE_DRAW_DISTANCE_SQUARED = 
+		Float.MIN_NORMAL; // 0.015f
+	
+	/** The default radius of the semi-cylindrical edges */
 	private static final float EDGE_RADIUS = 0.018f;
 	
+	/** A multiplicative curve factor for the edges */
 	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
 	
+	/** How many straight edge segments to use for approximating a curved edge,
+	 * this value does not have to be static */
 	private static int QUADRATIC_EDGE_SEGMENTS = 5;
 	
-	private static int NODE_SLICES_DETAIL = 10; //10, 10, 4 // 24, 24, 12 used to be default values for slices/stacks/slices
+	/** The slices detail level to use for drawing spherical nodes */
+	//10, 10, 4 // 24, 24, 12 used to be default values for slices/stacks/slices
+	private static int NODE_SLICES_DETAIL = 10; 
+	
+	/** The stacks detail level to use for drawing spherical nodes */
 	private static int NODE_STACKS_DETAIL = 10;
+	
+	/** The slices detail level to use for drawing edges */
 	private static int EDGE_SLICES_DETAIL = 4;
+	
+	/** The stacks detail level to use for drawing edges */
 	private static int EDGE_STACKS_DETAIL = 1;
 
+	/** The radius to use for the drag selection border's straight segments */
 	private static final float SELECT_BORDER_RADIUS = 0.0027f;
+	
+	/** The slices detail level to use for the selection border's 
+	 * straight segments */
 	private static final int SELECT_BORDER_SLICES_DETAIL = 7;
+	
+	/** The stacks detail level to use for the selection border's 
+	 * straight segments */
 	private static final int SELECT_BORDER_STACKS_DETAIL = 1;
 	
+	/** The distance from the camera to draw the selection box */
 	private static final double SELECT_BORDER_DISTANCE = 0.91;
 	
+	/** Controls the distance apart to draw the reticle for the mouse */
 	private static final double RETICLE_DISTANCE = 0.06;
-	private static final double RETICLE_RADIUS = 0.012;
-	private static final double RETICLE_LENGTH = 0.03;;
 	
+	/** Controls the radius of the reticle */
+	private static final double RETICLE_RADIUS = 0.012;
+	
+	/** The length to draw each segment of the reticle */
+	private static final double RETICLE_LENGTH = 0.03;
+	
+	
+	/** The display list index for the nodes */
 	private int nodeListIndex;
+	
+	/** The display list index for the edges */
 	private int edgeListIndex;
 	
+	/** The display list index for the reticle */
 	private int reticleListIndex;
+	
+	/** The display list index for the selection border segments */
 	private int selectBorderListIndex;
 	
+	
+	/** Start time used for certain timing */
 	private long startTime;
+	
+	/** End time used for certain timing */
 	private long endTime;
+	
+	/** Number of frames elapsed */
 	private int framesElapsed = 0;
+	
+	
+	/** The height of the screen */
 	private int screenHeight;
+	
+	/** The width of the screen */
 	private int screenWidth;
 	
+	
+	/** The set of all currently selected nodes */
 	private Set<CyNode> selectedNodes;
+	
+	/** The set of all currently selected edges */
 	private Set<CyEdge> selectedEdges;
 	
+	
+	
+	/** The set of indices for nodes that are selected */
 	private Set<Integer> selectedNodeIndices;
+	
+	/** The set of indices for edges that are selected */
 	private Set<Integer> selectedEdgeIndices;
 	
+	
+	
+	/** The NULL coordinate which means "no coordinate" */
 	private static int NULL_COORDINATE = Integer.MIN_VALUE;
 	
+	
+	/** A flag for whether drag selection mode is currently active */
 	private boolean dragSelectMode;
+	
+	
+	
+	/** The top left x position for the selection border */
 	private int selectTopLeftX;
+	
+	/** The top left y position for the selection border */
 	private int selectTopLeftY;
 	
+	/** The bottom right x position for the selection border */
 	private int selectBottomRightX;
+	
+	/** The bottom right y position for the selection border */
 	private int selectBottomRightY;
 	
 
+	
+	/** A constant that stands for "no index is here" */
 	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
 	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
+	
+	/** The index of the node currently being hovered over */
 	private int hoverNodeIndex;
+	
+	/** The index of the edge currently being hovered over */
 	private int hoverEdgeIndex;
 	
-	// private LinkedHashSet<CyNode>
 	
+	
+	/** A draw state modifier which can be used to modify the appearance
+	 * of certain objects
+	 */
 	private static enum DrawStateModifier {
 	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER
 	}
 	
+	/** A constant that stands for "no type is here" */
 	private static final int NO_TYPE = -1;
+	
+	/** A constant representing the type node */
 	private static final int NODE_TYPE = 0;
+	
+	/** A constant representing the type edge */
 	private static final int EDGE_TYPE = 1;
 	
+	
+	
+	/** A monitor to keep track of keyboard events */
 	private KeyboardMonitor keys;
+	
+	/** A monitor to keep track of mouse events */
 	private MouseMonitor mouse;
+	
+	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
 	
+	
+	
+	/** The application manager for the Cytoscape application */
 	private CyApplicationManager applicationManager;
+	
+	/** The current Cytoscape network manager */
 	private CyNetworkManager networkManager;
+	
+	/** A view manager for network views */
 	private CyNetworkViewManager networkViewManager;
+	
+	/** A rendering engine manager */
 	private RenderingEngineManager renderingEngineManager;
 	
+	
+	/** The network view to be rendered */
 	private CyNetworkView networkView;
+	
+	/** The visual lexicon to use */
 	private VisualLexicon visualLexicon;
 	
-	private TextRenderer textRenderer;
-	
+	/** A debug boolean */
 	private boolean latch_1;
+	
+	/** A boolean to use lower quality 3D shapes to improve framerate */
 	private boolean lowerQuality = false;
+	
+	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean skipHover = false;
 	
+	
+	/** A projection of the current mouse position into 3D coordinates to be used 
+	 * for mouse drag movement of certain objects */
 	private Vector3 currentSelectedProjection;
+	
+	/** A projection of the mouse position into 3D coordinates to be used 
+	 * for mouse drag movement of certain objects */
 	private Vector3 previousSelectedProjection;
+	
+	/** The distance from the projected point to the screen */
 	private double selectProjectionDistance;
 	
+	
+	/** A class capable of storing the edge and node indices of edges and nodes
+	 * that were found to be selected using the shape picking methods
+	 */
 	private class PickResults {
 		public Set<Integer> nodeIndices = new LinkedHashSet<Integer>();
 		public Set<Integer> edgeIndices = new LinkedHashSet<Integer>();
 	}
 	
+	/** Initialize a singleton that seems to help with JOGL in some compatibility
+	 * aspects
+	 */
 	public static void initSingleton() {
 		GLProfile.initSingleton(false);
-		System.out.println("initSingleton called");
+		//System.out.println("initSingleton called");
 	}
 	
+	/** Create a new Graphics object
+	 * 
+	 * @param networkView The CyNetworkView object, representing the 
+	 * View<CyNetwork> object that we are rendering
+	 * @param visualLexicon The visual lexicon being used
+	 */
 	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon) {
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
@@ -180,10 +315,13 @@ public class Graphics implements GLEventListener {
 		
 		selectBottomRightX = NULL_COORDINATE;
 		selectBottomRightY = NULL_COORDINATE;
-		
-		textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 36));
 	}
 	
+	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
+	 * to the specified component for capturing keyboard and mouse events
+	 * 
+	 * @param component The component to listen to events for
+	 */
 	public void trackInput(Component component) {
 		component.addMouseListener(mouse);
 		component.addMouseMotionListener(mouse);
@@ -194,6 +332,13 @@ public class Graphics implements GLEventListener {
 		component.addFocusListener(keys);
 	}
 	
+	/** Assign the values of certain managers that were imported as OSGi services
+	 * 
+	 * @param applicationManager The Cytoscape application's application manager
+	 * @param networkManager The network manager
+	 * @param networkViewManager The network view manager
+	 * @param renderingEngineManager The rendering engine manager
+	 */
 	public void setManagers(CyApplicationManager applicationManager,
 			CyNetworkManager networkManager,
 			CyNetworkViewManager networkViewManager,
@@ -204,10 +349,15 @@ public class Graphics implements GLEventListener {
 		this.renderingEngineManager = renderingEngineManager;
 	}
 
+	/** Main drawing method; can be called by an {@link Animator} such as
+	 * {@link FPSAnimator}, responsible for drawing the scene and advancing
+	 * the frame
+	 * 
+	 * @param drawable The GLAutoDrawable object used for rendering
+	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		
-		//drawable.swapBuffers();
 		GL2 gl = drawable.getGL().getGL2();
 		
 		// Check input
@@ -226,13 +376,10 @@ public class Graphics implements GLEventListener {
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
 
-
 		// Draw mouse reticle
 		// ------------------
 		
 		if (!dragSelectMode) {
-			//gl.glPushMatrix();
-			//gl.glTranslated(rightPointer.x(), rightPointer.y(), rightPointer.z());
 			
 			Vector3 projection = projectMouseCoordinates(camera.getDistance());
 			
@@ -279,21 +426,27 @@ public class Graphics implements GLEventListener {
 		// -------------------------
 		
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
-//				FloatBuffer.wrap(lightPosition));
+		
+		// Code below toggles the light following the camera
+		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
+		// FloatBuffer.wrap(lightPosition));
 
 
 		// Draw nodes and edges
 		// --------------------
 		
-		// gl.glColor3f(0.73f, 0.73f, 0.73f);
 		drawNodes(gl);
-		// gl.glColor3f(0.51f, 0.51f, 0.53f);
 		drawEdges(gl, DrawStateModifier.NORMAL);
 		
 		framesElapsed++;
 	}
 	
+	/** Obtain input and check for changes in the keyboard and mouse buttons,
+	 * as well as mouse movement. This method also handles responses
+	 * to such events
+	 * 
+	 * @param gl The {@link GL2} object used for rendering
+	 */
 	private void checkInput(GL2 gl) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
@@ -324,10 +477,6 @@ public class Graphics implements GLEventListener {
 			if (pressed.contains(KeyEvent.VK_C)) {
 				camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
 						new Vector3(0, 1, 0), 0.04, 0.002, 0.01, 0.01, 0.4);
-			}
-			
-			if (pressed.contains(KeyEvent.VK_K)) {
-				generalLayout();
 			}
 			
 			// Debug-related boolean
@@ -585,8 +734,6 @@ public class Graphics implements GLEventListener {
 					
 					selectedNodeIndices.clear();
 					selectedEdgeIndices.clear();
-					
-					// System.out.println("Selection reset");
 				}
 			
 				// Prepare to perform drag selection
@@ -614,7 +761,7 @@ public class Graphics implements GLEventListener {
 							selectedNodeIndices.add(picked.getIndex());
 						}
 						
-						System.out.println("Selected node index: " + picked.getIndex());
+						//System.out.println("Selected node index: " + picked.getIndex());
 					}
 				} else if (newHoverEdgeIndex != NO_INDEX) {
 					CyEdge picked = networkView.getModel().getEdge(newHoverEdgeIndex);
@@ -630,7 +777,7 @@ public class Graphics implements GLEventListener {
 							selectedEdgeIndices.add(picked.getIndex());
 						}
 						
-						System.out.println("Selected edge index: " + picked.getIndex());
+						//System.out.println("Selected edge index: " + picked.getIndex());
 					}
 				} else {
 					
@@ -663,10 +810,7 @@ public class Graphics implements GLEventListener {
 				
 				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1 
 						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1) {
-					
-	//				System.out.println("Selection from (" + selectTopLeftX + ", " + selectTopLeftY + ") to "
-	//						+ "(" + selectBottomRightX + ", " + selectBottomRightY + ")");
-					
+	
 					PickResults results = performPick(gl, (selectTopLeftX + selectBottomRightX)/2, 
 							(selectTopLeftY + selectBottomRightY)/2, 
 							Math.abs(selectTopLeftX - selectBottomRightX),
@@ -680,7 +824,7 @@ public class Graphics implements GLEventListener {
 							selectedNodes.add(node);
 							selectedNodeIndices.add(nodeIndex);
 						} else {
-							System.out.println("Null node found for index " + nodeIndex + " in drag selection, ignoring..");
+							//System.out.println("Null node found for index " + nodeIndex + " in drag selection, ignoring..");
 						}
 					}
 					
@@ -692,7 +836,7 @@ public class Graphics implements GLEventListener {
 							selectedEdges.add(edge);
 							selectedEdgeIndices.add(edgeIndex);
 						} else {
-							System.out.println("Null edge found for index " + edgeIndex + " in drag selection, ignoring..");
+							//System.out.println("Null edge found for index " + edgeIndex + " in drag selection, ignoring..");
 						}
 					}
 				}
@@ -753,6 +897,14 @@ public class Graphics implements GLEventListener {
 		}
 	}
 	
+	/** Projects the current mouse coordinates into 3D coordinates
+	 * using the camera's direction vector, the camera's location,
+	 * and a given distance from the camera
+	 * 
+	 * @param planeDistance The distance away from the camera used
+	 * to generate the 2D plane that is perpendicular to the camera
+	 * @return The 3D coordinates as a Vector3 object
+	 */
 	private Vector3 projectMouseCoordinates(double planeDistance) {
 		return projectMouseCoordinates(mouse.x(), mouse.y(), planeDistance);
 	}
@@ -762,14 +914,11 @@ public class Graphics implements GLEventListener {
 	 * 3rd dimension is specified by the distance between the camera and the plane
 	 * which intersects a line passing through the eye and the cursor location
 	 * 
-	 * @param x
-	 * 			x window coordinate of the mouse
-	 * @param y
-	 * 			y window coordinate of the mouse
-	 * @param planeDistance
-	 * 			the distance between the camera and the intersecting plane
-	 * @return
-	 * 			the 3D position of the mouse
+	 * @param x The x window coordinate of the mouse
+	 * @param y The y window coordinate of the mouse
+	 * @param planeDistance The distance between the camera and the 
+	 * intersecting plane
+	 * @return The 3D position of the mouse
 	 */
 	private Vector3 projectMouseCoordinates(int x, int y, double planeDistance) {
 		
@@ -825,10 +974,8 @@ public class Graphics implements GLEventListener {
 	 * Obtain the average position of a set of nodes, where each node has the same
 	 * weight in the average
 	 * 
-	 * @param nodes
-	 * 				the {@link Collection} of nodes
-	 * @return
-	 * 				the average position
+	 * @param nodes The {@link Collection} of nodes
+	 * @return The average position
 	 */
 	private Vector3 findAveragePosition(Collection<CyNode> nodes) {
 		if (nodes.isEmpty()) {
@@ -861,7 +1008,21 @@ public class Graphics implements GLEventListener {
 		return result;
 	}
 	
-	private PickResults performPick(GL2 gl, int x, int y, int width, int height, boolean selectAll) {
+	/** Perform a picking operation on the specified region to capture
+	 * 3D shapes drawn in the given region
+	 * 
+	 * @param gl The {@link GL2} object used for rendering
+	 * @param x The center x location, in window coordinates
+	 * @param y The center y location, in window coordinates
+	 * @param width The width of the box used for picking
+	 * @param height The height of the box used for picking
+	 * @param selectAll Whether or not to select all shapes captured
+	 * in the given region, or only to only take the frontmost one
+	 * @return The edges and nodes found in the region, as a 
+	 * {@link PickResults} object
+	 */
+	private PickResults performPick(GL2 gl, int x, int y, int width, 
+			int height, boolean selectAll) {
 		int bufferSize = 1024;
 		
 		if (selectAll) {
@@ -935,7 +1096,6 @@ public class Graphics implements GLEventListener {
 
 	    int hits = gl.glRenderMode(GL2.GL_RENDER);
 	    
-	    // System.out.println("Number of hits: " + hits);
 	    int selectedIndex;
 	    int selectedType;
 	    
@@ -991,6 +1151,11 @@ public class Graphics implements GLEventListener {
 	    return results;
 	}
 
+	/** Draw all the nodes onto the screen, taking into account certain visual
+	 * properties
+	 * 
+	 * @param gl The {@link GL2} object used for rendering
+	 */
 	private void drawNodes(GL2 gl) {
 //		VisualProperty<Paint> NODE_PAINT
 //		VisualProperty<Paint> NODE_FILL_COLOR
@@ -1019,9 +1184,11 @@ public class Graphics implements GLEventListener {
 			gl.glPushMatrix();
 			gl.glTranslatef(x, y, z);
 			
+			/*
 			gl.glScalef(nodeView.getVisualProperty(MinimalVisualLexicon.NODE_WIDTH).floatValue() / DISTANCE_SCALE, 
 					nodeView.getVisualProperty(MinimalVisualLexicon.NODE_HEIGHT).floatValue() / DISTANCE_SCALE, 
 					nodeView.getVisualProperty(RichVisualLexicon.NODE_DEPTH).floatValue() / DISTANCE_SCALE);
+			*/
 			
 			if (selectedNodeIndices.contains(index)) {
 				gl.glColor3f(0.52f, 0.70f, 0.52f);
@@ -1031,11 +1198,11 @@ public class Graphics implements GLEventListener {
 			} else {
 				Color color = (Color) nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
 
-				gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
+				// gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
 
 				// System.out.println("Color: " + color.getRed() / 255.0f + ", " + color.getGreen() / 255.0f + ", " + color.getBlue() / 255.0f);
 				
-				// gl.glColor3f(0.73f, 0.73f, 0.73f);
+				gl.glColor3f(0.73f, 0.73f, 0.73f);
 				
 			}
 			
@@ -1045,7 +1212,14 @@ public class Graphics implements GLEventListener {
 		}
 	}
 	
-	// This method will draw all edges
+	/** Draw all edges onto the screen, taking into account
+	 * certain visual properties such as color
+	 * 
+	 * @param gl The {@link GL2} object used for rendering
+	 * @param generalModifier A modifier to be applied to the drawn results.
+	 * {@link DrawStateModifier}.ENLARGED is used for picking while using
+	 * OpenGL's GL_SELECT rendering mode.
+	 */
 	private void drawEdges(GL2 gl, DrawStateModifier generalModifier) {
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
@@ -1170,21 +1344,15 @@ public class Graphics implements GLEventListener {
 	}
 	
 	
-	/**
-	 * Draws an edge shaped around a quadratic Bezier curve
+	/** Draws an edge shaped around a quadratic Bezier curve
 	 * 
-	 * @param gl
-	 * 			{@link GL2} rendering object
-	 * @param p0
-	 * 			the starting point, p0
-	 * @param p1
-	 * 			the approach point, p1
-	 * @param p2
-	 * 			the end point, p2
-	 * @param numSegments
-	 * 			the number of straight-line segments used to approximate the Bezier curve
-	 * @param modifier
-	 * 			a modifier to change the appearance of the edge object
+	 * @param gl {@link GL2} rendering object
+	 * @param p0 The starting point for the Bezier curve, p0
+	 * @param p1 The approach point, p1
+	 * @param p2 Tthe end point, p2
+	 * @param numSegments The number of straight-line segments used to 
+	 * approximate the Bezier curve
+	 * @param modifier A modifier to change the appearance of the edge object
 	 */
 	private void drawQuadraticEdge(GL2 gl, Vector3 p0, Vector3 p1, Vector3 p2, int numSegments, DrawStateModifier modifier, View<CyEdge> edgeView) {
 		// TODO: Allow the minimum distance to be changed
@@ -1224,16 +1392,14 @@ public class Graphics implements GLEventListener {
 		}		
 	}
 	
-	/** 
-	 * Set up matrix transformations such that the position is equal to the location vector 
-	 * and the z-axis is in the direction of the given direction
+	/** Set up matrix transformations such that the position is 
+	 * equal to the location vector and the z-axis is in the direction 
+	 * of the given direction
 	 * 
-	 * @param gl
-	 * 			{@link GL2} rendering object
-	 * @param location
-	 * 			desired position
-	 * @param direction
-	 * 			desired direction, does not have to be a unit vector
+	 * @param gl The {@link GL2} rendering object
+	 * @param location The desired position
+	 * @param direction The desired direction, does not have to be a 
+	 * unit vector
 	 * 			
 	 */
 	private void setUpFacingTransformation(GL2 gl, Vector3 location, Vector3 direction) {
@@ -1246,19 +1412,15 @@ public class Graphics implements GLEventListener {
 				rotateAxis.z());
 	}
 	
-	/**
-	 * Draws a single edge-like graphics object
+	/** Draws a single edge-like object
 	 * 
-	 * @param gl
-	 * 			{@link GL2} rendering object
-	 * @param start
-	 * 			start location
-	 * @param end
-	 * 			end location
-	 * @param modifier
-	 * 			a modifier to vary the appearance of the output
+	 * @param gl The {@link GL2} rendering object
+	 * @param start The start location
+	 * @param end The end location
+	 * @param modifier A modifier to vary the appearance of the output
 	 */
-	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, DrawStateModifier modifier, View<CyEdge> edgeView) {
+	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, 
+			DrawStateModifier modifier, View<CyEdge> edgeView) {
 		gl.glPushMatrix();
 		
 		Vector3 direction = end.subtract(start);
@@ -1290,13 +1452,10 @@ public class Graphics implements GLEventListener {
 		gl.glPopMatrix();
 	}
 
-	/**
-	 * Draw the drag selection box
+	/** Draw the drag selection box
 	 * 
-	 * @param gl
-	 * 			{@link GL2} rendering object
-	 * @param drawDistance
-	 * 			the distance from the camera to draw the box
+	 * @param gl The {@link GL2} rendering object
+	 * @param drawDistance The distance from the camera to draw the box
 	 */
 	private void drawSelectBox(GL2 gl, double drawDistance) {
 		Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, drawDistance);
@@ -1314,9 +1473,8 @@ public class Graphics implements GLEventListener {
 		
 	}
 	
-	/**
-	 * Draws an edge-like object for the border of the selection box; calculations are made so that
-	 * the corners of the box are sharp
+	/** Draws an edge-like object for the border of the selection box; 
+	 * calculations are made so that the corners of the box are sharp
 	 * 
 	 * @param gl
 	 * 			{@link GL2} rendering object
@@ -1354,6 +1512,9 @@ public class Graphics implements GLEventListener {
 
 	}
 
+	/** Initialize the Graphics object, performing certain
+	 * OpenGL initializations
+	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
@@ -1384,6 +1545,11 @@ public class Graphics implements GLEventListener {
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	/** Create the display lists that are used to draw the edges and nodes,
+	 * as well as certain other objects
+	 * 
+	 * @param gl {@link GL2} rendering object
+	 */
 	private void createDisplayLists(GL2 gl) {
 		nodeListIndex = gl.glGenLists(1);
 		edgeListIndex = gl.glGenLists(1);
@@ -1509,6 +1675,9 @@ public class Graphics implements GLEventListener {
 		screenWidth = width;
 	}
 	
+	/** Move the camera so that it zooms out on a central part of the network,
+	 * but this method is not finalized yet
+	 */
 	public void provideCentralView() {
 		camera.moveTo(new Vector3(0, 0, 0));
 		
@@ -1518,246 +1687,4 @@ public class Graphics implements GLEventListener {
 		camera.moveBackward();
 		camera.zoomOut(40);
 	}
-	
-	public void generalLayout() {
-		
-		LinkedHashSet<CyNode> totalNodesToVisit = new LinkedHashSet<CyNode>();
-		totalNodesToVisit.addAll(networkView.getModel().getNodeList());
-		
-		Vector3 currentCentralLocation = new Vector3();
-		Vector3 nextCentralLocation = new Vector3();
-		
-		double greatestDistanceSquared = -1;
-		
-		// System.out.println("Initial total: " + totalNodesToVisit.size());
-		
-		
-		do {
-			
-			// Find the central node
-			// ---------------------
-			
-			// Approach: Use node with most edges
-			
-			LinkedHashSet<CyNode> plantedNodes = new LinkedHashSet<CyNode>();
-			
-			CyNetwork network = networkView.getModel();
-			
-			CyNode centerNode = null;
-			int highestNeighborCount = -1;
-			int neighbourCount;
-			
-			for (CyNode node : totalNodesToVisit) {
-				neighbourCount = network.getNeighborList(node, Type.ANY).size();
-				
-				if (centerNode == null) {
-					centerNode = node;
-					highestNeighborCount = neighbourCount;
-				} else {
-					if (neighbourCount > highestNeighborCount) {
-						centerNode = node;
-						highestNeighborCount = neighbourCount;
-					}
-				}
-			}
-			
-			// Mark as planted
-			plantedNodes.add(centerNode);
-			
-			// Plant the center node
-			// ---------------------
-			
-			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, currentCentralLocation.x());
-			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, currentCentralLocation.y());
-			networkView.getNodeView(centerNode).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, currentCentralLocation.z());
-			
-			// Plant the first neighbors
-			// -------------------------
-			
-			// Idea: 2nd and further neighbors arranged in an x degree cone 
-			// facing outwards from the last edge
-		
-			HashMap<CyNode, Vector3> outwardDirections = new HashMap<CyNode, Vector3>();
-			
-			
-			double nodeDistance = 1.03 * DISTANCE_SCALE;
-			
-			LinkedHashSet<CyNode> firstNeighbors = new LinkedHashSet<CyNode>();
-			
-			// Removes duplicates as well
-			firstNeighbors.addAll(network.getNeighborList(centerNode, Type.ANY));
-			
-			int firstNeighborCount = firstNeighbors.size();
-			
-			double rotation = 0; 
-			
-			if (firstNeighborCount > 0) {
-				rotation = Math.PI * 2 / firstNeighborCount;
-			}
-			
-			Vector3 current = currentCentralLocation; // TODO: Simplify this part of the code
-			Vector3 offset = new Vector3(0, 1, 0);
-			offset.multiplyLocal(nodeDistance);
-			
-			// Pre-rotation
-			// offset = offset.rotate(new Vector3(0, 0, 1), Math.random() * 2 * Math.PI);
-			
-			for (CyNode firstNeighbor : firstNeighbors) {
-				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
-						offset.x() + current.x());
-				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
-						offset.y() + current.y());
-				networkView.getNodeView(firstNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
-						offset.z() + current.z());
-				
-				outwardDirections.put(firstNeighbor, offset);
-				
-				offset = offset.rotate(new Vector3(0, 0, 1), rotation);
-				
-				// Mark as planted
-				plantedNodes.add(firstNeighbor);
-				
-				// Check for greatest distance
-				// ===========================
-				
-				Vector3 usedLocation = offset.add(current);
-				
-				if (usedLocation.distanceSquared(currentCentralLocation) > greatestDistanceSquared) {
-					greatestDistanceSquared = usedLocation.distanceSquared(currentCentralLocation);
-					
-					nextCentralLocation = usedLocation.subtract(currentCentralLocation).normalize().multiply(3.4).add(usedLocation);
-				}
-			}
-		
-		
-			// Plant the next neighbors
-			// ------------------------
-			
-			double conicalAngle = 0.51;
-			double outwardProjectionDistance = nodeDistance;
-			
-			LinkedHashSet<CyNode> currentNeighbors = firstNeighbors;
-			LinkedHashSet<CyNode> nextToVisit = new LinkedHashSet<CyNode>();
-			
-			do {
-				
-				for (CyNode currentNeighbor : currentNeighbors) {
-					
-					LinkedHashSet<CyNode> nextNeighbors = new LinkedHashSet<CyNode>();
-					
-					// This will also remove redundant nodes from the getNeighborList result
-					nextNeighbors.addAll(network.getNeighborList(currentNeighbor, Type.ANY));
-					
-					Vector3 outwardOffset = outwardDirections.get(currentNeighbor);
-					outwardOffset.normalizeLocal();
-					outwardOffset.multiplyLocal(outwardProjectionDistance);
-					
-					Vector3 perpendicularOffset = outwardOffset.cross(new Vector3(0, 0, 1));
-					perpendicularOffset.normalizeLocal();
-					perpendicularOffset.multiplyLocal(nodeDistance * Math.tan(conicalAngle));
-					
-					double conicalRotation = 0;
-					
-					if (nextNeighbors.size() > 0) {
-						conicalRotation = 2 * Math.PI / nextNeighbors.size();
-					}
-					
-					for (CyNode nextNeighbor : nextNeighbors) {
-						
-						if (!plantedNodes.contains(nextNeighbor)) {
-							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_X_LOCATION,
-									perpendicularOffset.x() + outwardOffset.x() + 
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_X_LOCATION));
-							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION,
-									perpendicularOffset.y() + outwardOffset.y() + 
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION));
-							networkView.getNodeView(nextNeighbor).setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION,
-									perpendicularOffset.z() + outwardOffset.z() + 
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-							
-							outwardDirections.put(nextNeighbor, perpendicularOffset.add(outwardOffset));
-							
-							perpendicularOffset = perpendicularOffset.rotate(outwardOffset, conicalRotation);
-							
-							// Mark as planted
-							plantedNodes.add(nextNeighbor);
-							
-							nextToVisit.add(nextNeighbor);
-							
-							// Check for greatest distance
-							// ===========================
-							
-							Vector3 currentNeighborLocation = new Vector3(
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-									networkView.getNodeView(currentNeighbor).
-									getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-									
-							Vector3 usedLocation = perpendicularOffset.add(outwardOffset).add(currentNeighborLocation);
-							
-							if (usedLocation.distanceSquared(currentCentralLocation) > greatestDistanceSquared) {
-								greatestDistanceSquared = usedLocation.distanceSquared(currentCentralLocation);
-								
-								nextCentralLocation = usedLocation.subtract(currentCentralLocation).normalize().multiply(3.4).add(usedLocation);
-							}
-						}
-					}
-				}
-				
-				currentNeighbors.clear();
-				currentNeighbors.addAll(nextToVisit);
-				
-				nextToVisit.clear();
-				
-			} while (!currentNeighbors.isEmpty());
-			
-			// System.out.println("planted so far: " + plantedNodes.size());
-			totalNodesToVisit.removeAll(plantedNodes);
-			// System.out.println("total after remove: " + totalNodesToVisit.size());
-			
-			
-			double greatestDistance = Math.sqrt(greatestDistanceSquared) * 1.5;
-			
-			// currentCentralLocation.set(nextCentralLocation);
-			currentCentralLocation.addLocal((Math.random() * 2 * greatestDistance - greatestDistance) * 1.65, 
-					(Math.random() * 2 * greatestDistance - greatestDistance) * 1.65,
-					(Math.random() * 2 * greatestDistance - greatestDistance) * 0.02);
-			
-			if (greatestDistanceSquared < 0.2) {
-				currentCentralLocation.addLocal(new Vector3(0.6, -0.6, 0));
-			}
-			
-			greatestDistanceSquared = -1;
-		} while (!totalNodesToVisit.isEmpty());
-	
-		camera.moveTo(findAveragePosition(networkView.getModel().getNodeList())
-				.subtract(camera.getDirection().multiply(camera.getDistance())));
-		camera.zoomOut(20);
-	}
-	
-	/*
-	// Draw X axis
-	gl.glTranslatef(-overHang, 0.0f, 0.0f);
-	gl.glRotatef(90, 0, 1, 0);
-	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
-	gl.glRotatef(-90, 0, 1, 0);
-	gl.glTranslatef(overHang, 0.0f, 0.0f);
-	
-	// Draw Y axis
-	gl.glTranslatef(0.0f, -overHang, 0.0f);
-	gl.glRotatef(-90, 1, 0, 0);
-	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
-	gl.glRotatef(90, 1, 0, 0);
-	gl.glTranslatef(0.0f, overHang, 0.0f);
-	
-	// Draw Z axis
-	gl.glTranslatef(0.0f, 0.0f, -overHang);
-	glu.gluCylinder(reticleQuadric, radius, radius, axisLength, 4, 1);
-	gl.glTranslatef(0.0f, 0.0f, overHang);
-	*/
 }

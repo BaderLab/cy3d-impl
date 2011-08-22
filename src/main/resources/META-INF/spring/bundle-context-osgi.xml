@@ -24,8 +24,6 @@
 	</osgi:reference>
 	
 	<!-- Exported Services -->
-	<osgi:service id="sampleActionService" ref="sampleAction"
-		interface="org.cytoscape.application.swing.CyAction"/>
 
 	<osgi:service id="windRenderingEngineFactoryService" ref="windRenderingEngineFactory">
 		<osgi:interfaces>

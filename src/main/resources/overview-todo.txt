@@ -1,0 +1,7 @@
+
+TODO:
+
+-Allow drawing edges from a node to itself
+-Fix animator bug with use of the listener in WindRenderingEngine to stop the
+animator before the Graphics object and canvas are destroyed
+-Add text-displaying ability, but this will likely require using texture-mapped fonts

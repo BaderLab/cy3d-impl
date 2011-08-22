@@ -15,20 +15,6 @@
 	default-lazy-init="true">
 
 	<context:annotation-config />
-
-	<bean name="sampleAction" class="org.cytoscape.paperwing.internal.SampleAction">
-		<constructor-arg>
-			<props>
-				<prop key="title">Sample Action</prop>
-				<prop key="inMenuBar">true</prop>
-				<prop key="preferredMenu">Plugins</prop>
-			</props>
-		</constructor-arg>
-		<constructor-arg ref="cyApplicationManagerRef"/>
-		<constructor-arg ref="cyNetworkManagerRef"/>
-		<constructor-arg ref="cyNetworkViewManagerRef"/>
-		<constructor-arg ref="cyRenderingEngineManagerRef"/>
-	</bean>
 	
 	<bean name="windVisualLexicon"
 		class="org.cytoscape.paperwing.internal.WindVisualLexicon">
