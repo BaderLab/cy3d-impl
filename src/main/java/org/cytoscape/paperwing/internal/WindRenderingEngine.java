@@ -1,39 +1,29 @@
 package org.cytoscape.paperwing.internal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Image;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.Properties;
 
-import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.events.NetworkAboutToBeDestroyedEvent;
+import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
-import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedEvent;
-import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
-
 import com.jogamp.opengl.util.FPSAnimator;
 
 /** This class represents a WindRenderingEngine, responsible for
@@ -95,18 +85,18 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	 * 
 	 * @return A listener object handling certain cleanup
 	 */
-	public RenderingEngineAboutToBeRemovedListener getEngineRemovedListener() {
+	public NetworkAboutToBeDestroyedListener getAboutToBeRemovedListener() {
 		
 		// System.out.println("getEngineRemovedListener call");
 		
-		return new RenderingEngineAboutToBeRemovedListener(){
+		return new NetworkAboutToBeDestroyedListener(){
 
 			@Override
-			public void handleEvent(RenderingEngineAboutToBeRemovedEvent evt) {
-				System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
-				System.out.println("Current engine: " + selfPointer);
+			public void handleEvent(NetworkAboutToBeDestroyedEvent evt) {
+				// System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
+				// System.out.println("Current engine: " + selfPointer);
 				
-				if (evt.getRenderingEngine() == selfPointer) {
+				if (evt.getNetwork() == networkView.getModel()) {
 					System.out.println("Rendering engine about to be removed, stopping animator");
 					animator.stop();
 				}

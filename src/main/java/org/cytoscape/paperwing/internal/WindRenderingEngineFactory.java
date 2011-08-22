@@ -3,6 +3,7 @@ package org.cytoscape.paperwing.internal;
 import java.util.Properties;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -10,7 +11,6 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
-import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
 
 /** The RenderingEngineFactory for the WindRenderingEngine
  * 
@@ -70,8 +70,9 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		// System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
 		// 		+ ", " + RenderingEngineAboutToBeRemovedListener.class);
-		serviceRegistrar.registerService(engine.getEngineRemovedListener(), 
-				RenderingEngineAboutToBeRemovedListener.class, new Properties());
+		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
+				NetworkAboutToBeDestroyedListener.class, 
+				new Properties());
 		
 		return engine;
 	}
