@@ -12,14 +12,28 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.presentation.events.RenderingEngineAboutToBeRemovedListener;
 
+/** The RenderingEngineFactory for the WindRenderingEngine
+ * 
+ * @author paperwing (Yue Dong)
+ */
 public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
 
+	/** The network view manager containing references to the network views */
 	private CyNetworkViewManager networkViewManager;
+	
+	/** The RenderingEngineManager containing references to the current 
+	 * rendering engines */
 	private RenderingEngineManager renderingEngineManager;
+	
+	/** The visual lexicon for the wind rendering engine */
 	private final VisualLexicon visualLexicon;
 	
+	/** The service registrar used to listen for events regarding when
+	 * the Graphics object is to be removed
+	 */
 	private CyServiceRegistrar serviceRegistrar;
 	
+	/** Construct a new WindRenderingEngineFactory object */
 	public WindRenderingEngineFactory(CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
 			CyServiceRegistrar serviceRegistrar) {	
@@ -40,34 +54,22 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		/* For code below, seems that NetworkViewManager does not contain references to all available NetworkViews
 		 */
+		/*
 		System.out.println("given model: " + viewModel.getModel());
 		System.out.println("given model suid: " + viewModel.getModel().getSUID());
 		System.out.println("given suid: " + viewModel.getSUID());
 		System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
-		
-		/*
-		// CyNetworkView networkView = networkViewManager.getNetworkView(viewModel.getSUID());
-		CyNetworkView networkView = null;
-		for (CyNetworkView view : networkViewManager.getNetworkViewSet()) {
-			if (view.getModel() == viewModel.getModel()) {
-				networkView = view;
-			}
-			System.out.println("current model: " + view.getModel());
-			System.out.println("current model suid: " + view.getModel().getSUID());
-			System.out.println("current suid: " + view.getSUID());
-				
-		}
 		*/
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
 		WindRenderingEngine engine = new WindRenderingEngine(container, viewModel, visualLexicon);
-		System.out.println("returning engine: " + engine);
+		// System.out.println("returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);
 		
-		System.out.println("Engine active?: " + engine.isActive());
+		// System.out.println("Engine active?: " + engine.isActive());
 		
-		System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
-				+ ", " + RenderingEngineAboutToBeRemovedListener.class);
+		// System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
+		// 		+ ", " + RenderingEngineAboutToBeRemovedListener.class);
 		serviceRegistrar.registerService(engine.getEngineRemovedListener(), 
 				RenderingEngineAboutToBeRemovedListener.class, new Properties());
 		

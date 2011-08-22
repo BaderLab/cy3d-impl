@@ -1,3 +1,10 @@
+// If you are visiting this class for the first time,
+// consider taking a look at the following files:
+//
+// src/main/resources/controls.txt -- contains information about controls
+// src/main/resources/overview-todo.txt -- contains information about what 
+// is to be done
+
 package org.cytoscape.paperwing.internal;
 import java.awt.Color;
 import java.awt.Component;
@@ -74,6 +81,11 @@ public class Graphics implements GLEventListener {
 	
 	/** A multiplicative curve factor for the edges */
 	private static final float EDGE_CURVE_FACTOR = 0.43f; //0.31f
+	
+	/** A multiplicative factor for the width of the edges when reading from the
+	 * visual property mappings
+	 */
+    private static final float EDGE_WIDTH_FACTOR = 0.01f;
 	
 	/** How many straight edge segments to use for approximating a curved edge,
 	 * this value does not have to be static */
@@ -910,9 +922,10 @@ public class Graphics implements GLEventListener {
 	}
 	
 	/**
-	 * Converts 2D mouse coordinates to 3D coordinates, where the coordinate for the
-	 * 3rd dimension is specified by the distance between the camera and the plane
-	 * which intersects a line passing through the eye and the cursor location
+	 * Converts 2D mouse coordinates to 3D coordinates, where the coordinate 
+	 * for the 3rd dimension is specified by the distance between the camera 
+	 * and the plane which intersects a line passing through the eye and 
+	 * the cursor location
 	 * 
 	 * @param x The x window coordinate of the mouse
 	 * @param y The y window coordinate of the mouse
@@ -952,7 +965,8 @@ public class Graphics implements GLEventListener {
 		
 		nearPosition.addLocal(camera.getPosition());
 		nearPosition.addLocal(camera.getUp().multiply(nearY));
-		nearPosition.addLocal(camera.getLeft().multiply(-nearX)); // Note that nearX is positive to the right
+		// Note that nearX is positive to the right
+		nearPosition.addLocal(camera.getLeft().multiply(-nearX)); 
 		
 		// Obtain the projection direction vector
 		Vector3 projectionDirection = nearPosition.subtract(camera.getPosition());
@@ -998,7 +1012,8 @@ public class Graphics implements GLEventListener {
 				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
 				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
 			} else {
-				System.out.println("Node with no view found: " + node + ", index: " + node.getIndex());
+				System.out.println("Node with no view found: " + node + 
+						", index: " + node.getIndex());
 			}
 		}
 		
@@ -1099,7 +1114,8 @@ public class Graphics implements GLEventListener {
 	    int selectedIndex;
 	    int selectedType;
 	    
-	    // Current hit record is size 5 because we have (numNames, minZ, maxZ, name1, name2) for
+	    // Current hit record is size 5 because we have 
+	    // (numNames, minZ, maxZ, name1, name2) for
 	    // indices 0-4 respectively
 	    int sizeOfHitRecord = 5;
 	    
@@ -1131,12 +1147,17 @@ public class Graphics implements GLEventListener {
 			} else {
 		    	for (int i = 0; i < hits; i++) {
 		    	
-		    		if (buffer.get(i * sizeOfHitRecord + 2) <= max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+		    		if (buffer.get(i * sizeOfHitRecord + 2) <= 
+		    			max && buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+		    			
 		    			max = buffer.get(i * sizeOfHitRecord + 2);
 		    			maxType = buffer.get(i * sizeOfHitRecord + 3);
 		    			
-		    			selectedType = buffer.get(i * sizeOfHitRecord + 3); // We have that name1 represents the object type
-		    			selectedIndex = buffer.get(i * sizeOfHitRecord + 4); // name2 represents the object index		
+		    			// We have that name1 represents the object type
+		    			selectedType = buffer.get(i * sizeOfHitRecord + 3); 
+		    			
+		    			// name2 represents the object index		
+		    			selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
 		    		}
 		    	}
 	    	
@@ -1157,25 +1178,32 @@ public class Graphics implements GLEventListener {
 	 * @param gl The {@link GL2} object used for rendering
 	 */
 	private void drawNodes(GL2 gl) {
-//		VisualProperty<Paint> NODE_PAINT
-//		VisualProperty<Paint> NODE_FILL_COLOR
-//
-//		VisualProperty<Double> NODE_SIZE
-//
-//		VisualProperty<Boolean> NODE_VISIBLE
-//		VisualProperty<Boolean> NODE_SELECTED
-//
-//		VisualProperty<NodeShape> NODE_SHAPE
-//
-//		VisualProperty<Paint> NODE_SELECTED_PAINT
+		// Currently supporting the following visual properties
+		
+		// VisualProperty<Double> NODE_X_LOCATION
+		// VisualProperty<Double> NODE_Y_LOCATION
+		// VisualProperty<Double> NODE_Z_LOCATION
+		// VisualProperty<Paint> NODE_PAINT
+		// VisualProperty<Boolean> NODE_VISIBLE
+		// VisualProperty<Boolean> NODE_SELECTED
+		// VisualProperty<Double> NODE_WIDTH
+		// VisualProperty<Double> NODE_HEIGHT
+		// VisualProperty<Double> NODE_DEPTH
+
+		// Uncertain about the following visual properties
+		
+		// VisualProperty<Paint> NODE_FILL_COLOR
 		
 		float x, y, z;
 		int index;
 		networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION).floatValue() / DISTANCE_SCALE;
-			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION).floatValue() / DISTANCE_SCALE;
-			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION).floatValue() / DISTANCE_SCALE;
+			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
+				.floatValue() / DISTANCE_SCALE;
+			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)
+				.floatValue() / DISTANCE_SCALE;
+			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
+				.floatValue() / DISTANCE_SCALE;
 			
 			index = nodeView.getModel().getIndex();
 			gl.glLoadName(index);
@@ -1184,29 +1212,60 @@ public class Graphics implements GLEventListener {
 			gl.glPushMatrix();
 			gl.glTranslatef(x, y, z);
 			
-			/*
-			gl.glScalef(nodeView.getVisualProperty(MinimalVisualLexicon.NODE_WIDTH).floatValue() / DISTANCE_SCALE, 
-					nodeView.getVisualProperty(MinimalVisualLexicon.NODE_HEIGHT).floatValue() / DISTANCE_SCALE, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_DEPTH).floatValue() / DISTANCE_SCALE);
-			*/
+			
+			gl.glScalef(nodeView.getVisualProperty(
+							MinimalVisualLexicon.NODE_WIDTH).floatValue() 
+							/ DISTANCE_SCALE, 
+					nodeView.getVisualProperty(
+							MinimalVisualLexicon.NODE_HEIGHT).floatValue() 
+							/ DISTANCE_SCALE, 
+					nodeView.getVisualProperty(
+							RichVisualLexicon.NODE_DEPTH).floatValue() 
+							/ DISTANCE_SCALE);
+			
+			Color color;
 			
 			if (selectedNodeIndices.contains(index)) {
-				gl.glColor3f(0.52f, 0.70f, 0.52f);
+				
 				gl.glScalef(1.1f, 1.1f, 1.1f);
+				
+				color = (Color) nodeView.getVisualProperty(
+						RichVisualLexicon.NODE_SELECTED_PAINT);
+				
+				gl.glColor3f(color.getRed() / 255.0f, 
+						color.getGreen() / 255.0f,
+						color.getBlue() / 255.0f);
+				
+				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, 
+						true);
+				
+				// Default color is below
+				// gl.glColor3f(0.52f, 0.70f, 0.52f);
 			} else if (index == hoverNodeIndex) {
 				gl.glColor3f(0.52f, 0.52f, 0.70f);
-			} else {
-				Color color = (Color) nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
-
-				// gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
-
-				// System.out.println("Color: " + color.getRed() / 255.0f + ", " + color.getGreen() / 255.0f + ", " + color.getBlue() / 255.0f);
 				
-				gl.glColor3f(0.73f, 0.73f, 0.73f);
+				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, 
+						false);
+			} else {
+				color = (Color) nodeView.getVisualProperty(
+						MinimalVisualLexicon.NODE_PAINT);
+
+				gl.glColor3f(color.getRed() / 255.0f, 
+						color.getGreen() / 255.0f,
+						color.getBlue() / 255.0f);
+
+				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, 
+						false);
+				
+				// Default color is below
+				// gl.glColor3f(0.73f, 0.73f, 0.73f);
 				
 			}
 			
-			gl.glCallList(nodeListIndex);
+			// Draw it only if the visual property says it is visible
+			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
+				gl.glCallList(nodeListIndex);
+			}
 			
 			gl.glPopMatrix();
 		}
@@ -1221,6 +1280,15 @@ public class Graphics implements GLEventListener {
 	 * OpenGL's GL_SELECT rendering mode.
 	 */
 	private void drawEdges(GL2 gl, DrawStateModifier generalModifier) {
+		// Indirectly supporting the following visual properties
+		// VisualProperty<Paint> EDGE_PAINT
+		// VisualProperty<Double> EDGE_WIDTH
+		// VisualProperty<Paint> EDGE_SELECTED_PAINT
+		
+		// Directly supporting the following visual properties
+		// VisualProperty<Boolean> EDGE_VISIBLE
+		// VisualProperty<Boolean> EDGE_SELECTED
+		
 		View<CyNode> sourceView;
 		View<CyNode> targetView;
 		
@@ -1258,14 +1326,19 @@ public class Graphics implements GLEventListener {
 			assert sourceIndex < nodeCount;
 			assert targetIndex < nodeCount;
 			
-			// Identify this pair of nodes so we'll know if we've drawn an edge between them before
-			pairIdentifier = ((long) Integer.MAX_VALUE + 1) * sourceIndex + targetIndex; // TODO: Check if this is a safe calculation
+			// Identify this pair of nodes so we'll know if we've drawn an 
+			// edge between them before
+			// TODO: Check if this is a safe calculation
+			pairIdentifier = ((long) Integer.MAX_VALUE + 1) * sourceIndex + targetIndex; 
 
-			// Commenting the below will remove distinguishment between source and target nodes
+			// Commenting the below will remove distinguishment between source and 
+			//target nodes
 			if (sourceIndex > targetIndex) {
-				pairIdentifier = ((long) Integer.MAX_VALUE + 1) * targetIndex + sourceIndex;
+				pairIdentifier = ((long) Integer.MAX_VALUE + 1) * targetIndex 
+					+ sourceIndex;
 			} else {
-				pairIdentifier = ((long) Integer.MAX_VALUE + 1) * sourceIndex + targetIndex;
+				pairIdentifier = ((long) Integer.MAX_VALUE + 1) * sourceIndex 
+					+ targetIndex;
 			}
 			
 			// Have we visited an edge between these nodes before?
@@ -1293,7 +1366,8 @@ public class Graphics implements GLEventListener {
 			p1Offset = direction.cross(0, 1, 0);
 			p1Offset.normalizeLocal();
 			
-			// Multiplier controlling distance between curve point p1 and the straight line between the nodes p0 and p2
+			// Multiplier controlling distance between curve point p1 and the 
+			// straight line between the nodes p0 and p2
 			int distanceMultiplier = (int) Math.sqrt(pairs.get(pairIdentifier));
 			
 			int radiusEdgeCount = distanceMultiplier * 2 + 1;
@@ -1301,13 +1375,18 @@ public class Graphics implements GLEventListener {
 			// Multiplier controlling rotation about the p0p2 vector axis
 			int rotationMultiplier = pairs.get(pairIdentifier);
 			
-			// Shift the square root graph one to the left and one down to get smoother curves
-			p1Offset.multiplyLocal(distanceMultiplier * EDGE_CURVE_FACTOR * (Math.sqrt(direction.magnitude() + 1) - 1)); //TODO: Check if sqrt is needed
+			// Shift the square root graph one to the left and one down 
+			// to get smoother curves
+			//TODO: Check if sqrt is needed
+			p1Offset.multiplyLocal(distanceMultiplier * EDGE_CURVE_FACTOR * 
+					(Math.sqrt(direction.magnitude() + 1) - 1)); 
 			
 			if (distanceMultiplier % 2 == 1) {
-				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * rotationMultiplier / radiusEdgeCount);
+				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * 
+						rotationMultiplier / radiusEdgeCount);
 			} else {
-				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * rotationMultiplier / radiusEdgeCount + Math.PI);
+				p1Offset = p1Offset.rotate(direction, 2 * Math.PI * 
+						rotationMultiplier / radiusEdgeCount + Math.PI);
 			}
 			
 			p1.addLocal(p1Offset);
@@ -1315,28 +1394,40 @@ public class Graphics implements GLEventListener {
 			if (latch_1) {
 				System.out.println("Source index: " + sourceIndex);
 				System.out.println("Source target: " + targetIndex);
-				System.out.println("pairs.get(pairIdentifier): " + pairs.get(pairIdentifier));
+				System.out.println("pairs.get(pairIdentifier): " + 
+						pairs.get(pairIdentifier));
 				System.out.println("pairIdentifier: " + pairIdentifier);
 			}
 		
 			// Load name for edge picking
 			gl.glLoadName(edgeIndex);
 			
+			edgeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, 
+					false);
+			
 			DrawStateModifier modifier; 
 			if (generalModifier == DrawStateModifier.ENLARGED) {
 				modifier = DrawStateModifier.ENLARGED;
 			} else if (selectedEdgeIndices.contains(edgeIndex)) {
 				modifier = DrawStateModifier.SELECTED;
+				
+				edgeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, 
+						true);
 			} else if (edgeIndex == hoverEdgeIndex) {
 				modifier = DrawStateModifier.HOVERED;
 			} else {
 				modifier = DrawStateModifier.NORMAL;
 			}
 			
-			if (distanceMultiplier == 0) {
-				drawQuadraticEdge(gl, p0, p1, p2, 1, modifier, edgeView);
-			} else {
-				drawQuadraticEdge(gl, p0, p1, p2, QUADRATIC_EDGE_SEGMENTS, modifier, edgeView);
+			// Draw it only if the visual property says it is visible
+			if (edgeView.getVisualProperty(MinimalVisualLexicon.EDGE_VISIBLE)) {
+
+				if (distanceMultiplier == 0) {
+					drawQuadraticEdge(gl, p0, p1, p2, 1, modifier, edgeView);
+				} else {
+					drawQuadraticEdge(gl, p0, p1, p2, QUADRATIC_EDGE_SEGMENTS, 
+							modifier, edgeView);
+				}
 			}
 		}
 		
@@ -1421,22 +1512,52 @@ public class Graphics implements GLEventListener {
 	 */
 	private void drawSingleEdge(GL2 gl, Vector3 start, Vector3 end, 
 			DrawStateModifier modifier, View<CyEdge> edgeView) {
+		// Directly supporting th following visual properties
+		// VisualProperty<Paint> EDGE_PAINT
+		// VisualProperty<Double> EDGE_WIDTH
+		// VisualProperty<Paint> EDGE_SELECTED_PAINT
+		
 		gl.glPushMatrix();
 		
 		Vector3 direction = end.subtract(start);
 		
 		setUpFacingTransformation(gl, start, direction);
 		
+		// Perform a transformation to adjust length
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
 		
+		float width = edgeView.getVisualProperty(RichVisualLexicon.EDGE_WIDTH)
+			.floatValue() * EDGE_WIDTH_FACTOR;
+		
+		// Perform a transformation to adjust width
+		gl.glScalef(width, width, 1.0f);
+		
+		Color color;
+		
 		if (modifier == DrawStateModifier.NORMAL) {
-			gl.glColor3f(0.73f, 0.73f, 0.73f);
+			color = (Color) edgeView.getVisualProperty(
+					RichVisualLexicon.EDGE_PAINT);
+			
+			gl.glColor3f(color.getRed() / 255.0f, 
+					color.getGreen() / 255.0f,
+					color.getBlue() / 255.0f);
+			
+			// Default color is below
+			// gl.glColor3f(0.73f, 0.73f, 0.73f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.ENLARGED) {
 			gl.glScalef(1.6f, 1.6f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.SELECTED) {
-			gl.glColor3f(0.48f, 0.65f, 0.48f);
+			color = (Color) edgeView.getVisualProperty(
+					RichVisualLexicon.EDGE_SELECTED_PAINT);
+			
+			gl.glColor3f(color.getRed() / 255.0f, 
+					color.getGreen() / 255.0f,
+					color.getBlue() / 255.0f);
+			
+			// Default color below
+			// gl.glColor3f(0.48f, 0.65f, 0.48f);
 			gl.glScalef(1.1f, 1.1f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.HOVERED) {
