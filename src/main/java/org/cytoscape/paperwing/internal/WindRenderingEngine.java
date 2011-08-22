@@ -15,6 +15,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.Properties;
 
+import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
@@ -145,7 +146,15 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			// TODO: check whether to use GLCanvas or GLJPanel
 			GLJPanel panel = new GLJPanel(capabilities);
 			
-			graphics = new Graphics(networkView, visualLexicon);
+			graphics = new Graphics(networkView, visualLexicon) {
+				
+				@Override
+				public void dispose(GLAutoDrawable drawable) {
+					animator.stop();
+					
+					super.dispose(drawable);
+				}
+			};
 
 			panel.addGLEventListener(graphics);
 	

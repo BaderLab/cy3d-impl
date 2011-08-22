@@ -85,7 +85,7 @@ public class Graphics implements GLEventListener {
 	/** A multiplicative factor for the width of the edges when reading from the
 	 * visual property mappings
 	 */
-    private static final float EDGE_WIDTH_FACTOR = 0.01f;
+    private static final float EDGE_WIDTH_FACTOR = 0.17f;
 	
 	/** How many straight edge segments to use for approximating a curved edge,
 	 * this value does not have to be static */
@@ -265,7 +265,6 @@ public class Graphics implements GLEventListener {
 	
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean skipHover = false;
-	
 	
 	/** A projection of the current mouse position into 3D coordinates to be used 
 	 * for mouse drag movement of certain objects */
@@ -1629,7 +1628,7 @@ public class Graphics implements GLEventListener {
 	}
 	
 	@Override
-	public void dispose(GLAutoDrawable arg0) {
+	public void dispose(GLAutoDrawable autoDrawable) {
 
 	}
 
