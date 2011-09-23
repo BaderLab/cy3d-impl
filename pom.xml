@@ -4,8 +4,8 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<parent>
 		<groupId>org.cytoscape</groupId>
-		<artifactId>parent</artifactId>
-		<version>3.0.0-alpha9-SNAPSHOT</version>
+		<artifactId>impl-parent</artifactId>
+		<version>3.0.0-alpha8-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<bundle.symbolicName>org.cytoscape.paperwing-impl</bundle.symbolicName>
