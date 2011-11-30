@@ -1,0 +1,13 @@
+Index: src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java
+===================================================================
+--- src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(revision 27647)
++++ src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(working copy)
+@@ -15,7 +15,7 @@
+ 	private final Map<View<?>, RenderingEngine<?>> renderingEngineMap;
+ 	
+ 	private static final String FACTORY_ID_TAG = "id";
+-	private static final String DEFAULT_FACTORY_ID = "ding";
++	private static final String DEFAULT_FACTORY_ID = "wind";
+ 	
+ 	private VisualLexicon defaultLexicon;
+ 

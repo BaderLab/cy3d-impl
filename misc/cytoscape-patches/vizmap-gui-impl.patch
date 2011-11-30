@@ -1,0 +1,37 @@
+Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
+===================================================================
+--- src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 27648)
++++ src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(working copy)
+@@ -26,7 +26,7 @@
+ 			.getLogger(BypassManager.class);
+ 
+ 	// TODO: how can we display compatible VP only?
+-	private static final String DEF_RENDERER = "ding";
++	private static final String DEF_RENDERER = "wind";
+ 
+ 	// TODO: this should be a public string or enum managed in swing app.
+ 	private static final String MENU_KEY = "preferredMenu";
+@@ -48,7 +48,7 @@
+ 	}
+ 
+ 	public void addBypass(RenderingEngineFactory<?> factory, Map props) {
+-		if (props.containsValue("ding") == false)
++		if (props.containsValue("wind") == false)
+ 			return;
+ 
+ 		final VisualLexicon lexicon = factory.getVisualLexicon();
+Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java
+===================================================================
+--- src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(revision 27648)
++++ src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(working copy)
+@@ -74,8 +74,8 @@
+ 		CyApplicationConfiguration cyApplicationConfigurationServiceRef = getService(bc,CyApplicationConfiguration.class);
+ 		DialogTaskManager dialogTaskManagerServiceRef = getService(bc,DialogTaskManager.class);
+ 		VisualStyleFactory visualStyleFactoryServiceRef = getService(bc,VisualStyleFactory.class);
+-		VisualLexicon dingVisualLexiconServiceRef = getService(bc,VisualLexicon.class,"(id=ding)");
+-		RenderingEngineFactory dingRenderingEngineFactoryServiceRef = getService(bc,RenderingEngineFactory.class,"(id=ding)");
++		VisualLexicon windVisualLexiconServiceRef = getService(bc,VisualLexicon.class,"(id=wind)");
++		RenderingEngineFactory windRenderingEngineFactoryServiceRef = getService(bc,RenderingEngineFactory.class,"(id=wind)");
+ 		VisualMappingManager vmmServiceRef = getService(bc,VisualMappingManager.class);
+ 		CyNetworkManager cyNetworkManagerServiceRef = getService(bc,CyNetworkManager.class);
+ 		CyApplicationManager cyApplicationManagerServiceRef = getService(bc,CyApplicationManager.class);
