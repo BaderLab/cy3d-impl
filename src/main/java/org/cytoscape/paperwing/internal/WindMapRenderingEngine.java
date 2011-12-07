@@ -1,5 +1,7 @@
 package org.cytoscape.paperwing.internal;
 
+import java.awt.Container;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -28,6 +30,10 @@ public class WindMapRenderingEngine extends WindRenderingEngine {
 		super(container, viewModel, visualLexicon);
 		
 		graphics.provideCentralView();
+		graphics.setMapMode(true);
+		graphics.setMapContainer((Container) container);
+		
+		graphics.findMapPartner();
 	}
 
 }

@@ -8,6 +8,7 @@
 package org.cytoscape.paperwing.internal;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.nio.ByteBuffer;
@@ -15,8 +16,12 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import javax.media.opengl.GL;
@@ -266,6 +271,16 @@ public class Graphics implements GLEventListener {
 	private double selectProjectionDistance;
 	
 	
+	private boolean mapMode = false;
+	private Graphics mapPartner = null;
+	
+	private Container mapContainer = null;
+	
+	private static Map<CyNetworkView, List<Graphics>> registry = null;
+	static {
+		Graphics.registry = new HashMap<CyNetworkView, List<Graphics>>();
+	}
+	
 	/** A class capable of storing the edge and node indices of edges and nodes
 	 * that were found to be selected using the shape picking methods
 	 */
@@ -289,6 +304,15 @@ public class Graphics implements GLEventListener {
 	 * @param visualLexicon The visual lexicon being used
 	 */
 	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon) {
+		if (registry.get(networkView) == null) {
+			List<Graphics> list = new LinkedList<Graphics>();
+			list.add(this);
+			
+			registry.put(networkView, list);
+		} else {
+			registry.get(networkView).add(this);
+		}
+	
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
 
@@ -314,6 +338,38 @@ public class Graphics implements GLEventListener {
 		
 		selectBottomRightX = NULL_COORDINATE;
 		selectBottomRightY = NULL_COORDINATE;
+	}
+	
+	public void setMapMode(boolean mapMode) {
+		this.mapMode = mapMode;
+	}
+	
+	private void setMapPartner(Graphics mapPartner) {
+		this.mapPartner = mapPartner;
+	}
+	
+	public void setMapContainer(Container container) {
+		this.mapContainer = container;
+	}
+	
+	public void findMapPartner() {
+		List<Graphics> list = registry.get(networkView);
+		
+		if (list == null) {
+			return;
+		} else {
+			for (Graphics g : list) {
+				if (g.mapMode != this.mapMode && g.mapPartner == null && this.mapPartner == null) {
+					g.setMapPartner(this);
+					this.setMapPartner(g);
+					
+					System.out.println("Graphics with mapMode (" + mapMode + ") found partner. Link is + " + g + " and " + this);
+					
+					return;
+				}
+			}
+		}
+		
 	}
 	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
@@ -378,6 +434,7 @@ public class Graphics implements GLEventListener {
 		// Draw mouse reticle
 		// ------------------
 		
+		/*
 		if (!dragSelectMode) {
 			
 			Vector3 projection = projectMouseCoordinates(camera.getDistance());
@@ -412,6 +469,7 @@ public class Graphics implements GLEventListener {
 			gl.glCallList(reticleListIndex);
 			gl.glPopMatrix();
 		}
+		*/
 		
 		// Draw selection box
 		// ------------------
@@ -438,6 +496,12 @@ public class Graphics implements GLEventListener {
 		drawEdges(gl, DrawStateModifier.NORMAL);
 		
 		framesElapsed++;
+		
+		if (mapMode) {
+			if (mapContainer != null) {
+				mapContainer.repaint();
+			}
+		}
 	}
 	
 	/** Obtain input and check for changes in the keyboard and mouse buttons,
@@ -789,6 +853,10 @@ public class Graphics implements GLEventListener {
 			if (mouse.getHeld().contains(MouseEvent.BUTTON1) && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				selectBottomRightX = mouse.x();
 				selectBottomRightY = mouse.y();
+				
+				if (mapMode) {
+					System.out.println("Map clicked");
+				}
 				
 				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1 
 						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1 &&
@@ -1199,7 +1267,7 @@ public class Graphics implements GLEventListener {
 			gl.glPushMatrix();
 			gl.glTranslatef(x, y, z);
 			
-			
+			/*
 			gl.glScalef(nodeView.getVisualProperty(
 							MinimalVisualLexicon.NODE_WIDTH).floatValue() 
 							/ DISTANCE_SCALE, 
@@ -1209,6 +1277,7 @@ public class Graphics implements GLEventListener {
 					nodeView.getVisualProperty(
 							RichVisualLexicon.NODE_DEPTH).floatValue() 
 							/ DISTANCE_SCALE);
+			*/
 			
 			Color color;
 			
@@ -1572,12 +1641,35 @@ public class Graphics implements GLEventListener {
 		Vector3 topRight = projectMouseCoordinates(selectBottomRightX, selectTopLeftY, drawDistance);
 		Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, drawDistance);
 
-		
+		/**
+		// Below uses older cylinder approach
 		drawSingleSelectEdge(gl, topLeft, topRight);
 		drawSingleSelectEdge(gl, topLeft, bottomLeft);
 		
 		drawSingleSelectEdge(gl, topRight, bottomRight);
 		drawSingleSelectEdge(gl, bottomLeft, bottomRight);
+		**/
+		
+		gl.glDisable(GL2.GL_LIGHTING);
+		gl.glColor3f(0.0f, 0.4f, 0.6f);
+		
+		// Below uses converted 3D coordinates
+		gl.glBegin(GL2.GL_LINE_LOOP);
+		gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
+		gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
+		gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
+		gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
+		gl.glEnd();
+		
+		// Below uses raw 2d coordinates
+//		gl.glBegin(GL2.GL_LINE_LOOP);
+//		gl.glVertex2i(selectTopLeftX, selectTopLeftY);
+//		gl.glVertex2i(selectTopLeftX, selectBottomRightY);
+//		gl.glVertex2i(selectBottomRightX, selectBottomRightY);
+//		gl.glVertex2i(selectBottomRightX, selectTopLeftY);
+//		gl.glEnd();
+		
+		gl.glEnable(GL2.GL_LIGHTING);
 		
 	}
 	
@@ -1708,8 +1800,15 @@ public class Graphics implements GLEventListener {
 		gl.glNewList(reticleListIndex, GL2.GL_COMPILE);
 		// glu.gluSphere(pointerQuadric, SMALL_SPHERE_RADIUS / 4, 4, 4);
 		
-		glu.gluCylinder(reticleQuadric, RETICLE_RADIUS, RETICLE_RADIUS, RETICLE_LENGTH,
-				SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
+		// This is the cylinder
+		// glu.gluCylinder(reticleQuadric, RETICLE_RADIUS, RETICLE_RADIUS, RETICLE_LENGTH,
+		//		SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
+		
+		// This is the line approach
+		gl.glBegin(GL2.GL_LINES);
+		gl.glVertex3d(0, 0, 0);
+		gl.glVertex3d(0, 0, RETICLE_LENGTH);
+		gl.glEnd();
 		
 		gl.glEndList();
 		
@@ -1721,8 +1820,18 @@ public class Graphics implements GLEventListener {
 		glu.gluQuadricNormals(selectBorderQuadric, GLU.GLU_SMOOTH);
 
 		gl.glNewList(selectBorderListIndex, GL2.GL_COMPILE);
-		glu.gluCylinder(selectBorderQuadric, SELECT_BORDER_RADIUS, SELECT_BORDER_RADIUS, 1.0,
-				SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
+		
+		// Cylinder approach
+		// Given radius, length 1.0
+		// glu.gluCylinder(selectBorderQuadric, SELECT_BORDER_RADIUS, SELECT_BORDER_RADIUS, 1.0,
+		//		SELECT_BORDER_SLICES_DETAIL, SELECT_BORDER_STACKS_DETAIL);
+		
+		// Line approach
+		gl.glBegin(GL2.GL_LINES);
+		gl.glVertex3d(0, 0, 0);
+		gl.glVertex3d(0, 0, 1);
+		gl.glEnd();
+		
 		gl.glEndList();
 		
 		

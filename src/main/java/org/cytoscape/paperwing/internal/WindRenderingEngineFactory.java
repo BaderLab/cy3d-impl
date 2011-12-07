@@ -49,7 +49,7 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	}
 	
 	@Override
-	public RenderingEngine<CyNetwork> getInstance(
+	public RenderingEngine<CyNetwork> createRenderingEngine(
 			Object container, View<CyNetwork> viewModel) {
 		
 		/* For code below, seems that NetworkViewManager does not contain references to all available NetworkViews
