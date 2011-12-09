@@ -502,6 +502,34 @@ public class Graphics implements GLEventListener {
 				mapContainer.repaint();
 			}
 		}
+		
+		// Draw the location rectangle on the map
+		if (mapMode) {
+			if (mapPartner != null) {
+				SimpleCamera partnerCamera = mapPartner.camera;
+				
+				Vector3 topLeft = mapPartner.projectScreenCoordinates(0, 0, partnerCamera.getDistance());
+				Vector3 bottomLeft = mapPartner.projectScreenCoordinates(0, mapPartner.screenHeight, partnerCamera.getDistance());
+				
+				Vector3 topRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, 0, partnerCamera.getDistance());
+				Vector3 bottomRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, mapPartner.screenHeight, partnerCamera.getDistance());
+				
+				gl.glDisable(GL2.GL_LIGHTING);
+				gl.glColor3f(0.7f, 0.7f, 0.6f);
+				
+				// Below uses converted 3D coordinates
+				gl.glBegin(GL2.GL_LINE_LOOP);
+				gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
+				gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
+				gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
+				gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
+				gl.glEnd();
+				
+				
+				gl.glEnable(GL2.GL_LIGHTING);
+			}
+		}
+		
 	}
 	
 	/** Obtain input and check for changes in the keyboard and mouse buttons,
@@ -973,22 +1001,25 @@ public class Graphics implements GLEventListener {
 	 * @return The 3D coordinates as a Vector3 object
 	 */
 	private Vector3 projectMouseCoordinates(double planeDistance) {
-		return projectMouseCoordinates(mouse.x(), mouse.y(), planeDistance);
+		return projectScreenCoordinates(mouse.x(), mouse.y(), planeDistance);
 	}
 	
 	/**
-	 * Converts 2D mouse coordinates to 3D coordinates, where the coordinate 
-	 * for the 3rd dimension is specified by the distance between the camera 
-	 * and the plane which intersects a line passing through the eye and 
-	 * the cursor location
+	 * Converts 2D screen coordinates to 3D OpenGL coordinates, where the
+	 * coordinate for the 3rd dimension is specified by the distance between 
+	 * the camera and the plane which intersects a line passing through the eye and 
+	 * the specified location on the plane
 	 * 
-	 * @param x The x window coordinate of the mouse
-	 * @param y The y window coordinate of the mouse
+	 * This method can be used for mouse coordinates, as mouse coordinates are
+	 * screen coordinates.
+	 * 
+	 * @param x The x window coordinate of the mouse (0 for top left)
+	 * @param y The y window coordinate of the mouse (0 for top left)
 	 * @param planeDistance The distance between the camera and the 
 	 * intersecting plane
 	 * @return The 3D position of the mouse
 	 */
-	private Vector3 projectMouseCoordinates(int x, int y, double planeDistance) {
+	private Vector3 projectScreenCoordinates(int x, int y, double planeDistance) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
@@ -1007,7 +1038,7 @@ public class Graphics implements GLEventListener {
 		double percentMouseOffsetX = (double) (x - screenWidth) / screenWidth + 0.5;
 		double percentMouseOffsetY = (double) (y - screenHeight) / screenHeight + 0.5;
 		
-		// OpenGL has up as the positive y direction, whereas the mouse is at (0, 0) in the top left
+		// OpenGL has up as the positive y direction, whereas the mouse/screen coordinate is (0, 0) at the top left
 		percentMouseOffsetY = -percentMouseOffsetY;
 		
 		double nearX = percentMouseOffsetX * nearPlaneWidth;
@@ -1635,11 +1666,11 @@ public class Graphics implements GLEventListener {
 	 * @param drawDistance The distance from the camera to draw the box
 	 */
 	private void drawSelectBox(GL2 gl, double drawDistance) {
-		Vector3 topLeft = projectMouseCoordinates(selectTopLeftX, selectTopLeftY, drawDistance);
-		Vector3 bottomLeft = projectMouseCoordinates(selectTopLeftX, selectBottomRightY, drawDistance);
+		Vector3 topLeft = projectScreenCoordinates(selectTopLeftX, selectTopLeftY, drawDistance);
+		Vector3 bottomLeft = projectScreenCoordinates(selectTopLeftX, selectBottomRightY, drawDistance);
 		
-		Vector3 topRight = projectMouseCoordinates(selectBottomRightX, selectTopLeftY, drawDistance);
-		Vector3 bottomRight = projectMouseCoordinates(selectBottomRightX, selectBottomRightY, drawDistance);
+		Vector3 topRight = projectScreenCoordinates(selectBottomRightX, selectTopLeftY, drawDistance);
+		Vector3 bottomRight = projectScreenCoordinates(selectBottomRightX, selectBottomRightY, drawDistance);
 
 		/**
 		// Below uses older cylinder approach
