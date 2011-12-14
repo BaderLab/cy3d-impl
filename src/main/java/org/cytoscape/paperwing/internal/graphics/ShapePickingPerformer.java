@@ -16,6 +16,20 @@ import org.cytoscape.paperwing.internal.Graphics.PickResults;
 
 public class ShapePickingPerformer {
 	
+	/** A constant that stands for "no type is here" */
+	private static final int NO_TYPE = -1;
+	
+	/** A constant representing the type node */
+	private static final int NODE_TYPE = 0;
+	
+	/** A constant representing the type edge */
+	private static final int EDGE_TYPE = 1;
+	
+	/** A constant that stands for "no index is here" */
+	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
+	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
+	
+	
 	/** A class capable of storing the edge and node indices of edges and nodes
 	 * that were found to be selected using the shape picking methods
 	 */
@@ -83,7 +97,7 @@ public class ShapePickingPerformer {
 
 		gl.glPushName(NODE_TYPE);
 		gl.glPushName(NO_INDEX);
-		
+	
 		// Render nodes for picking
 		drawNodes(gl);
 		
