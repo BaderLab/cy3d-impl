@@ -2,10 +2,14 @@ package org.cytoscape.paperwing.internal.graphics;
 
 import java.util.Set;
 
+import javax.media.opengl.GL2;
+
 import org.cytoscape.paperwing.internal.SimpleCamera;
+import org.cytoscape.paperwing.internal.Vector3;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class GraphicsData {
+
 	/** The network view to be rendered */
 	private CyNetworkView networkView;
 	
@@ -14,12 +18,6 @@ public class GraphicsData {
 	 * coordinates to drawing coordinates
 	 */
 	private float distanceScale = 178.0f; 
-
-	/** The set of indices for nodes that are selected */
-	private Set<Integer> selectedNodeIndices;
-	
-	/** The set of indices for edges that are selected */
-	private Set<Integer> selectedEdgeIndices;
 	
 	/** The index of the node currently being hovered over */
 	private int hoverNodeIndex;
@@ -29,18 +27,6 @@ public class GraphicsData {
 	
 	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
-	
-	/** The top left x position for the selection border */
-	private int selectTopLeftX;
-	
-	/** The top left y position for the selection border */
-	private int selectTopLeftY;
-	
-	/** The bottom right x position for the selection border */
-	private int selectBottomRightX;
-	
-	/** The bottom right y position for the selection border */
-	private int selectBottomRightY;
 	
 	/** The height of the screen */
 	private int screenHeight;
@@ -53,6 +39,17 @@ public class GraphicsData {
 	
 	/** End time used for FPS timing */
 	private long endTime;
+	
+	/** A boolean to disable real-time shape picking to improve framerate */
+	private boolean disableHovering;
+	
+	private GraphicsSelectionData selectionData;
+	
+	private GL2 glContext;
+	
+	public GraphicsData() {
+		selectionData = new GraphicsSelectionData();
+	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
 		this.networkView = networkView;
@@ -68,22 +65,6 @@ public class GraphicsData {
 
 	public float getDistanceScale() {
 		return distanceScale;
-	}
-
-	public void setSelectedNodeIndices(Set<Integer> selectedNodeIndices) {
-		this.selectedNodeIndices = selectedNodeIndices;
-	}
-
-	public Set<Integer> getSelectedNodeIndices() {
-		return selectedNodeIndices;
-	}
-
-	public void setSelectedEdgeIndices(Set<Integer> selectedEdgeIndices) {
-		this.selectedEdgeIndices = selectedEdgeIndices;
-	}
-
-	public Set<Integer> getSelectedEdgeIndices() {
-		return selectedEdgeIndices;
 	}
 
 	public void setHoverNodeIndex(int hoverNodeIndex) {
@@ -108,38 +89,6 @@ public class GraphicsData {
 
 	public SimpleCamera getCamera() {
 		return camera;
-	}
-
-	public void setSelectTopLeftX(int selectTopLeftX) {
-		this.selectTopLeftX = selectTopLeftX;
-	}
-
-	public int getSelectTopLeftX() {
-		return selectTopLeftX;
-	}
-
-	public void setSelectTopLeftY(int selectTopLeftY) {
-		this.selectTopLeftY = selectTopLeftY;
-	}
-
-	public int getSelectTopLeftY() {
-		return selectTopLeftY;
-	}
-
-	public void setSelectBottomRightX(int selectBottomRightX) {
-		this.selectBottomRightX = selectBottomRightX;
-	}
-
-	public int getSelectBottomRightX() {
-		return selectBottomRightX;
-	}
-
-	public void setSelectBottomRightY(int selectBottomRightY) {
-		this.selectBottomRightY = selectBottomRightY;
-	}
-
-	public int getSelectBottomRightY() {
-		return selectBottomRightY;
 	}
 
 	public void setScreenHeight(int screenHeight) {
@@ -173,7 +122,28 @@ public class GraphicsData {
 	public long getStartTime() {
 		return startTime;
 	}
-	
-	
-	
+
+	public void setDisableHovering(boolean disableHovering) {
+		this.disableHovering = disableHovering;
+	}
+
+	public boolean isDisableHovering() {
+		return disableHovering;
+	}
+
+	public void setGlContext(GL2 glContext) {
+		this.glContext = glContext;
+	}
+
+	public GL2 getGlContext() {
+		return glContext;
+	}
+
+	public GraphicsSelectionData getSelectionData() {
+		return selectionData;
+	}
+
+	public void setSelectionData(GraphicsSelectionData selectionData) {
+		this.selectionData = selectionData;
+	}
 }

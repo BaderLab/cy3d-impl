@@ -1,5 +1,7 @@
 package org.cytoscape.paperwing.internal.graphics;
 
+import java.util.List;
+
 import javax.media.opengl.GL2;
 
 import org.cytoscape.paperwing.internal.SimpleCamera;
@@ -8,7 +10,7 @@ import org.cytoscape.paperwing.internal.Vector3;
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	@Override
-	public void initialize(GL2 gl, GraphicsData graphicsData) {
+	public void initialize(GraphicsData graphicsData) {
 		// TODO Auto-generated method stub
 
 	}
@@ -22,11 +24,17 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	 *            The distance from the camera to draw the box
 	 */
 	@Override
-	public void execute(GL2 gl, GraphicsData graphicsData) {
-		int selectTopLeftX = graphicsData.getSelectTopLeftX();
-		int selectTopLeftY = graphicsData.getSelectTopLeftY();
-		int selectBottomRightX = graphicsData.getSelectBottomRightX();
-		int selectBottomRightY = graphicsData.getSelectBottomRightY();
+	public void execute(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+
+		int selectTopLeftX = graphicsData.getSelectionData()
+				.getSelectTopLeftX();
+		int selectTopLeftY = graphicsData.getSelectionData()
+				.getSelectTopLeftY();
+		int selectBottomRightX = graphicsData.getSelectionData()
+				.getSelectBottomRightX();
+		int selectBottomRightY = graphicsData.getSelectionData()
+				.getSelectBottomRightY();
 
 		int screenWidth = graphicsData.getScreenWidth();
 		int screenHeight = graphicsData.getScreenHeight();

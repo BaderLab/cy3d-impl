@@ -5,22 +5,44 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.media.opengl.GL2;
+
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.paperwing.internal.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.MouseMonitor;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.Graphics.PickResults;
+import org.cytoscape.paperwing.internal.graphics.ShapePickingPerformer.PickResults;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class InputProcessor {
+	
+	public static int NULL_COORDINATE = Integer.MIN_VALUE;
+	
+	// Relies on Cytoscape's guarantee that edge and node indices are 
+	// nonnegative
+	public static int NO_INDEX = -1; 
+	
+	
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+			GraphicsData graphicsData, ShapePickingPerformer shapePicker) {
 
+		GL2 gl = graphicsData.getGlContext();
 		SimpleCamera camera = graphicsData.getCamera();
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+		// CyNetwork model = graphicsData.getNetworkView().getModel();
+
+		Set<Integer> selectedNodeIndices = selectionData
+				.getSelectedNodeIndices();
+		Set<Integer> selectedEdgeIndices = selectionData
+				.getSelectedEdgeIndices();
 
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
@@ -36,15 +58,15 @@ public class InputProcessor {
 
 			// Display FPS
 			if (pressed.contains(KeyEvent.VK_SPACE)) {
-				endTime = System.nanoTime();
-
-				double duration = (endTime - startTime) / Math.pow(10, 9);
-				double frameRate = framesElapsed / duration;
-				System.out.println("Average fps over " + duration
-						+ " seconds: " + frameRate);
-
-				startTime = System.nanoTime();
-				framesElapsed = 0;
+				// endTime = System.nanoTime();
+				//
+				// double duration = (endTime - startTime) / Math.pow(10, 9);
+				// double frameRate = framesElapsed / duration;
+				// System.out.println("Average fps over " + duration
+				// + " seconds: " + frameRate);
+				//
+				// startTime = System.nanoTime();
+				// framesElapsed = 0;
 			}
 
 			// Reset Camera to default
@@ -56,35 +78,35 @@ public class InputProcessor {
 
 			// Debug-related boolean
 			if (pressed.contains(KeyEvent.VK_1)) {
-				latch_1 = true;
+				// latch_1 = true;
 			}
 
 			if (pressed.contains(KeyEvent.VK_L)) {
-				if (!lowerQuality) {
-					lowerQuality = true;
-
-					QUADRATIC_EDGE_SEGMENTS = 3;
-					NODE_SLICES_DETAIL = 6;
-					NODE_STACKS_DETAIL = 6;
-					EDGE_SLICES_DETAIL = 3;
-					EDGE_STACKS_DETAIL = 1;
-
-					createDisplayLists(gl);
-				} else {
-					lowerQuality = false;
-
-					QUADRATIC_EDGE_SEGMENTS = 5;
-					NODE_SLICES_DETAIL = 10;
-					NODE_STACKS_DETAIL = 10;
-					EDGE_SLICES_DETAIL = 4;
-					EDGE_STACKS_DETAIL = 1;
-
-					createDisplayLists(gl);
-				}
+				// if (!lowerQuality) {
+				// lowerQuality = true;
+				//
+				// QUADRATIC_EDGE_SEGMENTS = 3;
+				// NODE_SLICES_DETAIL = 6;
+				// NODE_STACKS_DETAIL = 6;
+				// EDGE_SLICES_DETAIL = 3;
+				// EDGE_STACKS_DETAIL = 1;
+				//
+				// createDisplayLists(gl);
+				// } else {
+				// lowerQuality = false;
+				//
+				// QUADRATIC_EDGE_SEGMENTS = 5;
+				// NODE_SLICES_DETAIL = 10;
+				// NODE_STACKS_DETAIL = 10;
+				// EDGE_SLICES_DETAIL = 4;
+				// EDGE_STACKS_DETAIL = 1;
+				//
+				// createDisplayLists(gl);
+				// }
 			}
 
 			if (pressed.contains(KeyEvent.VK_P)) {
-				skipHover = !skipHover;
+				// skipHover = !skipHover;
 			}
 
 			// Roll camera clockwise
@@ -100,42 +122,59 @@ public class InputProcessor {
 			// Create edges between nodes
 			if (pressed.contains(KeyEvent.VK_J)) {
 				CyNode hoverNode = networkView.getModel().getNode(
-						hoverNodeIndex);
+						graphicsData.getHoverNodeIndex());
 
 				if (hoverNode != null) {
 
-					for (CyNode node : selectedNodes) {
-						networkView.getModel().addEdge(node, hoverNode, false);
+					for (Integer index : selectedNodeIndices) {
+						networkView.getModel().addEdge(
+								networkView.getModel().getNode(index),
+								hoverNode, false);
 
 						// TODO: Not sure if this call is needed
 						networkView.updateView();
 					}
-					;
 				}
 			}
 
 			// Delete selected edges/nodes
 			if (pressed.contains(KeyEvent.VK_DELETE)) {
-				LinkedHashSet<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
-
-				for (CyNode node : selectedNodes) {
-					// TODO: Check if use of Type.ANY for any edge is correct
-					// TODO: Check if this addAll method properly skips adding
-					// edges already in the edgesToBeRemovedList
-					edgesToBeRemoved.addAll(networkView.getModel()
-							.getAdjacentEdgeList(node, Type.ANY));
+				Set<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
+				Set<CyNode> nodesToBeRemoved = new LinkedHashSet<CyNode>();
+				
+				// Remove nodes
+				CyNode nodeToBeRemoved;
+				
+				for (Integer index : selectedNodeIndices) {
+					nodeToBeRemoved = networkView.getModel().getNode(index);
+					
+					if (nodeToBeRemoved != null ) {
+						nodesToBeRemoved.add(nodeToBeRemoved);
+						
+						// TODO: Check if use of Type.ANY for any edge is correct
+						// TODO: Check if this addAll method properly skips adding
+						// edges already in the edgesToBeRemovedList
+						edgesToBeRemoved.addAll(networkView.getModel()
+								.getAdjacentEdgeList(nodeToBeRemoved,
+										Type.ANY));
+					}
+					
 				}
 
-				if (!networkView.getModel().removeNodes(selectedNodes)) {
-					// do nothing
-				} else {
-					// Remove edges attached to the node
-					networkView.getModel().removeEdges(edgesToBeRemoved);
+				// Remove edges
+				CyEdge edgeToBeRemoved;
+				
+				for (Integer index : selectedEdgeIndices) {
+					edgeToBeRemoved = networkView.getModel().getEdge(index);
+					
+					if (edgeToBeRemoved != null) {
+						edgesToBeRemoved.add(edgeToBeRemoved);
+					}
 				}
-
-				// Remove selected edges
-				networkView.getModel().removeEdges(selectedEdges);
-
+				
+				networkView.getModel().removeNodes(nodesToBeRemoved);
+				networkView.getModel().removeEdges(edgesToBeRemoved);
+				
 				// TODO: Not sure if this call is needed
 				networkView.updateView();
 			}
@@ -187,22 +226,24 @@ public class InputProcessor {
 
 				View<CyNode> viewAdded = networkView.getNodeView(added);
 
+				double distanceScale = graphicsData.getDistanceScale();
+				
 				// TODO: Maybe throw an exception if viewAdded is null
 				if (viewAdded != null) {
 					viewAdded.setVisualProperty(
 							RichVisualLexicon.NODE_X_LOCATION, projection.x()
-									* DISTANCE_SCALE);
+									* distanceScale);
 					viewAdded.setVisualProperty(
 							RichVisualLexicon.NODE_Y_LOCATION, projection.y()
-									* DISTANCE_SCALE);
+									* distanceScale);
 					viewAdded.setVisualProperty(
 							RichVisualLexicon.NODE_Z_LOCATION, projection.z()
-									* DISTANCE_SCALE);
+									* distanceScale);
 
 					// Set the node to be hovered
 					// TODO: This might not be needed if the node were added
 					// through some way other than the mouse
-					hoverNodeIndex = added.getIndex();
+					graphicsData.setHoverNodeIndex(added.getIndex());
 				}
 			}
 
@@ -235,36 +276,36 @@ public class InputProcessor {
 
 			// Debug - display distance between 2 nodes
 			if (pressed.contains(KeyEvent.VK_O)) {
-				CyNode hoverNode = networkView.getModel().getNode(
-						hoverNodeIndex);
-
-				if (hoverNode != null && selectedNodes.size() == 1) {
-					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
-					View<CyNode> selectView = hoverView;
-					for (CyNode node : selectedNodes) {
-						selectView = networkView.getNodeView(node);
-					}
-					;
-
-					Vector3 hover = new Vector3(
-							hoverView
-									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-							hoverView
-									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-							hoverView
-									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-
-					Vector3 select = new Vector3(
-							selectView
-									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-							selectView
-									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-							selectView
-									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-
-					System.out.println("Distance: " + hover.distance(select)
-							/ DISTANCE_SCALE);
-				}
+//				CyNode hoverNode = networkView.getModel().getNode(
+//						graphicsData.getHoverNodeIndex());
+//
+//				if (hoverNode != null && selectedNodeIndices.size() == 1) {
+//					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
+//					View<CyNode> selectView = hoverView;
+//					for (CyNode node : selectedNodes) {
+//						selectView = networkView.getNodeView(node);
+//					}
+//					;
+//
+//					Vector3 hover = new Vector3(
+//							hoverView
+//									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+//							hoverView
+//									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+//							hoverView
+//									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+//
+//					Vector3 select = new Vector3(
+//							selectView
+//									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+//							selectView
+//									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+//							selectView
+//									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+//
+//					System.out.println("Distance: " + hover.distance(select)
+//							/ DISTANCE_SCALE);
+//				}
 			}
 
 			keys.update();
@@ -274,14 +315,14 @@ public class InputProcessor {
 		// ----------------------------------
 
 		PickResults pickResults;
-		if (skipHover) {
-			pickResults = new PickResults();
+		if (graphicsData.isDisableHovering()) {
+			pickResults = shapePicker.new PickResults();
 		} else {
-			pickResults = performPick(gl, mouse.x(), mouse.y(), 2, 2, false);
+			pickResults = shapePicker.performPick(mouse.x(), mouse.y(), 2, 2, false);
 		}
 
-		int newHoverNodeIndex = NO_INDEX;
-		int newHoverEdgeIndex = NO_INDEX;
+		int newHoverNodeIndex = ShapePickingPerformer.NO_INDEX;
+		int newHoverEdgeIndex = ShapePickingPerformer.NO_INDEX;
 
 		for (Integer nodeIndex : pickResults.nodeIndices) {
 			newHoverNodeIndex = nodeIndex;
@@ -294,12 +335,12 @@ public class InputProcessor {
 		// Make sure only 1 object is selected for single selection
 		assert pickResults.nodeIndices.size() + pickResults.edgeIndices.size() <= 1;
 
-		if (keys.getHeld().contains(KeyEvent.VK_CONTROL) || dragSelectMode) {
-			hoverNodeIndex = NO_INDEX;
-			hoverEdgeIndex = NO_INDEX;
+		if (keys.getHeld().contains(KeyEvent.VK_CONTROL) || selectionData.isDragSelectMode()) {
+			graphicsData.setHoverNodeIndex(ShapePickingPerformer.NO_INDEX);
+			graphicsData.setHoverEdgeIndex(ShapePickingPerformer.NO_INDEX);
 		} else {
-			hoverNodeIndex = newHoverNodeIndex;
-			hoverEdgeIndex = newHoverEdgeIndex;
+			graphicsData.setHoverNodeIndex(newHoverNodeIndex);
+			graphicsData.setHoverEdgeIndex(newHoverEdgeIndex);
 		}
 
 		if (mouse.hasMoved() || mouse.hasNew()) {
@@ -314,11 +355,21 @@ public class InputProcessor {
 			if (mouse.dWheel() != 0) {
 				camera.zoomOut((double) mouse.dWheel());
 
-				if (!selectedNodes.isEmpty()) {
+				if (!selectedNodeIndices.isEmpty()) {
 					// TODO: Check if this is a suitable place to put this, as
 					// it helps to make node dragging smoother
-					selectProjectionDistance = findAveragePosition(
-							selectedNodes).distance(camera.getPosition());
+					Vector3 averagePosition = new Vector3();
+					View<CyNode> nodeView;
+					
+					for (Integer index : selectedNodeIndices) {
+						nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
+						
+						averagePosition.addLocal(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION), 
+								nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+								nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+					}
+					
+					selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 				}
 			}
 
@@ -328,9 +379,6 @@ public class InputProcessor {
 
 				// If the user did not hold down shift, unselect other objects
 				if (!keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
-					selectedNodes.clear();
-					selectedEdges.clear();
-
 					selectedNodeIndices.clear();
 					selectedEdgeIndices.clear();
 				}
@@ -338,50 +386,44 @@ public class InputProcessor {
 				// Prepare to perform drag selection
 				// ---------------------------------
 
-				selectTopLeftX = mouse.x();
-				selectTopLeftY = mouse.y();
+				selectionData.setSelectTopLeftX(mouse.x());
+				selectionData.setSelectTopLeftY(mouse.y());
 
-				selectBottomRightX = NULL_COORDINATE;
-				selectBottomRightY = NULL_COORDINATE;
+				selectionData.setSelectBottomRightX(NULL_COORDINATE);
+				selectionData.setSelectBottomRightY(NULL_COORDINATE);
 
 				// ----------------------------------
 
 				if (newHoverNodeIndex != NO_INDEX) {
-					CyNode picked = networkView.getModel().getNode(
-							newHoverNodeIndex);
+					Integer pickedIndex = newHoverNodeIndex;
 
 					// TODO: Possibly throw exception if the node was found to
 					// be null, ie. invalid index
-					if (picked != null) {
+					if (pickedIndex != null) {
 
-						if (selectedNodes.contains(picked)) {
-							selectedNodes.remove(picked);
-							selectedNodeIndices.remove(picked.getIndex());
+						if (selectedNodeIndices.contains(pickedIndex)) {
+							selectedNodeIndices.remove(pickedIndex);
 						} else {
-							selectedNodes.add(picked);
-							selectedNodeIndices.add(picked.getIndex());
+							selectedNodeIndices.add(pickedIndex);
 						}
 
 						// System.out.println("Selected node index: " +
 						// picked.getIndex());
 					}
 				} else if (newHoverEdgeIndex != NO_INDEX) {
-					CyEdge picked = networkView.getModel().getEdge(
-							newHoverEdgeIndex);
+					Integer pickedIndex = newHoverEdgeIndex;
 
 					// TODO: Possibly throw exception if the edge was found to
 					// be null, ie. invalid index
-					if (picked != null) {
+					if (pickedIndex != null) {
 
-						if (selectedEdges.contains(picked)) {
-							selectedEdges.remove(picked);
-							selectedEdgeIndices.remove(picked.getIndex());
+						if (selectedEdgeIndices.contains(pickedIndex)) {
+							selectedEdgeIndices.remove(pickedIndex);
 						} else {
-							selectedEdges.add(picked);
-							selectedEdgeIndices.add(picked.getIndex());
+							selectedEdgeIndices.add(pickedIndex);
 						}
 
-						// System.out.println("Selected edge index: " +
+						// System.out.println("Selected node index: " +
 						// picked.getIndex());
 					}
 				} else {
@@ -394,46 +436,47 @@ public class InputProcessor {
 			// Drag selection; moving the box
 			if (mouse.getHeld().contains(MouseEvent.BUTTON1)
 					&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
-				selectBottomRightX = mouse.x();
-				selectBottomRightY = mouse.y();
+				selectionData.setSelectBottomRightX(mouse.x());
+				selectionData.setSelectBottomRightY(mouse.y());
 
+				/** Map-mode toggling is likely to be disabled
 				if (mapMode) {
 					System.out.println("Map clicked");
 				}
+				*/
 
-				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1
-						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1
-						&& selectTopLeftX != NULL_COORDINATE
-						&& selectTopLeftY != NULL_COORDINATE) {
+				if (Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX()) >= 1
+						&& Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()) >= 1
+						&& selectionData.getSelectTopLeftX() != NULL_COORDINATE
+						&& selectionData.getSelectTopLeftY() != NULL_COORDINATE) {
 
-					dragSelectMode = true;
+					selectionData.setDragSelectMode(true);
 				} else {
-					dragSelectMode = false;
+					selectionData.setDragSelectMode(false);
 				}
 			}
 
 			// Drag selection; selecting contents of the box
 			if (mouse.getReleased().contains(MouseEvent.BUTTON1)
 					&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)
-					&& dragSelectMode) {
-				selectBottomRightX = mouse.x();
-				selectBottomRightY = mouse.y();
+					&& selectionData.isDragSelectMode()) {
+				selectionData.setSelectBottomRightX(mouse.x());
+				selectionData.setSelectBottomRightY(mouse.y());
 
-				if (Math.abs(selectTopLeftX - selectBottomRightX) >= 1
-						&& Math.abs(selectTopLeftY - selectBottomRightY) >= 1) {
+				if (Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX()) >= 1
+						&& Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()) >= 1) {
 
-					PickResults results = performPick(gl,
-							(selectTopLeftX + selectBottomRightX) / 2,
-							(selectTopLeftY + selectBottomRightY) / 2,
-							Math.abs(selectTopLeftX - selectBottomRightX),
-							Math.abs(selectTopLeftY - selectBottomRightY), true);
+					PickResults results = shapePicker.performPick(
+							(selectionData.getSelectTopLeftX() + selectionData.getSelectBottomRightX()) / 2,
+							(selectionData.getSelectTopLeftY() + selectionData.getSelectBottomRightY()) / 2,
+							Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX()),
+							Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()), true);
 
 					CyNode node;
 					for (Integer nodeIndex : results.nodeIndices) {
 						node = networkView.getModel().getNode(nodeIndex);
 
 						if (node != null) {
-							selectedNodes.add(node);
 							selectedNodeIndices.add(nodeIndex);
 						} else {
 							// System.out.println("Null node found for index " +
@@ -446,7 +489,6 @@ public class InputProcessor {
 						edge = networkView.getModel().getEdge(edgeIndex);
 
 						if (edge != null) {
-							selectedEdges.add(edge);
 							selectedEdgeIndices.add(edgeIndex);
 						} else {
 							// System.out.println("Null edge found for index " +
@@ -455,13 +497,13 @@ public class InputProcessor {
 					}
 				}
 
-				selectTopLeftX = NULL_COORDINATE;
-				selectTopLeftY = NULL_COORDINATE;
+				selectionData.setSelectTopLeftX(NULL_COORDINATE);
+				selectionData.setSelectTopLeftY(NULL_COORDINATE);
 
-				selectBottomRightX = NULL_COORDINATE;
-				selectBottomRightY = NULL_COORDINATE;
+				selectionData.setSelectBottomRightX(NULL_COORDINATE);
+				selectionData.setSelectBottomRightY(NULL_COORDINATE);
 
-				dragSelectMode = false;
+				selectionData.setDragSelectMode(false);
 
 			}
 
@@ -469,45 +511,66 @@ public class InputProcessor {
 			// --------------------------------------------------------
 
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1)
-					&& !selectedNodes.isEmpty()) {
+					&& !selectedNodeIndices.isEmpty()) {
 				// Store the result for use for mouse-difference related
 				// calculations
-				selectProjectionDistance = findAveragePosition(selectedNodes)
-						.distance(camera.getPosition());
+				Vector3 averagePosition = new Vector3();
+				View<CyNode> nodeView;
+				
+				for (Integer index : selectedNodeIndices) {
+					nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
+					
+					averagePosition.addLocal(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION), 
+							nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+							nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+				}
+				
+				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 
-				previousSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
+				// These projections are used to find displacement vectors to move the nodes
+				// during dragging
+				selectionData.setPreviousSelectedProjection(
+						GraphicsUtility.projectMouseCoordinates(
+								mouse,
+								graphicsData,
+								selectionData.getSelectProjectionDistance()));
 				// } else if (mouse.getHeld().contains(MouseEvent.BUTTON1) &&
 				// !selectedNodes.isEmpty() && previousSelectProjection != null)
 				// {
 			} else if (keys.getHeld().contains(KeyEvent.VK_CONTROL)
 					&& mouse.getHeld().contains(MouseEvent.BUTTON1)
-					&& !selectedNodes.isEmpty()
-					&& previousSelectedProjection != null) {
+					&& !selectedNodeIndices.isEmpty()
+					&& selectionData.getPreviousSelectedProjection() != null) {
 				View<CyNode> nodeView;
 				Vector3 projectionDisplacement;
 
-				currentSelectedProjection = projectMouseCoordinates(selectProjectionDistance);
-				projectionDisplacement = currentSelectedProjection
-						.subtract(previousSelectedProjection);
+				selectionData.setCurrentSelectedProjection(
+						GraphicsUtility.projectMouseCoordinates(mouse, graphicsData, selectionData.getSelectProjectionDistance()));
+				projectionDisplacement = selectionData.getCurrentSelectedProjection()
+						.subtract(selectionData.getPreviousSelectedProjection());
 
 				double x, y, z;
-
-				for (CyNode node : selectedNodes) {
+				CyNode node;
+				
+				for (Integer index : selectedNodeIndices) {
 					// TODO: This relies on an efficient traversal of selected
 					// nodes, as well
 					// as efficient retrieval from the networkView object
+					
+					node = networkView.getModel().getNode(index);
 					nodeView = networkView.getNodeView(node);
-
+					float distanceScale = graphicsData.getDistanceScale();
+					
 					if (nodeView != null) {
 						x = nodeView
 								.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
-								+ projectionDisplacement.x() * DISTANCE_SCALE;
+								+ projectionDisplacement.x() * distanceScale;
 						y = nodeView
 								.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)
-								+ projectionDisplacement.y() * DISTANCE_SCALE;
+								+ projectionDisplacement.y() * distanceScale;
 						z = nodeView
 								.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
-								+ projectionDisplacement.z() * DISTANCE_SCALE;
+								+ projectionDisplacement.z() * distanceScale;
 
 						nodeView.setVisualProperty(
 								RichVisualLexicon.NODE_X_LOCATION, x);
@@ -519,10 +582,10 @@ public class InputProcessor {
 					}
 				}
 
-				previousSelectedProjection = currentSelectedProjection;
+				selectionData.setPreviousSelectedProjection(selectionData.getCurrentSelectedProjection());
 
-				selectTopLeftX = NULL_COORDINATE;
-				selectTopLeftY = NULL_COORDINATE;
+				selectionData.setSelectTopLeftX(NULL_COORDINATE);
+				selectionData.setSelectTopLeftY(NULL_COORDINATE);
 			}
 
 			mouse.update();

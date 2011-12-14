@@ -1,5 +1,7 @@
 package org.cytoscape.paperwing.internal.graphics;
 
+import java.util.List;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
@@ -11,7 +13,9 @@ public class RenderCursorProcedure implements ReadOnlyGraphicsProcedure {
 	int reticleListIndex;
 	
 	@Override
-	public void initialize(GL2 gl, GraphicsData graphicsData) {
+	public void initialize(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+		
 		reticleListIndex = gl.glGenLists(1);
 		
 		GLU glu = new GLU();
@@ -48,7 +52,7 @@ public class RenderCursorProcedure implements ReadOnlyGraphicsProcedure {
 	}
 
 	@Override
-	public void execute(GL2 gl, GraphicsData graphicsData) {
+	public void execute(GraphicsData graphicsData) {
 		// TODO Auto-generated method stub
 
 	}

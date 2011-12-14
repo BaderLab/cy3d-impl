@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal.graphics;
 
 import javax.media.opengl.GL2;
 
+import org.cytoscape.paperwing.internal.MouseMonitor;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
 
@@ -91,5 +92,13 @@ public class GraphicsUtility {
 		projection.addLocal(camera.getPosition());
 		
 		return projection;
+	}
+	
+	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
+	// which is perpendicular to the camera.
+	public static Vector3 projectMouseCoordinates(MouseMonitor mouse, GraphicsData graphicsData, 
+			double planeDistance) {
+		return projectScreenCoordinates(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
+		
 	}
 }

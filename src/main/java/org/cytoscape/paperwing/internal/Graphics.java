@@ -120,14 +120,7 @@ public class Graphics implements GLEventListener {
 	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER
 	}
 	
-	/** A constant that stands for "no type is here" */
-	private static final int NO_TYPE = -1;
-	
-	/** A constant representing the type node */
-	private static final int NODE_TYPE = 0;
-	
-	/** A constant representing the type edge */
-	private static final int EDGE_TYPE = 1;
+
 	
 	
 	
