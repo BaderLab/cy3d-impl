@@ -14,7 +14,7 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
-public class RenderNodeProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 	/** The default radius of the spherical nodes */
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f

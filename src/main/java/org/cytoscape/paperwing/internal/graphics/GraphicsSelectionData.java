@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.graphics;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.cytoscape.paperwing.internal.Vector3;
@@ -37,7 +38,12 @@ public class GraphicsSelectionData {
 	
 	/** The distance from the projected point to the screen */
 	private double selectProjectionDistance;
-
+	
+	public GraphicsSelectionData() {
+		selectedNodeIndices = new LinkedHashSet<Integer>();
+		selectedEdgeIndices = new LinkedHashSet<Integer>();
+	}
+	
 	public Set<Integer> getSelectedNodeIndices() {
 		return selectedNodeIndices;
 	}

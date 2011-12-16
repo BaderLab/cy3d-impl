@@ -12,7 +12,6 @@ import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.Graphics.DrawStateModifier;
 import org.cytoscape.paperwing.internal.Graphics.PickResults;
 
 public class ShapePickingPerformer {

@@ -13,7 +13,6 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 // import org.cytoscape.paperwing.internal.Graphics.DrawStateModifier;
 import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.Graphics.DrawStateModifier;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
@@ -21,7 +20,7 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 import com.jogamp.opengl.util.gl2.GLUT;
 
-public class RenderEdgeProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 	/** The default radius of the semi-cylindrical edges */
 	private static final float EDGE_RADIUS = 0.018f;

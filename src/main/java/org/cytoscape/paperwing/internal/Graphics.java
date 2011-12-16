@@ -18,6 +18,7 @@ import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +42,11 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.paperwing.internal.graphics.GraphicsData;
+import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
+import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
+import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -55,18 +61,6 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
  * @author Paperwing (Yue Dong)
  */
 public class Graphics implements GLEventListener {
-
-	/**
-	 * This value controls distance scaling when converting from node
-	 * coordinates to drawing coordinates
-	 */
-	private static final float DISTANCE_SCALE = 178.0f; 
-	
-	/** The radius to use for the drag selection border's straight segments */
-	private static final float SELECT_BORDER_RADIUS = 0.0027f;
-	
-	/** The distance from the camera to draw the selection box */
-	private static final double SELECT_BORDER_DISTANCE = 0.91;
 	
 	/** Controls the distance apart to draw the reticle for the mouse */
 	private static final double RETICLE_DISTANCE = 0.06;
@@ -74,54 +68,13 @@ public class Graphics implements GLEventListener {
 	/** Controls the radius of the reticle */
 	private static final double RETICLE_RADIUS = 0.012;
 	
-	
-	/** The display list index for the reticle */
-	private int reticleListIndex;
-	
-	/** The display list index for the selection border segments */
-	private int selectBorderListIndex;
-
-	
-	/** Number of frames elapsed */
-	private int framesElapsed = 0;
-	
-	
-	/** The height of the screen */
-	private int screenHeight;
-	
-	/** The width of the screen */
-	private int screenWidth;
-	
-	
 	/** The NULL coordinate which means "no coordinate" */
 	private static int NULL_COORDINATE = Integer.MIN_VALUE;
-	
-	
-	/** A flag for whether drag selection mode is currently active */
-	private boolean dragSelectMode;
 	
 
 	/** A constant that stands for "no index is here" */
 	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
-	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held
-	
-	/** The index of the node currently being hovered over */
-	private int hoverNodeIndex;
-	
-	/** The index of the edge currently being hovered over */
-	private int hoverEdgeIndex;
-	
-	
-	
-	/** A draw state modifier which can be used to modify the appearance
-	 * of certain objects
-	 */
-	public static enum DrawStateModifier {
-	    HOVERED, SELECTED, NORMAL, ENLARGED, SELECT_BORDER
-	}
-	
-
-	
+	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held	
 	
 	
 	/** A monitor to keep track of keyboard events */
@@ -130,55 +83,17 @@ public class Graphics implements GLEventListener {
 	/** A monitor to keep track of mouse events */
 	private MouseMonitor mouse;
 	
-	/** The camera to use for transformation of 3D scene */
-	private SimpleCamera camera;
-	
-	
-	
-	/** The application manager for the Cytoscape application */
-	private CyApplicationManager applicationManager;
-	
-	/** The current Cytoscape network manager */
-	private CyNetworkManager networkManager;
-	
-	/** A view manager for network views */
-	private CyNetworkViewManager networkViewManager;
-	
-	/** A rendering engine manager */
-	private RenderingEngineManager renderingEngineManager;
-	
-	
-	/** The network view to be rendered */
-	private CyNetworkView networkView;
-	
-	/** The visual lexicon to use */
-	private VisualLexicon visualLexicon;
-	
-	/** A debug boolean */
-	private boolean latch_1;
-	
 	/** A boolean to use lower quality 3D shapes to improve framerate */
 	private boolean lowerQuality = false;
-	
-	/** A boolean to disable real-time shape picking to improve framerate */
-	private boolean skipHover = false;
-	
-	/** A projection of the current mouse position into 3D coordinates to be used 
-	 * for mouse drag movement of certain objects */
-	private Vector3 currentSelectedProjection;
-	
-	/** A projection of the mouse position into 3D coordinates to be used 
-	 * for mouse drag movement of certain objects */
-	private Vector3 previousSelectedProjection;
-	
-	/** The distance from the projected point to the screen */
-	private double selectProjectionDistance;
 	
 	
 	private boolean mapMode = false;
 	private Graphics mapPartner = null;
-	
 	private Container mapContainer = null;
+	
+	private GraphicsData graphicsData;
+	private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
+	
 	
 	private static Map<CyNetworkView, List<Graphics>> registry = null;
 	static {
@@ -220,23 +135,18 @@ public class Graphics implements GLEventListener {
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
 
+		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
+		renderProcedures.put("nodes", new RenderNodesProcedure());
+		renderProcedures.put("edges", new RenderEdgesProcedure());
+		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
+		
 		// TODO: add default constant speeds for camera movement
-		camera = new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
-				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4);
+		graphicsData = new GraphicsData();
+		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
+				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4));
 		
-		this.networkView = networkView;
-		this.visualLexicon = visualLexicon;
-		
-		selectedNodes = new LinkedHashSet<CyNode>();
-		selectedEdges = new LinkedHashSet<CyEdge>();
-		
-		selectedNodeIndices = new HashSet<Integer>();
-		selectedEdgeIndices = new HashSet<Integer>();
-
-		hoverNodeIndex = NO_INDEX;
-		hoverEdgeIndex = NO_INDEX;
-		
-		dragSelectMode = false;
+		graphicsData.setNetworkView(networkView);
+		graphicsData.setVisualLexicon(visualLexicon);
 	}
 	
 	public void setMapMode(boolean mapMode) {
@@ -252,7 +162,7 @@ public class Graphics implements GLEventListener {
 	}
 	
 	public void findMapPartner() {
-		List<Graphics> list = registry.get(networkView);
+		List<Graphics> list = registry.get(graphicsData.getNetworkView());
 		
 		if (list == null) {
 			return;
@@ -285,23 +195,6 @@ public class Graphics implements GLEventListener {
 		component.addKeyListener(keys);
 		component.addFocusListener(keys);
 	}
-	
-	/** Assign the values of certain managers that were imported as OSGi services
-	 * 
-	 * @param applicationManager The Cytoscape application's application manager
-	 * @param networkManager The network manager
-	 * @param networkViewManager The network view manager
-	 * @param renderingEngineManager The rendering engine manager
-	 */
-	public void setManagers(CyApplicationManager applicationManager,
-			CyNetworkManager networkManager,
-			CyNetworkViewManager networkViewManager,
-			RenderingEngineManager renderingEngineManager) {
-		this.applicationManager = applicationManager;
-		this.networkManager = networkManager;
-		this.networkViewManager = networkViewManager;
-		this.renderingEngineManager = renderingEngineManager;
-	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as
 	 * {@link FPSAnimator}, responsible for drawing the scene and advancing
@@ -312,6 +205,8 @@ public class Graphics implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		
+		SimpleCamera camera = graphicsData.getCamera();
+		
 		GL2 gl = drawable.getGL().getGL2();
 		
 		// Check input
@@ -320,11 +215,10 @@ public class Graphics implements GLEventListener {
 		// Reset scene
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
-
+		
 		Vector3 position = camera.getPosition();
 		Vector3 target = camera.getTarget();
 		Vector3 up = camera.getUp();
-
 		
 		GLU glu = new GLU();
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
@@ -333,9 +227,9 @@ public class Graphics implements GLEventListener {
 		// Draw selection box
 		// ------------------
 
-		if (dragSelectMode) {
+		if (graphicsData.getSelectionData().isDragSelectMode()) {
 			
-			drawSelectBox(gl, SELECT_BORDER_DISTANCE);
+			renderProcedures.get("selectionBox").execute(graphicsData);
 		}
 		
 		// Control light positioning
@@ -351,10 +245,10 @@ public class Graphics implements GLEventListener {
 		// Draw nodes and edges
 		// --------------------
 		
-		drawNodes(gl);
-		drawEdges(gl, DrawStateModifier.NORMAL);
+		renderProcedures.get("nodes").execute(graphicsData);
+		renderProcedures.get("edges").execute(graphicsData);
 		
-		framesElapsed++;
+		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
 		
 		if (mapMode) {
 			if (mapContainer != null) {
@@ -362,32 +256,32 @@ public class Graphics implements GLEventListener {
 			}
 		}
 		
-		// Draw the location rectangle on the map
-		if (mapMode) {
-			if (mapPartner != null) {
-				SimpleCamera partnerCamera = mapPartner.camera;
-				
-				Vector3 topLeft = mapPartner.projectScreenCoordinates(0, 0, partnerCamera.getDistance());
-				Vector3 bottomLeft = mapPartner.projectScreenCoordinates(0, mapPartner.screenHeight, partnerCamera.getDistance());
-				
-				Vector3 topRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, 0, partnerCamera.getDistance());
-				Vector3 bottomRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, mapPartner.screenHeight, partnerCamera.getDistance());
-				
-				gl.glDisable(GL2.GL_LIGHTING);
-				gl.glColor3f(0.7f, 0.7f, 0.6f);
-				
-				// Below uses converted 3D coordinates
-				gl.glBegin(GL2.GL_LINE_LOOP);
-				gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
-				gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
-				gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
-				gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
-				gl.glEnd();
-				
-				
-				gl.glEnable(GL2.GL_LIGHTING);
-			}
-		}
+//		// Draw the location rectangle on the map
+//		if (mapMode) {
+//			if (mapPartner != null) {
+//				SimpleCamera partnerCamera = mapPartner.camera;
+//				
+//				Vector3 topLeft = mapPartner.projectScreenCoordinates(0, 0, partnerCamera.getDistance());
+//				Vector3 bottomLeft = mapPartner.projectScreenCoordinates(0, mapPartner.screenHeight, partnerCamera.getDistance());
+//				
+//				Vector3 topRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, 0, partnerCamera.getDistance());
+//				Vector3 bottomRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, mapPartner.screenHeight, partnerCamera.getDistance());
+//				
+//				gl.glDisable(GL2.GL_LIGHTING);
+//				gl.glColor3f(0.7f, 0.7f, 0.6f);
+//				
+//				// Below uses converted 3D coordinates
+//				gl.glBegin(GL2.GL_LINE_LOOP);
+//				gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
+//				gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
+//				gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
+//				gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
+//				gl.glEnd();
+//				
+//				
+//				gl.glEnable(GL2.GL_LIGHTING);
+//			}
+//		}
 		
 	}
 	
@@ -398,56 +292,6 @@ public class Graphics implements GLEventListener {
 	 * @param gl The {@link GL2} object used for rendering
 	 */
 	private void checkInput(GL2 gl) {
-		
-		
-	}
-	
-	/**
-	 * Obtain the average position of a set of nodes, where each node has the same
-	 * weight in the average
-	 * 
-	 * @param nodes The {@link Collection} of nodes
-	 * @return The average position
-	 */
-	private Vector3 findAveragePosition(Collection<CyNode> nodes) {
-		if (nodes.isEmpty()) {
-			return null;
-		}
-		
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		
-		View<CyNode> nodeView;
-		
-		for (CyNode node : nodes) {
-			// TODO: This relies on an efficient traversal of nodes, as well
-			// as efficient retrieval from the networkView object
-			nodeView = networkView.getNodeView(node);
-			
-			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
-			} else {
-				System.out.println("Node with no view found: " + node + 
-						", index: " + node.getIndex());
-			}
-		}
-		
-		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(DISTANCE_SCALE * nodes.size());
-		
-		return result;
-	}
-	
-
-	/** Draw the drag selection box
-	 * 
-	 * @param gl The {@link GL2} rendering object
-	 * @param drawDistance The distance from the camera to draw the box
-	 */
-	private void drawSelectBox(GL2 gl, double drawDistance) {
 		
 		
 	}
@@ -477,8 +321,6 @@ public class Graphics implements GLEventListener {
 
 		//generateNodes();
 		//generateEdges();
-		startTime = System.nanoTime();
-		createDisplayLists(gl);
 		
 		// Correct lightning for scaling certain models
 		gl.glEnable(GL2.GL_NORMALIZE);
@@ -488,23 +330,14 @@ public class Graphics implements GLEventListener {
 		
 		// gl.glEnable(GL2.GL_BLEND);
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+		
+		graphicsData.setStartTime(System.nanoTime());
+		
+		for (ReadOnlyGraphicsProcedure procedure : renderProcedures.values()) {
+			procedure.initialize(graphicsData);
+		}
 	}
 
-	/** Create the display lists that are used to draw the edges and nodes,
-	 * as well as certain other objects
-	 * 
-	 * @param gl {@link GL2} rendering object
-	 */
-	private void createDisplayLists(GL2 gl) {
-		
-		selectBorderListIndex = gl.glGenLists(1);
-		
-		GLU glu = new GLU();
-
-		GLUquadric quadric = glu.gluNewQuadric();
-		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
-		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
-	}
 
 	private void initLighting(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
@@ -561,20 +394,20 @@ public class Graphics implements GLEventListener {
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		
-		screenHeight = height;
-		screenWidth = width;
+		graphicsData.setScreenHeight(height);
+		graphicsData.setScreenWidth(width);
 	}
 	
 	/** Move the camera so that it zooms out on a central part of the network,
 	 * but this method is not finalized yet
 	 */
 	public void provideCentralView() {
-		camera.moveTo(new Vector3(0, 0, 0));
-		
-		if (findAveragePosition(networkView.getModel().getNodeList()) != null) {
-			camera.moveTo(findAveragePosition(networkView.getModel().getNodeList()));
-		}
-		camera.moveBackward();
-		camera.zoomOut(40);
+//		camera.moveTo(new Vector3(0, 0, 0));
+//		
+//		if (findAveragePosition(networkView.getModel().getNodeList()) != null) {
+//			camera.moveTo(findAveragePosition(networkView.getModel().getNodeList()));
+//		}
+//		camera.moveBackward();
+//		camera.zoomOut(40);
 	}
 }

@@ -7,6 +7,7 @@ import javax.media.opengl.GL2;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.VisualLexicon;
 
 public class GraphicsData {
 
@@ -37,6 +38,9 @@ public class GraphicsData {
 	/** Start time used for FPS timing */
 	private long startTime;
 	
+	/** Number of frames elapsed */
+	private int framesElapsed = 0;
+	
 	/** End time used for FPS timing */
 	private long endTime;
 	
@@ -47,8 +51,12 @@ public class GraphicsData {
 	
 	private GL2 glContext;
 	
+	private VisualLexicon visualLexicon;
+	
 	public GraphicsData() {
 		selectionData = new GraphicsSelectionData();
+		
+		camera = new SimpleCamera();
 	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
@@ -145,5 +153,21 @@ public class GraphicsData {
 
 	public void setSelectionData(GraphicsSelectionData selectionData) {
 		this.selectionData = selectionData;
+	}
+
+	public void setVisualLexicon(VisualLexicon visualLexicon) {
+		this.visualLexicon = visualLexicon;
+	}
+
+	public VisualLexicon getVisualLexicon() {
+		return visualLexicon;
+	}
+
+	public void setFramesElapsed(int framesElapsed) {
+		this.framesElapsed = framesElapsed;
+	}
+
+	public int getFramesElapsed() {
+		return framesElapsed;
 	}
 }

@@ -1,10 +1,16 @@
 package org.cytoscape.paperwing.internal.graphics;
 
+import java.util.Collection;
+
 import javax.media.opengl.GL2;
 
+import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.MouseMonitor;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class GraphicsUtility {
 	
@@ -94,11 +100,52 @@ public class GraphicsUtility {
 		return projection;
 	}
 	
+	// public static Vector3 projectScreenCoordinates
+	
 	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
 	// which is perpendicular to the camera.
 	public static Vector3 projectMouseCoordinates(MouseMonitor mouse, GraphicsData graphicsData, 
 			double planeDistance) {
 		return projectScreenCoordinates(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
 		
+	}
+	
+	/**
+	 * Obtain the average position of a set of nodes, where each node has the same
+	 * weight in the average
+	 * 
+	 * @param nodes The {@link Collection} of nodes
+	 * @return The average position
+	 */
+	public static Vector3 findAveragePosition(Collection<CyNode> nodes, CyNetworkView networkView) {
+		if (nodes.isEmpty()) {
+			return null;
+		}
+		
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		
+		View<CyNode> nodeView;
+		
+		for (CyNode node : nodes) {
+			// TODO: This relies on an efficient traversal of nodes, as well
+			// as efficient retrieval from the networkView object
+			nodeView = networkView.getNodeView(node);
+			
+			if (nodeView != null) {
+				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+			} else {
+				System.out.println("Node with no view found: " + node + 
+						", index: " + node.getIndex());
+			}
+		}
+		
+		Vector3 result = new Vector3(x, y, z);
+		// result.divideLocal(DISTANCE_SCALE * nodes.size());
+		
+		return result;
 	}
 }
