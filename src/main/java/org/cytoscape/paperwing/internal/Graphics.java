@@ -135,7 +135,7 @@ public class Graphics implements GLEventListener {
 		} else {
 			registry.get(networkView).add(this);
 		}
-	
+		
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
 
