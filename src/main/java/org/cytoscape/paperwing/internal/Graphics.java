@@ -43,10 +43,12 @@ import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.graphics.GraphicsData;
+import org.cytoscape.paperwing.internal.graphics.InputProcessor;
 import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
 import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
 import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
+import org.cytoscape.paperwing.internal.graphics.ShapePicker;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -94,6 +96,8 @@ public class Graphics implements GLEventListener {
 	private GraphicsData graphicsData;
 	private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	
+	private InputProcessor inputProcessor;
+	private ShapePicker shapePicker;
 	
 	private static Map<CyNetworkView, List<Graphics>> registry = null;
 	static {
@@ -147,6 +151,9 @@ public class Graphics implements GLEventListener {
 		
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
+		
+		shapePicker = new ShapePicker(graphicsData, renderProcedures.get("nodes"), renderProcedures.get("edges"));
+		inputProcessor = new InputProcessor();
 	}
 	
 	public void setMapMode(boolean mapMode) {
@@ -204,10 +211,10 @@ public class Graphics implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		GL2 gl = drawable.getGL().getGL2();
+		graphicsData.setGlContext(gl);
 		
 		SimpleCamera camera = graphicsData.getCamera();
-		
-		GL2 gl = drawable.getGL().getGL2();
 		
 		// Check input
 		checkInput(gl);
@@ -292,8 +299,7 @@ public class Graphics implements GLEventListener {
 	 * @param gl The {@link GL2} object used for rendering
 	 */
 	private void checkInput(GL2 gl) {
-		
-		
+		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
 	}
 	
 	@Override
@@ -332,6 +338,7 @@ public class Graphics implements GLEventListener {
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
 		graphicsData.setStartTime(System.nanoTime());
+		graphicsData.setGlContext(gl);
 		
 		for (ReadOnlyGraphicsProcedure procedure : renderProcedures.values()) {
 			procedure.initialize(graphicsData);

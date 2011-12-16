@@ -23,7 +23,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 	/** The default radius of the semi-cylindrical edges */
-	private static final float EDGE_RADIUS = 0.018f;
+	private static final float EDGE_RADIUS = 0.141f; // 0.018f default as of Dec 2011
 
 	/**
 	 * A multiplicative factor for the width of the edges when reading from the

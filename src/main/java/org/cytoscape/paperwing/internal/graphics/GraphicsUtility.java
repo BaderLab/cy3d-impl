@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.graphics;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.media.opengl.GL2;
 
@@ -145,6 +146,35 @@ public class GraphicsUtility {
 		
 		Vector3 result = new Vector3(x, y, z);
 		// result.divideLocal(DISTANCE_SCALE * nodes.size());
+		
+		return result;
+	}
+	
+	public static Vector3 findAveragePosition(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
+		if (nodeIndices.isEmpty()) {
+			return null;
+		}
+		
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		int visitedCount = 0;
+		
+		View<CyNode> nodeView;
+		
+		for (Integer index : nodeIndices) {
+			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
+			
+			if (nodeView != null) {
+				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+				visitedCount++;
+			}
+		}
+		
+		Vector3 result = new Vector3(x, y, z);
+		result.divideLocal(distanceScale * visitedCount);
 		
 		return result;
 	}

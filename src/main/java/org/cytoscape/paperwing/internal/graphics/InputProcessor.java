@@ -15,7 +15,7 @@ import org.cytoscape.paperwing.internal.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.MouseMonitor;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.graphics.ShapePickingPerformer.PickResults;
+import org.cytoscape.paperwing.internal.graphics.ShapePicker.PickResults;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
@@ -30,7 +30,7 @@ public class InputProcessor {
 	
 	
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData, ShapePickingPerformer shapePicker) {
+			GraphicsData graphicsData, ShapePicker shapePicker) {
 
 		GL2 gl = graphicsData.getGlContext();
 		SimpleCamera camera = graphicsData.getCamera();
@@ -321,8 +321,8 @@ public class InputProcessor {
 			pickResults = shapePicker.performPick(mouse.x(), mouse.y(), 2, 2, false);
 		}
 
-		int newHoverNodeIndex = ShapePickingPerformer.NO_INDEX;
-		int newHoverEdgeIndex = ShapePickingPerformer.NO_INDEX;
+		int newHoverNodeIndex = ShapePicker.NO_INDEX;
+		int newHoverEdgeIndex = ShapePicker.NO_INDEX;
 
 		for (Integer nodeIndex : pickResults.nodeIndices) {
 			newHoverNodeIndex = nodeIndex;
@@ -336,8 +336,8 @@ public class InputProcessor {
 		assert pickResults.nodeIndices.size() + pickResults.edgeIndices.size() <= 1;
 
 		if (keys.getHeld().contains(KeyEvent.VK_CONTROL) || selectionData.isDragSelectMode()) {
-			graphicsData.setHoverNodeIndex(ShapePickingPerformer.NO_INDEX);
-			graphicsData.setHoverEdgeIndex(ShapePickingPerformer.NO_INDEX);
+			graphicsData.setHoverNodeIndex(ShapePicker.NO_INDEX);
+			graphicsData.setHoverEdgeIndex(ShapePicker.NO_INDEX);
 		} else {
 			graphicsData.setHoverNodeIndex(newHoverNodeIndex);
 			graphicsData.setHoverEdgeIndex(newHoverEdgeIndex);
@@ -358,17 +358,7 @@ public class InputProcessor {
 				if (!selectedNodeIndices.isEmpty()) {
 					// TODO: Check if this is a suitable place to put this, as
 					// it helps to make node dragging smoother
-					Vector3 averagePosition = new Vector3();
-					View<CyNode> nodeView;
-					
-					for (Integer index : selectedNodeIndices) {
-						nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
-						
-						averagePosition.addLocal(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION), 
-								nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-								nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-					}
-					
+					Vector3 averagePosition = GraphicsUtility.findAveragePosition(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
 					selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 				}
 			}
@@ -514,17 +504,8 @@ public class InputProcessor {
 					&& !selectedNodeIndices.isEmpty()) {
 				// Store the result for use for mouse-difference related
 				// calculations
-				Vector3 averagePosition = new Vector3();
-				View<CyNode> nodeView;
 				
-				for (Integer index : selectedNodeIndices) {
-					nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
-					
-					averagePosition.addLocal(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION), 
-							nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-							nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-				}
-				
+				Vector3 averagePosition = GraphicsUtility.findAveragePosition(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 
 				// These projections are used to find displacement vectors to move the nodes

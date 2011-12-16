@@ -14,7 +14,7 @@ import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
 import org.cytoscape.paperwing.internal.Graphics.PickResults;
 
-public class ShapePickingPerformer {
+public class ShapePicker {
 
 	/** A constant that stands for "no type is here" */
 	public static final int NO_TYPE = -1;
@@ -41,15 +41,15 @@ public class ShapePickingPerformer {
 	}
 
 	private GraphicsData graphicsData;
-	private ReadOnlyGraphicsProcedure drawNodeProcedure;
-	private ReadOnlyGraphicsProcedure drawEdgeProcedure;
+	private ReadOnlyGraphicsProcedure drawNodesProcedure;
+	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
 
-	public ShapePickingPerformer(GraphicsData graphicsData,
+	public ShapePicker(GraphicsData graphicsData,
 			ReadOnlyGraphicsProcedure drawNodeProcedure,
 			ReadOnlyGraphicsProcedure drawEdgeProcedure) {
 		this.graphicsData = graphicsData;
-		this.drawNodeProcedure = drawNodeProcedure;
-		this.drawEdgeProcedure = drawEdgeProcedure;
+		this.drawNodesProcedure = drawNodeProcedure;
+		this.drawEdgesProcedure = drawEdgeProcedure;
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class ShapePickingPerformer {
 		gl.glPushName(NO_INDEX);
 
 		// Render nodes for picking
-		drawNodeProcedure.execute(graphicsData);
+		drawNodesProcedure.execute(graphicsData);
 
 		gl.glPopName();
 		gl.glPopName();
@@ -142,7 +142,7 @@ public class ShapePickingPerformer {
 		gl.glPushName(NO_INDEX);
 
 		// Render edges for picking
-		drawEdgeProcedure.execute(graphicsData);
+		drawEdgesProcedure.execute(graphicsData);
 
 		gl.glPopName();
 		gl.glPopName();
