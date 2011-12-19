@@ -42,6 +42,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.paperwing.internal.graphics.BirdsEyeViewCoordinator;
 import org.cytoscape.paperwing.internal.graphics.GraphicsData;
 import org.cytoscape.paperwing.internal.graphics.InputProcessor;
 import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
@@ -99,6 +100,8 @@ public class Graphics implements GLEventListener {
 	private InputProcessor inputProcessor;
 	private ShapePicker shapePicker;
 	
+	private BirdsEyeViewCoordinator coordinator;
+	
 	private static Map<CyNetworkView, List<Graphics>> registry = null;
 	static {
 		Graphics.registry = new HashMap<CyNetworkView, List<Graphics>>();
@@ -138,6 +141,12 @@ public class Graphics implements GLEventListener {
 		
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
+		
+		if (BirdsEyeViewCoordinator.getCoordinator(networkView) != null) {
+			coordinator = BirdsEyeViewCoordinator.getCoordinator(networkView);
+		} else {
+			coordinator = BirdsEyeViewCoordinator.createCoordinator(networkView);
+		}
 
 		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
 		renderProcedures.put("nodes", new RenderNodesProcedure());

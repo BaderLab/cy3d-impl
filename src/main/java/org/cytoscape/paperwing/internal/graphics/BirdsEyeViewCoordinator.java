@@ -30,16 +30,22 @@ public class BirdsEyeViewCoordinator {
 	
 	// This networkView is only used to differentiate between main camera and
 	// birds eye camera pairs
-	public BirdsEyeViewCoordinator(CyNetworkView networkView) {
+	private BirdsEyeViewCoordinator(CyNetworkView networkView) {
 		newMainCamera = new SimpleCamera();
 		newBirdsEyeCamera = new SimpleCamera();
-		
-		coordinators.put(networkView, this);
-		networkViews.put(this, networkView);
 	}
 	
 	public static BirdsEyeViewCoordinator getCoordinator(CyNetworkView networkView) {
 		return coordinators.get(networkView);
+	}
+	
+	public static BirdsEyeViewCoordinator createCoordinator(CyNetworkView networkView) {
+		BirdsEyeViewCoordinator coordinator = new BirdsEyeViewCoordinator(networkView);
+		
+		coordinators.put(networkView, coordinator);
+		networkViews.put(coordinator, networkView);
+		
+		return coordinator;
 	}
 	
 	// Update orientation
