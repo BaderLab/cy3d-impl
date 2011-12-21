@@ -1,9 +1,11 @@
 package org.cytoscape.paperwing.internal.graphics;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
 
+import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
 import org.cytoscape.view.model.CyNetworkView;

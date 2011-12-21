@@ -42,7 +42,8 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.paperwing.internal.graphics.BirdsEyeViewCoordinator;
+import org.cytoscape.paperwing.internal.graphics.BirdsEyeCoordinator;
+import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.graphics.GraphicsData;
 import org.cytoscape.paperwing.internal.graphics.InputProcessor;
 import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
@@ -64,7 +65,6 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
  * @author Paperwing (Yue Dong)
  */
 public class Graphics implements GLEventListener {
-
 	
 	/** A monitor to keep track of keyboard events */
 	private KeyboardMonitor keys;
@@ -76,20 +76,13 @@ public class Graphics implements GLEventListener {
 	private boolean lowerQuality = false;
 	
 	private GraphicsData graphicsData;
-	private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	
 	private InputProcessor inputProcessor;
 	private ShapePicker shapePicker;
+	private BirdsEyeCoordinator coordinator;
+	private CoordinatorProcessor coordinatorProcessor;
 	
-	private BirdsEyeViewCoordinator coordinator;
-	
-	/** A class capable of storing the edge and node indices of edges and nodes
-	 * that were found to be selected using the shape picking methods
-	 */
-	public class PickResults {
-		public Set<Integer> nodeIndices = new LinkedHashSet<Integer>();
-		public Set<Integer> edgeIndices = new LinkedHashSet<Integer>();
-	}
+	private GraphicsHandler handler;
 	
 	/** Initialize a singleton that seems to help with JOGL in some compatibility
 	 * aspects
@@ -105,23 +98,14 @@ public class Graphics implements GLEventListener {
 	 * View<CyNetwork> object that we are rendering
 	 * @param visualLexicon The visual lexicon being used
 	 */
-	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon) {
+	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsHandler handler) {
 		
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
-		
-		if (BirdsEyeViewCoordinator.getCoordinator(networkView) != null) {
-			coordinator = BirdsEyeViewCoordinator.getCoordinator(networkView);
-		} else {
-			coordinator = BirdsEyeViewCoordinator.createCoordinator(networkView);
-		}
-		
-		System.out.println("coordinator found for default graphics " + this);
 
-		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
-		renderProcedures.put("nodes", new RenderNodesProcedure());
-		renderProcedures.put("edges", new RenderEdgesProcedure());
-		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
+//		renderProcedures.put("nodes", new RenderNodesProcedure());
+//		renderProcedures.put("edges", new RenderEdgesProcedure());
+//		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
 		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
@@ -131,8 +115,9 @@ public class Graphics implements GLEventListener {
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
 		
-		shapePicker = new ShapePicker(graphicsData, renderProcedures.get("nodes"), renderProcedures.get("edges"));
-		inputProcessor = new InputProcessor();
+		coordinator = handler.getCoordinator(graphicsData);
+		shapePicker = handler.getShapePicker();
+		inputProcessor = handler.getInputProcessor();
 	}
 	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
@@ -162,81 +147,23 @@ public class Graphics implements GLEventListener {
 		graphicsData.setGlContext(gl);
 		
 		// Check input
-		processInput();
+		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
 
 		// Update data for bird's eye view camera movement
-		checkBevCameraMovement();
+		coordinatorProcessor.extractData(coordinator, graphicsData);
 		
 		// Reset the scene for drawing
-		resetSceneForDrawing(gl);
+		handler.resetSceneForDrawing(graphicsData);
 		
 		// Draw the scene
-		drawScene(gl);
-		
+		handler.drawScene(graphicsData);
 		
 		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
 	}
-	
 
-	/** Obtain input and check for changes in the keyboard and mouse buttons,
-	 * as well as mouse movement. This method also handles responses
-	 * to such events
-	 */
-	private void processInput() {
-		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
-	}
-	
-	
-	// Check for signals from birdsEyeView
-	private void checkBevCameraMovement() {
-		if (coordinator.birdsEyeBoundsChanged()) {
-			Vector3 newCameraPosition = 
-				BirdsEyeViewCoordinator.extractCameraPosition(coordinator, 
-						graphicsData.getCamera().getDirection(), 
-						graphicsData.getCamera().getDistance());
-			
-			graphicsData.getCamera().moveTo(newCameraPosition);
-		}
-	}
-	
-	
-	private void resetSceneForDrawing(GL2 gl) {
-		SimpleCamera camera = graphicsData.getCamera();
-		
-		// Reset scene
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-		
-		Vector3 position = camera.getPosition();
-		Vector3 target = camera.getTarget();
-		Vector3 up = camera.getUp();
-		
-		GLU glu = new GLU();
-		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
-				target.y(), target.z(), up.x(), up.y(), up.z());
-	}
-	
-	private void drawScene(GL2 gl) {
-		
-		// Draw selection box
-		if (graphicsData.getSelectionData().isDragSelectMode()) {
-			renderProcedures.get("selectionBox").execute(graphicsData);
-		}
-		
-		// Control light positioning
-		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
-		
-		// Code below toggles the light following the camera
-		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
-		// FloatBuffer.wrap(lightPosition));
-		
-		renderProcedures.get("nodes").execute(graphicsData);
-		renderProcedures.get("edges").execute(graphicsData);
-	}
-	
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
-
+		coordinatorProcessor.unlinkCoordinator(coordinator);
 	}
 
 	/** Initialize the Graphics object, performing certain
@@ -257,9 +184,6 @@ public class Graphics implements GLEventListener {
 
 		gl.glViewport(0, 0, drawable.getWidth(), drawable.getHeight());
 
-		//generateNodes();
-		//generateEdges();
-		
 		// Correct lightning for scaling certain models
 		gl.glEnable(GL2.GL_NORMALIZE);
 		
@@ -272,9 +196,8 @@ public class Graphics implements GLEventListener {
 		graphicsData.setStartTime(System.nanoTime());
 		graphicsData.setGlContext(gl);
 		
-		for (ReadOnlyGraphicsProcedure procedure : renderProcedures.values()) {
-			procedure.initialize(graphicsData);
-		}
+		handler.initializeGraphicsProcedures(graphicsData);
+		handler.setupLighting(graphicsData);
 	}
 
 

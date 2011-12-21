@@ -95,7 +95,7 @@ public class InputProcessor {
 		if (graphicsData.isDisableHovering()) {
 			pickResults = shapePicker.new PickResults();
 		} else {
-			pickResults = shapePicker.performPick(mouse.x(), mouse.y(), 2, 2, false);
+			pickResults = shapePicker.performPick(mouse.x(), mouse.y(), 2, 2, false, graphicsData);
 		}
 
 		int newHoverNodeIndex = ShapePicker.NO_INDEX;
@@ -237,7 +237,8 @@ public class InputProcessor {
 							(selectionData.getSelectTopLeftX() + selectionData.getSelectBottomRightX()) / 2,
 							(selectionData.getSelectTopLeftY() + selectionData.getSelectBottomRightY()) / 2,
 							Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX()),
-							Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()), true);
+							Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()), true,
+							graphicsData);
 
 					CyNode node;
 					for (Integer nodeIndex : results.nodeIndices) {

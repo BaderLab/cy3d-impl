@@ -44,10 +44,8 @@ public class ShapePicker {
 	private ReadOnlyGraphicsProcedure drawNodesProcedure;
 	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
 
-	public ShapePicker(GraphicsData graphicsData,
-			ReadOnlyGraphicsProcedure drawNodeProcedure,
+	public ShapePicker(ReadOnlyGraphicsProcedure drawNodeProcedure,
 			ReadOnlyGraphicsProcedure drawEdgeProcedure) {
-		this.graphicsData = graphicsData;
 		this.drawNodesProcedure = drawNodeProcedure;
 		this.drawEdgesProcedure = drawEdgeProcedure;
 	}
@@ -73,7 +71,7 @@ public class ShapePicker {
 	 *         object
 	 */
 	public PickResults performPick(int x, int y, int width, int height,
-			boolean selectAll) {
+			boolean selectAll, GraphicsData graphicsData) {
 		int bufferSize = 1024;
 
 		if (selectAll) {
