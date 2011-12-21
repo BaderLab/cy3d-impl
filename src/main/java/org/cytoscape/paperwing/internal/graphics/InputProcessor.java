@@ -81,231 +81,8 @@ public class InputProcessor {
 				// latch_1 = true;
 			}
 
-			if (pressed.contains(KeyEvent.VK_L)) {
-				// if (!lowerQuality) {
-				// lowerQuality = true;
-				//
-				// QUADRATIC_EDGE_SEGMENTS = 3;
-				// NODE_SLICES_DETAIL = 6;
-				// NODE_STACKS_DETAIL = 6;
-				// EDGE_SLICES_DETAIL = 3;
-				// EDGE_STACKS_DETAIL = 1;
-				//
-				// createDisplayLists(gl);
-				// } else {
-				// lowerQuality = false;
-				//
-				// QUADRATIC_EDGE_SEGMENTS = 5;
-				// NODE_SLICES_DETAIL = 10;
-				// NODE_STACKS_DETAIL = 10;
-				// EDGE_SLICES_DETAIL = 4;
-				// EDGE_STACKS_DETAIL = 1;
-				//
-				// createDisplayLists(gl);
-				// }
-			}
-
 			if (pressed.contains(KeyEvent.VK_P)) {
 				// skipHover = !skipHover;
-			}
-
-			// Roll camera clockwise
-			if (held.contains(KeyEvent.VK_Z)) {
-				camera.rollClockwise();
-			}
-
-			// Roll camera counter-clockwise
-			if (held.contains(KeyEvent.VK_X)) {
-				camera.rollCounterClockwise();
-			}
-
-			// Create edges between nodes
-			if (pressed.contains(KeyEvent.VK_J)) {
-				CyNode hoverNode = networkView.getModel().getNode(
-						graphicsData.getHoverNodeIndex());
-
-				if (hoverNode != null) {
-
-					for (Integer index : selectedNodeIndices) {
-						networkView.getModel().addEdge(
-								networkView.getModel().getNode(index),
-								hoverNode, false);
-
-						// TODO: Not sure if this call is needed
-						networkView.updateView();
-					}
-				}
-			}
-
-			// Delete selected edges/nodes
-			if (pressed.contains(KeyEvent.VK_DELETE)) {
-				Set<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
-				Set<CyNode> nodesToBeRemoved = new LinkedHashSet<CyNode>();
-				
-				// Remove nodes
-				CyNode nodeToBeRemoved;
-				
-				for (Integer index : selectedNodeIndices) {
-					nodeToBeRemoved = networkView.getModel().getNode(index);
-					
-					if (nodeToBeRemoved != null ) {
-						nodesToBeRemoved.add(nodeToBeRemoved);
-						
-						// TODO: Check if use of Type.ANY for any edge is correct
-						// TODO: Check if this addAll method properly skips adding
-						// edges already in the edgesToBeRemovedList
-						edgesToBeRemoved.addAll(networkView.getModel()
-								.getAdjacentEdgeList(nodeToBeRemoved,
-										Type.ANY));
-					}
-					
-				}
-
-				// Remove edges
-				CyEdge edgeToBeRemoved;
-				
-				for (Integer index : selectedEdgeIndices) {
-					edgeToBeRemoved = networkView.getModel().getEdge(index);
-					
-					if (edgeToBeRemoved != null) {
-						edgesToBeRemoved.add(edgeToBeRemoved);
-					}
-				}
-				
-				networkView.getModel().removeNodes(nodesToBeRemoved);
-				networkView.getModel().removeEdges(edgesToBeRemoved);
-				
-				// TODO: Not sure if this call is needed
-				networkView.updateView();
-			}
-
-			// If shift is pressed, perform orbit camera movement
-			if (held.contains(KeyEvent.VK_SHIFT)) {
-
-				if (held.contains(KeyEvent.VK_LEFT)) {
-					camera.orbitLeft();
-				}
-
-				if (held.contains(KeyEvent.VK_RIGHT)) {
-					camera.orbitRight();
-				}
-
-				if (held.contains(KeyEvent.VK_UP)) {
-					camera.orbitUp();
-				}
-
-				if (held.contains(KeyEvent.VK_DOWN)) {
-					camera.orbitDown();
-				}
-
-				// Otherwise, turn camera in a first-person like fashion
-			} else {
-
-				if (held.contains(KeyEvent.VK_LEFT)) {
-					camera.turnLeft(4);
-				}
-
-				if (held.contains(KeyEvent.VK_RIGHT)) {
-					camera.turnRight(4);
-				}
-
-				if (held.contains(KeyEvent.VK_UP)) {
-					camera.turnUp(4);
-				}
-
-				if (held.contains(KeyEvent.VK_DOWN)) {
-					camera.turnDown(4);
-				}
-
-			}
-
-			// Create a new node
-			if (pressed.contains(KeyEvent.VK_N)) {
-				CyNode added = networkView.getModel().addNode();
-				networkView.updateView();
-
-				View<CyNode> viewAdded = networkView.getNodeView(added);
-
-				double distanceScale = graphicsData.getDistanceScale();
-				
-				// TODO: Maybe throw an exception if viewAdded is null
-				if (viewAdded != null) {
-					viewAdded.setVisualProperty(
-							RichVisualLexicon.NODE_X_LOCATION, projection.x()
-									* distanceScale);
-					viewAdded.setVisualProperty(
-							RichVisualLexicon.NODE_Y_LOCATION, projection.y()
-									* distanceScale);
-					viewAdded.setVisualProperty(
-							RichVisualLexicon.NODE_Z_LOCATION, projection.z()
-									* distanceScale);
-
-					// Set the node to be hovered
-					// TODO: This might not be needed if the node were added
-					// through some way other than the mouse
-					graphicsData.setHoverNodeIndex(added.getIndex());
-				}
-			}
-
-			// Camera translational movement
-			// -----------------------------
-
-			if (held.contains(KeyEvent.VK_W)) {
-				camera.moveUp();
-			}
-
-			if (held.contains(KeyEvent.VK_S)) {
-				camera.moveDown();
-			}
-
-			if (held.contains(KeyEvent.VK_A)) {
-				camera.moveLeft();
-			}
-
-			if (held.contains(KeyEvent.VK_D)) {
-				camera.moveRight();
-			}
-
-			if (held.contains(KeyEvent.VK_Q)) {
-				camera.moveBackward();
-			}
-
-			if (held.contains(KeyEvent.VK_E)) {
-				camera.moveForward();
-			}
-
-			// Debug - display distance between 2 nodes
-			if (pressed.contains(KeyEvent.VK_O)) {
-//				CyNode hoverNode = networkView.getModel().getNode(
-//						graphicsData.getHoverNodeIndex());
-//
-//				if (hoverNode != null && selectedNodeIndices.size() == 1) {
-//					View<CyNode> hoverView = networkView.getNodeView(hoverNode);
-//					View<CyNode> selectView = hoverView;
-//					for (CyNode node : selectedNodes) {
-//						selectView = networkView.getNodeView(node);
-//					}
-//					;
-//
-//					Vector3 hover = new Vector3(
-//							hoverView
-//									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-//							hoverView
-//									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-//							hoverView
-//									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-//
-//					Vector3 select = new Vector3(
-//							selectView
-//									.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-//							selectView
-//									.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-//							selectView
-//									.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-//
-//					System.out.println("Distance: " + hover.distance(select)
-//							/ DISTANCE_SCALE);
-//				}
 			}
 
 			keys.update();
@@ -572,5 +349,99 @@ public class InputProcessor {
 			mouse.update();
 
 		}
+	}
+	
+	
+	
+	private void processNetworkChanges(Set<Integer> pressed, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		// Create edges between nodes
+		if (pressed.contains(KeyEvent.VK_J)) {
+			CyNode hoverNode = networkView.getModel().getNode(
+					graphicsData.getHoverNodeIndex());
+
+			if (hoverNode != null) {
+
+				for (Integer index : selectedNodeIndices) {
+					networkView.getModel().addEdge(
+							networkView.getModel().getNode(index),
+							hoverNode, false);
+
+					// TODO: Not sure if this call is needed
+					networkView.updateView();
+				}
+			}
+		}
+
+		// Delete selected edges/nodes
+		if (pressed.contains(KeyEvent.VK_DELETE)) {
+			Set<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
+			Set<CyNode> nodesToBeRemoved = new LinkedHashSet<CyNode>();
+			
+			// Remove nodes
+			CyNode nodeToBeRemoved;
+			
+			for (Integer index : selectedNodeIndices) {
+				nodeToBeRemoved = networkView.getModel().getNode(index);
+				
+				if (nodeToBeRemoved != null ) {
+					nodesToBeRemoved.add(nodeToBeRemoved);
+					
+					// TODO: Check if use of Type.ANY for any edge is correct
+					// TODO: Check if this addAll method properly skips adding
+					// edges already in the edgesToBeRemovedList
+					edgesToBeRemoved.addAll(networkView.getModel()
+							.getAdjacentEdgeList(nodeToBeRemoved,
+									Type.ANY));
+				}
+				
+			}
+
+			// Remove edges
+			CyEdge edgeToBeRemoved;
+			
+			for (Integer index : selectedEdgeIndices) {
+				edgeToBeRemoved = networkView.getModel().getEdge(index);
+				
+				if (edgeToBeRemoved != null) {
+					edgesToBeRemoved.add(edgeToBeRemoved);
+				}
+			}
+			
+			networkView.getModel().removeNodes(nodesToBeRemoved);
+			networkView.getModel().removeEdges(edgesToBeRemoved);
+			
+			// TODO: Not sure if this call is needed
+			networkView.updateView();
+		}
+
+		
+
+		
+	}
+	
+	private void processCreateNode(Set<Integer> pressed, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		
+	}
+	
+	private void processCreateEdge(Set<Integer> pressed, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		
+	}
+	
+	private void processDeleteNode(Set<Integer> pressed, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		
+	}
+	
+	private void processDeleteEdge(Set<Integer> pressed, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		
 	}
 }
