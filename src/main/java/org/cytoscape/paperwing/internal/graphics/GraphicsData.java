@@ -20,6 +20,8 @@ public class GraphicsData {
 	 */
 	private float distanceScale = 178.0f; 
 	
+	private float verticalFov = 45.0f;
+	
 	/** The index of the node currently being hovered over */
 	private int hoverNodeIndex;
 	
@@ -179,5 +181,13 @@ public class GraphicsData {
 
 	public CoordinatorData getCoordinatorData() {
 		return coordinatorData;
+	}
+
+	public float getVerticalFov() {
+		return verticalFov;
+	}
+
+	public void setVerticalFov(float verticalFov) {
+		this.verticalFov = verticalFov;
 	}
 }

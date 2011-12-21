@@ -64,21 +64,7 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
  * @author Paperwing (Yue Dong)
  */
 public class Graphics implements GLEventListener {
-	
-	/** Controls the distance apart to draw the reticle for the mouse */
-	private static final double RETICLE_DISTANCE = 0.06;
-	
-	/** Controls the radius of the reticle */
-	private static final double RETICLE_RADIUS = 0.012;
-	
-	/** The NULL coordinate which means "no coordinate" */
-	private static int NULL_COORDINATE = Integer.MIN_VALUE;
-	
 
-	/** A constant that stands for "no index is here" */
-	// TODO: NO_INDEX relies on cytoscape's guarantee that node and edge indices are nonnegative
-	private static final int NO_INDEX = -1; // Value representing that no node or edge index is being held	
-	
 	
 	/** A monitor to keep track of keyboard events */
 	private KeyboardMonitor keys;
@@ -89,11 +75,6 @@ public class Graphics implements GLEventListener {
 	/** A boolean to use lower quality 3D shapes to improve framerate */
 	private boolean lowerQuality = false;
 	
-	
-	private boolean mapMode = false;
-	private Graphics mapPartner = null;
-	private Container mapContainer = null;
-	
 	private GraphicsData graphicsData;
 	private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	
@@ -101,11 +82,6 @@ public class Graphics implements GLEventListener {
 	private ShapePicker shapePicker;
 	
 	private BirdsEyeViewCoordinator coordinator;
-	
-	private static Map<CyNetworkView, List<Graphics>> registry = null;
-	static {
-		Graphics.registry = new HashMap<CyNetworkView, List<Graphics>>();
-	}
 	
 	/** A class capable of storing the edge and node indices of edges and nodes
 	 * that were found to be selected using the shape picking methods
@@ -130,14 +106,6 @@ public class Graphics implements GLEventListener {
 	 * @param visualLexicon The visual lexicon being used
 	 */
 	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		if (registry.get(networkView) == null) {
-			List<Graphics> list = new LinkedList<Graphics>();
-			list.add(this);
-			
-			registry.put(networkView, list);
-		} else {
-			registry.get(networkView).add(this);
-		}
 		
 		keys = new KeyboardMonitor();
 		mouse = new MouseMonitor();
@@ -167,38 +135,6 @@ public class Graphics implements GLEventListener {
 		inputProcessor = new InputProcessor();
 	}
 	
-	public void setMapMode(boolean mapMode) {
-		this.mapMode = mapMode;
-	}
-	
-	private void setMapPartner(Graphics mapPartner) {
-		this.mapPartner = mapPartner;
-	}
-	
-	public void setMapContainer(Container container) {
-		this.mapContainer = container;
-	}
-	
-	public void findMapPartner() {
-		List<Graphics> list = registry.get(graphicsData.getNetworkView());
-		
-		if (list == null) {
-			return;
-		} else {
-			for (Graphics g : list) {
-				if (g.mapMode != this.mapMode && g.mapPartner == null && this.mapPartner == null) {
-					g.setMapPartner(this);
-					this.setMapPartner(g);
-					
-					System.out.println("Graphics with mapMode (" + mapMode + ") found partner. Link is + " + g + " and " + this);
-					
-					return;
-				}
-			}
-		}
-		
-	}
-	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
 	 * to the specified component for capturing keyboard and mouse events
 	 * 
@@ -225,11 +161,48 @@ public class Graphics implements GLEventListener {
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
 		
+		// Check input
+		processInput();
+
+		// Update data for bird's eye view camera movement
+		checkBevCameraMovement();
+		
+		// Reset the scene for drawing
+		resetSceneForDrawing(gl);
+		
+		// Draw the scene
+		drawScene(gl);
+		
+		
+		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
+	}
+	
+
+	/** Obtain input and check for changes in the keyboard and mouse buttons,
+	 * as well as mouse movement. This method also handles responses
+	 * to such events
+	 */
+	private void processInput() {
+		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
+	}
+	
+	
+	// Check for signals from birdsEyeView
+	private void checkBevCameraMovement() {
+		if (coordinator.birdsEyeBoundsChanged()) {
+			Vector3 newCameraPosition = 
+				BirdsEyeViewCoordinator.extractCameraPosition(coordinator, 
+						graphicsData.getCamera().getDirection(), 
+						graphicsData.getCamera().getDistance());
+			
+			graphicsData.getCamera().moveTo(newCameraPosition);
+		}
+	}
+	
+	
+	private void resetSceneForDrawing(GL2 gl) {
 		SimpleCamera camera = graphicsData.getCamera();
 		
-		// Check input
-		checkInput(gl);
-
 		// Reset scene
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
@@ -241,76 +214,24 @@ public class Graphics implements GLEventListener {
 		GLU glu = new GLU();
 		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
 				target.y(), target.z(), up.x(), up.y(), up.z());
+	}
+	
+	private void drawScene(GL2 gl) {
 		
 		// Draw selection box
-		// ------------------
-
 		if (graphicsData.getSelectionData().isDragSelectMode()) {
-			
 			renderProcedures.get("selectionBox").execute(graphicsData);
 		}
 		
 		// Control light positioning
-		// -------------------------
-		
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 		
 		// Code below toggles the light following the camera
 		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 		// FloatBuffer.wrap(lightPosition));
-
-
-		// Draw nodes and edges
-		// --------------------
 		
 		renderProcedures.get("nodes").execute(graphicsData);
 		renderProcedures.get("edges").execute(graphicsData);
-		
-		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
-		
-		if (mapMode) {
-			if (mapContainer != null) {
-				mapContainer.repaint();
-			}
-		}
-		
-//		// Draw the location rectangle on the map
-//		if (mapMode) {
-//			if (mapPartner != null) {
-//				SimpleCamera partnerCamera = mapPartner.camera;
-//				
-//				Vector3 topLeft = mapPartner.projectScreenCoordinates(0, 0, partnerCamera.getDistance());
-//				Vector3 bottomLeft = mapPartner.projectScreenCoordinates(0, mapPartner.screenHeight, partnerCamera.getDistance());
-//				
-//				Vector3 topRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, 0, partnerCamera.getDistance());
-//				Vector3 bottomRight = mapPartner.projectScreenCoordinates(mapPartner.screenWidth, mapPartner.screenHeight, partnerCamera.getDistance());
-//				
-//				gl.glDisable(GL2.GL_LIGHTING);
-//				gl.glColor3f(0.7f, 0.7f, 0.6f);
-//				
-//				// Below uses converted 3D coordinates
-//				gl.glBegin(GL2.GL_LINE_LOOP);
-//				gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
-//				gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
-//				gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
-//				gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
-//				gl.glEnd();
-//				
-//				
-//				gl.glEnable(GL2.GL_LIGHTING);
-//			}
-//		}
-		
-	}
-	
-	/** Obtain input and check for changes in the keyboard and mouse buttons,
-	 * as well as mouse movement. This method also handles responses
-	 * to such events
-	 * 
-	 * @param gl The {@link GL2} object used for rendering
-	 */
-	private void checkInput(GL2 gl) {
-		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
 	}
 	
 	@Override
@@ -407,25 +328,12 @@ public class Graphics implements GLEventListener {
 		gl.glLoadIdentity();
 
 		GLU glu = new GLU();
-		glu.gluPerspective(45.0f, (float) width / height, 0.2f, 50.0f);
+		glu.gluPerspective(graphicsData.getVerticalFov(), (float) width / height, 0.2f, 50.0f);
 
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		
 		graphicsData.setScreenHeight(height);
 		graphicsData.setScreenWidth(width);
-	}
-	
-	/** Move the camera so that it zooms out on a central part of the network,
-	 * but this method is not finalized yet
-	 */
-	public void provideCentralView() {
-//		camera.moveTo(new Vector3(0, 0, 0));
-//		
-//		if (findAveragePosition(networkView.getModel().getNodeList()) != null) {
-//			camera.moveTo(findAveragePosition(networkView.getModel().getNodeList()));
-//		}
-//		camera.moveBackward();
-//		camera.zoomOut(40);
 	}
 }

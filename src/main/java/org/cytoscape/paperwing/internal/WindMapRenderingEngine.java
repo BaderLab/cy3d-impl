@@ -29,11 +29,11 @@ public class WindMapRenderingEngine extends WindRenderingEngine {
 		
 		super(container, viewModel, visualLexicon);
 		
-		graphics.provideCentralView();
-		graphics.setMapMode(true);
-		graphics.setMapContainer((Container) container);
-		
-		graphics.findMapPartner();
+//		graphics.provideCentralView();
+//		graphics.setMapMode(true);
+//		graphics.setMapContainer((Container) container);
+//		
+//		graphics.findMapPartner();
 	}
 
 }

@@ -111,43 +111,29 @@ public class GraphicsUtility {
 		
 	}
 	
-	/**
-	 * Obtain the average position of a set of nodes, where each node has the same
-	 * weight in the average
-	 * 
-	 * @param nodes The {@link Collection} of nodes
-	 * @return The average position
-	 */
-	public static Vector3 findAveragePosition(Collection<CyNode> nodes, CyNetworkView networkView) {
-		if (nodes.isEmpty()) {
-			return null;
-		}
+	// Needs camera direction vector, camera up vector to be unit
+	// This method also uses the Math.tan method, so there might be room for finding a faster tangent method
+	public static Quadrilateral generateViewingBounds(Vector3 cameraPosition, Vector3 cameraDirection, Vector3 cameraUp, 
+			double planeDistance, double verticalFov, double aspectRatio) {
+		// These x, y, z offsets are oriented relative to the camera's direction vector
+		Vector3 zOffset = cameraDirection.copy();
+		zOffset.multiplyLocal(planeDistance);
 		
-		double x = 0;
-		double y = 0;
-		double z = 0;
+		Vector3 yOffset = cameraUp.copy();
+		yOffset.multiplyLocal(planeDistance * Math.tan(verticalFov));
 		
-		View<CyNode> nodeView;
+		Vector3 xOffset = cameraDirection.copy(); // xOffset will be the camera's right vector
+		xOffset.crossLocal(cameraUp);
+		xOffset.multiplyLocal(yOffset.magnitude() * aspectRatio); // aspect = width / length
 		
-		for (CyNode node : nodes) {
-			// TODO: This relies on an efficient traversal of nodes, as well
-			// as efficient retrieval from the networkView object
-			nodeView = networkView.getNodeView(node);
-			
-			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
-			} else {
-				System.out.println("Node with no view found: " + node + 
-						", index: " + node.getIndex());
-			}
-		}
+		Vector3 centerPoint = cameraPosition.copy().plus(zOffset);
 		
-		Vector3 result = new Vector3(x, y, z);
-		// result.divideLocal(DISTANCE_SCALE * nodes.size());
+		Vector3 topLeft = centerPoint.plus(yOffset).subtract(xOffset);
+		Vector3 topRight = centerPoint.plus(yOffset).plus(xOffset);
+		Vector3 bottomLeft = centerPoint.subtract(yOffset).subtract(xOffset);
+		Vector3 bottomRight = centerPoint.subtract(yOffset).plus(xOffset);
 		
-		return result;
+		return new Quadrilateral(topLeft, topRight, bottomLeft, bottomRight);
 	}
 	
 	public static Vector3 findAveragePosition(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {

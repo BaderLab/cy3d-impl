@@ -180,7 +180,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			
 			active = true;
 			
-			graphics.findMapPartner();
+//			graphics.findMapPartner();
 		}
 	}
 

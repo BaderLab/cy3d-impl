@@ -199,7 +199,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 							.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
 			p2.divideLocal(distanceScale);
 
-			p1 = p0.add(p2);
+			p1 = p0.plus(p2);
 			p1.divideLocal(2);
 
 			direction = p2.subtract(p0);

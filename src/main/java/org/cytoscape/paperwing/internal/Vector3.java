@@ -94,7 +94,7 @@ public class Vector3 {
 	 * @param other The vector to add
 	 * @return A new {@link Vector3} representing the sum
 	 */
-	public Vector3 add(Vector3 other) {
+	public Vector3 plus(Vector3 other) {
 		return new Vector3(x + other.x, y + other.y, z + other.z);
 	}
 	
@@ -249,7 +249,7 @@ public class Vector3 {
 		}
 	}
 	
-	/** Obtain the magnitude, sometimes length, of the vector
+	/** Obtain the magnitude, or the length, of the vector
 	 * 
 	 * @return The magnitude of the vector
 	 */
@@ -341,5 +341,13 @@ public class Vector3 {
 	@Override
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";
+	}
+	
+	/** Make a copy of this vector
+	 * 
+	 * @return A copy of this vector object
+	 */
+	public Vector3 copy() {
+		return new Vector3(this);
 	}
 }

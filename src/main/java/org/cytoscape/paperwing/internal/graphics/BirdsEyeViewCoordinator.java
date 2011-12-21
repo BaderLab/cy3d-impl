@@ -10,10 +10,10 @@ import org.cytoscape.view.model.CyNetworkView;
 public class BirdsEyeViewCoordinator {
 
 	private SimpleCamera newMainCamera;
-	private SimpleCamera newBirdsEyeCamera;
+	private Quadrilateral newBirdsEyeBounds;
 
 	private boolean mainCameraChanged = false;
-	private boolean birdsEyeCameraChanged = false;
+	private boolean birdsEyeBoundsChanged = false;
 
 	private boolean mainClaimed = false;
 	private boolean birdsEyeClaimed = false;
@@ -28,11 +28,29 @@ public class BirdsEyeViewCoordinator {
 	// the maps
 	private static Map<BirdsEyeViewCoordinator, CyNetworkView> networkViews = new LinkedHashMap<BirdsEyeViewCoordinator, CyNetworkView>();
 	
+	// Camera direction must be a unit vector
+	public static Vector3 extractCameraPosition(BirdsEyeViewCoordinator coordinator, Vector3 cameraDirection, double cameraDistance) {
+		Vector3 offset = cameraDirection.copy();
+		offset.multiplyLocal(cameraDistance);
+		
+		Quadrilateral bounds = coordinator.getNewBirdsEyeBounds();
+		
+		Vector3 position = bounds.getCenterPoint();
+		position.addLocal(offset);
+		
+		return position;
+	}
+	
+	public static Quadrilateral extractBounds(SimpleCamera camera, double verticalFov, double aspectRatio) {
+		return GraphicsUtility.generateViewingBounds(camera.getPosition(), camera.getDirection(), camera.getUp(), 
+				camera.getDistance(), verticalFov, aspectRatio);
+	}
+	
 	// This networkView is only used to differentiate between main camera and
 	// birds eye camera pairs
 	private BirdsEyeViewCoordinator(CyNetworkView networkView) {
 		newMainCamera = new SimpleCamera();
-		newBirdsEyeCamera = new SimpleCamera();
+		newBirdsEyeBounds = new Quadrilateral();
 	}
 	
 	public static BirdsEyeViewCoordinator getCoordinator(CyNetworkView networkView) {
@@ -55,35 +73,35 @@ public class BirdsEyeViewCoordinator {
 	}
 
 	// Update orientation
-	public void updateBirdsEyeCamera(SimpleCamera birdsEyeCamera) {
-		newBirdsEyeCamera.copyOrientation(birdsEyeCamera);
-		birdsEyeCameraChanged = true;
+	public void updateBirdsEyeBounds(Quadrilateral bounds) {
+		newBirdsEyeBounds.set(bounds);
+		birdsEyeBoundsChanged = true;
 	}
-
+	
 	// Get the updated camera
 	public SimpleCamera getNewMainCamera() {
 		return newMainCamera;
 	}
 
 	// Get the updated camera
-	public SimpleCamera getNewBirdsEyeCamera() {
-		return newBirdsEyeCamera;
+	public Quadrilateral getNewBirdsEyeBounds() {
+		return newBirdsEyeBounds;
 	}
 
 	public boolean mainCameraChanged() {
 		return mainCameraChanged;
 	}
 
-	public boolean birdsEyeCameraChanged() {
-		return birdsEyeCameraChanged;
+	public boolean birdsEyeBoundsChanged() {
+		return birdsEyeBoundsChanged;
 	}
 
 	public void updateMainCamera() {
 		mainCameraChanged = false;
 	}
 
-	public void updateBirdsEyeCamera() {
-		birdsEyeCameraChanged = false;
+	public void updateBirdsEyeBounds() {
+		birdsEyeBoundsChanged = false;
 	}
 
 	// Claim by a main window rendering object
