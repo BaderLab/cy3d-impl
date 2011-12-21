@@ -147,6 +147,8 @@ public class Graphics implements GLEventListener {
 		} else {
 			coordinator = BirdsEyeViewCoordinator.createCoordinator(networkView);
 		}
+		
+		System.out.println("coordinator found for default graphics " + this);
 
 		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
 		renderProcedures.put("nodes", new RenderNodesProcedure());

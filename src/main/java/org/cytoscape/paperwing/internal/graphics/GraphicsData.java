@@ -48,6 +48,7 @@ public class GraphicsData {
 	private boolean disableHovering;
 	
 	private GraphicsSelectionData selectionData;
+	private CoordinatorData coordinatorData;
 	
 	private GL2 glContext;
 	
@@ -55,6 +56,7 @@ public class GraphicsData {
 	
 	public GraphicsData() {
 		selectionData = new GraphicsSelectionData();
+		coordinatorData = new CoordinatorData();
 		
 		camera = new SimpleCamera();
 	}
@@ -169,5 +171,13 @@ public class GraphicsData {
 
 	public int getFramesElapsed() {
 		return framesElapsed;
+	}
+
+	public void setCoordinatorData(CoordinatorData coordinatorData) {
+		this.coordinatorData = coordinatorData;
+	}
+
+	public CoordinatorData getCoordinatorData() {
+		return coordinatorData;
 	}
 }
