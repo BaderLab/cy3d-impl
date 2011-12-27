@@ -26,6 +26,10 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
+		
+		if (!graphicsData.getSelectionData().isDragSelectMode()) {
+			return;
+		}
 
 		int selectTopLeftX = graphicsData.getSelectionData()
 				.getSelectTopLeftX();

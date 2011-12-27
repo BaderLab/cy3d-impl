@@ -35,7 +35,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 		nodeListIndex = gl.glGenLists(1);
 
-		GLU glu = new GLU();
+		GLU glu = GLU.createGLU(gl);
 
 		GLUquadric quadric = glu.gluNewQuadric();
 		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
@@ -61,7 +61,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		float distanceScale = graphicsData.getDistanceScale();
 		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData()
 				.getSelectedNodeIndices();
-		int hoverNodeIndex = graphicsData.getHoverNodeIndex();
+		int hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
 		// Currently supporting the following visual properties
 

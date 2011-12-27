@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.SimpleCamera;
@@ -23,12 +24,6 @@ public class GraphicsData {
 	private float distanceScale = 178.0f; 
 	
 	private float verticalFov = 45.0f;
-	
-	/** The index of the node currently being hovered over */
-	private int hoverNodeIndex;
-	
-	/** The index of the edge currently being hovered over */
-	private int hoverEdgeIndex;
 	
 	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
@@ -53,6 +48,7 @@ public class GraphicsData {
 	
 	private GraphicsSelectionData selectionData;
 	private CoordinatorData coordinatorData;
+	private PickingData pickingData;
 	
 	private GL2 glContext;
 	
@@ -61,6 +57,7 @@ public class GraphicsData {
 	public GraphicsData() {
 		selectionData = new GraphicsSelectionData();
 		coordinatorData = new CoordinatorData();
+		pickingData = new PickingData();
 		
 		camera = new SimpleCamera();
 	}
@@ -79,22 +76,6 @@ public class GraphicsData {
 
 	public float getDistanceScale() {
 		return distanceScale;
-	}
-
-	public void setHoverNodeIndex(int hoverNodeIndex) {
-		this.hoverNodeIndex = hoverNodeIndex;
-	}
-
-	public int getHoverNodeIndex() {
-		return hoverNodeIndex;
-	}
-
-	public void setHoverEdgeIndex(int hoverEdgeIndex) {
-		this.hoverEdgeIndex = hoverEdgeIndex;
-	}
-
-	public int getHoverEdgeIndex() {
-		return hoverEdgeIndex;
 	}
 
 	public void setCamera(SimpleCamera camera) {
@@ -191,5 +172,13 @@ public class GraphicsData {
 
 	public void setVerticalFov(float verticalFov) {
 		this.verticalFov = verticalFov;
+	}
+
+	public PickingData getPickingData() {
+		return pickingData;
+	}
+
+	public void setPickingData(PickingData pickingData) {
+		this.pickingData = pickingData;
 	}
 }

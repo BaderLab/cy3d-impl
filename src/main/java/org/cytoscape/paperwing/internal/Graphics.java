@@ -42,7 +42,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.paperwing.internal.graphics.BirdsEyeCoordinator;
+import org.cytoscape.paperwing.internal.graphics.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.graphics.GraphicsData;
 import org.cytoscape.paperwing.internal.graphics.InputProcessor;
@@ -51,6 +51,7 @@ import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
 import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
 import org.cytoscape.paperwing.internal.graphics.ShapePicker;
+import org.cytoscape.paperwing.internal.graphics.ShapePickingProcessor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -78,8 +79,9 @@ public class Graphics implements GLEventListener {
 	private GraphicsData graphicsData;
 	
 	private InputProcessor inputProcessor;
-	private ShapePicker shapePicker;
-	private BirdsEyeCoordinator coordinator;
+	// private ShapePicker shapePicker;
+	private ShapePickingProcessor shapePickingProcessor;
+	private ViewingCoordinator coordinator;
 	private CoordinatorProcessor coordinatorProcessor;
 	
 	private GraphicsHandler handler;
@@ -107,6 +109,8 @@ public class Graphics implements GLEventListener {
 //		renderProcedures.put("edges", new RenderEdgesProcedure());
 //		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
 		
+		this.handler = handler;
+		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
 		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
@@ -116,7 +120,9 @@ public class Graphics implements GLEventListener {
 		graphicsData.setVisualLexicon(visualLexicon);
 		
 		coordinator = handler.getCoordinator(graphicsData);
-		shapePicker = handler.getShapePicker();
+		coordinatorProcessor = handler.getCoordinatorProcessor();
+		
+		shapePickingProcessor = handler.getShapePickingProcessor();
 		inputProcessor = handler.getInputProcessor();
 	}
 	
@@ -146,8 +152,11 @@ public class Graphics implements GLEventListener {
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
 		
+		// Perform picking
+		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
+		
 		// Check input
-		inputProcessor.processInput(keys, mouse, graphicsData, shapePicker);
+		inputProcessor.processInput(keys, mouse, graphicsData);
 
 		// Update data for bird's eye view camera movement
 		coordinatorProcessor.extractData(coordinator, graphicsData);
@@ -198,6 +207,8 @@ public class Graphics implements GLEventListener {
 		
 		handler.initializeGraphicsProcedures(graphicsData);
 		handler.setupLighting(graphicsData);
+		
+		shapePickingProcessor.initialize(graphicsData);
 	}
 
 

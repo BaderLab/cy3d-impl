@@ -7,7 +7,7 @@ import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
 import org.cytoscape.view.model.CyNetworkView;
 
-public class BirdsEyeCoordinator {
+public class ViewingCoordinator {
 
 	private SimpleCamera newMainCamera;
 	private Quadrilateral newBirdsEyeBounds;
@@ -22,14 +22,14 @@ public class BirdsEyeCoordinator {
 	private boolean birdsEyeToUnlink = false;
 	
 	// Assumes 1 CyNetworkView object per main-bird pair
-	private static Map<CyNetworkView, BirdsEyeCoordinator> coordinators = new LinkedHashMap<CyNetworkView, BirdsEyeCoordinator>();
+	private static Map<CyNetworkView, ViewingCoordinator> coordinators = new LinkedHashMap<CyNetworkView, ViewingCoordinator>();
 	
 	// 1:1 relationship between coordinators and networkViews, can use this to make an inverse map used to remove coordinators from
 	// the maps
-	private static Map<BirdsEyeCoordinator, CyNetworkView> networkViews = new LinkedHashMap<BirdsEyeCoordinator, CyNetworkView>();
+	private static Map<ViewingCoordinator, CyNetworkView> networkViews = new LinkedHashMap<ViewingCoordinator, CyNetworkView>();
 	
 	// Camera direction must be a unit vector
-	public static Vector3 extractCameraPosition(BirdsEyeCoordinator coordinator, Vector3 cameraDirection, double cameraDistance) {
+	public static Vector3 extractCameraPosition(ViewingCoordinator coordinator, Vector3 cameraDirection, double cameraDistance) {
 		Vector3 offset = cameraDirection.copy();
 		offset.multiplyLocal(cameraDistance);
 		
@@ -48,17 +48,17 @@ public class BirdsEyeCoordinator {
 	
 	// This networkView is only used to differentiate between main camera and
 	// birds eye camera pairs
-	private BirdsEyeCoordinator(CyNetworkView networkView) {
+	private ViewingCoordinator(CyNetworkView networkView) {
 		newMainCamera = new SimpleCamera();
 		newBirdsEyeBounds = new Quadrilateral();
 	}
 	
-	public static BirdsEyeCoordinator getCoordinator(CyNetworkView networkView) {
+	public static ViewingCoordinator getCoordinator(CyNetworkView networkView) {
 		return coordinators.get(networkView);
 	}
 	
-	public static BirdsEyeCoordinator createCoordinator(CyNetworkView networkView) {
-		BirdsEyeCoordinator coordinator = new BirdsEyeCoordinator(networkView);
+	public static ViewingCoordinator createCoordinator(CyNetworkView networkView) {
+		ViewingCoordinator coordinator = new ViewingCoordinator(networkView);
 		
 		coordinators.put(networkView, coordinator);
 		networkViews.put(coordinator, networkView);

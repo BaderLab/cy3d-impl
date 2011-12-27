@@ -18,7 +18,7 @@ public class RenderCursorProcedure implements ReadOnlyGraphicsProcedure {
 		
 		reticleListIndex = gl.glGenLists(1);
 		
-		GLU glu = new GLU();
+		GLU glu = GLU.createGLU(gl);
 
 		GLUquadric quadric = glu.gluNewQuadric();
 		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);

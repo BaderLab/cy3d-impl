@@ -1,7 +1,7 @@
 package org.cytoscape.paperwing.internal.graphics;
 
 public interface CoordinatorProcessor {
-	public void extractData(BirdsEyeCoordinator coordinator, GraphicsData graphicsData);
+	public void extractData(ViewingCoordinator coordinator, GraphicsData graphicsData);
 
-	public void unlinkCoordinator(BirdsEyeCoordinator coordinator);
+	public void unlinkCoordinator(ViewingCoordinator coordinator);
 }

@@ -25,8 +25,17 @@ public class GraphicsSelectionData {
 	/** The bottom right y position for the selection border */
 	private int selectBottomRightY;
 	
+	/** The index of the node currently being hovered over */
+	private int hoverNodeIndex;
+	
+	/** The index of the edge currently being hovered over */
+	private int hoverEdgeIndex;
+	
 	/** A flag for whether drag selection mode is currently active */
 	private boolean dragSelectMode;
+	
+	// Whether we have a valid top left corner for the selection box
+	private boolean selectTopLeftFound;
 	
 	/** A projection of the current mouse position into 3D coordinates to be used 
 	 * for mouse drag movement of certain objects */
@@ -122,5 +131,29 @@ public class GraphicsSelectionData {
 
 	public void setSelectProjectionDistance(double selectProjectionDistance) {
 		this.selectProjectionDistance = selectProjectionDistance;
+	}
+
+	public void setHoverNodeIndex(int hoverNodeIndex) {
+		this.hoverNodeIndex = hoverNodeIndex;
+	}
+
+	public int getHoverNodeIndex() {
+		return hoverNodeIndex;
+	}
+
+	public void setHoverEdgeIndex(int hoverEdgeIndex) {
+		this.hoverEdgeIndex = hoverEdgeIndex;
+	}
+
+	public int getHoverEdgeIndex() {
+		return hoverEdgeIndex;
+	}
+
+	public void setSelectTopLeftFound(boolean selectTopLeftFound) {
+		this.selectTopLeftFound = selectTopLeftFound;
+	}
+
+	public boolean isSelectTopLeftFound() {
+		return selectTopLeftFound;
 	}
 }

@@ -10,11 +10,17 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
+import org.cytoscape.paperwing.internal.KeyboardMonitor;
+import org.cytoscape.paperwing.internal.MouseMonitor;
 import org.cytoscape.paperwing.internal.SimpleCamera;
 import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.graphics.ShapePicker.PickResults;
 
-public class ShapePicker {
+import com.jogamp.newt.event.MouseEvent;
 
+// Read-only from GraphicsData and SelectionData, writes to PickingData
+public class ShapePickingProcessor {
+	
 	/** A constant that stands for "no type is here" */
 	public static final int NO_TYPE = -1;
 
@@ -30,25 +36,36 @@ public class ShapePicker {
 	public static final int NO_INDEX = -1; // Value representing that no node
 											// or edge index is being held
 
-	/**
-	 * A class capable of storing the edge and node indices of edges and nodes
-	 * that were found to be selected using the shape picking methods
-	 */
-	public class PickResults {
-		public Set<Integer> nodeIndices = new LinkedHashSet<Integer>();
-		public Set<Integer> edgeIndices = new LinkedHashSet<Integer>();
-	}
-
-	private GraphicsData graphicsData;
+	
 	private ReadOnlyGraphicsProcedure drawNodesProcedure;
 	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
-
-	public ShapePicker(ReadOnlyGraphicsProcedure drawNodeProcedure,
-			ReadOnlyGraphicsProcedure drawEdgeProcedure) {
-		this.drawNodesProcedure = drawNodeProcedure;
-		this.drawEdgesProcedure = drawEdgeProcedure;
+	
+	public ShapePickingProcessor(ReadOnlyGraphicsProcedure drawNodesProcedure, ReadOnlyGraphicsProcedure drawEdgesProcedure) {
+		this.drawNodesProcedure = drawNodesProcedure;
+		this.drawEdgesProcedure = drawEdgesProcedure;
 	}
-
+	
+	public void initialize(GraphicsData graphicsData) {
+		drawNodesProcedure.initialize(graphicsData);
+		drawEdgesProcedure.initialize(graphicsData);
+	}
+	
+	public void processPicking(MouseMonitor mouse, KeyboardMonitor keys, GraphicsData graphicsData) {
+		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+	
+		if (selectionData.isDragSelectMode()) {
+			int selectionBoxCenterX = (selectionData.getSelectTopLeftX() + selectionData.getSelectBottomRightX()) / 2;
+			int selectionBoxCenterY = (selectionData.getSelectTopLeftY() + selectionData.getSelectBottomRightY()) / 2;
+			int selectionBoxWidth = Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX());
+			int selectionBoxHeight = Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY());
+			
+			performPick(selectionBoxCenterX, selectionBoxCenterY, selectionBoxWidth, selectionBoxHeight, true, graphicsData);
+		} else {
+			performPick(mouse.x(), mouse.y(), 2, 2, false, graphicsData);
+		}
+	}
+	
+	
 	/**
 	 * Perform a picking operation on the specified region to capture 3D shapes
 	 * drawn in the given region
@@ -69,7 +86,7 @@ public class ShapePicker {
 	 * @return The edges and nodes found in the region, as a {@link PickResults}
 	 *         object
 	 */
-	public PickResults performPick(int x, int y, int width, int height,
+	private void performPick(int x, int y, int width, int height,
 			boolean selectAll, GraphicsData graphicsData) {
 		int bufferSize = 1024;
 
@@ -113,7 +130,33 @@ public class ShapePicker {
 		// gl.glOrtho(0.0, 8.0, 0.0, 8.0, -0.5, 2.5);
 
 		// --Begin Drawing--
+		performSelectionDrawing(graphicsData);
+		// --End Drawing--
 
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glPopMatrix();
+
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+
+		// not sure if this is needed
+		// gl.glFlush();
+
+		int hits = gl.glRenderMode(GL2.GL_RENDER);
+		
+		if (selectAll) {
+			parseSelectionBufferMultipleSelection(buffer, hits, graphicsData.getPickingData());
+		} else {
+			parseSelectionBufferSingleSelection(buffer, hits, graphicsData.getPickingData());
+		}
+	}
+	
+	
+	// Render objects into the selection buffer
+	private void performSelectionDrawing(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+		SimpleCamera camera = graphicsData.getCamera();
+		GLU glu = GLU.createGLU(gl);
+		
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
@@ -143,19 +186,12 @@ public class ShapePicker {
 
 		gl.glPopName();
 		gl.glPopName();
-
-		// --End Drawing--
-
-		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glPopMatrix();
-
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
-
-		// not sure if this is needed
-		// gl.glFlush();
-
-		int hits = gl.glRenderMode(GL2.GL_RENDER);
-
+	}
+	
+	private void parseSelectionBufferSingleSelection(IntBuffer buffer, int hits, PickingData pickingData) {
+		pickingData.setClosestPickedNodeIndex(NO_INDEX);
+		pickingData.setClosestPickedEdgeIndex(NO_INDEX);
+		
 		int selectedIndex;
 		int selectedType;
 
@@ -164,7 +200,51 @@ public class ShapePicker {
 		// indices 0-4 respectively
 		int sizeOfHitRecord = 5;
 
-		PickResults results = new PickResults();
+		if (hits > 0) {
+			// The variable max helps keep track of the polygon that is closest
+			// to the front of the screen
+			int max = buffer.get(2);
+			int maxType = buffer.get(3);
+
+			selectedType = buffer.get(3);
+			selectedIndex = buffer.get(4);
+
+			for (int i = 0; i < hits; i++) {
+
+				if (buffer.get(i * sizeOfHitRecord + 2) <= max
+						&& buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+
+					max = buffer.get(i * sizeOfHitRecord + 2);
+					maxType = buffer.get(i * sizeOfHitRecord + 3);
+
+					// We have that name1 represents the object type
+					selectedType = buffer.get(i * sizeOfHitRecord + 3);
+
+					// name2 represents the object index
+					selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
+				}
+			}
+			
+			if (selectedType == NODE_TYPE) {
+				pickingData.setClosestPickedNodeIndex(selectedIndex);
+			} else if (selectedType == EDGE_TYPE) {
+				pickingData.setClosestPickedEdgeIndex(selectedIndex);
+			}
+		}
+	}
+	
+	
+	private void parseSelectionBufferMultipleSelection(IntBuffer buffer, int hits, PickingData pickingData) {
+		pickingData.getPickedNodeIndices().clear();
+		pickingData.getPickedEdgeIndices().clear();
+		
+		int selectedIndex;
+		int selectedType;
+
+		// Current hit record is size 5 because we have
+		// (numNames, minZ, maxZ, name1, name2) for
+		// indices 0-4 respectively
+		int sizeOfHitRecord = 5;
 
 		if (hits > 0) {
 			// The variable max helps keep track of the polygon that is closest
@@ -176,44 +256,17 @@ public class ShapePicker {
 			selectedIndex = buffer.get(4);
 
 			// Drag-selection; select all
-			if (selectAll) {
-				for (int i = 0; i < hits; i++) {
+			for (int i = 0; i < hits; i++) {
 
-					selectedType = buffer.get(i * sizeOfHitRecord + 3);
-					selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
-
-					if (selectedType == NODE_TYPE) {
-						results.nodeIndices.add(selectedIndex);
-					} else if (selectedType == EDGE_TYPE) {
-						results.edgeIndices.add(selectedIndex);
-					}
-				}
-				// Single selection
-			} else {
-				for (int i = 0; i < hits; i++) {
-
-					if (buffer.get(i * sizeOfHitRecord + 2) <= max
-							&& buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
-
-						max = buffer.get(i * sizeOfHitRecord + 2);
-						maxType = buffer.get(i * sizeOfHitRecord + 3);
-
-						// We have that name1 represents the object type
-						selectedType = buffer.get(i * sizeOfHitRecord + 3);
-
-						// name2 represents the object index
-						selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
-					}
-				}
+				selectedType = buffer.get(i * sizeOfHitRecord + 3);
+				selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
 
 				if (selectedType == NODE_TYPE) {
-					results.nodeIndices.add(selectedIndex);
+					pickingData.getPickedNodeIndices().add(selectedIndex);
 				} else if (selectedType == EDGE_TYPE) {
-					results.edgeIndices.add(selectedIndex);
+					pickingData.getPickedEdgeIndices().add(selectedIndex);
 				}
 			}
 		}
-
-		return results;
 	}
 }

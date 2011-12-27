@@ -65,7 +65,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 		edgeListIndex = gl.glGenLists(1);
 
-		GLU glu = new GLU();
+		GLU glu = GLU.createGLU(gl);
 
 		GLUquadric quadric = glu.gluNewQuadric();
 		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
@@ -103,7 +103,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
-		int hoverEdgeIndex = graphicsData.getHoverEdgeIndex();
+		int hoverEdgeIndex = graphicsData.getSelectionData().getHoverEdgeIndex();
 		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData()
 				.getSelectedEdgeIndices();
 
