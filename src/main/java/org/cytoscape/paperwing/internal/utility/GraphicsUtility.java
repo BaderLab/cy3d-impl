@@ -121,7 +121,7 @@ public class GraphicsUtility {
 		zOffset.multiplyLocal(planeDistance);
 		
 		Vector3 yOffset = cameraUp.copy();
-		yOffset.multiplyLocal(planeDistance * Math.tan(verticalFov));
+		yOffset.multiplyLocal(planeDistance * Math.tan(verticalFov / 360.0 * Math.PI));
 		
 		Vector3 xOffset = cameraDirection.copy(); // xOffset will be the camera's right vector
 		xOffset.crossLocal(cameraUp);
@@ -203,6 +203,7 @@ public class GraphicsUtility {
 			currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
 					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
 					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+			currentPosition.divideLocal(distanceScale);
 			
 			currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
 			

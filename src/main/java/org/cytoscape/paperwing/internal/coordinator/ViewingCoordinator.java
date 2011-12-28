@@ -47,7 +47,7 @@ public class ViewingCoordinator {
 	// Camera direction must be a unit vector
 	public static Vector3 extractCameraPosition(ViewingCoordinator coordinator, Vector3 cameraDirection, double cameraDistance) {
 		Vector3 offset = cameraDirection.copy();
-		offset.multiplyLocal(cameraDistance);
+		offset.multiplyLocal(-cameraDistance);
 		
 		Quadrilateral bounds = coordinator.getCurrentBirdsEyeBounds();
 		

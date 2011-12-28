@@ -29,15 +29,13 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 			SimpleCamera camera = graphicsData.getCamera();
 			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
 			
-			// Check if bounds have changed
-			if (coordinator.compareBirdsEyeBoundsChanged(coordinatorData.getBounds())) {
-				coordinator.updateBirdsEyeBounds(coordinatorData.getBounds());
-			
-			// Check if the main camera moved
-			} else if (coordinator.mainCameraChanged()) {
+			if (coordinator.mainCameraChanged()) {
 				coordinatorData.setBounds(ViewingCoordinator.extractBounds(coordinator.getCurrentMainCamera(),
 						coordinator.getMainVerticalFov(), coordinator.getMainAspectRatio()));
 			
+				System.out.println("New Bounds: " + ViewingCoordinator.extractBounds(coordinator.getCurrentMainCamera(),
+						coordinator.getMainVerticalFov(), coordinator.getMainAspectRatio()));
+				
 				// Update the birds eye view camera
 				camera.copyOrientation(coordinator.getCurrentMainCamera());
 				
@@ -47,12 +45,25 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				Vector3 farthestNode = GraphicsUtility.findFarthestNodeFromCenter(graphicsData.getNetworkView(), networkCenter, graphicsData.getDistanceScale());
 				
 				double newDistance = farthestNode.distance(networkCenter);
+				
+				// Further increase the distance needed
+				newDistance *= 4;
+				
+				System.out.println("NewDistance: " + newDistance);
 				Vector3 offset = camera.getDirection().multiply(-newDistance);
 				
-				camera.moveTo(camera.getPosition().plus(offset));
+				System.out.println("NetworkCenter: " + networkCenter);
+				System.out.println("FarthestNode: " + farthestNode);
+				System.out.println("Map camera new position: " + networkCenter.plus(offset));				
+
+				camera.moveTo(networkCenter.plus(offset));
 				camera.setDistance(newDistance);
 				
+				System.out.println("Camera Displacement from center: " + camera.getPosition().distance(networkCenter));
+				
 				coordinator.updateMainCamera();
+			} else if (coordinator.compareBirdsEyeBoundsChanged(coordinatorData.getBounds())) {
+				coordinator.updateBirdsEyeBounds(coordinatorData.getBounds());
 			}
 		}
 

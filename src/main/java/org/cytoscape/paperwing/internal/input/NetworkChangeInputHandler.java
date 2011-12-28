@@ -34,13 +34,16 @@ public class NetworkChangeInputHandler implements InputHandler {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		SimpleCamera camera = graphicsData.getCamera();
 		
-		// Project mouse coordinates into 3d space to determine where to put the node
-		Vector3 projection = GraphicsUtility.convertScreenTo3d(
-				mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
-				graphicsData.getScreenHeight(), camera.getDistance(), camera);
-		
 		// Create a new node
 		if (pressed.contains(KeyEvent.VK_N)) {
+			
+			// Project mouse coordinates into 3d space to determine where to put the node
+			Vector3 projection = GraphicsUtility.convertScreenTo3d(
+					mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
+					graphicsData.getScreenHeight(), camera.getDistance(), camera);
+			
+			System.out.println("Node created at: " + projection);
+			
 			CyNode added = networkView.getModel().addNode();
 			networkView.updateView();
 

@@ -12,23 +12,28 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 			GraphicsData graphicsData) {
 		coordinator.claimMain();
 		coordinator.setInitialMainCameraOrientation(graphicsData.getCamera());
-		
-		double verticalFov = graphicsData.getVerticalFov();
-		double aspectRatio = graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1));
-		
-		coordinator.setMainVerticalFov(verticalFov);
-		coordinator.setMainAspectRatio(aspectRatio);
-		coordinator.setInitialBirdsEyeBounds(ViewingCoordinator.extractBounds(graphicsData.getCamera(), 
-				verticalFov, 
-				aspectRatio));
-		
-		//debug
-		System.out.println("Initial bounds: " + coordinator.getCurrentBirdsEyeBounds());
 	}
 	
 	@Override
 	public void extractData(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
+		
+		if (!coordinator.isBoundsInitialized()) {
+			double verticalFov = graphicsData.getVerticalFov();
+			double aspectRatio = (float) graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1));
+			
+			coordinator.setMainVerticalFov(verticalFov);
+			coordinator.setMainAspectRatio(aspectRatio);
+			
+			System.out.println("ScreenWidth: " + graphicsData.getScreenWidth() + ", ScreenHeight: " + graphicsData.getScreenHeight());
+			System.out.println("Initialing birds eye bounds: fov " + verticalFov + ", aspectRatio " + aspectRatio);
+			coordinator.setInitialBirdsEyeBounds(ViewingCoordinator.extractBounds(graphicsData.getCamera(), 
+					verticalFov, 
+					aspectRatio));
+			
+			//debug
+			System.out.println("Initial bounds: " + coordinator.getCurrentBirdsEyeBounds());
+		}
 		
 		if (coordinator.isBirdsEyeClaimed()) {
 			SimpleCamera camera = graphicsData.getCamera();
@@ -36,7 +41,7 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 			
 			// TODO: consider moving these somewhere else
 			coordinator.setMainVerticalFov(graphicsData.getVerticalFov());
-			coordinator.setMainAspectRatio(graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1)));
+			coordinator.setMainAspectRatio((float) graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1)));
 			
 			if (coordinator.compareMainCameraChanged(camera)) {
 				coordinator.updateMainCamera(camera);

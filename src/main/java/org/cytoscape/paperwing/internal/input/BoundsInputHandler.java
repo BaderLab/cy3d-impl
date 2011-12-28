@@ -22,6 +22,9 @@ public class BoundsInputHandler implements InputHandler {
 		if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 			Vector3 mousePosition = GraphicsUtility.convertMouseTo3d(mouse, graphicsData, graphicsData.getCamera().getDistance());
 			
+			// The y-coordinate needs to be inverted
+			mousePosition.set(mousePosition.x(), -mousePosition.y(), mousePosition.z());
+			
 			coordinatorData.getBounds().moveTo(mousePosition);
 		}
 	}
