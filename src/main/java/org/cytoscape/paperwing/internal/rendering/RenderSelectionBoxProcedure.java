@@ -1,11 +1,14 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.rendering;
 
 import java.util.List;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -45,17 +48,17 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		SimpleCamera camera = graphicsData.getCamera();
 		double drawDistance = graphicsData.getCamera().getDistance();
 
-		Vector3 topLeft = GraphicsUtility.projectScreenCoordinates(
+		Vector3 topLeft = GraphicsUtility.convertScreenTo3d(
 				selectTopLeftX, selectTopLeftY, screenWidth, screenHeight,
 				drawDistance, camera);
-		Vector3 bottomLeft = GraphicsUtility.projectScreenCoordinates(
+		Vector3 bottomLeft = GraphicsUtility.convertScreenTo3d(
 				selectTopLeftX, selectBottomRightY, screenWidth, screenHeight,
 				drawDistance, camera);
 
-		Vector3 topRight = GraphicsUtility.projectScreenCoordinates(
+		Vector3 topRight = GraphicsUtility.convertScreenTo3d(
 				selectBottomRightX, selectTopLeftY, screenWidth, screenHeight,
 				drawDistance, camera);
-		Vector3 bottomRight = GraphicsUtility.projectScreenCoordinates(
+		Vector3 bottomRight = GraphicsUtility.convertScreenTo3d(
 				selectBottomRightX, selectBottomRightY, screenWidth,
 				screenHeight, drawDistance, camera);
 
@@ -68,6 +71,7 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		 **/
 
 		gl.glDisable(GL2.GL_LIGHTING);
+		gl.glDisable(GL.GL_DEPTH_TEST);
 		gl.glColor3f(0.0f, 0.4f, 0.6f);
 
 		// Below uses converted 3D coordinates
@@ -86,6 +90,7 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		// gl.glVertex2i(selectBottomRightX, selectTopLeftY);
 		// gl.glEnd();
 
+		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glEnable(GL2.GL_LIGHTING);
 	}
 

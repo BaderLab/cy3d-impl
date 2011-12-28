@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal;
+package org.cytoscape.paperwing.internal.input;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;

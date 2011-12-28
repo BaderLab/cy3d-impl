@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.utility;
 
 import java.util.Collection;
 import java.util.Set;
@@ -6,9 +6,10 @@ import java.util.Set;
 import javax.media.opengl.GL2;
 
 import org.cytoscape.model.CyNode;
-import org.cytoscape.paperwing.internal.MouseMonitor;
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
@@ -50,7 +51,7 @@ public class GraphicsUtility {
 	 * intersecting plane
 	 * @return The 3D position of the mouse
 	 */
-	public static Vector3 projectScreenCoordinates(int x, int y, int screenWidth, int screenHeight, 
+	public static Vector3 convertScreenTo3d(int x, int y, int screenWidth, int screenHeight, 
 			double planeDistance, SimpleCamera camera) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
@@ -105,9 +106,9 @@ public class GraphicsUtility {
 	
 	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
 	// which is perpendicular to the camera.
-	public static Vector3 projectMouseCoordinates(MouseMonitor mouse, GraphicsData graphicsData, 
+	public static Vector3 convertMouseTo3d(MouseMonitor mouse, GraphicsData graphicsData, 
 			double planeDistance) {
-		return projectScreenCoordinates(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
+		return convertScreenTo3d(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
 		
 	}
 	
@@ -136,14 +137,12 @@ public class GraphicsUtility {
 		return new Quadrilateral(topLeft, topRight, bottomLeft, bottomRight);
 	}
 	
-	public static Vector3 findAveragePosition(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
+	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
 		if (nodeIndices.isEmpty()) {
 			return null;
 		}
 		
-		double x = 0;
-		double y = 0;
-		double z = 0;
+		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		
 		View<CyNode> nodeView;
@@ -163,5 +162,60 @@ public class GraphicsUtility {
 		result.divideLocal(distanceScale * visitedCount);
 		
 		return result;
+	}
+	
+	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {
+		
+		double x = 0, y = 0, z = 0;
+		int visitedCount = 0;
+		
+		View<CyNode> nodeView;
+		
+		for (CyNode node : networkView.getModel().getNodeList()) {
+			nodeView = networkView.getNodeView(node);
+			
+			if (nodeView != null) {
+				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+				visitedCount++;
+			}
+		}
+		
+		Vector3 result = new Vector3(x, y, z);
+		result.divideLocal(distanceScale * visitedCount);
+		
+		return result;
+	}
+	
+	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, Vector3 networkCenter, double distanceScale) {
+		double currentDistanceSquared;
+		double maxDistanceSquared = 0;
+		
+		Vector3 currentPosition = new Vector3();
+		Vector3 maxPosition = new Vector3();
+		
+		View<CyNode> nodeView;
+		
+		for (CyNode node : networkView.getModel().getNodeList()) {
+			nodeView = networkView.getNodeView(node);
+			
+			currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+			
+			currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
+			
+			if (currentDistanceSquared > maxDistanceSquared) {
+				maxDistanceSquared = currentDistanceSquared;
+				maxPosition.set(currentPosition);
+			}
+		}
+		
+		return maxPosition;
+	}
+
+	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, double distanceScale) {
+		return findFarthestNodeFromCenter(networkView, findNetworkCenter(networkView, distanceScale), distanceScale);
 	}
 }

@@ -1,4 +1,6 @@
-package org.cytoscape.paperwing.internal;
+package org.cytoscape.paperwing.internal.utility;
+
+import org.cytoscape.paperwing.internal.geometric.Vector3;
 
 /** A class representing a 3D camera object possessing a direction, up, left,
  * as well as a position vector
@@ -572,5 +574,14 @@ public class SimpleCamera {
 		Vector3 newPosition = direction.multiply(-distance);
 		newPosition.addLocal(target);
 		position.set(newPosition);
+	}
+	
+	public void setDistance(double distance) {
+		this.distance = distance;
+		
+		Vector3 newTarget = direction.multiply(distance);
+		newTarget.addLocal(position);
+		
+		target.set(newTarget);
 	}
 }

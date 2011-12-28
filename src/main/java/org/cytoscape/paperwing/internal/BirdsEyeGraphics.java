@@ -3,37 +3,43 @@ package org.cytoscape.paperwing.internal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.cytoscape.paperwing.internal.graphics.MainCoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
-import org.cytoscape.paperwing.internal.graphics.ResetSceneProcedure;
-import org.cytoscape.paperwing.internal.graphics.ViewingCoordinator;
-import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.InputProcessor;
-import org.cytoscape.paperwing.internal.graphics.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.input.BirdsEyeInputProcessor;
+import org.cytoscape.paperwing.internal.input.InputProcessor;
+import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
+import org.cytoscape.paperwing.internal.input.MainInputProcessor;
+import org.cytoscape.paperwing.internal.input.MouseMonitor;
+import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderBoundingBoxProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
+import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 
 public class BirdsEyeGraphics implements GraphicsHandler {
 
 private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
-	
-	public MainGraphics() {
+
+	public BirdsEyeGraphics() {
 		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
 		
 		renderProcedures.put("nodes", new RenderNodesProcedure());
 		renderProcedures.put("edges", new RenderEdgesProcedure());
-		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
-		renderProcedures.put("resetScene", new ResetSceneProcedure());
+		renderProcedures.put("boundingBox", new RenderBoundingBoxProcedure());
 		
+		renderProcedures.put("resetScene", new ResetSceneProcedure());
 	}
 	
 	@Override
 	public InputProcessor getInputProcessor() {
-		return new InputProcessor();
+		return new BirdsEyeInputProcessor();
 	}
 
 	@Override
@@ -45,6 +51,9 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	public void drawScene(GraphicsData graphicsData) {
 		// TODO Auto-generated method stub
 		
+		//debug
+		System.out.println("map display call");
+		
 		// Control light positioning
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 		
@@ -54,7 +63,7 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 		
 		renderProcedures.get("edges").execute(graphicsData);
 		renderProcedures.get("nodes").execute(graphicsData);
-		renderProcedures.get("selectionBox").execute(graphicsData);
+		renderProcedures.get("boundingBox").execute(graphicsData);
 	}
 
 	@Override
@@ -65,7 +74,22 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 
 	@Override
 	public ShapePickingProcessor getShapePickingProcessor() {
-		return new ShapePickingProcessor(new RenderNodesProcedure(), new RenderEdgesProcedure());
+		return new ShapePickingProcessor() {
+
+			@Override
+			public void initialize(GraphicsData graphicsData) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void processPicking(MouseMonitor mouse,
+					KeyboardMonitor keys, GraphicsData graphicsData) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		};
 	}
 
 	@Override
@@ -81,7 +105,7 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 
 	@Override
 	public CoordinatorProcessor getCoordinatorProcessor() {
-		return new MainCoordinatorProcessor();
+		return new BirdsEyeCoordinatorProcessor();
 	}
 
 	@Override

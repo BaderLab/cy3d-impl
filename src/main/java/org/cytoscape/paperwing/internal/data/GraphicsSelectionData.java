@@ -1,9 +1,9 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.data;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
 
 public class GraphicsSelectionData {
 	

@@ -1,11 +1,6 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.input;
 
-import org.cytoscape.paperwing.internal.KeyboardMonitor;
-import org.cytoscape.paperwing.internal.MouseMonitor;
-import org.cytoscape.paperwing.internal.input.CameraInputHandler;
-import org.cytoscape.paperwing.internal.input.InputHandler;
-import org.cytoscape.paperwing.internal.input.NetworkChangeInputHandler;
-import org.cytoscape.paperwing.internal.input.SelectionInputHandler;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
 
 public class MainInputProcessor implements InputProcessor {
 	

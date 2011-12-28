@@ -7,12 +7,10 @@ import java.util.Set;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.paperwing.internal.KeyboardMonitor;
-import org.cytoscape.paperwing.internal.MouseMonitor;
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.GraphicsUtility;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
@@ -37,7 +35,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		// Project mouse coordinates into 3d space to determine where to put the node
-		Vector3 projection = GraphicsUtility.projectScreenCoordinates(
+		Vector3 projection = GraphicsUtility.convertScreenTo3d(
 				mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
 				graphicsData.getScreenHeight(), camera.getDistance(), camera);
 		

@@ -1,9 +1,11 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.rendering;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -17,14 +19,16 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
-		Vector3 topLeft = graphicsData.getCoordinatorData().getTopLeftBound();
-		Vector3 topRight = graphicsData.getCoordinatorData().getTopRightBound();
+		Vector3 topLeft = graphicsData.getCoordinatorData().getBounds().getTopLeft();
+		Vector3 topRight = graphicsData.getCoordinatorData().getBounds().getTopRight();
 		
-		Vector3 bottomLeft = graphicsData.getCoordinatorData().getBottomLeftBound();
-		Vector3 bottomRight = graphicsData.getCoordinatorData().getBottomRightBound();
+		Vector3 bottomLeft = graphicsData.getCoordinatorData().getBounds().getBottomLeft();
+		Vector3 bottomRight = graphicsData.getCoordinatorData().getBounds().getBottomRight();
 		
 		gl.glDisable(GL2.GL_LIGHTING);
-		gl.glColor3f(0.7f, 0.7f, 0.6f);
+		gl.glDisable(GL.GL_DEPTH_TEST);
+		
+		gl.glColor3f(0.8f, 0.8f, 0.8f);
 		
 		// Below uses converted 3D coordinates
 		gl.glBegin(GL2.GL_LINE_LOOP);
@@ -34,6 +38,7 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
 		gl.glEnd();
 		
+		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glEnable(GL2.GL_LIGHTING);
 	}
 

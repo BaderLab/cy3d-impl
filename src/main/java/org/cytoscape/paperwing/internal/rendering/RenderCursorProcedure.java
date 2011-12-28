@@ -1,10 +1,12 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.rendering;
 
 import java.util.List;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
+
+import org.cytoscape.paperwing.internal.data.GraphicsData;
 
 public class RenderCursorProcedure implements ReadOnlyGraphicsProcedure {
 	/** The length to draw each segment of the reticle */

@@ -4,10 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Set;
 
-import org.cytoscape.paperwing.internal.KeyboardMonitor;
-import org.cytoscape.paperwing.internal.MouseMonitor;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.GraphicsSelectionData;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 
 public class SelectionInputHandler implements InputHandler {
 

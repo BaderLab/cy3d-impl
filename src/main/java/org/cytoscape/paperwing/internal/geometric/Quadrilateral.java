@@ -1,6 +1,6 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.geometric;
 
-import org.cytoscape.paperwing.internal.Vector3;
+
 
 public class Quadrilateral {
 	private Vector3 topLeft;
@@ -66,5 +66,25 @@ public class Quadrilateral {
 		center.divideLocal(4.0);
 		
 		return center;
+	}
+	
+	public void moveTo(Vector3 newCenter) {
+		Vector3 currentCenter = getCenterPoint();
+		Vector3 offset = newCenter.subtract(currentCenter);
+		
+		topLeft.addLocal(offset);
+		topRight.addLocal(offset);
+		bottomLeft.addLocal(offset);
+		bottomRight.addLocal(offset);
+	}
+	
+	public String toString() {
+		String result = "";
+		result += "Top Left: " + topLeft + ", ";
+		result += "Top Right: " + topRight + ", ";
+		result += "Bottom Left: " + bottomLeft + ", ";
+		result += "Bottom Right: " + bottomRight;
+		
+		return result;
 	}
 }

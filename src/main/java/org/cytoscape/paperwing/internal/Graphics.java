@@ -6,59 +6,28 @@
 // is to be done
 
 package org.cytoscape.paperwing.internal;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
-
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.gl2.GLUT;
 
-import org.cytoscape.application.CyApplicationManager;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyEdge.Type;
-import org.cytoscape.model.CyNetworkManager;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.paperwing.internal.graphics.ViewingCoordinator;
-import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.InputProcessor;
-import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
-import org.cytoscape.paperwing.internal.graphics.ShapePicker;
-import org.cytoscape.paperwing.internal.graphics.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.input.InputProcessor;
+import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
+import org.cytoscape.paperwing.internal.input.MouseMonitor;
+import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.CyNetworkViewManager;
-import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.RenderingEngineManager;
-import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 /** The main class for the Wind rendering engines responsible for
  * creating graphics with the use of the JOGL (Java OpenGL) library
@@ -121,6 +90,7 @@ public class Graphics implements GLEventListener {
 		
 		coordinator = handler.getCoordinator(graphicsData);
 		coordinatorProcessor = handler.getCoordinatorProcessor();
+		coordinatorProcessor.initializeCoordinator(coordinator, graphicsData);
 		
 		shapePickingProcessor = handler.getShapePickingProcessor();
 		inputProcessor = handler.getInputProcessor();

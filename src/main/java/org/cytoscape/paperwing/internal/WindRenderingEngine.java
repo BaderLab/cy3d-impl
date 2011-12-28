@@ -115,6 +115,10 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 		return active;
 	}
 	
+	private Graphics newInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
+		return new Graphics(networkView, visualLexicon, new MainGraphics());
+	}
+	
 	/** Set up the canvas by creating and placing it, along with a Graphics
 	 * object, into the container
 	 * 
@@ -136,7 +140,7 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 			// TODO: check whether to use GLCanvas or GLJPanel
 			GLJPanel panel = new GLJPanel(capabilities);
 			
-			graphics = new Graphics(networkView, visualLexicon, new MainGraphics());
+			graphics = newInstance(networkView, visualLexicon);
 
 			panel.addGLEventListener(graphics);
 	

@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal;
+package org.cytoscape.paperwing.internal.geometric;
 
 /**
  * This class represents a 3-dimensional vector object, which can be useful

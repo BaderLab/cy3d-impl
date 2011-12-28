@@ -3,25 +3,20 @@ package org.cytoscape.paperwing.internal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-
-import org.cytoscape.paperwing.internal.graphics.MainInputProcessor;
-import org.cytoscape.paperwing.internal.graphics.ViewingCoordinator;
-import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.InputProcessor;
-import org.cytoscape.paperwing.internal.graphics.MainCoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderEdgesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderNodesProcedure;
-import org.cytoscape.paperwing.internal.graphics.RenderSelectionBoxProcedure;
-import org.cytoscape.paperwing.internal.graphics.ResetSceneProcedure;
-import org.cytoscape.paperwing.internal.graphics.ShapePicker;
-import org.cytoscape.paperwing.internal.graphics.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.input.InputProcessor;
+import org.cytoscape.paperwing.internal.input.MainInputProcessor;
+import org.cytoscape.paperwing.internal.picking.DefaultShapePickingProcessor;
+import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
+import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.VisualLexicon;
 
 public class MainGraphics implements GraphicsHandler {
 
@@ -33,8 +28,8 @@ public class MainGraphics implements GraphicsHandler {
 		renderProcedures.put("nodes", new RenderNodesProcedure());
 		renderProcedures.put("edges", new RenderEdgesProcedure());
 		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
-		renderProcedures.put("resetScene", new ResetSceneProcedure());
 		
+		renderProcedures.put("resetScene", new ResetSceneProcedure());
 	}
 	
 	@Override
@@ -71,7 +66,7 @@ public class MainGraphics implements GraphicsHandler {
 
 	@Override
 	public ShapePickingProcessor getShapePickingProcessor() {
-		return new ShapePickingProcessor(new RenderNodesProcedure(), new RenderEdgesProcedure());
+		return new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderEdgesProcedure());
 	}
 
 	@Override

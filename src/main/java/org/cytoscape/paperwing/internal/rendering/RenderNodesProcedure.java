@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
 import java.util.List;
@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
 import org.cytoscape.model.CyNode;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;

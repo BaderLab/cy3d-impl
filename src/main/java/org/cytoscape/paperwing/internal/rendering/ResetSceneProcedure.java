@@ -1,11 +1,12 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.rendering;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
 public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
 

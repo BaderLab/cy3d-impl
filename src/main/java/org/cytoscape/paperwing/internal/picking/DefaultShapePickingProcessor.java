@@ -1,26 +1,25 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.picking;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import org.cytoscape.paperwing.internal.KeyboardMonitor;
-import org.cytoscape.paperwing.internal.MouseMonitor;
-import org.cytoscape.paperwing.internal.SimpleCamera;
-import org.cytoscape.paperwing.internal.Vector3;
-import org.cytoscape.paperwing.internal.graphics.ShapePicker.PickResults;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
+import org.cytoscape.paperwing.internal.data.PickingData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
+import org.cytoscape.paperwing.internal.input.MouseMonitor;
+import org.cytoscape.paperwing.internal.picking.ShapePicker.PickResults;
+import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
-import com.jogamp.newt.event.MouseEvent;
+public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
-// Read-only from GraphicsData and SelectionData, writes to PickingData
-public class ShapePickingProcessor {
-	
 	/** A constant that stands for "no type is here" */
 	public static final int NO_TYPE = -1;
 
@@ -40,7 +39,7 @@ public class ShapePickingProcessor {
 	private ReadOnlyGraphicsProcedure drawNodesProcedure;
 	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
 	
-	public ShapePickingProcessor(ReadOnlyGraphicsProcedure drawNodesProcedure, ReadOnlyGraphicsProcedure drawEdgesProcedure) {
+	public DefaultShapePickingProcessor(ReadOnlyGraphicsProcedure drawNodesProcedure, ReadOnlyGraphicsProcedure drawEdgesProcedure) {
 		this.drawNodesProcedure = drawNodesProcedure;
 		this.drawEdgesProcedure = drawEdgesProcedure;
 	}
@@ -56,8 +55,8 @@ public class ShapePickingProcessor {
 		if (selectionData.isDragSelectMode()) {
 			int selectionBoxCenterX = (selectionData.getSelectTopLeftX() + selectionData.getSelectBottomRightX()) / 2;
 			int selectionBoxCenterY = (selectionData.getSelectTopLeftY() + selectionData.getSelectBottomRightY()) / 2;
-			int selectionBoxWidth = Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX());
-			int selectionBoxHeight = Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY());
+			int selectionBoxWidth = Math.max(1, Math.abs(selectionData.getSelectTopLeftX() - selectionData.getSelectBottomRightX()));
+			int selectionBoxHeight = Math.max(1, Math.abs(selectionData.getSelectTopLeftY() - selectionData.getSelectBottomRightY()));
 			
 			performPick(selectionBoxCenterX, selectionBoxCenterY, selectionBoxWidth, selectionBoxHeight, true, graphicsData);
 		} else {
@@ -269,4 +268,5 @@ public class ShapePickingProcessor {
 			}
 		}
 	}
+
 }

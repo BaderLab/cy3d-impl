@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal.graphics;
+package org.cytoscape.paperwing.internal.data;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

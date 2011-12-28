@@ -2,12 +2,12 @@ package org.cytoscape.paperwing.internal;
 
 import java.util.Map;
 
-import org.cytoscape.paperwing.internal.graphics.ViewingCoordinator;
-import org.cytoscape.paperwing.internal.graphics.CoordinatorProcessor;
-import org.cytoscape.paperwing.internal.graphics.GraphicsData;
-import org.cytoscape.paperwing.internal.graphics.InputProcessor;
-import org.cytoscape.paperwing.internal.graphics.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.graphics.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
+import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.input.InputProcessor;
+import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
 
 // The GraphicsHandler is read-only for given GraphicsData objects
 public interface GraphicsHandler {
