@@ -66,7 +66,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 				// Set the node to be hovered
 				// TODO: This might not be needed if the node were added
 				// through some way other than the mouse
-				graphicsData.getSelectionData().setHoverNodeIndex(added.getIndex());
+				// graphicsData.getSelectionData().setHoverNodeIndex(added.getIndex());
 			}
 		}
 	}

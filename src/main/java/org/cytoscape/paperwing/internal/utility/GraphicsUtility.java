@@ -183,7 +183,10 @@ public class GraphicsUtility {
 		}
 		
 		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(distanceScale * visitedCount);
+		
+		if (visitedCount != 0) {
+			result.divideLocal(distanceScale * visitedCount);
+		}
 		
 		return result;
 	}
@@ -218,5 +221,43 @@ public class GraphicsUtility {
 
 	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, double distanceScale) {
 		return findFarthestNodeFromCenter(networkView, findNetworkCenter(networkView, distanceScale), distanceScale);
+	}
+	
+	
+	// Just like Math.acos, but a bit safer
+	public static double saferArcCos(double argument) {
+		if (argument >= 1) {
+			return 0;
+		} else if (argument <= -1) {
+			return Math.PI;
+		} else {
+			return Math.acos(argument);
+		}
+	}
+	
+	
+	// This method solves the case where newAnchor and oldPosition are supposed to be aligned by the normal vector,
+	// but newAnchor has moved and we need to update oldPosition accordingly.
+	public static Vector3 findNewOrthogonalPosition(Vector3 newAnchor, Vector3 oldPosition, Vector3 normal) {
+
+		Vector3 diagonalDisplacement = newAnchor.subtract(oldPosition);
+		double diagonalLength = diagonalDisplacement.magnitude();
+		double dotProduct = diagonalDisplacement.dot(normal);
+		
+		// Use the dot product formula to find angle between diagonal displacement and camera's direction vector
+		double angle = GraphicsUtility.saferArcCos(dotProduct / diagonalLength);
+		
+		double orthogonalDisplacementLength = Math.cos(angle) * diagonalLength;
+		
+		Vector3 orthogonalDisplacement = normal.normalize().multiply(-orthogonalDisplacementLength);
+		
+		return newAnchor.plus(orthogonalDisplacement);
+	}
+	
+	public static Vector3 findMidpoint(Vector3 first, Vector3 second) {
+		Vector3 result = first.plus(second);
+		result.divideLocal(2);
+		
+		return result;
 	}
 }

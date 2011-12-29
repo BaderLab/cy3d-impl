@@ -46,8 +46,11 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 			if (coordinator.compareMainCameraChanged(camera)) {
 				coordinator.updateMainCamera(camera);
 			} else if (coordinator.birdsEyeBoundsChanged()) {
-				newPosition = ViewingCoordinator.extractCameraPosition(coordinator, camera.getDirection(), camera.getDistance());
+				//newPosition = ViewingCoordinator.extractCameraPosition(coordinator, camera.getDirection(), camera.getDistance());
+				newPosition = ViewingCoordinator.findNewOrthoCameraPosition(coordinator.getCurrentBirdsEyeBounds(), camera.getPosition(), camera.getDirection());
 				camera.moveTo(newPosition);
+				
+				coordinator.updateMainCamera(camera);
 				
 				coordinator.updateBirdsEyeBounds();
 			}

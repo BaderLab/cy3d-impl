@@ -334,6 +334,14 @@ public class Vector3 {
     	return rotated;
     }
 	
+	public Vector3 towards(Vector3 other, double fraction) {
+		Vector3 result = other.subtract(this);
+		result.multiplyLocal(fraction);
+		result.addLocal(this);
+		
+		return result;
+	}
+	
 	/** Give a string representation of this vector
 	 * 
 	 * @return The string representation, in format (x, y, z)

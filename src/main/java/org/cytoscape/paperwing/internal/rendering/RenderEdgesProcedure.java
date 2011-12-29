@@ -25,7 +25,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 	/** The default radius of the semi-cylindrical edges */
-	private static final float EDGE_RADIUS = 0.141f; // 0.018f default as of Dec 2011
+	private static final float EDGE_RADIUS = 0.11f; // 0.018f default as of Dec 2011
 
 	/**
 	 * A multiplicative factor for the width of the edges when reading from the
@@ -372,7 +372,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					color.getBlue() / 255.0f);
 
 			// Default color is below
-			// gl.glColor3f(0.73f, 0.73f, 0.73f);
+//			 gl.glColor3f(0.73f, 0.73f, 0.73f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.ENLARGED) {
 			gl.glScalef(1.6f, 1.6f, 1.0f);
@@ -381,11 +381,11 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			color = (Color) edgeView
 					.getVisualProperty(RichVisualLexicon.EDGE_SELECTED_PAINT);
 
-			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
-					color.getBlue() / 255.0f);
+//			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
+//					color.getBlue() / 255.0f);
 
 			// Default color below
-			// gl.glColor3f(0.48f, 0.65f, 0.48f);
+			gl.glColor3f(0.48f, 0.65f, 0.48f);
 			gl.glScalef(1.1f, 1.1f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.HOVERED) {

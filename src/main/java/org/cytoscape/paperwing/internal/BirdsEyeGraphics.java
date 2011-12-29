@@ -51,9 +51,6 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	public void drawScene(GraphicsData graphicsData) {
 		// TODO Auto-generated method stub
 		
-		//debug
-		System.out.println("map display call");
-		
 		// Control light positioning
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 		

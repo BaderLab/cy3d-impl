@@ -11,8 +11,8 @@ import org.cytoscape.view.model.CyNetworkView;
 
 public class ViewingCoordinator {
 
-	public static double BOUNDS_CHANGE_THRESHOLD = 5e-22;
-	public static double CAMERA_CHANGE_THRESHOLD = 5e-22;
+	public static double BOUNDS_CHANGE_THRESHOLD = 5e-10;
+	public static double CAMERA_CHANGE_THRESHOLD = 5e-10;
 	
 	private SimpleCamera currentMainCamera;
 	private Quadrilateral currentBirdsEyeBounds;
@@ -20,8 +20,8 @@ public class ViewingCoordinator {
 	private boolean mainCameraChanged = false;
 	private boolean birdsEyeBoundsChanged = false;
 	
-	private double mainVerticalFov = 45;
-	private double mainAspectRatio = 1;
+	private double mainVerticalFov;
+	private double mainAspectRatio;
 	
 	private boolean boundsInitialized = false;
 	
@@ -55,6 +55,12 @@ public class ViewingCoordinator {
 		position.addLocal(offset);
 		
 		return position;
+	}
+	
+	
+	// Orthogonally shifts the camera to match new bounds, orthogonal with respect to the camera's direction vector
+	public static Vector3 findNewOrthoCameraPosition(Quadrilateral newBounds, Vector3 oldCameraPosition, Vector3 cameraDirection) {
+		return GraphicsUtility.findNewOrthogonalPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
 	}
 	
 	public static Quadrilateral extractBounds(SimpleCamera camera, double verticalFov, double aspectRatio) {

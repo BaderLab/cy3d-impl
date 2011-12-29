@@ -272,6 +272,14 @@ public class SimpleCamera {
 		target.set(newTarget);
 	}
 	
+	public void moveTowards(Vector3 position) {
+		Vector3 offset = position.subtract(this.position);
+		offset.normalizeLocal();
+		offset.multiplyLocal(moveSpeed);
+		
+		moveTo(this.position.plus(offset));
+	}
+	
 	/** Turn the camera leftwards by a multiplier of its turning speed
 	 * 
 	 * @param multiplier The multiplier, ie. how many times its turning speed to turn

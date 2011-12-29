@@ -26,10 +26,10 @@ public class GraphicsSelectionData {
 	private int selectBottomRightY;
 	
 	/** The index of the node currently being hovered over */
-	private int hoverNodeIndex;
+	private int hoverNodeIndex = -1;
 	
 	/** The index of the edge currently being hovered over */
-	private int hoverEdgeIndex;
+	private int hoverEdgeIndex = -1;
 	
 	/** A flag for whether drag selection mode is currently active */
 	private boolean dragSelectMode;

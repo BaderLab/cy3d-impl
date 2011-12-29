@@ -116,14 +116,14 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				color = (Color) nodeView
 						.getVisualProperty(RichVisualLexicon.NODE_SELECTED_PAINT);
 
-				gl.glColor3f(color.getRed() / 255.0f,
-						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
+//				gl.glColor3f(color.getRed() / 255.0f,
+//						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
 
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						true);
 
 				// Default color is below
-				// gl.glColor3f(0.52f, 0.70f, 0.52f);
+				gl.glColor3f(0.52f, 0.70f, 0.52f);
 			} else if (index == hoverNodeIndex) {
 				gl.glColor3f(0.52f, 0.52f, 0.70f);
 
@@ -140,7 +140,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 						false);
 
 				// Default color is below
-				// gl.glColor3f(0.73f, 0.73f, 0.73f);
+//				gl.glColor3f(0.73f, 0.73f, 0.73f);
 
 			}
 

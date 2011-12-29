@@ -141,6 +141,7 @@ public class WindMapRenderingEngine implements RenderingEngine<CyNetwork> {
 			// capabilities.setDoubleBuffered(true);
 			
 			// TODO: check whether to use GLCanvas or GLJPanel
+			
 			GLJPanel panel = new GLJPanel(capabilities);
 			
 			graphics = newInstance(networkView, visualLexicon);
@@ -165,25 +166,30 @@ public class WindMapRenderingEngine implements RenderingEngine<CyNetwork> {
 			
 			animator = new FPSAnimator(60);
 			animator.add(panel);
+			animator.setIgnoreExceptions(true);
+			animator.setPrintExceptions(true);
+			animator.start();
 			
-			focus.addFocusListener(new FocusListener() {
-
-				@Override
-				public void focusGained(FocusEvent event) {
-					if (!event.isTemporary()) {
-						System.out.println("Animator started for map: " + this);
-						animator.start();
-					}
-				}
-
-				@Override
-				public void focusLost(FocusEvent event) {
-					if (!event.isTemporary()) {
-						System.out.println("Animator stopped for map: " + this);
-						animator.stop();
-					}
-				}
-			});
+			System.out.println("Map animator animating status: " + animator.isAnimating());
+			
+//			focus.addFocusListener(new FocusListener() {
+//
+//				@Override
+//				public void focusGained(FocusEvent event) {
+//					if (!event.isTemporary()) {
+//						System.out.println("Animator started for map: " + this);
+//						animator.start();
+//					}
+//				}
+//
+//				@Override
+//				public void focusLost(FocusEvent event) {
+//					if (!event.isTemporary()) {
+//						System.out.println("Animator stopped for map: " + this);
+//						animator.stop();
+//					}
+//				}
+//			});
 			
 			active = true;
 			

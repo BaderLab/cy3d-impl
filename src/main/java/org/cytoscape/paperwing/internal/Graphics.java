@@ -125,11 +125,11 @@ public class Graphics implements GLEventListener {
 		// Perform picking
 		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
 		
-		// Check input
-		inputProcessor.processInput(keys, mouse, graphicsData);
-
 		// Update data for bird's eye view camera movement
 		coordinatorProcessor.extractData(coordinator, graphicsData);
+		
+		// Check input
+		inputProcessor.processInput(keys, mouse, graphicsData);
 		
 		// Reset the scene for drawing
 		handler.resetSceneForDrawing(graphicsData);
