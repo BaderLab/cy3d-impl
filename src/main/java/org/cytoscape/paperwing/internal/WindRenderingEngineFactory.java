@@ -16,7 +16,7 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
  * 
  * @author paperwing (Yue Dong)
  */
-public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
+public abstract class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
 
 	/** The network view manager containing references to the network views */
 	private CyNetworkViewManager networkViewManager;
@@ -43,46 +43,31 @@ public class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		this.serviceRegistrar = serviceRegistrar;
 		
-		// TestGraphics.initSingleton();
 		Graphics.initSingleton();
-		WindRenderingEngine.setNetworkViewManager(networkViewManager);
 	}
 	
 	@Override
 	public RenderingEngine<CyNetwork> createRenderingEngine(
 			Object container, View<CyNetwork> viewModel) {
 		
-		/* For code below, seems that NetworkViewManager does not contain references to all available NetworkViews
-		 */
-		/*
-		System.out.println("given model: " + viewModel.getModel());
-		System.out.println("given model suid: " + viewModel.getModel().getSUID());
-		System.out.println("given suid: " + viewModel.getSUID());
-		System.out.println("networkViewSet: " + networkViewManager.getNetworkViewSet());
-		*/
-		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		WindRenderingEngine engine = new WindRenderingEngine(container, viewModel, visualLexicon);
+		WindRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
+		
+		engine.setUpNetworkView(networkViewManager);
+		engine.setUpCanvas(container);
+		engine.setUpNetworkViewDestroyedListener(serviceRegistrar);
+		
 		// System.out.println("returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);
 		
-		// System.out.println("Engine active?: " + engine.isActive());
-		
-		// System.out.println("registering service to " + serviceRegistrar + ": " + engine.getEngineRemovedListener()
-		// 		+ ", " + RenderingEngineAboutToBeRemovedListener.class);
-		
-//		serviceRegistrar.registerService(engine.getAboutToBeRemovedListener(), 
-//				NetworkAboutToBeDestroyedListener.class, 
-//				new Properties());
-		
 		return engine;
 	}
-
+	
+	protected abstract WindRenderingEngine getNewRenderingEngine(Object container, 
+			View<CyNetwork> viewModel, VisualLexicon visualLexicon);
+	
 	@Override
 	public VisualLexicon getVisualLexicon() {
-		// System.out.println("getVisualLexicon call");
-		
 		return visualLexicon;
 	}
-
 }

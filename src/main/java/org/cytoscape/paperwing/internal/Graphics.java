@@ -179,6 +179,8 @@ public class Graphics implements GLEventListener {
 		handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
+		
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 
@@ -191,10 +193,15 @@ public class Graphics implements GLEventListener {
 		gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global));
 		gl.glShadeModel(GL2.GL_SMOOTH);
 
-		float[] ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
-		float[] diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float[] specular = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float[] ambient = { 0.4f, 0.4f, 0.4f, 1.0f };
+		float[] diffuse = { 0.7f, 0.7f, 0.7f, 1.0f };
+		float[] specular = { 0.9f, 0.9f, 0.9f, 0.9f };
 		float[] position = { -4.0f, 4.0f, 6.0f, 1.0f };
+		
+//		float[] ambient = { 0.8f, 0.8f, 0.8f, 0.8f };
+//		float[] diffuse = { 0.7f, 0.7f, 0.7f, 0.7f };
+//		float[] specular = { 0.8f, 0.8f, 0.8f, 0.8f };
+//		float[] position = { -4.0f, 4.0f, 6.0f, 1.0f };
 
 		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, FloatBuffer.wrap(ambient));
 		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, FloatBuffer.wrap(diffuse));

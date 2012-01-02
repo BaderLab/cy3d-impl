@@ -16,14 +16,17 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedEvent;
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
+import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedEvent;
+import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.presentation.RenderingEngine;
+
+import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
 /** This class represents a WindRenderingEngine, responsible for
@@ -31,11 +34,8 @@ import com.jogamp.opengl.util.FPSAnimator;
  * 
  * @author Paperwing (Yue Dong)
  */
-public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
+public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 
-	/** The networkViewManager with a list of all current network views */
-	private static CyNetworkViewManager networkViewManager;
-	
 	/** The networkView to be rendered */
 	private CyNetworkView networkView;
 	
@@ -49,14 +49,13 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	private FPSAnimator animator;
 	
 	/** The Graphics object responsible for creating the graphics */
-	protected Graphics graphics;
+	private Graphics graphics;
 	
 	/** Whether or not the current rendering engine is active */
 	private boolean active;
 	
-	/** A pointer to itself, possibly useful for accessing protected 
-	 * member variables */
-	private RenderingEngine<CyNetwork> selfPointer;
+	private CyServiceRegistrar serviceRegistrar;
+	private NetworkViewAboutToBeDestroyedListener networkViewDestroyedListener;
 	
 	/** Create a new WindRenderingEngine object */
 	public WindRenderingEngine(Object container, View<CyNetwork> viewModel, 
@@ -65,58 +64,13 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 		this.viewModel = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.active = false;
-		
-		selfPointer = this;
-		
+	}
+	
+	// Needs to be called before setUpCanvas
+	public void setUpNetworkView(CyNetworkViewManager networkViewManager) {
 		if (networkViewManager != null) {
 			this.networkView = networkViewManager.getNetworkView(viewModel.getModel().getSUID());
 		}
-		
-		if (this.networkView != null) {
-			// System.out.println("Setting up canvas..");
-			setUpCanvas(container);
-		}
-		
-		// System.out.println("Provided visualLexicon: " + visualLexicon);
-	}
-	
-	/** Return a listener to listen to events regarding when the graphics
-	 * object is to be destroyed, and the animator stopped
-	 * 
-	 * @return A listener object handling certain cleanup
-	 */
-	public NetworkAboutToBeDestroyedListener getAboutToBeRemovedListener() {
-		
-		// System.out.println("getEngineRemovedListener call");
-		
-		return new NetworkAboutToBeDestroyedListener(){
-
-			@Override
-			public void handleEvent(NetworkAboutToBeDestroyedEvent evt) {
-				// System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
-				// System.out.println("Current engine: " + selfPointer);
-				
-				if (evt.getNetwork() == networkView.getModel()) {
-					System.out.println("Rendering engine about to be removed, stopping animator");
-					animator.stop();
-				}
-			}
-		};
-	}
-	
-	/** Set the current networkViewManager */
-	public static void setNetworkViewManager(CyNetworkViewManager
-			networkViewManager) {
-		WindRenderingEngine.networkViewManager = networkViewManager;
-	}
-	
-	/** Return whether the rendering engine is active */
-	public boolean isActive() {
-		return active;
-	}
-	
-	private Graphics newInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		return new Graphics(networkView, visualLexicon, new MainGraphics());
 	}
 	
 	/** Set up the canvas by creating and placing it, along with a Graphics
@@ -125,69 +79,105 @@ public class WindRenderingEngine implements RenderingEngine<CyNetwork> {
 	 * @param container A container in the GUI window used to contain
 	 * the rendered results
 	 */
-	private void setUpCanvas(Object container) {
-		if (container instanceof JComponent) {			
-			JComponent component = (JComponent) container;
-			Container focus = component;
-			
-			// Use the system's default version of OpenGL
-			GLProfile profile = GLProfile.getDefault();
-			GLCapabilities capabilities = new GLCapabilities(profile);
-
-			// TODO: check if this line should be moved to graphics object
-			// capabilities.setDoubleBuffered(true);
-			
-			// TODO: check whether to use GLCanvas or GLJPanel
-			GLJPanel panel = new GLJPanel(capabilities);
-			
-			graphics = newInstance(networkView, visualLexicon);
-
-			panel.addGLEventListener(graphics);
+	public void setUpCanvas(Object container) {
+		if (networkView != null) {
+			if (container instanceof JComponent) {			
+				JComponent component = (JComponent) container;
+				Container focus = component;
+				
+				// Use the system's default version of OpenGL
+				GLProfile profile = GLProfile.getDefault();
+				GLCapabilities capabilities = new GLCapabilities(profile);
 	
-			if (container instanceof JInternalFrame) {
-				JInternalFrame frame = (JInternalFrame) container;
-				Container pane = frame.getContentPane();
+				// TODO: check if this line should be moved to graphics object
+				// capabilities.setDoubleBuffered(true);
 				
-				focus = pane;
-				graphics.trackInput(pane);
+				// TODO: check whether to use GLCanvas or GLJPanel
+				GLJPanel panel = new GLJPanel(capabilities);
 				
-				pane.setLayout(new BorderLayout());
-				pane.add(panel, BorderLayout.CENTER);
-			} else {
-				graphics.trackInput(component);
+				graphics = getGraphicsInstance(networkView, visualLexicon);
+
+				panel.addGLEventListener(graphics);
+
+				if (container instanceof JInternalFrame) {
+					JInternalFrame frame = (JInternalFrame) container;
+					Container pane = frame.getContentPane();
+					
+					focus = pane;
+					graphics.trackInput(pane);
+					
+					pane.setLayout(new BorderLayout());
+					pane.add(panel, BorderLayout.CENTER);
+				} else {
+					focus = component;
+					graphics.trackInput(component);
+					
+					component.setLayout(new BorderLayout());
+					component.add(panel, BorderLayout.CENTER);
+				}
 				
-				component.setLayout(new BorderLayout());
-				component.add(panel, BorderLayout.CENTER);
+				animator = new FPSAnimator(60);
+				animator.add(panel);
+				
+				// Setup animator start/stop, can be based on gaining/losing focus of the canvas
+				setUpAnimatorStarting(focus, animator);
+				
+				active = true;
 			}
-			
-			animator = new FPSAnimator(60);
-			animator.add(panel);
-			
-			focus.addFocusListener(new FocusListener() {
-
-				@Override
-				public void focusGained(FocusEvent event) {
-					if (!event.isTemporary()) {
-						//System.out.println("Animator started for: " + this);
-						animator.start();
-					}
-				}
-
-				@Override
-				public void focusLost(FocusEvent event) {
-					if (!event.isTemporary()) {
-						//System.out.println("Animator stopped for: " + this);
-						animator.stop();
-					}
-				}
-			});
-			
-			active = true;
-			
-//			graphics.findMapPartner();
 		}
 	}
+	
+	protected abstract void setUpAnimatorStarting(Container container, FPSAnimator animator);
+	
+	public void setUpNetworkViewDestroyedListener(CyServiceRegistrar serviceRegistrar) {
+		this.serviceRegistrar = serviceRegistrar;
+		
+		if (networkViewDestroyedListener == null) {
+			networkViewDestroyedListener = getAboutToBeRemovedListener();
 
+			serviceRegistrar.registerService(
+					networkViewDestroyedListener,
+					NetworkViewAboutToBeDestroyedListener.class,
+					new Properties());
+		}
+	}
+	
+	
+	
+	
+	/** Return a listener to listen to events regarding when the graphics
+	 * object is to be destroyed, and the animator stopped
+	 * 
+	 * @return A listener object handling certain cleanup
+	 */
+	private NetworkViewAboutToBeDestroyedListener getAboutToBeRemovedListener() {
+		
+		// System.out.println("getEngineRemovedListener call");
+		
+		return new NetworkViewAboutToBeDestroyedListener(){
+
+			@Override
+			public void handleEvent(NetworkViewAboutToBeDestroyedEvent evt) {
+				// System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
+				// System.out.println("Current engine: " + selfPointer);
+				
+				if (evt.getNetworkView() == networkView) {
+					System.out.println("Rendering engine about to be removed, stopping animator");
+					animator.stop();
+					
+					serviceRegistrar.unregisterService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class);
+				}
+			}
+		};
+	}
+	
+	/** Return whether the rendering engine is active */
+	public boolean isActive() {
+		return active;
+	}
+	
+	protected abstract Graphics getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon);
+	
 	@Override
 	public View<CyNetwork> getViewModel() {
 		return viewModel;

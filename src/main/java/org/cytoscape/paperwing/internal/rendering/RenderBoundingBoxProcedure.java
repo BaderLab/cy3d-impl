@@ -8,10 +8,14 @@ import javax.media.opengl.glu.GLUquadric;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
+import org.cytoscape.paperwing.internal.utility.RenderColor;
 import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
+	private static final RenderColor DEFAULT_COLOR = 
+		new RenderColor(0.7, 0.7, 0.7);
+	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 	}
@@ -49,7 +53,7 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glDisable(GL2.GL_LIGHTING);
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		
-		gl.glColor3f(0.7f, 0.7f, 0.7f);
+		GraphicsUtility.setNonAlphaColors(gl, DEFAULT_COLOR);
 		
 		// Below uses converted 3D coordinates
 		gl.glBegin(GL2.GL_LINE_STRIP);

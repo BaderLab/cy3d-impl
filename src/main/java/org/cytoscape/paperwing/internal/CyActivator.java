@@ -24,10 +24,10 @@ public class CyActivator extends AbstractCyActivator {
 				CyServiceRegistrar.class);
 
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
-		WindRenderingEngineFactory windRenderingEngineFactory = new WindRenderingEngineFactory(
+		WindMainRenderingEngineFactory windRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, cyServiceRegistrarRef);
-		WindMapRenderingEngineFactory windMapRenderingEngineFactory = new WindMapRenderingEngineFactory(
+		WindBirdsEyeRenderingEngineFactory windMapRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, cyServiceRegistrarRef);
 

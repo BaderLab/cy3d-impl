@@ -15,6 +15,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
+import org.cytoscape.paperwing.internal.utility.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
@@ -24,6 +25,15 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
+	private static final RenderColor DEFAULT_COLOR = 
+		new RenderColor(0.67, 0.67, 0.67);
+	private static final RenderColor DEFAULT_SELECTED_COLOR = 
+		new RenderColor(0.73, 0.73, 0.6);
+	private static final RenderColor DEFAULT_HOVER_COLOR = 
+		new RenderColor(0.7, 0.7, 0.5);
+	
+	
+	
 	/** The default radius of the semi-cylindrical edges */
 	private static final float EDGE_RADIUS = 0.11f; // 0.018f default as of Dec 2011
 
@@ -371,8 +381,8 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
 					color.getBlue() / 255.0f);
 
-			// Default color is below
-//			 gl.glColor3f(0.73f, 0.73f, 0.73f);
+			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_COLOR);
+			
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.ENLARGED) {
 			gl.glScalef(1.6f, 1.6f, 1.0f);
@@ -384,12 +394,11 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 //			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
 //					color.getBlue() / 255.0f);
 
-			// Default color below
-			gl.glColor3f(0.48f, 0.65f, 0.48f);
+			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
 			gl.glScalef(1.1f, 1.1f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.HOVERED) {
-			gl.glColor3f(0.45f, 0.45f, 0.70f);
+			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
 			gl.glCallList(edgeListIndex);
 			// } else if (modifier == DrawStateModifier.SELECT_BORDER) {
 			// gl.glColor3f(0.72f, 0.31f, 0.40f);

@@ -36,6 +36,11 @@ public class GraphicsUtility {
 				rotateAxis.z());
 	}
 	
+	
+	public static void setNonAlphaColors(GL2 gl, RenderColor color) {
+		gl.glColor3d(color.getRed(), color.getGreen(), color.getBlue());
+	}
+	
 	/**
 	 * Converts 2D screen coordinates to 3D OpenGL coordinates, where the
 	 * coordinate for the 3rd dimension is specified by the distance between 

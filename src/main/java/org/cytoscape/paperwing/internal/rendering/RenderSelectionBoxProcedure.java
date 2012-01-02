@@ -11,7 +11,7 @@ import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
 import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
-
+	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		// TODO Auto-generated method stub

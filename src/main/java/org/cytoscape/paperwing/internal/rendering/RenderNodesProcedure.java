@@ -10,6 +10,8 @@ import javax.media.opengl.glu.GLUquadric;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
+import org.cytoscape.paperwing.internal.utility.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
@@ -17,6 +19,14 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
+	private static final RenderColor DEFAULT_COLOR = 
+		new RenderColor(0.67, 0.67, 0.67);
+	private static final RenderColor DEFAULT_SELECTED_COLOR = 
+		new RenderColor(0.73, 0.73, 0.6);
+	private static final RenderColor DEFAULT_HOVER_COLOR = 
+		new RenderColor(0.5, 0.5, 0.7);
+	
+	
 	/** The default radius of the spherical nodes */
 	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
 
@@ -122,10 +132,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						true);
 
-				// Default color is below
-				gl.glColor3f(0.52f, 0.70f, 0.52f);
+				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
 			} else if (index == hoverNodeIndex) {
-				gl.glColor3f(0.52f, 0.52f, 0.70f);
+				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
 
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						false);
@@ -139,8 +148,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						false);
 
-				// Default color is below
-//				gl.glColor3f(0.73f, 0.73f, 0.73f);
+				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_COLOR);
 
 			}
 
