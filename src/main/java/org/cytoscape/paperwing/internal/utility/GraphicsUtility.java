@@ -243,7 +243,7 @@ public class GraphicsUtility {
 	
 	// This method solves the case where newAnchor and oldPosition are supposed to be aligned by the normal vector,
 	// but newAnchor has moved and we need to update oldPosition accordingly.
-	public static Vector3 findNewOrthogonalPosition(Vector3 newAnchor, Vector3 oldPosition, Vector3 normal) {
+	public static Vector3 findNewOrthogonalAnchoredPosition(Vector3 newAnchor, Vector3 oldPosition, Vector3 normal) {
 
 		Vector3 diagonalDisplacement = newAnchor.subtract(oldPosition);
 		double diagonalLength = diagonalDisplacement.magnitude();
@@ -262,6 +262,31 @@ public class GraphicsUtility {
 	public static Vector3 findMidpoint(Vector3 first, Vector3 second) {
 		Vector3 result = first.plus(second);
 		result.divideLocal(2);
+		
+		return result;
+	}
+	
+	
+	// Assumes lineDirection points from lineSamplePoint into the plane
+	public static Vector3 findLinePlaneIntersection(Vector3 lineSamplePoint, Vector3 lineDirection, Vector3 planeSamplePoint, Vector3 planeNormal) {
+		
+		Vector3 sampleOffset = planeSamplePoint.subtract(lineSamplePoint);
+		double hypotenuse = sampleOffset.magnitude();
+		
+		double lineHypotenuseAngle = lineDirection.angle(sampleOffset);
+		double planeHypotenuseAngle = Math.PI / 2 - planeNormal.angle(sampleOffset);
+		
+		double intersectionCornerAngle = Math.PI - lineHypotenuseAngle - planeHypotenuseAngle;
+		
+		// Use sine law
+		// sin(intersection) / hypotenuse = sin(planeHypotenuseAngle) / lineOffsetMagnitude (desired)
+		
+		double lineOffsetMagnitude = Math.sin(planeHypotenuseAngle) * hypotenuse / Math.sin(intersectionCornerAngle);
+		
+		Vector3 lineOffset = lineDirection.normalize();
+		lineOffset.multiplyLocal(lineOffsetMagnitude);
+		
+		Vector3 result = lineSamplePoint.plus(lineOffset);
 		
 		return result;
 	}

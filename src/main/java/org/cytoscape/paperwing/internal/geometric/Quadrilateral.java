@@ -3,6 +3,8 @@ package org.cytoscape.paperwing.internal.geometric;
 
 
 public class Quadrilateral {
+	private static double MINIMUM_DIVISOR = Double.MIN_NORMAL;
+	
 	private Vector3 topLeft;
 	private Vector3 topRight;
 	private Vector3 bottomLeft;
@@ -86,5 +88,30 @@ public class Quadrilateral {
 		result += "Bottom Right: " + bottomRight;
 		
 		return result;
+	}
+	
+	// Project the quadrilateral onto a plane
+	public Quadrilateral projectOntoPlane(Vector3 sourcePoint, double newDistanceToCenter) {
+
+		double currentDistance = sourcePoint.distance(getCenterPoint());
+		double distanceRatio = newDistanceToCenter / Math.max(currentDistance, MINIMUM_DIVISOR);
+	
+		Vector3 newTopLeft = topLeft.subtract(sourcePoint);
+		newTopLeft.multiplyLocal(distanceRatio);
+		newTopLeft.addLocal(sourcePoint);
+		
+		Vector3 newTopRight = topRight.subtract(sourcePoint);
+		newTopRight.multiplyLocal(distanceRatio);
+		newTopRight.addLocal(sourcePoint);
+	
+		Vector3 newBottomLeft = bottomLeft.subtract(sourcePoint);
+		newBottomLeft.multiplyLocal(distanceRatio);
+		newBottomLeft.addLocal(sourcePoint);
+
+		Vector3 newBottomRight = bottomRight.subtract(sourcePoint);
+		newBottomRight.multiplyLocal(distanceRatio);
+		newBottomRight.addLocal(sourcePoint);
+
+		return new Quadrilateral(newTopLeft, newTopRight, newBottomLeft, newBottomRight);
 	}
 }

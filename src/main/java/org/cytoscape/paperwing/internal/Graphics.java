@@ -194,8 +194,8 @@ public class Graphics implements GLEventListener {
 		gl.glShadeModel(GL2.GL_SMOOTH);
 
 		float[] ambient = { 0.4f, 0.4f, 0.4f, 1.0f };
-		float[] diffuse = { 0.7f, 0.7f, 0.7f, 1.0f };
-		float[] specular = { 0.9f, 0.9f, 0.9f, 0.9f };
+		float[] diffuse = { 0.57f, 0.57f, 0.57f, 1.0f };
+		float[] specular = { 0.79f, 0.79f, 0.79f, 1.0f };
 		float[] position = { -4.0f, 4.0f, 6.0f, 1.0f };
 		
 //		float[] ambient = { 0.8f, 0.8f, 0.8f, 0.8f };

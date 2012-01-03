@@ -24,27 +24,27 @@ public class CyActivator extends AbstractCyActivator {
 				CyServiceRegistrar.class);
 
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
-		WindMainRenderingEngineFactory windRenderingEngineFactory = new WindMainRenderingEngineFactory(
+		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, cyServiceRegistrarRef);
-		WindBirdsEyeRenderingEngineFactory windMapRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
+		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, cyServiceRegistrarRef);
 
-		Properties windRenderingEngineFactoryProps = new Properties();
-		windRenderingEngineFactoryProps.setProperty("serviceType",
+		Properties windMainRenderingEngineFactoryProps = new Properties();
+		windMainRenderingEngineFactoryProps.setProperty("serviceType",
 				"presentationFactory");
-		windRenderingEngineFactoryProps.setProperty("id", "wind");
-		registerService(bc, windRenderingEngineFactory,
-				RenderingEngineFactory.class, windRenderingEngineFactoryProps);
+		windMainRenderingEngineFactoryProps.setProperty("id", "wind");
+		registerService(bc, windMainRenderingEngineFactory,
+				RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
 
-		Properties windMapRenderingEngineFactoryProps = new Properties();
-		windMapRenderingEngineFactoryProps.setProperty("serviceType",
+		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
+		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType",
 				"presentationFactory");
-		windMapRenderingEngineFactoryProps.setProperty("id", "windMap");
-		registerService(bc, windMapRenderingEngineFactory,
+		windBirdsEyeRenderingEngineFactoryProps.setProperty("id", "windMap");
+		registerService(bc, windBirdsEyeRenderingEngineFactory,
 				RenderingEngineFactory.class,
-				windMapRenderingEngineFactoryProps);
+				windBirdsEyeRenderingEngineFactoryProps);
 
 		Properties windVisualLexiconProps = new Properties();
 		windVisualLexiconProps.setProperty("serviceType", "visualLexicon");

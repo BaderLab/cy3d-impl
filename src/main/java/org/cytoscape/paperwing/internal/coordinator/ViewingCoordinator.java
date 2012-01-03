@@ -44,28 +44,17 @@ public class ViewingCoordinator {
 	// the maps
 	private static Map<ViewingCoordinator, CyNetworkView> networkViews = new LinkedHashMap<ViewingCoordinator, CyNetworkView>();
 	
-	// Camera direction must be a unit vector
-	public static Vector3 extractCameraPosition(ViewingCoordinator coordinator, Vector3 cameraDirection, double cameraDistance) {
-		Vector3 offset = cameraDirection.copy();
-		offset.multiplyLocal(-cameraDistance);
-		
-		Quadrilateral bounds = coordinator.getCurrentBirdsEyeBounds();
-		
-		Vector3 position = bounds.getCenterPoint();
-		position.addLocal(offset);
-		
-		return position;
-	}
+
 	
 	
 	// Orthogonally shifts the camera to match new bounds, orthogonal with respect to the camera's direction vector
 	public static Vector3 findNewOrthoCameraPosition(Quadrilateral newBounds, Vector3 oldCameraPosition, Vector3 cameraDirection) {
-		return GraphicsUtility.findNewOrthogonalPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
+		return GraphicsUtility.findNewOrthogonalAnchoredPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
 	}
 	
-	public static Quadrilateral extractBounds(SimpleCamera camera, double verticalFov, double aspectRatio) {
-		return GraphicsUtility.generateViewingBounds(camera.getPosition(), camera.getDirection(), camera.getUp(), 
-				camera.getDistance(), verticalFov, aspectRatio);
+	public static Quadrilateral extractNewDrawnBounds(Vector3 cameraPosition, Vector3 cameraDirection, Vector3 cameraUp, double cameraDistance, double verticalFov, double aspectRatio) {
+		return GraphicsUtility.generateViewingBounds(cameraPosition, cameraDirection, cameraUp, 
+				cameraDistance, verticalFov, aspectRatio);
 	}
 	
 	// This networkView is only used to differentiate between main camera and

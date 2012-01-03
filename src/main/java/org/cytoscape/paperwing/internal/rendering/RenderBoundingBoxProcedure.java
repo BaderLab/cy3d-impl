@@ -6,6 +6,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
 import org.cytoscape.paperwing.internal.utility.RenderColor;
@@ -14,7 +15,7 @@ import org.cytoscape.paperwing.internal.utility.SimpleCamera;
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.7, 0.7, 0.7);
+		new RenderColor(0.57, 0.57, 0.57);
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
@@ -30,13 +31,14 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	private void drawHalfBox(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
+		Quadrilateral bounds = graphicsData.getCoordinatorData().getBounds();
 		double fraction = 0.25;
 		
-		Vector3 topLeft = graphicsData.getCoordinatorData().getBounds().getTopLeft();
-		Vector3 topRight = graphicsData.getCoordinatorData().getBounds().getTopRight();
+		Vector3 topLeft = bounds.getTopLeft();
+		Vector3 topRight = bounds.getTopRight();
 		
-		Vector3 bottomLeft = graphicsData.getCoordinatorData().getBounds().getBottomLeft();
-		Vector3 bottomRight = graphicsData.getCoordinatorData().getBounds().getBottomRight();
+		Vector3 bottomLeft = bounds.getBottomLeft();
+		Vector3 bottomRight = bounds.getBottomRight();
 		
 		Vector3 topLeftDown = topLeft.towards(bottomLeft, fraction);
 		Vector3 topLeftRight = topLeft.towards(topRight, fraction);
@@ -86,12 +88,14 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	private void drawFullBox(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
+	
+		Quadrilateral bounds = graphicsData.getCoordinatorData().getBounds();
+
+		Vector3 topLeft = bounds.getTopLeft();
+		Vector3 topRight = bounds.getTopRight();
 		
-		Vector3 topLeft = graphicsData.getCoordinatorData().getBounds().getTopLeft();
-		Vector3 topRight = graphicsData.getCoordinatorData().getBounds().getTopRight();
-		
-		Vector3 bottomLeft = graphicsData.getCoordinatorData().getBounds().getBottomLeft();
-		Vector3 bottomRight = graphicsData.getCoordinatorData().getBounds().getBottomRight();
+		Vector3 bottomLeft = bounds.getBottomLeft();
+		Vector3 bottomRight = bounds.getBottomRight();
 		
 		gl.glDisable(GL2.GL_LIGHTING);
 		gl.glDisable(GL.GL_DEPTH_TEST);

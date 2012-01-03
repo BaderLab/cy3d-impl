@@ -26,15 +26,13 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				graphicsData.getCoordinatorData().setBounds(coordinator.getCurrentBirdsEyeBounds());
 			}
 			
-			SimpleCamera camera = graphicsData.getCamera();
 			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
+			SimpleCamera camera = coordinator.getCurrentMainCamera();
 			
 			if (coordinator.mainCameraChanged()) {
-				coordinatorData.setBounds(ViewingCoordinator.extractBounds(coordinator.getCurrentMainCamera(),
+				coordinatorData.setBounds(ViewingCoordinator.extractNewDrawnBounds(camera.getPosition(), 
+						camera.getDirection(), camera.getUp(), camera.getDistance(), 
 						coordinator.getMainVerticalFov(), coordinator.getMainAspectRatio()));
-			
-//				System.out.println("New Bounds: " + ViewingCoordinator.extractBounds(coordinator.getCurrentMainCamera(),
-//						coordinator.getMainVerticalFov(), coordinator.getMainAspectRatio()));
 				
 //				updateBirdsEyeCamera(coordinator, graphicsData);
 				
@@ -46,8 +44,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 			}
 			
 			updateBirdsEyeCamera(coordinator, graphicsData);
-		}
-		
+		}		
 	}
 
 	private void updateBirdsEyeCamera(ViewingCoordinator coordinator,

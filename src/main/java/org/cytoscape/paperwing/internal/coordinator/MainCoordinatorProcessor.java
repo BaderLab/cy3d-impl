@@ -19,6 +19,8 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 			GraphicsData graphicsData) {
 		
 		if (!coordinator.isBoundsInitialized()) {
+			SimpleCamera camera = graphicsData.getCamera();
+			
 			double verticalFov = graphicsData.getVerticalFov();
 			double aspectRatio = (float) graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1));
 			
@@ -27,9 +29,9 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 			
 			System.out.println("ScreenWidth: " + graphicsData.getScreenWidth() + ", ScreenHeight: " + graphicsData.getScreenHeight());
 			System.out.println("Initialing birds eye bounds: fov " + verticalFov + ", aspectRatio " + aspectRatio);
-			coordinator.setInitialBirdsEyeBounds(ViewingCoordinator.extractBounds(graphicsData.getCamera(), 
-					verticalFov, 
-					aspectRatio));
+			
+			coordinator.setInitialBirdsEyeBounds(ViewingCoordinator.extractNewDrawnBounds(camera.getPosition(), 
+					camera.getDirection(), camera.getUp(), camera.getDistance(), verticalFov, aspectRatio));
 			
 			//debug
 			System.out.println("Initial bounds: " + coordinator.getCurrentBirdsEyeBounds());
