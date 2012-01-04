@@ -6,8 +6,8 @@ import java.util.Set;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class CameraInputHandler implements InputHandler {
@@ -40,7 +40,7 @@ public class CameraInputHandler implements InputHandler {
 			if (!selectedNodeIndices.isEmpty()) {
 				// TODO: Check if this is a suitable place to put this, as
 				// it helps to make node dragging smoother
-				Vector3 averagePosition = GraphicsUtility.findCenter(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
+				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 			}
 		}

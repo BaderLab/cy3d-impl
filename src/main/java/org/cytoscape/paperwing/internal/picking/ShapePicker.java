@@ -13,7 +13,7 @@ import javax.media.opengl.glu.GLU;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class ShapePicker {
 

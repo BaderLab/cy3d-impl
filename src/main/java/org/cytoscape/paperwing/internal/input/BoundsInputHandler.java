@@ -4,8 +4,8 @@ import org.cytoscape.paperwing.internal.data.CoordinatorData;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.GeometricComputer;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 import com.jogamp.newt.event.MouseEvent;
 
@@ -23,14 +23,14 @@ public class BoundsInputHandler implements InputHandler {
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		if (mouse.getHeld().contains(MouseEvent.BUTTON1)) {
-			Vector3 mousePosition = GraphicsUtility.convertMouseTo3d(mouse, graphicsData, camera.getDistance());
+			Vector3 mousePosition = GeometricComputer.convertMouseTo3d(mouse, graphicsData, camera.getDistance());
 			
 			// The y-coordinate needs to be inverted
 			// mousePosition.set(mousePosition.x(), -mousePosition.y(), mousePosition.z());
 			
 			Quadrilateral oldBounds = coordinatorData.getBounds();
 			
-			Vector3 newCenterPoint = GraphicsUtility.findLinePlaneIntersection(camera.getPosition(), 
+			Vector3 newCenterPoint = GeometricComputer.findLinePlaneIntersection(camera.getPosition(), 
 					mousePosition.subtract(camera.getPosition()), oldBounds.getCenterPoint(), camera.getDirection());
 			oldBounds.moveTo(newCenterPoint);
 		}

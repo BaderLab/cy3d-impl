@@ -6,6 +6,7 @@ public class MainInputProcessor implements InputProcessor {
 	
 	private InputHandler cameraInputHandler = new CameraInputHandler();
 	private InputHandler networkChangeInputHandler = new NetworkChangeInputHandler();
+	private InputHandler dragMovementInputHandler = new DragMovementInputHandler();
 	private InputHandler selectionInputHandler = new SelectionInputHandler();
 	
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
@@ -13,6 +14,7 @@ public class MainInputProcessor implements InputProcessor {
 
 		cameraInputHandler.processInput(keys, mouse, graphicsData);
 		networkChangeInputHandler.processInput(keys, mouse, graphicsData);
+		dragMovementInputHandler.processInput(keys, mouse, graphicsData);
 		selectionInputHandler.processInput(keys, mouse, graphicsData);
 		
 		keys.update();

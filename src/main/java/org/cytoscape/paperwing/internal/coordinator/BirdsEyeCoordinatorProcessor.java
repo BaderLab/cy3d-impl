@@ -3,8 +3,8 @@ package org.cytoscape.paperwing.internal.coordinator;
 import org.cytoscape.paperwing.internal.data.CoordinatorData;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 
@@ -54,8 +54,8 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 		// Update the birds eye view camera
 		camera.copyOrientation(coordinator.getCurrentMainCamera());
 		
-		Vector3 networkCenter = GraphicsUtility.findNetworkCenter(graphicsData.getNetworkView(), graphicsData.getDistanceScale());
-		Vector3 farthestNode = GraphicsUtility.findFarthestNodeFromCenter(graphicsData.getNetworkView(), networkCenter, graphicsData.getDistanceScale());
+		Vector3 networkCenter = NetworkToolkit.findNetworkCenter(graphicsData.getNetworkView(), graphicsData.getDistanceScale());
+		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(graphicsData.getNetworkView(), networkCenter, graphicsData.getDistanceScale());
 		
 		double newDistance = farthestNode.distance(networkCenter);
 		

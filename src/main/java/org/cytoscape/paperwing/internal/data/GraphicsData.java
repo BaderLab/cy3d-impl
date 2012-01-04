@@ -8,7 +8,7 @@ import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 

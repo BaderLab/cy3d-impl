@@ -14,8 +14,8 @@ import org.cytoscape.model.CyNode;
 // import org.cytoscape.paperwing.internal.Graphics.DrawStateModifier;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.RenderColor;
+import org.cytoscape.paperwing.internal.tools.RenderColor;
+import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
@@ -361,7 +361,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 		Vector3 direction = end.subtract(start);
 
-		GraphicsUtility.setUpFacingTransformation(gl, start, direction);
+		RenderToolkit.setUpFacingTransformation(gl, start, direction);
 
 		// Perform a transformation to adjust length
 		gl.glScalef(1.0f, 1.0f, (float) direction.magnitude());
@@ -381,7 +381,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
 					color.getBlue() / 255.0f);
 
-			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_COLOR);
+			RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
 			
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.ENLARGED) {
@@ -394,11 +394,11 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 //			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
 //					color.getBlue() / 255.0f);
 
-			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
+			RenderColor.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
 			gl.glScalef(1.1f, 1.1f, 1.0f);
 			gl.glCallList(edgeListIndex);
 		} else if (modifier == DrawStateModifier.HOVERED) {
-			GraphicsUtility.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
+			RenderColor.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
 			gl.glCallList(edgeListIndex);
 			// } else if (modifier == DrawStateModifier.SELECT_BORDER) {
 			// gl.glColor3f(0.72f, 0.31f, 0.40f);

@@ -1,4 +1,6 @@
-package org.cytoscape.paperwing.internal.utility;
+package org.cytoscape.paperwing.internal.tools;
+
+import javax.media.opengl.GL2;
 
 public class RenderColor {
 	private static final double DEFAULT_ALPHA = 1.0;
@@ -37,5 +39,9 @@ public class RenderColor {
 	
 	public double getAlpha() {
 		return alpha;
+	}
+
+	public static void setNonAlphaColors(GL2 gl, RenderColor color) {
+		gl.glColor3d(color.getRed(), color.getGreen(), color.getBlue());
 	}
 }

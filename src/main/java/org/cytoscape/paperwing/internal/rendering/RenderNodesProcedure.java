@@ -10,8 +10,7 @@ import javax.media.opengl.glu.GLUquadric;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.RenderColor;
+import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
@@ -132,9 +131,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						true);
 
-				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
+				RenderColor.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
 			} else if (index == hoverNodeIndex) {
-				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
+				RenderColor.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
 
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						false);
@@ -148,7 +147,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						false);
 
-				GraphicsUtility.setNonAlphaColors(gl, DEFAULT_COLOR);
+				RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
 
 			}
 

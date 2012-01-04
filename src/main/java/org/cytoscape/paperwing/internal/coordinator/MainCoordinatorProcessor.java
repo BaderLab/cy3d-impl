@@ -2,7 +2,7 @@ package org.cytoscape.paperwing.internal.coordinator;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class MainCoordinatorProcessor implements CoordinatorProcessor {
 	

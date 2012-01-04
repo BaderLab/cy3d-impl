@@ -1,45 +1,14 @@
-package org.cytoscape.paperwing.internal.utility;
+package org.cytoscape.paperwing.internal.tools;
 
 import java.util.Collection;
-import java.util.Set;
 
-import javax.media.opengl.GL2;
 
-import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
-public class GraphicsUtility {
-	
-	/** Set up matrix transformations such that the position is 
-	 * equal to the location vector and the z-axis is in the direction 
-	 * of the given direction
-	 * 
-	 * @param gl The {@link GL2} rendering object
-	 * @param location The desired position
-	 * @param direction The desired direction, does not have to be a 
-	 * unit vector
-	 * 			
-	 */
-	public static void setUpFacingTransformation(GL2 gl, Vector3 location, Vector3 direction) {
-		gl.glTranslated(location.x(), location.y(), location.z());
-		
-		Vector3 current = new Vector3(0, 0, 1);
-		Vector3 rotateAxis = current.cross(direction);
-		
-		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
-				rotateAxis.z());
-	}
-	
-	
-	public static void setNonAlphaColors(GL2 gl, RenderColor color) {
-		gl.glColor3d(color.getRed(), color.getGreen(), color.getBlue());
-	}
+public class GeometricComputer {
 	
 	/**
 	 * Converts 2D screen coordinates to 3D OpenGL coordinates, where the
@@ -142,93 +111,6 @@ public class GraphicsUtility {
 		return new Quadrilateral(topLeft, topRight, bottomLeft, bottomRight);
 	}
 	
-	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
-		if (nodeIndices.isEmpty()) {
-			return null;
-		}
-		
-		double x = 0, y = 0, z = 0;
-		int visitedCount = 0;
-		
-		View<CyNode> nodeView;
-		
-		for (Integer index : nodeIndices) {
-			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
-			
-			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
-				visitedCount++;
-			}
-		}
-		
-		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(distanceScale * visitedCount);
-		
-		return result;
-	}
-	
-	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {
-		
-		double x = 0, y = 0, z = 0;
-		int visitedCount = 0;
-		
-		View<CyNode> nodeView;
-		
-		for (CyNode node : networkView.getModel().getNodeList()) {
-			nodeView = networkView.getNodeView(node);
-			
-			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
-				visitedCount++;
-			}
-		}
-		
-		Vector3 result = new Vector3(x, y, z);
-		
-		if (visitedCount != 0) {
-			result.divideLocal(distanceScale * visitedCount);
-		}
-		
-		return result;
-	}
-	
-	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, Vector3 networkCenter, double distanceScale) {
-		double currentDistanceSquared;
-		double maxDistanceSquared = 0;
-		
-		Vector3 currentPosition = new Vector3();
-		Vector3 maxPosition = new Vector3();
-		
-		View<CyNode> nodeView;
-		
-		for (CyNode node : networkView.getModel().getNodeList()) {
-			nodeView = networkView.getNodeView(node);
-			
-			currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-			currentPosition.divideLocal(distanceScale);
-			
-			currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
-			
-			if (currentDistanceSquared > maxDistanceSquared) {
-				maxDistanceSquared = currentDistanceSquared;
-				maxPosition.set(currentPosition);
-			}
-		}
-		
-		return maxPosition;
-	}
-
-	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, double distanceScale) {
-		return findFarthestNodeFromCenter(networkView, findNetworkCenter(networkView, distanceScale), distanceScale);
-	}
-	
-	
 	// Just like Math.acos, but a bit safer
 	public static double saferArcCos(double argument) {
 		if (argument >= 1) {
@@ -250,7 +132,7 @@ public class GraphicsUtility {
 		double dotProduct = diagonalDisplacement.dot(normal);
 		
 		// Use the dot product formula to find angle between diagonal displacement and camera's direction vector
-		double angle = GraphicsUtility.saferArcCos(dotProduct / diagonalLength);
+		double angle = GeometricComputer.saferArcCos(dotProduct / diagonalLength);
 		
 		double orthogonalDisplacementLength = Math.cos(angle) * diagonalLength;
 		
@@ -265,8 +147,8 @@ public class GraphicsUtility {
 		
 		return result;
 	}
-	
-	
+
+
 	// Assumes lineDirection points from lineSamplePoint into the plane
 	public static Vector3 findLinePlaneIntersection(Vector3 lineSamplePoint, Vector3 lineDirection, Vector3 planeSamplePoint, Vector3 planeNormal) {
 		
@@ -281,13 +163,26 @@ public class GraphicsUtility {
 		// Use sine law
 		// sin(intersection) / hypotenuse = sin(planeHypotenuseAngle) / lineOffsetMagnitude (desired)
 		
-		double lineOffsetMagnitude = Math.sin(planeHypotenuseAngle) * hypotenuse / Math.sin(intersectionCornerAngle);
+		double lineOffsetMultiplier = Math.sin(planeHypotenuseAngle) * hypotenuse / Math.sin(intersectionCornerAngle);
 		
 		Vector3 lineOffset = lineDirection.normalize();
-		lineOffset.multiplyLocal(lineOffsetMagnitude);
+		lineOffset.multiplyLocal(lineOffsetMultiplier);
+
+		// TODO: Correct for when lineDirection points away from the plane?
 		
 		Vector3 result = lineSamplePoint.plus(lineOffset);
 		
 		return result;
+	}
+	
+	// Distance from nearPoint to farPoint along the normal
+	public static double findOrthogonalDistance(Vector3 nearPoint, Vector3 farPoint, Vector3 normal) {
+		
+		Vector3 displacement = farPoint.subtract(nearPoint);
+		double hypotenuse = displacement.magnitude();
+
+		double angle = displacement.angle(normal);
+		
+		return Math.abs(Math.cos(angle) * hypotenuse);
 	}
 }

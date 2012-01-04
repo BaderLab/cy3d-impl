@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.utility.GraphicsUtility;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.GeometricComputer;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class ViewingCoordinator {
@@ -40,20 +40,14 @@ public class ViewingCoordinator {
 	// Assumes 1 CyNetworkView object per main-bird pair
 	private static Map<CyNetworkView, ViewingCoordinator> coordinators = new LinkedHashMap<CyNetworkView, ViewingCoordinator>();
 	
-	// 1:1 relationship between coordinators and networkViews, can use this to make an inverse map used to remove coordinators from
-	// the maps
-	private static Map<ViewingCoordinator, CyNetworkView> networkViews = new LinkedHashMap<ViewingCoordinator, CyNetworkView>();
-	
-
-	
 	
 	// Orthogonally shifts the camera to match new bounds, orthogonal with respect to the camera's direction vector
 	public static Vector3 findNewOrthoCameraPosition(Quadrilateral newBounds, Vector3 oldCameraPosition, Vector3 cameraDirection) {
-		return GraphicsUtility.findNewOrthogonalAnchoredPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
+		return GeometricComputer.findNewOrthogonalAnchoredPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
 	}
 	
 	public static Quadrilateral extractNewDrawnBounds(Vector3 cameraPosition, Vector3 cameraDirection, Vector3 cameraUp, double cameraDistance, double verticalFov, double aspectRatio) {
-		return GraphicsUtility.generateViewingBounds(cameraPosition, cameraDirection, cameraUp, 
+		return GeometricComputer.generateViewingBounds(cameraPosition, cameraDirection, cameraUp, 
 				cameraDistance, verticalFov, aspectRatio);
 	}
 	
@@ -72,7 +66,6 @@ public class ViewingCoordinator {
 		ViewingCoordinator coordinator = new ViewingCoordinator(networkView);
 		
 		coordinators.put(networkView, coordinator);
-		networkViews.put(coordinator, networkView);
 		
 		return coordinator;
 	}
@@ -204,10 +197,8 @@ public class ViewingCoordinator {
 		
 		// Both unlinked; prepare to remove this object
 		if (birdsEyeStatus == CoordinatorStatus.CLAIMED_AND_UNLINKED) {
-			CyNetworkView networkView = networkViews.get(this);
-			
-			coordinators.remove(networkView);
-			networkViews.remove(this);
+
+			removeFromList();
 		}
 	}
 	
@@ -217,10 +208,17 @@ public class ViewingCoordinator {
 		
 		// Both unlinked; prepare to remove this object
 		if (mainStatus == CoordinatorStatus.CLAIMED_AND_UNLINKED) {
-			CyNetworkView networkView = networkViews.get(this);
 			
-			coordinators.remove(networkView);
-			networkViews.remove(this);
+			removeFromList();
+		}
+	}
+	
+	private void removeFromList() {
+		for (CyNetworkView networkView : coordinators.keySet()) {
+			if (coordinators.get(networkView) == this) {
+				coordinators.remove(networkView);
+				return;
+			}
 		}
 	}
 

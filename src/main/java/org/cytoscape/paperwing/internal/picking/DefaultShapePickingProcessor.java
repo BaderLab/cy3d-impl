@@ -16,7 +16,7 @@ import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.picking.ShapePicker.PickResults;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
-import org.cytoscape.paperwing.internal.utility.SimpleCamera;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
@@ -44,11 +44,13 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		this.drawEdgesProcedure = drawEdgesProcedure;
 	}
 	
+	@Override
 	public void initialize(GraphicsData graphicsData) {
 		drawNodesProcedure.initialize(graphicsData);
 		drawEdgesProcedure.initialize(graphicsData);
 	}
 	
+	@Override
 	public void processPicking(MouseMonitor mouse, KeyboardMonitor keys, GraphicsData graphicsData) {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 	

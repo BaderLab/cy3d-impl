@@ -1,6 +1,7 @@
-package org.cytoscape.paperwing.internal.utility;
+package org.cytoscape.paperwing.internal.tools;
 
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+
 
 /** A class representing a 3D camera object possessing a direction, up, left,
  * as well as a position vector
