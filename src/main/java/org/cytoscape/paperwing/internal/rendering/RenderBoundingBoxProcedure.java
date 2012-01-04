@@ -14,7 +14,7 @@ import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.57, 0.57, 0.57);
+		new RenderColor(0.27, 0.27, 0.27);
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
@@ -24,7 +24,9 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 //		drawFullBox(graphicsData);
 		
-		drawHalfBox(graphicsData);
+		if (graphicsData.getCoordinatorData().isInitialBoundsMatched()) {
+			drawHalfBox(graphicsData);
+		}
 	}
 	
 	private void drawHalfBox(GraphicsData graphicsData) {

@@ -38,7 +38,8 @@ public class SelectionInputHandler implements InputHandler {
 		Set<Integer> selectedNodeIndices = selectionData.getSelectedNodeIndices();
 		Set<Integer> selectedEdgeIndices = selectionData.getSelectedEdgeIndices();
 		
-		if (!selectionData.isDragSelectMode()) {
+		if (!selectionData.isDragSelectMode()
+				&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 				

@@ -20,39 +20,60 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 			GraphicsData graphicsData) {
 		
 		if (coordinator.isMainClaimed()) {
+			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
 			
 			// Initialize bounds if not done so
-			if (!coordinator.isBoundsInitialized()) {
-				graphicsData.getCoordinatorData().setBounds(coordinator.getCurrentBirdsEyeBounds());
+			if (coordinator.isInitialMainCameraInitialized()
+					&& !coordinator.isInitialBoundsMatched()) {
+				
+				coordinatorData.setBoundsTo(coordinator.getMainCameraBounds());
+				coordinatorData.setInitialBoundsMatched(true);
+				coordinator.setInitialBoundsMatched(true);
 			}
 			
-			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
-			SimpleCamera camera = coordinator.getCurrentMainCamera();
-			
-			if (coordinator.mainCameraChanged()) {
-				coordinatorData.setBounds(ViewingCoordinator.extractNewDrawnBounds(camera.getPosition(), 
-						camera.getDirection(), camera.getUp(), camera.getDistance(), 
-						coordinator.getMainVerticalFov(), coordinator.getMainAspectRatio()));
+			// This is the regular case
+			if (coordinator.isInitialBoundsMatched()) {
 				
-//				updateBirdsEyeCamera(coordinator, graphicsData);
+				// User moved box, this case takes priority
+				if (coordinatorData.isBoundsManuallyChanged()) {
+					
+					// Transfer data to coordinator
+					coordinator.setBirdsEyeBoundsCopy(coordinatorData.getBounds());
+					
+					// Set flag
+					coordinator.setBirdsEyeBoundsMoved(true);
+					
+					// Unset internal flag
+					coordinatorData.setBoundsManuallyChanged(false);
+					
+				// User moved the main camera
+				} else if (coordinator.isMainCameraMoved()) {
+					
+					// Obtain data from coordinator
+					coordinatorData.setBoundsTo(coordinator.calculateBounds());
+					
+					// Unset flag
+					coordinator.setMainCameraMoved(false);
+				}
 				
-//				System.out.println("Camera Displacement from center: " + camera.getPosition().distance(networkCenter));
-				
-				coordinator.updateMainCamera();
-			} else if (coordinator.compareBirdsEyeBoundsChanged(coordinatorData.getBounds())) {
-				coordinator.updateBirdsEyeBounds(coordinatorData.getBounds());
+				// Zoom to extents, use appropriate angles
+				updateBirdsEyeCamera(coordinator.getMainCameraCopy(), graphicsData);	
 			}
 			
-			updateBirdsEyeCamera(coordinator, graphicsData);
-		}		
+			// main should check bounds moved first, then perform its own update
+		} else {
+			
+			// Update camera using default angles
+			updateBirdsEyeCamera(graphicsData.getCamera(), graphicsData);
+		}
 	}
 
-	private void updateBirdsEyeCamera(ViewingCoordinator coordinator,
+	private void updateBirdsEyeCamera(SimpleCamera mainCameraCopy,
 			GraphicsData graphicsData) {
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		// Update the birds eye view camera
-		camera.copyOrientation(coordinator.getCurrentMainCamera());
+		camera.set(mainCameraCopy);
 		
 		Vector3 networkCenter = NetworkToolkit.findNetworkCenter(graphicsData.getNetworkView(), graphicsData.getDistanceScale());
 		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(graphicsData.getNetworkView(), networkCenter, graphicsData.getDistanceScale());

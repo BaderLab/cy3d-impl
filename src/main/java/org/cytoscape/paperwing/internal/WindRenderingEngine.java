@@ -90,7 +90,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				GLCapabilities capabilities = new GLCapabilities(profile);
 	
 				// TODO: check if this line should be moved to graphics object
-				// capabilities.setDoubleBuffered(true);
+				capabilities.setDoubleBuffered(true);
 				
 				// TODO: check whether to use GLCanvas or GLJPanel
 				GLJPanel panel = new GLJPanel(capabilities);

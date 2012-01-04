@@ -50,6 +50,7 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 		return new Graphics(networkView, visualLexicon, new MainGraphicsHandler());
 	}
 	
+	
 	@Override
 	protected void setUpAnimatorStarting(Container container, FPSAnimator animator) {
 		container.addFocusListener(getContainerFocusListener(animator));
@@ -77,4 +78,5 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 		};
 	}
 
+	
 }

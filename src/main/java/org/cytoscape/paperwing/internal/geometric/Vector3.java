@@ -161,6 +161,16 @@ public class Vector3 {
 		}
 	}
 	
+	public double angleAcute(Vector3 other) {
+		double angle = this.angle(other);
+		
+		if (angle > Math.PI / 2) {
+			return (Math.PI - angle);
+		} else {
+			return angle;
+		}
+	}
+	
 	/** Find the cross product between this vector and another vector
 	 * 
 	 * @param other The other vector used to find the cross product

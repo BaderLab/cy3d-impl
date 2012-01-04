@@ -8,7 +8,7 @@ import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 
-public class GeometricComputer {
+public class GeometryToolkit {
 	
 	/**
 	 * Converts 2D screen coordinates to 3D OpenGL coordinates, where the
@@ -111,6 +111,14 @@ public class GeometricComputer {
 		return new Quadrilateral(topLeft, topRight, bottomLeft, bottomRight);
 	}
 	
+	
+	public static Vector3 generateCameraPosition(Quadrilateral bounds, Vector3 cameraDirection, double planeDistance) {
+		Vector3 offset = cameraDirection.normalize();
+		offset.multiplyLocal(planeDistance);
+		
+		return bounds.getCenterPoint().subtract(offset);
+	}
+	
 	// Just like Math.acos, but a bit safer
 	public static double saferArcCos(double argument) {
 		if (argument >= 1) {
@@ -132,7 +140,7 @@ public class GeometricComputer {
 		double dotProduct = diagonalDisplacement.dot(normal);
 		
 		// Use the dot product formula to find angle between diagonal displacement and camera's direction vector
-		double angle = GeometricComputer.saferArcCos(dotProduct / diagonalLength);
+		double angle = GeometryToolkit.saferArcCos(dotProduct / diagonalLength);
 		
 		double orthogonalDisplacementLength = Math.cos(angle) * diagonalLength;
 		
@@ -152,11 +160,11 @@ public class GeometricComputer {
 	// Assumes lineDirection points from lineSamplePoint into the plane
 	public static Vector3 findLinePlaneIntersection(Vector3 lineSamplePoint, Vector3 lineDirection, Vector3 planeSamplePoint, Vector3 planeNormal) {
 		
-		Vector3 sampleOffset = planeSamplePoint.subtract(lineSamplePoint);
-		double hypotenuse = sampleOffset.magnitude();
+		Vector3 sampleDisplacement = planeSamplePoint.subtract(lineSamplePoint);
+		double hypotenuse = sampleDisplacement.magnitude();
 		
-		double lineHypotenuseAngle = lineDirection.angle(sampleOffset);
-		double planeHypotenuseAngle = Math.PI / 2 - planeNormal.angle(sampleOffset);
+		double lineHypotenuseAngle = lineDirection.angle(sampleDisplacement);
+		double planeHypotenuseAngle = Math.PI / 2 - planeNormal.angle(sampleDisplacement);
 		
 		double intersectionCornerAngle = Math.PI - lineHypotenuseAngle - planeHypotenuseAngle;
 		

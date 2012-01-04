@@ -7,7 +7,7 @@ import javax.media.opengl.GL2;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.tools.GeometricComputer;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
@@ -48,17 +48,17 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		SimpleCamera camera = graphicsData.getCamera();
 		double drawDistance = graphicsData.getCamera().getDistance();
 
-		Vector3 topLeft = GeometricComputer.convertScreenTo3d(
+		Vector3 topLeft = GeometryToolkit.convertScreenTo3d(
 				selectTopLeftX, selectTopLeftY, screenWidth, screenHeight,
 				drawDistance, camera);
-		Vector3 bottomLeft = GeometricComputer.convertScreenTo3d(
+		Vector3 bottomLeft = GeometryToolkit.convertScreenTo3d(
 				selectTopLeftX, selectBottomRightY, screenWidth, screenHeight,
 				drawDistance, camera);
 
-		Vector3 topRight = GeometricComputer.convertScreenTo3d(
+		Vector3 topRight = GeometryToolkit.convertScreenTo3d(
 				selectBottomRightX, selectTopLeftY, screenWidth, screenHeight,
 				drawDistance, camera);
-		Vector3 bottomRight = GeometricComputer.convertScreenTo3d(
+		Vector3 bottomRight = GeometryToolkit.convertScreenTo3d(
 				selectBottomRightX, selectBottomRightY, screenWidth,
 				screenHeight, drawDistance, camera);
 

@@ -9,7 +9,7 @@ import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.tools.GeometricComputer;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -38,7 +38,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 		if (pressed.contains(KeyEvent.VK_N)) {
 			
 			// Project mouse coordinates into 3d space to determine where to put the node
-			Vector3 projection = GeometricComputer.convertScreenTo3d(
+			Vector3 projection = GeometryToolkit.convertScreenTo3d(
 					mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
 					graphicsData.getScreenHeight(), camera.getDistance(), camera);
 			

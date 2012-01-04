@@ -2,28 +2,32 @@ package org.cytoscape.paperwing.internal.coordinator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.jar.Manifest;
 
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.tools.GeometricComputer;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class ViewingCoordinator {
 
-	public static double BOUNDS_CHANGE_THRESHOLD = 5e-10;
-	public static double CAMERA_CHANGE_THRESHOLD = 5e-10;
+	public static double BOUNDS_CHANGE_THRESHOLD = 5e-16;
+	public static double CAMERA_CHANGE_THRESHOLD = 5e-3;
 	
-	private SimpleCamera currentMainCamera;
-	private Quadrilateral currentBirdsEyeBounds;
+	private SimpleCamera mainCameraCopy;
+	private Quadrilateral birdsEyeBoundsCopy;
 
-	private boolean mainCameraChanged = false;
-	private boolean birdsEyeBoundsChanged = false;
 	
-	private double mainVerticalFov;
-	private double mainAspectRatio;
 	
-	private boolean boundsInitialized = false;
+	
+	private double verticalFov;
+	private double aspectRatio;
+	
+	private boolean mainCameraMoved = false;
+	private boolean birdsEyeBoundsMoved = false;
+	private boolean initialMainCameraInitialized = false;
+	private boolean initialBoundsMatched = false;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -43,19 +47,31 @@ public class ViewingCoordinator {
 	
 	// Orthogonally shifts the camera to match new bounds, orthogonal with respect to the camera's direction vector
 	public static Vector3 findNewOrthoCameraPosition(Quadrilateral newBounds, Vector3 oldCameraPosition, Vector3 cameraDirection) {
-		return GeometricComputer.findNewOrthogonalAnchoredPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
+		return GeometryToolkit.findNewOrthogonalAnchoredPosition(newBounds.getCenterPoint(), oldCameraPosition, cameraDirection);
 	}
 	
-	public static Quadrilateral extractNewDrawnBounds(Vector3 cameraPosition, Vector3 cameraDirection, Vector3 cameraUp, double cameraDistance, double verticalFov, double aspectRatio) {
-		return GeometricComputer.generateViewingBounds(cameraPosition, cameraDirection, cameraUp, 
-				cameraDistance, verticalFov, aspectRatio);
+	public void updateVerticalFov(double verticalFov) {
+		this.verticalFov = verticalFov;
+	}
+	
+	public void updateAspectRatio(double aspectRatio) {
+		this.aspectRatio = aspectRatio;
+	}
+	
+	public Quadrilateral getMainCameraBounds() {
+		Quadrilateral bounds;
+		
+		bounds = GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
+				mainCameraCopy.getDirection(), mainCameraCopy.getUp(), mainCameraCopy.getDistance(), verticalFov, aspectRatio);
+		
+		return bounds;
 	}
 	
 	// This networkView is only used to differentiate between main camera and
 	// birds eye camera pairs
 	private ViewingCoordinator(CyNetworkView networkView) {
-		currentMainCamera = new SimpleCamera();
-		currentBirdsEyeBounds = new Quadrilateral();
+		mainCameraCopy = new SimpleCamera();
+		birdsEyeBoundsCopy = new Quadrilateral();
 	}
 	
 	public static ViewingCoordinator getCoordinator(CyNetworkView networkView) {
@@ -70,87 +86,47 @@ public class ViewingCoordinator {
 		return coordinator;
 	}
 	
-	// Stores a copy of the given camera
-	public void setInitialMainCameraOrientation(SimpleCamera mainCamera) {
-		currentMainCamera.copyOrientation(currentMainCamera);
-	}
 	
-	// Stores a copy of the bounds
-	public void setInitialBirdsEyeBounds(Quadrilateral bounds) {
-		currentBirdsEyeBounds.set(bounds);
-		
-		boundsInitialized = true;
-	}
 	
-	// Update orientation
-	public void updateMainCamera(SimpleCamera newMainCamera) {
-		currentMainCamera.copyOrientation(newMainCamera);
-		mainCameraChanged = true;
-	}
 	
-	// Update orientation
-	public void updateBirdsEyeBounds(Quadrilateral newBounds) {
-		currentBirdsEyeBounds.set(newBounds);
-		birdsEyeBoundsChanged = true;
-	}
-	
-	public boolean compareMainCameraChanged(SimpleCamera newMainCamera) {
+	public boolean checkCameraChanged(SimpleCamera mainCamera) {
 		double threshold = CAMERA_CHANGE_THRESHOLD;
 		
-		if (currentMainCamera.getPosition().distanceSquared(newMainCamera.getPosition()) > threshold) {
+		// Positional movement
+		if (mainCameraCopy.getPosition().distanceSquared(mainCamera.getPosition()) > threshold) {
 			return true;
-		} else if (currentMainCamera.getDirection().distanceSquared(newMainCamera.getDirection()) > threshold) {
+		// Rotation
+		} else if (mainCameraCopy.getDirection().distanceSquared(mainCamera.getDirection()) > threshold) {
 			return true;
-		} else if (currentMainCamera.getUp().distanceSquared(newMainCamera.getUp()) > threshold) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean compareBirdsEyeBoundsChanged(Quadrilateral newBounds) {
-		double threshold = BOUNDS_CHANGE_THRESHOLD;
-		
-		if (currentBirdsEyeBounds.getTopLeft().distanceSquared(newBounds.getTopLeft()) > threshold) {
-			return true;
-		} else if (currentBirdsEyeBounds.getTopRight().distanceSquared(newBounds.getTopRight()) > threshold) {
-			return true;
-		} else if (currentBirdsEyeBounds.getBottomLeft().distanceSquared(newBounds.getBottomLeft()) > threshold) {
-			return true;
-		} else if (currentBirdsEyeBounds.getBottomRight().distanceSquared(newBounds.getBottomRight()) > threshold) {
+		// Camera rolling
+		} else if (mainCameraCopy.getUp().distanceSquared(mainCamera.getUp()) > threshold) {
 			return true;
 		}
 		
 		return false;
 	}
+
+	// Returns null if main camera not initialized
+	public Quadrilateral calculateBounds() {
+		if (!initialMainCameraInitialized) {
+			return null;
+		} else {
+			return GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
+					mainCameraCopy.getDirection(), 
+					mainCameraCopy.getUp(),
+					mainCameraCopy.getDistance(), verticalFov, aspectRatio);
+		}
+	}
 	
 	
-	// Get the updated camera
-	public SimpleCamera getCurrentMainCamera() {
-		return currentMainCamera;
+	public Vector3 calculateCameraPosition(Vector3 cameraDirection, double distance) {
+		if (!initialBoundsMatched) {
+			return null;
+		} else {
+			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, distance);
+		}
 	}
-
-	// Get the updated camera
-	public Quadrilateral getCurrentBirdsEyeBounds() {
-		return currentBirdsEyeBounds;
-	}
-
-	public boolean mainCameraChanged() {
-		return mainCameraChanged;
-	}
-
-	public boolean birdsEyeBoundsChanged() {
-		return birdsEyeBoundsChanged;
-	}
-
-	public void updateMainCamera() {
-		mainCameraChanged = false;
-	}
-
-	public void updateBirdsEyeBounds() {
-		birdsEyeBoundsChanged = false;
-	}
-
+	
 	// Claim by a main window rendering object
 	public void claimMain() {
 		mainStatus = CoordinatorStatus.CLAIMED_AND_LINKED;
@@ -223,23 +199,66 @@ public class ViewingCoordinator {
 	}
 
 	public void setMainVerticalFov(double mainVerticalFov) {
-		this.mainVerticalFov = mainVerticalFov;
+		this.verticalFov = mainVerticalFov;
 	}
 
 	public double getMainVerticalFov() {
-		return mainVerticalFov;
+		return verticalFov;
 	}
 
 	public void setMainAspectRatio(double mainAspectRatio) {
-		this.mainAspectRatio = mainAspectRatio;
+		this.aspectRatio = mainAspectRatio;
 	}
 
 	public double getMainAspectRatio() {
-		return mainAspectRatio;
+		return aspectRatio;
 	}
 
-	public boolean isBoundsInitialized() {
-		return boundsInitialized;
+	public void setMainCameraMoved(boolean mainCameraMoved) {
+		this.mainCameraMoved = mainCameraMoved;
 	}
+
+	public boolean isMainCameraMoved() {
+		return mainCameraMoved;
+	}
+
+	public void setBirdsEyeBoundsMoved(boolean birdsEyeBoundsMoved) {
+		this.birdsEyeBoundsMoved = birdsEyeBoundsMoved;
+	}
+
+	public boolean isBirdsEyeBoundsMoved() {
+		return birdsEyeBoundsMoved;
+	}
+
+	public void setInitialMainCameraInitialized(boolean initialMainCameraInitialized) {
+		this.initialMainCameraInitialized = initialMainCameraInitialized;
+	}
+
+	public boolean isInitialMainCameraInitialized() {
+		return initialMainCameraInitialized;
+	}
+
+	public void setInitialBoundsMatched(boolean boundsInitialSynchronized) {
+		this.initialBoundsMatched = boundsInitialSynchronized;
+	}
+
+	public boolean isInitialBoundsMatched() {
+		return initialBoundsMatched;
+	}
+
+	public Quadrilateral getBirdsEyeBoundsCopy() {
+		return birdsEyeBoundsCopy;
+	}
+
+	public void setBirdsEyeBoundsCopy(Quadrilateral birdsEyeBounds) {
+		this.birdsEyeBoundsCopy.set(birdsEyeBounds);
+	}
+
+	public SimpleCamera getMainCameraCopy() {
+		return mainCameraCopy;
+	}	
 	
+	public void setMainCameraCopy(SimpleCamera camera) {
+		mainCameraCopy.set(camera);
+	}
 }

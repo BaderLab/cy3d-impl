@@ -1,7 +1,9 @@
 package org.cytoscape.paperwing.internal.coordinator;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class MainCoordinatorProcessor implements CoordinatorProcessor {
@@ -11,50 +13,48 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 	public void initializeCoordinator(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
 		coordinator.claimMain();
-		coordinator.setInitialMainCameraOrientation(graphicsData.getCamera());
 	}
 	
 	@Override
 	public void extractData(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
 		
-		if (!coordinator.isBoundsInitialized()) {
-			SimpleCamera camera = graphicsData.getCamera();
-			
-			double verticalFov = graphicsData.getVerticalFov();
-			double aspectRatio = (float) graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1));
-			
-			coordinator.setMainVerticalFov(verticalFov);
-			coordinator.setMainAspectRatio(aspectRatio);
-			
-			System.out.println("ScreenWidth: " + graphicsData.getScreenWidth() + ", ScreenHeight: " + graphicsData.getScreenHeight());
-			System.out.println("Initialing birds eye bounds: fov " + verticalFov + ", aspectRatio " + aspectRatio);
-			
-			coordinator.setInitialBirdsEyeBounds(ViewingCoordinator.extractNewDrawnBounds(camera.getPosition(), 
-					camera.getDirection(), camera.getUp(), camera.getDistance(), verticalFov, aspectRatio));
-			
-			//debug
-			System.out.println("Initial bounds: " + coordinator.getCurrentBirdsEyeBounds());
-		}
-		
 		if (coordinator.isBirdsEyeClaimed()) {
 			SimpleCamera camera = graphicsData.getCamera();
-			Vector3 newPosition;
 			
-			// TODO: consider moving these somewhere else
-			coordinator.setMainVerticalFov(graphicsData.getVerticalFov());
-			coordinator.setMainAspectRatio((float) graphicsData.getScreenWidth() / (Math.max(graphicsData.getScreenHeight(), 1)));
+			// Update screen data, in case the user resizes the window
+			coordinator.updateVerticalFov(graphicsData.getVerticalFov());
+			coordinator.updateAspectRatio((double) graphicsData.getScreenWidth() 
+					/ Math.max(1, graphicsData.getScreenHeight()));
 			
-			if (coordinator.compareMainCameraChanged(camera)) {
-				coordinator.updateMainCamera(camera);
-			} else if (coordinator.birdsEyeBoundsChanged()) {
-				//newPosition = ViewingCoordinator.extractCameraPosition(coordinator, camera.getDirection(), camera.getDistance());
-				newPosition = ViewingCoordinator.findNewOrthoCameraPosition(coordinator.getCurrentBirdsEyeBounds(), camera.getPosition(), camera.getDirection());
-				camera.moveTo(newPosition);
+			// This case runs only once
+			if (!coordinator.isInitialMainCameraInitialized()) {
+				coordinator.setMainCameraCopy(camera);
+				coordinator.setInitialMainCameraInitialized(true);
+			}
+			
+			// Regular expected case
+			if (coordinator.isInitialBoundsMatched()) {
 				
-				coordinator.updateMainCamera(camera);
-				
-				coordinator.updateBirdsEyeBounds();
+				// User moved bird's eye box, this case takes priority
+				if (coordinator.isBirdsEyeBoundsMoved()) {
+					
+					// Transfer data from coordinator
+					Vector3 newPosition = coordinator.calculateCameraPosition(camera.getDirection(), camera.getDistance());
+					camera.moveTo(newPosition);
+					
+					// Unset flag
+					coordinator.setBirdsEyeBoundsMoved(false);
+					
+				// User moved the main camera
+				} else if (coordinator.checkCameraChanged(camera)) {
+					
+					// Transfer data to coordinator
+					coordinator.setMainCameraCopy(camera);
+					
+					// Set flag
+					coordinator.setMainCameraMoved(true);
+				}
 			}
 		}
 	}

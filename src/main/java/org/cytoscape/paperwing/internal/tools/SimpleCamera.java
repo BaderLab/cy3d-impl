@@ -128,15 +128,20 @@ public class SimpleCamera {
 		this.zoomSpeed = zoomSpeed;
 	}
 
-	public void copyOrientation(SimpleCamera other) {
+	public void set(SimpleCamera other) {
 		
 		this.direction.set(other.direction);
 		this.up.set(other.up);
 		this.left.set(other.left);
 		this.position.set(other.position);
 		this.target.set(other.target);
-		
 		this.distance = other.distance;
+		
+		this.moveSpeed = other.moveSpeed;
+		this.turnSpeed = other.turnSpeed;
+		this.orbitSpeed = other.orbitSpeed;
+		this.rollSpeed = other.rollSpeed;
+		this.zoomSpeed = other.zoomSpeed;
 	}
 	
 	/** Set the various speeds of the camera

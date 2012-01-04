@@ -51,10 +51,12 @@ public class WindBirdsEyeRenderingEngine extends WindRenderingEngine {
 		
 		return new Graphics(networkView, visualLexicon, new BirdsEyeGraphicsHandler());
 	}
-
+	
 	@Override
 	protected void setUpAnimatorStarting(Container container, FPSAnimator animator) {
 		
 		animator.start();
 	}
+
+	
 }
