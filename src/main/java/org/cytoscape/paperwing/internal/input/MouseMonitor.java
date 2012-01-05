@@ -19,8 +19,6 @@ import java.util.Set;
  */
 public class MouseMonitor implements MouseListener, MouseMotionListener,
 		MouseWheelListener, FocusListener {
-	
-	private static final int NULL_COORDINATE = Integer.MAX_VALUE;
 
 	/** The previous mouse x-coordinate, since the previous frame */
 	private int prevX;
@@ -45,6 +43,8 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 	
 	/** Flag to ignore the next mouse move event */
 	private boolean ignoreNext;
+	
+	private boolean exited;
 	
 	/** The set of all recently pressed mouse keys */
 	private Set<Integer> justPressed;
@@ -136,19 +136,21 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 	@Override
 	public void mouseClicked(MouseEvent event) {
 	}
+	
+	public boolean hasExited() {
+		return exited;
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent event) {
-		ignoreNext = false;
+		exited = false;
 	}
 
 	@Override
 	public void mouseExited(MouseEvent event) {
-		ignoreNext = false;
+		exited = true;
 		
-		// Scramble mouse coordinates
-		currentX = NULL_COORDINATE;
-		currentY = NULL_COORDINATE;
+		// TODO: Scramble coordinates for when the mouse exits?
 	}
 
 	@Override

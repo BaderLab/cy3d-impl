@@ -31,14 +31,37 @@ public class BoundsInputHandler implements InputHandler {
 			
 			Quadrilateral oldBounds = coordinatorData.getBounds();
 			
+			// Line-plane intersection approach
 //			Vector3 newCenterPoint = GeometryToolkit.findLinePlaneIntersection(camera.getPosition(), 
 //					mousePosition.subtract(camera.getPosition()), oldBounds.getCenterPoint(), camera.getDirection());
 			
-			Vector3 newCenterPoint = GeometryToolkit.findNewOrthogonalAnchoredPosition(mousePosition, oldBounds.getCenterPoint(), camera.getDirection());
+			// Orthogonal anchor approach (not complete, approximate)
+//			Vector3 newCenterPoint = GeometryToolkit.findNewOrthogonalAnchoredPosition(mousePosition, 
+//					oldBounds.getCenterPoint(), camera.getDirection());
+			
+			// Direct calculation approach
+			double projectionOrthogonalDistance = GeometryToolkit.findOrthogonalDistance(camera.getPosition(), 
+					oldBounds.getCenterPoint(), camera.getDirection());
+
+			Vector3 mouseCameraOffset = mousePosition.subtract(camera.getPosition());
+			double mouseCameraAngle = camera.getDirection().angle(mouseCameraOffset);
+			
+			// TODO: implement checks so mouseCameraAngle stays away from 90 degrees, but should be ok as
+			// this means the mouse is at an unlikely 90 degrees from the direction vector
+			double projectionDiagonalDistance = projectionOrthogonalDistance / Math.cos(mouseCameraAngle);
+			
+			Vector3 newCenterPoint = mouseCameraOffset.normalize();
+			newCenterPoint.multiplyLocal(projectionDiagonalDistance);
+			newCenterPoint.addLocal(camera.getPosition());
 			
 			oldBounds.moveTo(newCenterPoint);
 			
-			System.out.println("newCenterPoint: " + newCenterPoint);
+			// Debug useful
+//			System.out.println("mouseX: " + mouse.x());
+//			System.out.println("mouseY: " + mouse.y());
+//	
+//			System.out.println("mousePosition: " + mousePosition);
+//			System.out.println("newCenterPoint: " + newCenterPoint);
 			
 			coordinatorData.setBoundsManuallyChanged(true);
 		}

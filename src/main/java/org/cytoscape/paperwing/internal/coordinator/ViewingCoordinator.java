@@ -13,7 +13,7 @@ import org.cytoscape.view.model.CyNetworkView;
 public class ViewingCoordinator {
 
 	public static double BOUNDS_CHANGE_THRESHOLD = 5e-16;
-	public static double CAMERA_CHANGE_THRESHOLD = 5e-3;
+	public static double CAMERA_CHANGE_THRESHOLD = 5e-16;
 	
 	private SimpleCamera mainCameraCopy;
 	private Quadrilateral birdsEyeBoundsCopy;

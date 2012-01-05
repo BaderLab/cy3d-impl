@@ -30,7 +30,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_SELECTED_COLOR = 
 		new RenderColor(0.73, 0.73, 0.6);
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
-		new RenderColor(0.7, 0.7, 0.5);
+		new RenderColor(0.5, 0.5, 0.7);
 	
 	
 	

@@ -4,6 +4,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Set;
 
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyRow;
+import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 
@@ -18,12 +21,13 @@ public class SelectionInputHandler implements InputHandler {
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
+		
 		processDeselectOther(keys, mouse, graphicsData);
 		processSingleSelection(keys, mouse, graphicsData);
 		processDragSelection(keys, mouse, graphicsData);
-		
+		processClearHover(keys, mouse, graphicsData);
 	}
-	
+
 	// Performs single selection, and deselection of previously selected objects
 	private void processSingleSelection(KeyboardMonitor keys,
 			MouseMonitor mouse, GraphicsData graphicsData) {
@@ -31,7 +35,7 @@ public class SelectionInputHandler implements InputHandler {
 		int newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		
+
 		selectionData.setHoverNodeIndex(newHoverNodeIndex);
 		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
 		
@@ -126,6 +130,15 @@ public class SelectionInputHandler implements InputHandler {
 		}
 	}
 	
-	
+	// Stop hovering if mouse exited
+	private void processClearHover(KeyboardMonitor keys, MouseMonitor mouse,
+			GraphicsData graphicsData) {
+		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+		
+		if (mouse.hasExited()) {
+			selectionData.setHoverNodeIndex(NO_INDEX);
+			selectionData.setHoverEdgeIndex(NO_INDEX);
+		}
+	}
 
 }
