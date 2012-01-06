@@ -4,11 +4,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Set;
 
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
+import org.cytoscape.view.model.CyNetworkView;
 
 public class SelectionInputHandler implements InputHandler {
 
@@ -21,11 +25,19 @@ public class SelectionInputHandler implements InputHandler {
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
+		//TODO: Check whether to have this method here or in MainCytoscapeDataProcessor
+//		processClearToBeDeselected(selectionData);
 		
 		processDeselectOther(keys, mouse, graphicsData);
 		processSingleSelection(keys, mouse, graphicsData);
 		processDragSelection(keys, mouse, graphicsData);
 		processClearHover(keys, mouse, graphicsData);
+	}
+
+	// Clear the set of to-be deselected nodes and edges
+	private void processClearToBeDeselected(GraphicsSelectionData selectionData) {
+		selectionData.getToBeDeselectedNodeIndices().clear();
+		selectionData.getToBeDeselectedEdgeIndices().clear();
 	}
 
 	// Performs single selection, and deselection of previously selected objects
@@ -41,6 +53,10 @@ public class SelectionInputHandler implements InputHandler {
 		
 		Set<Integer> selectedNodeIndices = selectionData.getSelectedNodeIndices();
 		Set<Integer> selectedEdgeIndices = selectionData.getSelectedEdgeIndices();
+	
+		// These are needed to keep track of to-be removed objects for faster Cytoscape data processing
+		Set<Integer> toBeDeselectedNodeIndices = selectionData.getToBeDeselectedNodeIndices();
+		Set<Integer> toBeDeselectedEdgeIndices = selectionData.getToBeDeselectedEdgeIndices();
 		
 		if (!selectionData.isDragSelectMode()
 				&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
@@ -51,6 +67,8 @@ public class SelectionInputHandler implements InputHandler {
 					
 					if (selectedNodeIndices.contains(newHoverNodeIndex)) {
 						selectedNodeIndices.remove(newHoverNodeIndex);
+						toBeDeselectedNodeIndices.add(newHoverNodeIndex);
+						
 					} else {
 						selectedNodeIndices.add(newHoverNodeIndex);
 					}
@@ -59,6 +77,7 @@ public class SelectionInputHandler implements InputHandler {
 		
 					if (selectedEdgeIndices.contains(newHoverEdgeIndex)) {
 						selectedEdgeIndices.remove(newHoverEdgeIndex);
+						toBeDeselectedEdgeIndices.add(newHoverEdgeIndex);
 					} else {
 						selectedEdgeIndices.add(newHoverEdgeIndex);
 					}
@@ -72,6 +91,9 @@ public class SelectionInputHandler implements InputHandler {
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
+		Set<Integer> selectedNodeIndices = selectionData.getSelectedNodeIndices();
+		Set<Integer> selectedEdgeIndices = selectionData.getSelectedEdgeIndices();
+		
 		if (mouse.getPressed().contains(MouseEvent.BUTTON1)) { 
 			if (!selectionData.isDragSelectMode() 
 					&& !keys.getHeld().contains(KeyEvent.VK_SHIFT)
@@ -80,8 +102,11 @@ public class SelectionInputHandler implements InputHandler {
 					//&& graphicsData.getPickingData().getClosestPickedNodeIndex() == NO_INDEX
 					//&& graphicsData.getPickingData().getClosestPickedEdgeIndex() == NO_INDEX) {
 				
-				selectionData.getSelectedNodeIndices().clear();
-				selectionData.getSelectedEdgeIndices().clear();
+				selectionData.getToBeDeselectedNodeIndices().addAll(selectedNodeIndices);
+				selectionData.getToBeDeselectedEdgeIndices().addAll(selectedEdgeIndices);
+				
+				selectedNodeIndices.clear();
+				selectedEdgeIndices.clear();
 			}
 		}
 		
@@ -140,5 +165,7 @@ public class SelectionInputHandler implements InputHandler {
 			selectionData.setHoverEdgeIndex(NO_INDEX);
 		}
 	}
+	
+	
 
 }

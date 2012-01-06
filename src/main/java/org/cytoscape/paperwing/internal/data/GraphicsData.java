@@ -38,7 +38,7 @@ public class GraphicsData {
 	private long startTime;
 	
 	/** Number of frames elapsed */
-	private int framesElapsed = 0;
+	private long framesElapsed = 0;
 	
 	/** End time used for FPS timing */
 	private long endTime;
@@ -150,11 +150,11 @@ public class GraphicsData {
 		return visualLexicon;
 	}
 
-	public void setFramesElapsed(int framesElapsed) {
+	public void setFramesElapsed(long framesElapsed) {
 		this.framesElapsed = framesElapsed;
 	}
 
-	public int getFramesElapsed() {
+	public long getFramesElapsed() {
 		return framesElapsed;
 	}
 

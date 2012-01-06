@@ -6,6 +6,8 @@ import java.util.Map;
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.CytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.MainCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
@@ -85,12 +87,17 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		return new MainCoordinatorProcessor();
 	}
 
+
+	@Override
+	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
+		return new MainCytoscapeDataProcessor();
+	}
+	
 	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {
 		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures.values()) {
 			renderProcedure.initialize(graphicsData);
 		}
 	}
-
 	
 }

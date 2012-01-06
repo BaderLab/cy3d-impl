@@ -13,6 +13,11 @@ public class GraphicsSelectionData {
 	/** The set of indices for edges that are selected */
 	private Set<Integer> selectedEdgeIndices;
 	
+	private Set<Integer> toBeDeselectedNodeIndices; 
+	
+	private Set<Integer> toBeDeselectedEdgeIndices; 	
+	
+	
 	/** The top left x position for the selection border */
 	private int selectTopLeftX;
 	
@@ -51,6 +56,9 @@ public class GraphicsSelectionData {
 	public GraphicsSelectionData() {
 		selectedNodeIndices = new LinkedHashSet<Integer>();
 		selectedEdgeIndices = new LinkedHashSet<Integer>();
+		
+		toBeDeselectedNodeIndices = new LinkedHashSet<Integer>();
+		toBeDeselectedEdgeIndices = new LinkedHashSet<Integer>();
 	}
 	
 	public Set<Integer> getSelectedNodeIndices() {
@@ -155,5 +163,23 @@ public class GraphicsSelectionData {
 
 	public boolean isSelectTopLeftFound() {
 		return selectTopLeftFound;
+	}
+
+	public void setToBeDeselectedNodeIndices(
+			Set<Integer> toBeDeselectedNodeIndices) {
+		this.toBeDeselectedNodeIndices = toBeDeselectedNodeIndices;
+	}
+
+	public Set<Integer> getToBeDeselectedNodeIndices() {
+		return toBeDeselectedNodeIndices;
+	}
+
+	public void setToBeDeselectedEdgeIndices(
+			Set<Integer> toBeDeselectedEdgeIndices) {
+		this.toBeDeselectedEdgeIndices = toBeDeselectedEdgeIndices;
+	}
+
+	public Set<Integer> getToBeDeselectedEdgeIndices() {
+		return toBeDeselectedEdgeIndices;
 	}
 }

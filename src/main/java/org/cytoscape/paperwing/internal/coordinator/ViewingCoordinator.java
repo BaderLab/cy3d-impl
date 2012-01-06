@@ -28,6 +28,7 @@ public class ViewingCoordinator {
 	private boolean birdsEyeBoundsMoved = false;
 	private boolean initialMainCameraInitialized = false;
 	private boolean initialBoundsMatched = false;
+	private boolean suggestRecalculateBounds = false;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -169,10 +170,10 @@ public class ViewingCoordinator {
 	
 	// Notify that main will no longer look after this coordinator
 	public void unlinkMain() {
-		mainStatus = CoordinatorStatus.CLAIMED_AND_UNLINKED;
+		mainStatus = CoordinatorStatus.UNCLAIMED_AND_UNLINKED;
 		
 		// Both unlinked; prepare to remove this object
-		if (birdsEyeStatus == CoordinatorStatus.CLAIMED_AND_UNLINKED) {
+		if (birdsEyeStatus == CoordinatorStatus.UNCLAIMED_AND_UNLINKED) {
 
 			removeFromList();
 		}
@@ -180,10 +181,10 @@ public class ViewingCoordinator {
 	
 	// Notify that bird's eye view will no longer look after this coordinator
 	public void unlinkBirdsEye() {
-		birdsEyeStatus = CoordinatorStatus.CLAIMED_AND_UNLINKED;
+		birdsEyeStatus = CoordinatorStatus.UNCLAIMED_AND_UNLINKED;
 		
 		// Both unlinked; prepare to remove this object
-		if (mainStatus == CoordinatorStatus.CLAIMED_AND_UNLINKED) {
+		if (mainStatus == CoordinatorStatus.UNCLAIMED_AND_UNLINKED) {
 			
 			removeFromList();
 		}
@@ -260,5 +261,13 @@ public class ViewingCoordinator {
 	
 	public void setMainCameraCopy(SimpleCamera camera) {
 		mainCameraCopy.set(camera);
+	}
+
+	public void setSuggestRecalculateBounds(boolean suggestRecalculateBounds) {
+		this.suggestRecalculateBounds = suggestRecalculateBounds;
+	}
+
+	public boolean isSuggestRecalculateBounds() {
+		return suggestRecalculateBounds;
 	}
 }

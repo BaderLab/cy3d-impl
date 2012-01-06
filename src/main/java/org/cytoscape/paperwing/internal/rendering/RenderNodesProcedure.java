@@ -10,6 +10,7 @@ import javax.media.opengl.glu.GLUquadric;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -118,8 +119,10 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 			Color color;
 
-			if (selectedNodeIndices.contains(index)) {
-
+//			if (selectedNodeIndices.contains(index)) {
+//			if (NetworkToolkit.checkNodeSelected(index, networkView)) {
+			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_SELECTED)) {
+			
 				gl.glScalef(1.1f, 1.1f, 1.1f);
 
 				color = (Color) nodeView
@@ -128,8 +131,6 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 //				gl.glColor3f(color.getRed() / 255.0f,
 //						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
 
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
-						true);
 
 				RenderColor.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
 			} else if (index == hoverNodeIndex) {
@@ -144,11 +145,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				gl.glColor3f(color.getRed() / 255.0f,
 						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
 
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
-						false);
-
 				RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
-
 			}
 
 			// Draw it only if the visual property says it is visible

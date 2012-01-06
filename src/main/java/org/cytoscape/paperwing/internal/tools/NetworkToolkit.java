@@ -2,7 +2,12 @@ package org.cytoscape.paperwing.internal.tools;
 
 import java.util.Set;
 
+import org.cytoscape.model.CyColumn;
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyRow;
+import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -10,6 +15,8 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class NetworkToolkit {
 
+	private static final String SELECTED_COLUMN_NAME = "selected";
+	
 	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
 		if (nodeIndices.isEmpty()) {
 			return null;
@@ -22,7 +29,7 @@ public class NetworkToolkit {
 		
 		for (Integer index : nodeIndices) {
 			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
-			
+
 			if (nodeView != null) {
 				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
 				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
@@ -116,5 +123,92 @@ public class NetworkToolkit {
 			}
 		}
 	}
+	
+	
+	// Updates data in CyTable as well as View<CyNode>
+	public static void deselectNodes(Set<Integer> nodeIndices, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultNodeTable();
+		
+		CyNode node;
+		CyRow row;
+		
+		for (int index : nodeIndices) {
+			node = network.getNode(index);
+			
+			if (node != null) {
+				row = table.getRow(node.getSUID());
+				
+				if (row != null) {
+					row.set(SELECTED_COLUMN_NAME, false);
+				}
+				
+				networkView.getNodeView(node).setVisualProperty(RichVisualLexicon.NODE_SELECTED, false);
+			}
+		}
+	}
+	
+	// Sets data in CyTable as well as View<CyNode>
+	public static void setNodeSelected(int index, CyNetworkView networkView, boolean selected) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultNodeTable();
+		CyRow row = table.getRow(network.getNode(index).getSUID());
+		
+		row.set(SELECTED_COLUMN_NAME, selected);
+		
+		networkView.getNodeView(network.getNode(index)).setVisualProperty(
+				RichVisualLexicon.NODE_SELECTED, selected);
+	}
 
+	public static boolean checkNodeSelected(int index, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultNodeTable();
+		CyRow row = table.getRow(network.getNode(index).getSUID());
+		
+		return row.get(SELECTED_COLUMN_NAME, Boolean.class);
+	}
+	
+	// Updates data in CyTable as well as View<CyNode>
+	public static void deselectEdges(Set<Integer> edgeIndices, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultEdgeTable();
+		
+		CyEdge edge;
+		CyRow row;
+		
+		for (int index : edgeIndices) {
+			edge = network.getEdge(index);
+			
+			if (edge != null) {
+				
+				row = table.getRow(edge.getSUID());
+				
+				if (row != null) {
+					row.set(SELECTED_COLUMN_NAME, false);
+				}
+				
+				networkView.getEdgeView(edge).setVisualProperty(RichVisualLexicon.EDGE_SELECTED, false);
+			}
+		}
+	}
+	
+	// Sets data in CyTable as well as View<CyNode>
+	public static void setEdgeSelected(int index, CyNetworkView networkView, boolean selected) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultEdgeTable();
+		CyRow row = table.getRow(network.getEdge(index).getSUID());
+		
+		row.set(SELECTED_COLUMN_NAME, selected);
+		
+		networkView.getEdgeView(network.getEdge(index)).setVisualProperty(
+				RichVisualLexicon.EDGE_SELECTED, selected);
+	}
+	
+	public static boolean checkEdgeSelected(int index, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultNodeTable();
+		CyRow row = table.getRow(network.getEdge(index).getSUID());
+		
+		return row.get(SELECTED_COLUMN_NAME, Boolean.class);
+	}
 }

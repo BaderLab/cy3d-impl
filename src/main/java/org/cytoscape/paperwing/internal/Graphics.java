@@ -19,6 +19,7 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
@@ -52,6 +53,7 @@ public class Graphics implements GLEventListener {
 	private ShapePickingProcessor shapePickingProcessor;
 	private ViewingCoordinator coordinator;
 	private CoordinatorProcessor coordinatorProcessor;
+	private CytoscapeDataProcessor cytoscapeDataProcessor;
 	
 	private GraphicsHandler handler;
 	
@@ -94,6 +96,8 @@ public class Graphics implements GLEventListener {
 		
 		shapePickingProcessor = handler.getShapePickingProcessor();
 		inputProcessor = handler.getInputProcessor();
+		
+		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
 	}
 	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
@@ -130,6 +134,9 @@ public class Graphics implements GLEventListener {
 		
 		// Check input
 		inputProcessor.processInput(keys, mouse, graphicsData);
+		
+		// Process Cytoscape data
+		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
 		
 		// Reset the scene for drawing
 		handler.resetSceneForDrawing(graphicsData);

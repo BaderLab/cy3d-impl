@@ -260,7 +260,10 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			// if (generalModifier == DrawStateModifier.ENLARGED) {
 			// modifier = DrawStateModifier.ENLARGED;
 			// } else if (selectedEdgeIndices.contains(edgeIndex)) {
-			if (selectedEdgeIndices.contains(edgeIndex)) {
+			
+			
+//			if (selectedEdgeIndices.contains(edgeIndex)) {
+			if (edgeView.getVisualProperty(MinimalVisualLexicon.EDGE_SELECTED)) {
 				modifier = DrawStateModifier.SELECTED;
 
 				edgeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,

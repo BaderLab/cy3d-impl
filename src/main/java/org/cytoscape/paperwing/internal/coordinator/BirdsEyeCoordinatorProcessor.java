@@ -13,6 +13,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 			GraphicsData graphicsData) {
 		
 		coordinator.claimBirdsEye();
+		coordinator.setInitialBoundsMatched(false);
 	}
 
 	@Override
@@ -54,6 +55,16 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 					
 					// Unset flag
 					coordinator.setMainCameraMoved(false);
+				}
+				
+				// Check if bound recalculation is suggested due to bounds movement
+				if (coordinator.isSuggestRecalculateBounds()) {
+					
+					// Obtain data from coordinator
+					coordinatorData.setBoundsTo(coordinator.calculateBounds());
+					
+					// Unset flag
+					coordinator.setSuggestRecalculateBounds(false);
 				}
 				
 				// Zoom to extents, use appropriate angles

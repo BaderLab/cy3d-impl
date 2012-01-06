@@ -47,6 +47,9 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 					// Unset flag
 					coordinator.setBirdsEyeBoundsMoved(false);
 					
+					// Suggest bound recalculation due to camera movement
+					coordinator.setSuggestRecalculateBounds(true);
+					
 				// User moved the main camera
 				} else if (coordinator.checkCameraChanged(camera)) {
 					

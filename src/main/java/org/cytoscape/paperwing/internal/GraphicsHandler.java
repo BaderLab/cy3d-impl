@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
@@ -16,6 +17,7 @@ public interface GraphicsHandler {
 	public ShapePickingProcessor getShapePickingProcessor();
 	public ViewingCoordinator getCoordinator(GraphicsData graphicsData);
 	public CoordinatorProcessor getCoordinatorProcessor();
+	public CytoscapeDataProcessor getCytoscapeDataProcessor();
 	
 	// Call procedures' init methods
 	public void initializeGraphicsProcedures(GraphicsData graphicsData);

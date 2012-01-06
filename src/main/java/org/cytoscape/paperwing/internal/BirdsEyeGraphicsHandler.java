@@ -7,6 +7,8 @@ import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.CytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.MainCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.input.BirdsEyeInputProcessor;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
@@ -103,6 +105,18 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 	@Override
 	public CoordinatorProcessor getCoordinatorProcessor() {
 		return new BirdsEyeCoordinatorProcessor();
+	}
+	
+	@Override
+	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
+		return new CytoscapeDataProcessor() {
+
+			@Override
+			public void processCytoscapeData(GraphicsData graphicsData) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 	}
 
 	@Override
