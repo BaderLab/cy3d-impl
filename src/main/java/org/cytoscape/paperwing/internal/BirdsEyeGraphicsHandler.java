@@ -7,8 +7,8 @@ import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
-import org.cytoscape.paperwing.internal.cytoscape.CytoscapeDataProcessor;
-import org.cytoscape.paperwing.internal.cytoscape.MainCytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.input.BirdsEyeInputProcessor;
 import org.cytoscape.paperwing.internal.input.InputProcessor;

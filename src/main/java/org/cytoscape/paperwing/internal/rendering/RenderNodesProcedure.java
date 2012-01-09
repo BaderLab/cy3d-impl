@@ -33,10 +33,10 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	/** The slices detail level to use for drawing spherical nodes */
 	// 10, 10, 4 // 24, 24, 12 used to be default values for
 	// slices/stacks/slices
-	private static int NODE_SLICES_DETAIL = 10;
+	private static int NODE_SLICES_DETAIL = 12;
 
 	/** The stacks detail level to use for drawing spherical nodes */
-	private static int NODE_STACKS_DETAIL = 10;
+	private static int NODE_STACKS_DETAIL = 12;
 
 	private int nodeListIndex;
 

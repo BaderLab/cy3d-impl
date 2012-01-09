@@ -8,9 +8,13 @@ import javax.media.opengl.GL2;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
+import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
+	
+	private static final RenderColor DEFAULT_COLOR = 
+		new RenderColor(0.4, 0.6, 0.75);
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
@@ -72,8 +76,8 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 		gl.glDisable(GL2.GL_LIGHTING);
 		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glColor3f(0.0f, 0.4f, 0.6f);
-
+		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
+		
 		// Below uses converted 3D coordinates
 		gl.glBegin(GL2.GL_LINE_LOOP);
 		gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());

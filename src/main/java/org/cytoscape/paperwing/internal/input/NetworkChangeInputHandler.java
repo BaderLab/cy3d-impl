@@ -139,6 +139,9 @@ public class NetworkChangeInputHandler implements InputHandler {
 			networkView.getModel().removeNodes(nodesToBeRemoved);
 			networkView.getModel().removeEdges(edgesToBeRemoved);
 			
+			selectedNodeIndices.clear();
+			selectedEdgeIndices.clear();
+			
 			// TODO: Not sure if this call is needed
 			networkView.updateView();
 		}

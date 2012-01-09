@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal.cytoscape;
+package org.cytoscape.paperwing.internal.cytoscape.processing;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 

@@ -1,4 +1,4 @@
-package org.cytoscape.paperwing.internal.cytoscape;
+package org.cytoscape.paperwing.internal.cytoscape.processing;
 
 import java.util.Set;
 
