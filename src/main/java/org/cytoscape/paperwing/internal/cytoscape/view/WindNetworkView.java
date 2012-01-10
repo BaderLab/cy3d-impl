@@ -43,12 +43,16 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 		for (CyNode node : network.getNodeList()) {
 			nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
 			defaultValues.initializeNode(nodeView);
+			
+			nodeViews.put(node.getIndex(), nodeView);
 		}
 		
 		WindEdgeView edgeView;
 		for (CyEdge edge : network.getEdgeList()) {
 			edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
 			defaultValues.initializeEdge(edgeView);
+		
+			edgeViews.put(edge.getIndex(), edgeView);
 		}
 		
 		defaultValues.initializeNetwork(this);
@@ -86,7 +90,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 
 	@Override
 	public Collection<View<? extends CyTableEntry>> getAllViews() {
-		Collection<View<? extends CyTableEntry>> views = new HashSet();
+		Collection<View<? extends CyTableEntry>> views = new HashSet<View<? extends CyTableEntry>>();
 		
 		// Return views for Node, Edge, Network
 		views.addAll(getNodeViews());
@@ -98,19 +102,47 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 
 	@Override
 	public void fitContent() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void fitSelected() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void updateView() {
-		// TODO Auto-generated method stub
+		// TODO: Check if correct place to put this; below code should ensure having a view
+		// for every node/edge in the network
+		int nodeCountDifference = network.getNodeCount() - nodeViews.size();
+		
+		// Check if nodes have been added to the network
+		if (nodeCountDifference > 0) {
+			for (CyNode node : network.getNodeList()) {
+				
+				// Found a node without a view?
+				if (nodeViews.get(node.getIndex()) == null) {
+					
+					WindNodeView nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
+					defaultValues.initializeNode(nodeView);
+					
+					nodeViews.put(node.getIndex(), nodeView);
+					
+					nodeCountDifference--;
+				}
+			}
+			
+			// Did we fail to match every node with a node view?
+			if (nodeCountDifference != 0) {
+				
+				// TODO: Use exception
+				System.out.println("WindNetworkView.updateView(): node count mismatch by " + nodeCountDifference);
+			}
+		// Check if nodes have been removed from the network
+		} else if (nodeCountDifference < 0) {
+			
+		}
+		
 		
 	}
 

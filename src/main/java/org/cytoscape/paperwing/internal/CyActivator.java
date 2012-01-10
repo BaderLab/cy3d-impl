@@ -2,8 +2,10 @@ package org.cytoscape.paperwing.internal;
 
 import java.util.Properties;
 
+import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkViewFactory;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
+import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
@@ -23,14 +25,29 @@ public class CyActivator extends AbstractCyActivator {
 		CyServiceRegistrar cyServiceRegistrarRef = getService(bc,
 				CyServiceRegistrar.class);
 
+		// Wind Visual Lexicon
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
+		
+		Properties windVisualLexiconProps = new Properties();
+		windVisualLexiconProps.setProperty("serviceType", "visualLexicon");
+		windVisualLexiconProps.setProperty("id", "wind");
+		registerService(bc, windVisualLexicon, VisualLexicon.class,
+				windVisualLexiconProps);
+
+		// Wind NetworkView factory
+		WindNetworkViewFactory windNetworkViewFactory =
+			new WindNetworkViewFactory(windVisualLexicon);
+		
+		Properties windNetworkViewFactoryProps = new Properties();
+		windNetworkViewFactoryProps.setProperty("serviceType", 
+				"factory");
+		registerService(bc, windNetworkViewFactory, CyNetworkViewFactory.class, windNetworkViewFactoryProps);
+		
+		// Main RenderingEngine factory
 		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, cyServiceRegistrarRef);
-		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
-				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, cyServiceRegistrarRef);
-
+		
 		Properties windMainRenderingEngineFactoryProps = new Properties();
 		windMainRenderingEngineFactoryProps.setProperty("serviceType",
 				"presentationFactory");
@@ -38,6 +55,11 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(bc, windMainRenderingEngineFactory,
 				RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
 
+		// Bird's Eye RenderingEngine factory
+		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
+				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
+				windVisualLexicon, cyServiceRegistrarRef);
+		
 		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
 		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType",
 				"presentationFactory");
@@ -46,10 +68,6 @@ public class CyActivator extends AbstractCyActivator {
 				RenderingEngineFactory.class,
 				windBirdsEyeRenderingEngineFactoryProps);
 
-		Properties windVisualLexiconProps = new Properties();
-		windVisualLexiconProps.setProperty("serviceType", "visualLexicon");
-		windVisualLexiconProps.setProperty("id", "wind");
-		registerService(bc, windVisualLexicon, VisualLexicon.class,
-				windVisualLexiconProps);
+		
 	}
 }

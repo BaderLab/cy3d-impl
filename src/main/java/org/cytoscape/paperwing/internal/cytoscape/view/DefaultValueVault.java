@@ -71,7 +71,7 @@ public class DefaultValueVault {
 		
 		for (String key : nodeDefaultValues.keySet()) {
 			valueHolder = nodeDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder);
+			keeper.setVisualProperty(key, valueHolder.getValue());
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class DefaultValueVault {
 		
 		for (String key : edgeDefaultValues.keySet()) {
 			valueHolder = edgeDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder);
+			keeper.setVisualProperty(key, valueHolder.getValue());
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class DefaultValueVault {
 		
 		for (String key : networkDefaultValues.keySet()) {
 			valueHolder = networkDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder);
+			keeper.setVisualProperty(key, valueHolder.getValue());
 		}
 	}
 }

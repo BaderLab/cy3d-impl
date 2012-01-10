@@ -15,7 +15,7 @@ public abstract class VisualPropertyKeeper<S> implements View<S>{
 	}
 	
 	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
-
+		
 		return (T) valueHolders.get(visualProperty.getIdString()).getValue();
 	}
 

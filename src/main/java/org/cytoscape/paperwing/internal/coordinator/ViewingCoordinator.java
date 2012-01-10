@@ -13,13 +13,10 @@ import org.cytoscape.view.model.CyNetworkView;
 public class ViewingCoordinator {
 
 	public static double BOUNDS_CHANGE_THRESHOLD = 5e-16;
-	public static double CAMERA_CHANGE_THRESHOLD = 5e-16;
+	public static double CAMERA_CHANGE_THRESHOLD = 5e-25;
 	
 	private SimpleCamera mainCameraCopy;
 	private Quadrilateral birdsEyeBoundsCopy;
-
-	
-	
 	
 	private double verticalFov;
 	private double aspectRatio;
@@ -86,9 +83,6 @@ public class ViewingCoordinator {
 		
 		return coordinator;
 	}
-	
-	
-	
 	
 	public boolean checkCameraChanged(SimpleCamera mainCamera) {
 		double threshold = CAMERA_CHANGE_THRESHOLD;
