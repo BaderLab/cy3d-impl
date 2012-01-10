@@ -9,16 +9,16 @@ import org.cytoscape.view.model.VisualProperty;
 public class WindEdgeView extends VisualPropertyKeeper<CyEdge> {
 
 	private CyEdge edge;
-	private Long SUID;
+	private Long suid;
 	
-	public WindEdgeView(CyEdge edge, Long SUID) {
+	public WindEdgeView(CyEdge edge, Long suid) {
 		this.edge = edge;
-		this.SUID = SUID;		
+		this.suid = suid;		
 	}
 	
 	@Override
 	public long getSUID() {
-		return SUID;
+		return suid;
 	}
 
 	@Override

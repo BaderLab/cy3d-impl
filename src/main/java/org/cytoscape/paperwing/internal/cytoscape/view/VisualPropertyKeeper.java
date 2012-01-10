@@ -24,6 +24,12 @@ public abstract class VisualPropertyKeeper<S> implements View<S>{
 		
 		valueHolders.put(visualProperty.getIdString(), valueHolder);
 	}
+	
+	public <V> void setVisualProperty(String propertyID, V value) {
+		VisualPropertyValueHolder<V> valueHolder = new VisualPropertyValueHolder<V>(value);
+		
+		valueHolders.put(propertyID, valueHolder);
+	}
 
 	@Override
 	public <T, V extends T> void setLockedValue(VisualProperty<? extends T> visualProperty,

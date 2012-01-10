@@ -9,16 +9,16 @@ import org.cytoscape.view.model.VisualProperty;
 public class WindNodeView extends VisualPropertyKeeper<CyNode> {
 
 	private CyNode node;
-	private Long SUID;
+	private Long suid;
 	
-	public WindNodeView(CyNode node, Long SUID) {
+	public WindNodeView(CyNode node, Long suid) {
 		this.node = node;
-		this.SUID = SUID;		
+		this.suid = suid;		
 	}
 	
 	@Override
 	public long getSUID() {
-		return SUID;
+		return suid;
 	}
 
 	@Override

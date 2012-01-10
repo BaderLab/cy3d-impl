@@ -28,6 +28,7 @@ public class WindVisualLexicon extends RichVisualLexicon {
 		
 		VisualProperty visualProperty = this.lookup(Double.class, "test");
 		
+		
 	}
 
 }
