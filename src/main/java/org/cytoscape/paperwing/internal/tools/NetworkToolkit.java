@@ -82,16 +82,19 @@ public class NetworkToolkit {
 		for (CyNode node : networkView.getModel().getNodeList()) {
 			nodeView = networkView.getNodeView(node);
 			
-			currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
-			currentPosition.divideLocal(distanceScale);
+			if (nodeView != null) {
 			
-			currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
-			
-			if (currentDistanceSquared > maxDistanceSquared) {
-				maxDistanceSquared = currentDistanceSquared;
-				maxPosition.set(currentPosition);
+				currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
+						nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
+						nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+				currentPosition.divideLocal(distanceScale);
+				
+				currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
+				
+				if (currentDistanceSquared > maxDistanceSquared) {
+					maxDistanceSquared = currentDistanceSquared;
+					maxPosition.set(currentPosition);
+				}
 			}
 		}
 		

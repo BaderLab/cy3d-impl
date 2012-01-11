@@ -10,13 +10,20 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.model.SUIDFactory;
+import org.cytoscape.model.events.AboutToRemoveEdgesEvent;
+import org.cytoscape.model.events.AboutToRemoveEdgesListener;
+import org.cytoscape.model.events.AboutToRemoveNodesEvent;
+import org.cytoscape.model.events.AboutToRemoveNodesListener;
+import org.cytoscape.model.events.AddedEdgesEvent;
+import org.cytoscape.model.events.AddedEdgesListener;
+import org.cytoscape.model.events.AddedNodesEvent;
+import org.cytoscape.model.events.AddedNodesListener;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 
-public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> 
-		implements CyNetworkView {
+public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
 	private long suid;
 	
@@ -114,6 +121,16 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 	public void updateView() {
 		// TODO: Check if correct place to put this; below code should ensure having a view
 		// for every node/edge in the network
+		
+		matchNodes();
+		matchEdges();
+	}
+	
+	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
+	// to fix discrepancy by removing extra views and adding missing views
+	// TODO: Currently considers the set of views to be OK if node and nodeView counts match,
+	// does not check if there is an actual 1:1 relationship
+	private void matchNodes() {
 		int nodeCountDifference = network.getNodeCount() - nodeViews.size();
 		
 		// Check if nodes have been added to the network
@@ -136,14 +153,73 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 			if (nodeCountDifference != 0) {
 				
 				// TODO: Use exception
-				System.out.println("WindNetworkView.updateView(): node count mismatch by " + nodeCountDifference);
+				System.out.println("WindNetworkView.matchNodes(): node count mismatch by " + nodeCountDifference);
 			}
 		// Check if nodes have been removed from the network
 		} else if (nodeCountDifference < 0) {
+			int nodeIndex;
+			HashSet<Integer> toBeRemovedIndices = new HashSet<Integer>();
 			
+			for (View<CyNode> nodeView : nodeViews.values()) {
+				
+				nodeIndex = nodeView.getModel().getIndex();
+				
+				// TODO: Currently performs check by checking if the view's node index is still valid
+				if (network.getNode(nodeIndex) == null) {
+					toBeRemovedIndices.add(nodeIndex);
+				}
+			}
+			
+			for (int index : toBeRemovedIndices) {
+				nodeViews.remove(index);
+			}
 		}
+	}
+	
+	private void matchEdges() {
+		int edgeCountDifference = network.getEdgeCount() - edgeViews.size();
 		
-		
+		// Check if nodes have been added to the network
+		if (edgeCountDifference > 0) {
+			for (CyEdge edge : network.getEdgeList()) {
+				
+				// Found a edge without a view?
+				if (edgeViews.get(edge.getIndex()) == null) {
+					
+					WindEdgeView edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
+					defaultValues.initializeEdge(edgeView);
+					
+					edgeViews.put(edge.getIndex(), edgeView);
+					
+					edgeCountDifference--;
+				}
+			}
+			
+			// Did we fail to match every edge with a edge view?
+			if (edgeCountDifference != 0) {
+				
+				// TODO: Use exception
+				System.out.println("WindNetworkView.matchEdges(): edge count mismatch by " + edgeCountDifference);
+			}
+		// Check if edges have been removed from the network
+		} else if (edgeCountDifference < 0) {
+			int edgeIndex;
+			HashSet<Integer> toBeRemovedIndices = new HashSet<Integer>();
+			
+			for (View<CyEdge> edgeView : edgeViews.values()) {
+				
+				edgeIndex = edgeView.getModel().getIndex();
+				
+				// TODO: Currently performs check by checking if the view's edge index is still valid
+				if (network.getEdge(edgeIndex) == null) {
+					toBeRemovedIndices.add(edgeIndex);
+				}
+			}
+			
+			for (int index : toBeRemovedIndices) {
+				edgeViews.remove(index);
+			}
+		}
 	}
 
 	@Override
@@ -152,5 +228,53 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork>
 		
 		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
 	}
+
+//	@Override
+//	public void handleEvent(AboutToRemoveNodesEvent e) {
+//		if (e.getSource() == network) {
+//			for (CyNode node : e.getNodes()) {
+//				nodeViews.remove(node.getIndex());
+//			}
+//		}
+//	}
+//	
+//	@Override
+//	public void handleEvent(AboutToRemoveEdgesEvent e) {
+//		if (e.getSource() == network) {
+//			for (CyEdge edge : e.getEdges()) {
+//				edgeViews.remove(edge.getIndex());
+//			}
+//		}
+//	}
+//
+//	@Override
+//	public void handleEvent(AddedNodesEvent e) {
+//		if (e.getSource() == network) {
+//			WindNodeView nodeView;
+//			
+//			for (CyNode node : e.getPayloadCollection()) {
+//				nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
+//				defaultValues.initializeNode(nodeView);
+//				
+//				nodeViews.put(node.getIndex(), nodeView);
+//			}
+//		}
+//	}
+//
+//	@Override
+//	public void handleEvent(AddedEdgesEvent e) {
+//		if (e.getSource() == network) {
+//			WindEdgeView edgeView;
+//			
+//			for (CyEdge edge : e.getPayloadCollection()) {
+//				edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
+//				defaultValues.initializeEdge(edgeView);
+//				
+//				edgeViews.put(edge.getIndex(), edgeView);
+//			}
+//		}
+//	}
+
+	
 
 }

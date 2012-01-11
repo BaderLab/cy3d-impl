@@ -35,7 +35,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	
 	
 	/** The default radius of the semi-cylindrical edges */
-	private static final float EDGE_RADIUS = 0.11f; // 0.018f default as of Dec 2011
+	private static final float EDGE_RADIUS = 0.06f; // 0.018f default as of Dec 2011
 
 	/**
 	 * A multiplicative factor for the width of the edges when reading from the
@@ -53,10 +53,10 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	 * How many straight edge segments to use for approximating a curved edge,
 	 * this value does not have to be static
 	 */
-	private static int QUADRATIC_EDGE_SEGMENTS = 5;
+	private static int QUADRATIC_EDGE_SEGMENTS = 3;
 
 	/** The slices detail level to use for drawing edges */
-	private static int EDGE_SLICES_DETAIL = 4;
+	private static int EDGE_SLICES_DETAIL = 3;
 
 	/** The stacks detail level to use for drawing edges */
 	private static int EDGE_STACKS_DETAIL = 1;

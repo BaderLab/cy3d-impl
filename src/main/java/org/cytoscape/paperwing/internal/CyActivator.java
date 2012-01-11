@@ -36,7 +36,7 @@ public class CyActivator extends AbstractCyActivator {
 
 		// Wind NetworkView factory
 		WindNetworkViewFactory windNetworkViewFactory =
-			new WindNetworkViewFactory(windVisualLexicon);
+			new WindNetworkViewFactory(cyServiceRegistrarRef, windVisualLexicon);
 		
 		Properties windNetworkViewFactoryProps = new Properties();
 		windNetworkViewFactoryProps.setProperty("serviceType", 

@@ -88,9 +88,10 @@ public class NetworkChangeInputHandler implements InputHandler {
 							networkView.getModel().getNode(index),
 							hoverNode, false);
 
-					// TODO: Not sure if this call is needed
-					networkView.updateView();
 				}
+				
+				// TODO: Not sure if this call is needed
+				networkView.updateView();
 			}
 		}
 	}
