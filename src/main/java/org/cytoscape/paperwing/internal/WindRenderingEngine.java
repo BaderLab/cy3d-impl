@@ -95,6 +95,9 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				// TODO: check whether to use GLCanvas or GLJPanel
 				GLJPanel panel = new GLJPanel(capabilities);
 				
+				// TODO: check if negative effects produced by this
+				panel.setIgnoreRepaint(true);
+				
 				graphics = getGraphicsInstance(networkView, visualLexicon);
 
 				panel.addGLEventListener(graphics);

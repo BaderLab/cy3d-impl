@@ -92,7 +92,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 		float x, y, z;
 		int index;
-		networkView.updateView();
+		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
 					.floatValue() / distanceScale;
@@ -117,7 +117,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			 * RichVisualLexicon.NODE_DEPTH).floatValue() / DISTANCE_SCALE);
 			 */
 
-			Color color;
+			Color color = null;
 
 //			if (selectedNodeIndices.contains(index)) {
 //			if (NetworkToolkit.checkNodeSelected(index, networkView)) {
@@ -139,13 +139,28 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
 						false);
 			} else {
-				color = (Color) nodeView
-						.getVisualProperty(MinimalVisualLexicon.NODE_PAINT);
+//				color = (Color) nodeView
+//						.getVisualProperty(MinimalVisualLexicon.NODE_PAINT);
 
-				gl.glColor3f(color.getRed() / 255.0f,
+				// TODO: Cleanup code below
+				Object colorObject = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
+				
+				if (colorObject != null
+						&& colorObject.getClass() == Color.class) {
+					color = (Color) colorObject;
+				} else if (colorObject.getClass() != Color.class) {
+//					System.out.println("Found unexpected NODE_FILL_COLOR type for: " + nodeView 
+//							+ ", which was: " + colorObject.getClass() + " with value: " + colorObject);
+				}
+				
+				if (color != null) {
+					gl.glColor3f(color.getRed() / 255.0f,
 						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
-
-				RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
+				} else {
+					RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
+				}
+				
+				// RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
 			}
 
 			// Draw it only if the visual property says it is visible

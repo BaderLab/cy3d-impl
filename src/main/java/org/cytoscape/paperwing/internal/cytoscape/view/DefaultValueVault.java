@@ -38,10 +38,13 @@ public class DefaultValueVault {
 			
 			if (targetDataType == CyNode.class) {
 				nodeDefaultValues.put(visualProperty.getIdString(), valueHolder);
+//				System.out.println("Node default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
 			} else if (targetDataType == CyEdge.class) {
 				edgeDefaultValues.put(visualProperty.getIdString(), valueHolder);
+//				System.out.println("Edge default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
 			} else if (targetDataType == CyNetwork.class) {
 				networkDefaultValues.put(visualProperty.getIdString(), valueHolder);
+//				System.out.println("Network default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
 			}
 		}
 	}

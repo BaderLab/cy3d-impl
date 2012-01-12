@@ -55,7 +55,10 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 	
 	@Override
 	protected void setUpAnimatorStarting(Container container, FPSAnimator animator) {
-		container.addFocusListener(getContainerFocusListener(animator));
+		animator.start();
+		
+		// TODO: Disabled focus listener to let visual property changes appear
+		// container.addFocusListener(getContainerFocusListener(animator));
 	}
 	
 	private FocusListener getContainerFocusListener(final FPSAnimator animator) {
