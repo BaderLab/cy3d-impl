@@ -14,7 +14,7 @@ import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.4, 0.6, 0.75);
+		new RenderColor(0.58, 0.68, 0.85);
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {

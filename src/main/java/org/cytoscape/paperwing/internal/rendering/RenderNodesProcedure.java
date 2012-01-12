@@ -142,15 +142,11 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 //				color = (Color) nodeView
 //						.getVisualProperty(MinimalVisualLexicon.NODE_PAINT);
 
-				// TODO: Cleanup code below
 				Object colorObject = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
 				
 				if (colorObject != null
 						&& colorObject.getClass() == Color.class) {
 					color = (Color) colorObject;
-				} else if (colorObject.getClass() != Color.class) {
-//					System.out.println("Found unexpected NODE_FILL_COLOR type for: " + nodeView 
-//							+ ", which was: " + colorObject.getClass() + " with value: " + colorObject);
 				}
 				
 				if (color != null) {

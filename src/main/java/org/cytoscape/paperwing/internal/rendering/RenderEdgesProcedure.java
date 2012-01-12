@@ -243,26 +243,13 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 			p1.addLocal(p1Offset);
 
-			// if (latch_1) {
-			// System.out.println("Source index: " + sourceIndex);
-			// System.out.println("Source target: " + targetIndex);
-			// System.out.println("pairs.get(pairIdentifier): " +
-			// pairs.get(pairIdentifier));
-			// System.out.println("pairIdentifier: " + pairIdentifier);
-			// }
-
 			// Load name for edge picking
 			gl.glLoadName(edgeIndex);
 
 			edgeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED, false);
 
 			DrawStateModifier modifier;
-			// if (generalModifier == DrawStateModifier.ENLARGED) {
-			// modifier = DrawStateModifier.ENLARGED;
-			// } else if (selectedEdgeIndices.contains(edgeIndex)) {
 			
-			
-//			if (selectedEdgeIndices.contains(edgeIndex)) {
 			if (edgeView.getVisualProperty(MinimalVisualLexicon.EDGE_SELECTED)) {
 				modifier = DrawStateModifier.SELECTED;
 
@@ -375,12 +362,12 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		// Perform a transformation to adjust width
 		gl.glScalef(width, width, 1.0f);
 
-		Color color;
+		Color color = null;
 
 		if (modifier == DrawStateModifier.NORMAL) {
 			color = (Color) edgeView
 					.getVisualProperty(RichVisualLexicon.EDGE_PAINT);
-
+			
 			gl.glColor3f(color.getRed() / 255.0f, color.getGreen() / 255.0f,
 					color.getBlue() / 255.0f);
 
