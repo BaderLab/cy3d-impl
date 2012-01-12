@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
@@ -33,8 +34,8 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private DefaultValueVault defaultValues;
 	
 	// Assumes indices of nodes are unique
-	private HashMap<Integer, View<CyNode>> nodeViews;
-	private HashMap<Integer, View<CyEdge>> edgeViews;
+	private Map<Integer, View<CyNode>> nodeViews;
+	private Map<Integer, View<CyEdge>> edgeViews;
 	
 	public WindNetworkView(CyNetwork network, VisualLexicon visualLexicon) {
 		suid = SUIDFactory.getNextSUID();
@@ -58,7 +59,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		for (CyEdge edge : network.getEdgeList()) {
 			edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
 			defaultValues.initializeEdge(edgeView);
-		
+			
 			edgeViews.put(edge.getIndex(), edgeView);
 		}
 		

@@ -1,28 +1,40 @@
 package org.cytoscape.paperwing.internal.cytoscape.view;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 
 public class DefaultValueVault {
 	
 	// Assumes VisualProperty ID names are unique
-	private LinkedHashMap<String, VisualPropertyValueHolder<?>> nodeDefaultValues;
-	private LinkedHashMap<String, VisualPropertyValueHolder<?>> edgeDefaultValues;
-	private LinkedHashMap<String, VisualPropertyValueHolder<?>> networkDefaultValues;
+	private Map<String, VisualPropertyValueHolder<?>> nodeDefaultValues;
+	private Map<String, VisualPropertyValueHolder<?>> edgeDefaultValues;
+	private Map<String, VisualPropertyValueHolder<?>> networkDefaultValues;
+	
+	private Map<Class<? extends CyTableEntry>,
+		Map<String, VisualPropertyValueHolder<?>>> defaultValueSets;
 	
 	private VisualLexicon visualLexicon;
 	
 	public DefaultValueVault(VisualLexicon visualLexicon) {
 		this.visualLexicon = visualLexicon;
 		
-		nodeDefaultValues = new LinkedHashMap<String, VisualPropertyValueHolder<?>>();
-		edgeDefaultValues = new LinkedHashMap<String, VisualPropertyValueHolder<?>>();
-		networkDefaultValues = new LinkedHashMap<String, VisualPropertyValueHolder<?>>();
+		nodeDefaultValues = new HashMap<String, VisualPropertyValueHolder<?>>();
+		edgeDefaultValues = new HashMap<String, VisualPropertyValueHolder<?>>();
+		networkDefaultValues = new HashMap<String, VisualPropertyValueHolder<?>>();
+		
+		defaultValueSets = new HashMap<Class<? extends CyTableEntry>, Map<String, VisualPropertyValueHolder<?>>>();
+		defaultValueSets.put(CyNode.class, nodeDefaultValues);
+		defaultValueSets.put(CyEdge.class, edgeDefaultValues);
+		defaultValueSets.put(CyNetwork.class, networkDefaultValues);
 	
 		populateDefaultValues();
 	}
@@ -33,18 +45,11 @@ public class DefaultValueVault {
 		Class<?> targetDataType;
 		
 		for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
-			valueHolder = new VisualPropertyValueHolder(visualProperty.getDefault());
+			valueHolder = new VisualPropertyValueHolder<Object>(visualProperty.getDefault());
 			targetDataType = visualProperty.getTargetDataType();
 			
-			if (targetDataType == CyNode.class) {
-				nodeDefaultValues.put(visualProperty.getIdString(), valueHolder);
-//				System.out.println("Node default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
-			} else if (targetDataType == CyEdge.class) {
-				edgeDefaultValues.put(visualProperty.getIdString(), valueHolder);
-//				System.out.println("Edge default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
-			} else if (targetDataType == CyNetwork.class) {
-				networkDefaultValues.put(visualProperty.getIdString(), valueHolder);
-//				System.out.println("Network default: " + visualProperty.getIdString() + " -> " + valueHolder.getValue());
+			if (defaultValueSets.get(targetDataType) != null) {
+				defaultValueSets.get(targetDataType).put(visualProperty.getIdString(), valueHolder);
 			}
 		}
 	}
@@ -60,39 +65,26 @@ public class DefaultValueVault {
 		
 		VisualPropertyValueHolder<V> valueHolder = new VisualPropertyValueHolder<V>(value);
 		
-		if (targetDataType == CyNode.class) {
-			nodeDefaultValues.put(visualProperty.getIdString(), valueHolder);
-		} else if (targetDataType == CyEdge.class) {
-			edgeDefaultValues.put(visualProperty.getIdString(), valueHolder);
-		} else if (targetDataType == CyNetwork.class) {
-			networkDefaultValues.put(visualProperty.getIdString(), valueHolder);
+		if (defaultValueSets.get(targetDataType) != null) {
+			defaultValueSets.get(targetDataType).put(visualProperty.getIdString(), valueHolder);
 		}
 	}
 	
 	public void initializeNode(VisualPropertyKeeper<CyNode> keeper) {
-		VisualPropertyValueHolder<?> valueHolder;
-		
-		for (String key : nodeDefaultValues.keySet()) {
-			valueHolder = nodeDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder.getValue());
+		for (Entry<String, VisualPropertyValueHolder<?>> entry: nodeDefaultValues.entrySet()) {	
+			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
 		}
 	}
 	
 	public void initializeEdge(VisualPropertyKeeper<CyEdge> keeper) {
-		VisualPropertyValueHolder<?> valueHolder;
-		
-		for (String key : edgeDefaultValues.keySet()) {
-			valueHolder = edgeDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder.getValue());
+		for (Entry<String, VisualPropertyValueHolder<?>> entry: edgeDefaultValues.entrySet()) {	
+			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
 		}
 	}
 	
 	public void initializeNetwork(VisualPropertyKeeper<CyNetwork> keeper) {
-		VisualPropertyValueHolder<?> valueHolder;
-		
-		for (String key : networkDefaultValues.keySet()) {
-			valueHolder = networkDefaultValues.get(key);	
-			keeper.setVisualProperty(key, valueHolder.getValue());
+		for (Entry<String, VisualPropertyValueHolder<?>> entry: networkDefaultValues.entrySet()) {	
+			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.cytoscape.view;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualProperty;
@@ -8,7 +9,7 @@ import org.cytoscape.view.model.VisualProperty;
 // This class assumes that the VisualProperty's getIdString() method returns a unique
 // value amongst the VisualProperty objects
 public abstract class VisualPropertyKeeper<S> implements View<S>{
-	private HashMap<String, VisualPropertyValueHolder<?>> valueHolders;
+	private Map<String, VisualPropertyValueHolder<?>> valueHolders;
 	
 	public VisualPropertyKeeper() {
 		valueHolders = new HashMap<String, VisualPropertyValueHolder<?>>();
@@ -37,7 +38,6 @@ public abstract class VisualPropertyKeeper<S> implements View<S>{
 		setVisualProperty(visualProperty, value);
 		
 		valueHolders.get(visualProperty.getIdString()).setValueLocked(true);
-		
 	}
 
 	@Override
