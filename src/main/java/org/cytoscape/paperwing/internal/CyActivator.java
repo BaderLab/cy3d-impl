@@ -42,7 +42,7 @@ public class CyActivator extends AbstractCyActivator {
 		windNetworkViewFactoryProps.setProperty("serviceType", 
 				"factory");
 		registerService(bc, windNetworkViewFactory, CyNetworkViewFactory.class, windNetworkViewFactoryProps);
-		
+
 		// Main RenderingEngine factory
 		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,

@@ -69,7 +69,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	// Needs to be called before setUpCanvas
 	public void setUpNetworkView(CyNetworkViewManager networkViewManager) {
 		if (networkViewManager != null) {
-			this.networkView = networkViewManager.getNetworkView(viewModel.getModel().getSUID());
+			this.networkView = networkViewManager.getNetworkView(viewModel.getModel());
 		}
 	}
 	

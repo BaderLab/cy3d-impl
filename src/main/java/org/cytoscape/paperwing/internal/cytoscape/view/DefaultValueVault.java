@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.cytoscape.view;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class DefaultValueVault {
 	
@@ -36,7 +38,12 @@ public class DefaultValueVault {
 		defaultValueSets.put(CyEdge.class, edgeDefaultValues);
 		defaultValueSets.put(CyNetwork.class, networkDefaultValues);
 	
+		// Populate with default values from the relevant VisualLexicon (eg. RichVisualLexicon, MinimalVisualLexicon)
 		populateDefaultValues();
+		
+		// Override VisualLexicon default values with custom
+		// Wind values, useful for old MinimalVisualLexicon values
+//		updateDefaultValues();
 	}
 	
 	// Sets initial default values
@@ -52,6 +59,11 @@ public class DefaultValueVault {
 				defaultValueSets.get(targetDataType).put(visualProperty.getIdString(), valueHolder);
 			}
 		}
+	}
+	
+	// Override selected values from VisualProperties
+	private void updateDefaultValues() {
+		modifyDefaultValue(RichVisualLexicon.NODE_FILL_COLOR, new Color(120, 120, 120));
 	}
 	
 //	@Override

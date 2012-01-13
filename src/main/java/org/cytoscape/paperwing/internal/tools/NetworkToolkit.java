@@ -210,8 +210,13 @@ public class NetworkToolkit {
 	public static boolean checkEdgeSelected(int index, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultNodeTable();
-		CyRow row = table.getRow(network.getEdge(index).getSUID());
+		CyEdge edge = network.getEdge(index);
 		
-		return row.get(SELECTED_COLUMN_NAME, Boolean.class);
+		if (edge != null) {
+			CyRow row = table.getRow(edge.getSUID());
+			return row.get(SELECTED_COLUMN_NAME, Boolean.class);
+		} else {
+			return false;
+		}
 	}
 }

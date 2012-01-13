@@ -17,6 +17,7 @@ import org.cytoscape.paperwing.internal.input.MainInputProcessor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderBoundingBoxProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
@@ -33,7 +34,7 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
 		
 		renderProcedures.put("nodes", new RenderNodesProcedure());
-		renderProcedures.put("edges", new RenderEdgesProcedure());
+		renderProcedures.put("edges", new RenderArcEdgesProcedure());
 		renderProcedures.put("boundingBox", new RenderBoundingBoxProcedure());
 		
 		renderProcedures.put("resetScene", new ResetSceneProcedure());

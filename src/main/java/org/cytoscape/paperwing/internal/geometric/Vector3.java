@@ -148,9 +148,8 @@ public class Vector3 {
 				/ Math.sqrt(lengthSquare * otherLengthSquare);
 
 		if (Double.isNaN(cosArgument)) {
-			System.out.println("cosArgument NaN");
-			System.out.println("lengthSquare: " + lengthSquare);
-			System.out.println("otherLengthSquare: " + otherLengthSquare);
+			System.out.println("cosArgument NaN for Vector3.angle(Vector3)");
+			Thread.dumpStack();
 			return 0;
 		} else if (cosArgument >= 1) {
 			return 0;

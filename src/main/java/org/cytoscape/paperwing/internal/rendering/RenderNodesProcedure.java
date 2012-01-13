@@ -8,6 +8,7 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
@@ -102,70 +103,49 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 					.floatValue() / distanceScale;
 
 			index = nodeView.getModel().getIndex();
-			gl.glLoadName(index);
-			// gl.glLoadName(33);
-
-			gl.glPushMatrix();
-			gl.glTranslatef(x, y, z);
-
-			/*
-			 * gl.glScalef(nodeView.getVisualProperty(
-			 * MinimalVisualLexicon.NODE_WIDTH).floatValue() / DISTANCE_SCALE,
-			 * nodeView.getVisualProperty(
-			 * MinimalVisualLexicon.NODE_HEIGHT).floatValue() / DISTANCE_SCALE,
-			 * nodeView.getVisualProperty(
-			 * RichVisualLexicon.NODE_DEPTH).floatValue() / DISTANCE_SCALE);
-			 */
-
-			Color color = null;
-
-//			if (selectedNodeIndices.contains(index)) {
-//			if (NetworkToolkit.checkNodeSelected(index, networkView)) {
-			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_SELECTED)) {
 			
-				gl.glScalef(1.1f, 1.1f, 1.1f);
-
-				color = (Color) nodeView
-						.getVisualProperty(RichVisualLexicon.NODE_SELECTED_PAINT);
-
-//				gl.glColor3f(color.getRed() / 255.0f,
-//						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
-
-
-				RenderColor.setNonAlphaColors(gl, DEFAULT_SELECTED_COLOR);
-			} else if (index == hoverNodeIndex) {
-				RenderColor.setNonAlphaColors(gl, DEFAULT_HOVER_COLOR);
-
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_SELECTED,
-						false);
-			} else {
-//				color = (Color) nodeView
-//						.getVisualProperty(MinimalVisualLexicon.NODE_PAINT);
-
-				Object colorObject = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_FILL_COLOR);
-				
-				if (colorObject != null
-						&& colorObject.getClass() == Color.class) {
-					color = (Color) colorObject;
-				}
-				
-				if (color != null) {
-					gl.glColor3f(color.getRed() / 255.0f,
-						color.getGreen() / 255.0f, color.getBlue() / 255.0f);
-				} else {
-					RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
-				}
-				
-				// RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
-			}
+			// gl.glLoadName(33);
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
+				gl.glPushMatrix();
+				gl.glTranslatef(x, y, z);
+				gl.glLoadName(index);
+				
+				chooseColor(gl, nodeView, graphicsData);
 				gl.glCallList(nodeListIndex);
+				
+				gl.glPopMatrix();
 			}
-
-			gl.glPopMatrix();
 		}
+	}
+	
+	private void chooseColor(GL2 gl, View<CyNode> nodeView, GraphicsData graphicsData) {
+		Color visualPropertyColor = null;
+		visualPropertyColor = (Color) nodeView.getVisualProperty(RichVisualLexicon.NODE_FILL_COLOR);
+		
+		RenderColor color = new RenderColor(DEFAULT_COLOR);
+		
+		if (visualPropertyColor != null) {
+			color.set((double) visualPropertyColor.getRed() / 255, 
+					(double) visualPropertyColor.getGreen() / 255, 
+					(double) visualPropertyColor.getBlue() / 255);
+		}
+		
+		if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_SELECTED)) {
+			
+			// Make selected nodes appear greener
+			color.multiplyRed(0.7, 0, 1);
+			color.multiplyGreen(1.5, 0.5, 1);
+			color.multiplyBlue(0.7, 0, 1);
+		} else if (nodeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverNodeIndex()) {
+			// Make hovered nodes appear bluer
+			color.multiplyRed(0.7, 0, 1);
+			color.multiplyGreen(0.7, 0, 1);
+			color.multiplyBlue(1.5, 0.5, 1);
+		}
+		
+		RenderColor.setNonAlphaColors(gl, color);
 	}
 
 }

@@ -14,6 +14,7 @@ import org.cytoscape.paperwing.internal.input.MainInputProcessor;
 import org.cytoscape.paperwing.internal.picking.DefaultShapePickingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
@@ -28,7 +29,7 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
 		
 		renderProcedures.put("nodes", new RenderNodesProcedure());
-		renderProcedures.put("edges", new RenderEdgesProcedure());
+		renderProcedures.put("edges", new RenderArcEdgesProcedure());
 		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
 		
 		renderProcedures.put("resetScene", new ResetSceneProcedure());
@@ -68,7 +69,7 @@ public class MainGraphicsHandler implements GraphicsHandler {
 
 	@Override
 	public ShapePickingProcessor getShapePickingProcessor() {
-		return new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderEdgesProcedure());
+		return new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderArcEdgesProcedure());
 	}
 
 	@Override
