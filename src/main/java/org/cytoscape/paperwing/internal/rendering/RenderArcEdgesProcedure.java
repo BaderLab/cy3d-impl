@@ -192,12 +192,12 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					
 					// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
 					int edgeLevel = (int) (Math.sqrt((double) container.edgeNumber));
-					int maxLevel = (int) (Math.sqrt((double) container.totalCoincidentEdges / 2));
+					int maxLevel = (int) (Math.sqrt((double) container.totalCoincidentEdges));
 					
 					int edgesInLevel = edgeLevel * 2 + 1;
 					
 					// Smaller edge level -> greater radius
-					curvedEdgeRadius = start.distance(end) * (1.6 + (double) 1 / edgeLevel);
+					curvedEdgeRadius = start.distance(end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
 					
 					// The outmost level is usually not completed
 					if (edgeLevel == maxLevel) {
