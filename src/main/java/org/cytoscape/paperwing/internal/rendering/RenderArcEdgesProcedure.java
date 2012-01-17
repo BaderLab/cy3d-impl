@@ -40,11 +40,21 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private int segmentListIndex;
 	
+	// Container for EdgeView objects that also adds information about whether the
+	// edge is part of a series of edges that connect the same pair of nodes
 	private class EdgeViewContainer {
-		private View<CyEdge> edgeView;
+		protected View<CyEdge> edgeView;
 		
-		private int edgeNumber;
-		private int totalCoincidentEdges;
+		// Identifies the pair of nodes that the edge connects
+		protected long pairIdentifier;
+		
+		// The index of this edge compared to all the other edges that connect the same pair
+		// of nodes. If this is the first of 7 edges that connect the same pair of nodes, its
+		// edgeNumber would be set to 1.
+		protected int edgeNumber;
+		
+		// The total number of edges that connect the pair of nodes.
+		protected int totalCoincidentEdges;
 	}
 	
 	// Analyze the network to obtain whether each edge is connecting 2 nodes that
@@ -52,15 +62,24 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	// Maybe add an optimization so we only have to re-analyze the network each time it changes?
 	private Set<EdgeViewContainer> analyzeEdges(CyNetworkView networkView) {
 		
-		// A pair of nodes will be identified by index1 * index2 + index1, where index1
-		// is the higher of the 2 indices
-		Map<Long, Integer> pairs = new HashMap<Long, Integer>(
+		// Create the set of containers to be returned
+		Set<EdgeViewContainer> edgeViewContainers = new HashSet<EdgeViewContainer>(
+				networkView.getModel().getEdgeCount());
+		
+		// This map maps each node-pair identifier to the number of edges between that pair of nodes
+		// The identifier is: max(sourceIndex, targetIndex) * nodeCount + min(sourceIndex, targetIndex)
+		Map<Long, Integer> pairCoincidenceCount = new HashMap<Long, Integer>(
 				networkView.getModel().getNodeCount());
 		long identifier;
 		int sourceIndex, targetIndex;
 		int nodeCount = networkView.getModel().getNodeCount();
+		CyEdge edge;
+		int edgeNumber;
 		
-		for (CyEdge edge : networkView.getModel().getEdgeList()) {			
+		// Assign an identifier to each pair of nodes
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {			
+			edge = edgeView.getModel();
+			
 			sourceIndex = edge.getSource().getIndex();
 			targetIndex = edge.getTarget().getIndex();
 			
@@ -70,23 +89,31 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				identifier = (long) nodeCount * targetIndex + sourceIndex;
 			}
 			
-			if (!pairs.containsKey(identifier)) {
-				pairs.put(identifier, 1);
+			// Assign a value that represents how many edges have been found between this pair
+			if (!pairCoincidenceCount.containsKey(identifier)) {
+				edgeNumber = 1;
 			} else {
-				pairs.put(identifier, pairs.get(identifier) + 1);
+				edgeNumber = pairCoincidenceCount.get(identifier) + 1;
 			}
+			
+			pairCoincidenceCount.put(identifier, edgeNumber);
+			
+			EdgeViewContainer container = new EdgeViewContainer();
+			container.edgeView = edgeView;
+			container.pairIdentifier = identifier;
+			container.edgeNumber = edgeNumber;
+			
+			edgeViewContainers.add(container);
 		}
 		
-		Set<EdgeViewContainer> edgeViewContainers = new HashSet<EdgeViewContainer>(
-				networkView.getModel().getEdgeCount());
-		
-		EdgeViewContainer container;
-		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-			// container = new
+		// Update the value for the total number of edges between this pair of nodes
+		for (EdgeViewContainer container : edgeViewContainers) {
+			container.totalCoincidentEdges = pairCoincidenceCount.get(container.pairIdentifier);
 		}
 		
-		return null;
+		return edgeViewContainers;
 	}
+
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
@@ -199,9 +226,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		double nearCornerAngle = Math.PI / 2 - (arcAngle / 2);
 	
+		// Set the angle of rotation along the node-to-node displacement axis
 		Vector3 targetDirection = new Vector3(0, 0, 1);
 		targetDirection = targetDirection.rotate(displacement, angle);
 		
+		// Offset vector that points from first node to the circle's center
 		Vector3 circleCenterOffset = displacement.rotate(targetDirection.cross(displacement), nearCornerAngle);
 		circleCenterOffset.normalizeLocal();
 		circleCenterOffset.multiplyLocal(radius);
