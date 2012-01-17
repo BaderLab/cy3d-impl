@@ -38,6 +38,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
+	private static final int NUM_SEGMENTS = 11;
+	
 	private int segmentListIndex;
 	
 	// Container for EdgeView objects that also adds information about whether the
@@ -76,10 +78,10 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		CyEdge edge;
 		int edgeNumber;
 		
-		// Assign an identifier to each pair of nodes
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {			
 			edge = edgeView.getModel();
 			
+			// Assign an identifier to each pair of nodes
 			sourceIndex = edge.getSource().getIndex();
 			targetIndex = edge.getTarget().getIndex();
 			
@@ -140,26 +142,86 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		GL2 gl = graphicsData.getGlContext();
 		
-		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+//		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+//			
+//			chooseColor(gl, edgeView, graphicsData);
+//			
+//			CyEdge edge = edgeView.getModel();
+//			Vector3 start = obtainCoordinates(edge.getSource(), networkView, graphicsData.getDistanceScale());
+//			Vector3 end = obtainCoordinates(edge.getTarget(), networkView, graphicsData.getDistanceScale());
+//			
+//			// TODO: Check for case where source() == target(), ie. self-edge
+//			
+//			if (start != null && end != null) {
+//				// Load name for edge picking
+//				gl.glLoadName(edge.getIndex());
+//				
+//				// drawSegment(gl, start, end);
+//				drawArcSegments(gl, start, end, 0.2, Math.PI, 4);
+//			}
+//		}
+		
+		double distanceScale = graphicsData.getDistanceScale();
+		
+		Set<EdgeViewContainer> edgeViewContainers = analyzeEdges(networkView);
+		View<CyEdge> edgeView;
+		CyEdge edge;
+		Vector3 start, end;
+		
+		double curvedEdgeRadius, edgeRadialAngle;
+		for (EdgeViewContainer container : edgeViewContainers) {
+			edgeView = container.edgeView;
 			
 			chooseColor(gl, edgeView, graphicsData);
 			
-			CyEdge edge = edgeView.getModel();
-			Vector3 start = obtainCoordinates(edge.getSource(), networkView, graphicsData.getDistanceScale());
-			Vector3 end = obtainCoordinates(edge.getTarget(), networkView, graphicsData.getDistanceScale());
+			edge = edgeView.getModel();
+			start = obtainCoordinates(edge.getSource(), networkView, distanceScale);
+			end = obtainCoordinates(edge.getTarget(), networkView, distanceScale);
 			
-			// TODO: Check for case where source() == target(), ie. self-edge
+			// TODO: Check for cases where the edge goes from a node to itself
 			
 			if (start != null && end != null) {
-				// Load name for edge picking
+				// Load name for edge pikcking
 				gl.glLoadName(edge.getIndex());
 				
-				// drawSegment(gl, start, end);
-				drawArcSegments(gl, start, end, 0.2, Math.PI, 4);
-			} else { 
-//				System.out.println("Null coordinates: " + start + ", " + end);
+				// If there's only 1 edge between this pair of nodes, draw it straight
+				if (container.totalCoincidentEdges <= 1) {
+					drawSegment(gl, start, end);
+				// Otherwise, distribute the edges radially and make them curved
+				} else {
+					
+					// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
+					int edgeLevel = (int) (Math.sqrt((double) container.edgeNumber));
+					int maxLevel = (int) (Math.sqrt((double) container.totalCoincidentEdges / 2));
+					
+					int edgesInLevel = edgeLevel * 2 + 1;
+					
+					// Smaller edge level -> greater radius
+					curvedEdgeRadius = start.distance(end) * (1.6 + (double) 1 / edgeLevel);
+					
+					// The outmost level is usually not completed
+					if (edgeLevel == maxLevel) {
+						edgesInLevel = (int) (container.totalCoincidentEdges - Math.pow(maxLevel, 2) + 1);
+					}
+					
+					edgeRadialAngle = (double) (container.edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
+					
+					if (graphicsData.getFramesElapsed() == 500) {
+						System.out.println("edgeNumber: " + container.edgeNumber);
+						System.out.println("totalCoincidentEdges: " + container.totalCoincidentEdges);
+						System.out.println("edgeLevel: " + edgeLevel);
+						System.out.println("maxLevel: " + maxLevel);
+						System.out.println("edgesInLevel: " + edgesInLevel);
+						System.out.println("curvedEdgeRadius: " + curvedEdgeRadius);
+						System.out.println("edgeRadialAngle: " + edgeRadialAngle);
+						System.out.println("==================================");
+					}
+					
+					drawArcSegments(gl, start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
+				}
 			}
 		}
+		
 	}
 	
 	// Picks a color according to the edgeView and passes it to OpenGL
@@ -216,7 +278,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// Radius adjustment (can't draw an arc from start to end if the radius of the arc is less than half that
 		// distance)
-		radius = Math.max(displacementLength * 2, radius);
+		// radius = Math.max(displacementLength * 2, radius);
 		
 		// Use cosine law
 		double arcAngle;
