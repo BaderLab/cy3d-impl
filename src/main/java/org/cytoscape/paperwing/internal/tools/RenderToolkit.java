@@ -17,13 +17,15 @@ public class RenderToolkit {
 	 * 			
 	 */
 	public static void setUpFacingTransformation(GL2 gl, Vector3 location, Vector3 direction) {
-		gl.glTranslated(location.x(), location.y(), location.z());
+		gl.glTranslatef((float) location.x(), (float) location.y(), (float) location.z());
 		
 		Vector3 current = new Vector3(0, 0, 1);
 		Vector3 rotateAxis = current.cross(direction);
 		
-		gl.glRotated(Math.toDegrees(direction.angle(current)), rotateAxis.x(), rotateAxis.y(),
-				rotateAxis.z());
+		gl.glRotatef((float) Math.toDegrees(direction.angle(current)), 
+				(float) rotateAxis.x(),
+				(float) rotateAxis.y(),
+				(float) rotateAxis.z());
 	}
 
 }

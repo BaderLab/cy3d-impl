@@ -206,17 +206,17 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					
 					edgeRadialAngle = (double) (container.edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
 					
-					if (graphicsData.getFramesElapsed() == 500) {
-						System.out.println("edgeNumber: " + container.edgeNumber);
-						System.out.println("totalCoincidentEdges: " + container.totalCoincidentEdges);
-						System.out.println("edgeLevel: " + edgeLevel);
-						System.out.println("maxLevel: " + maxLevel);
-						System.out.println("edgesInLevel: " + edgesInLevel);
-						System.out.println("curvedEdgeRadius: " + curvedEdgeRadius);
-						System.out.println("edgeRadialAngle: " + edgeRadialAngle);
-						System.out.println("==================================");
-					}
-					
+//					if (graphicsData.getFramesElapsed() == 500) {
+//						System.out.println("edgeNumber: " + container.edgeNumber);
+//						System.out.println("totalCoincidentEdges: " + container.totalCoincidentEdges);
+//						System.out.println("edgeLevel: " + edgeLevel);
+//						System.out.println("maxLevel: " + maxLevel);
+//						System.out.println("edgesInLevel: " + edgesInLevel);
+//						System.out.println("curvedEdgeRadius: " + curvedEdgeRadius);
+//						System.out.println("edgeRadialAngle: " + edgeRadialAngle);
+//						System.out.println("==================================");
+//					}
+
 					drawArcSegments(gl, start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
 				}
 			}

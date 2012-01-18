@@ -230,6 +230,8 @@ public class Graphics implements GLEventListener {
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 31);
+		
+		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
 	}
 
 	@Override

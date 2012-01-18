@@ -30,8 +30,9 @@ public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
 		Vector3 target = camera.getTarget();
 		Vector3 up = camera.getUp();
 
-		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
-				target.y(), target.z(), up.x(), up.y(), up.z());
+		glu.gluLookAt((float) position.x(), (float) position.y(), (float) position.z(), 
+				(float) target.x(), (float) target.y(), (float) target.z(), 
+				(float) up.x(), (float) up.y(), (float) up.z());
 	}
 
 }

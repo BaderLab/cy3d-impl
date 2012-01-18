@@ -11,6 +11,8 @@ import javax.media.opengl.glu.GLUquadric;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer;
+import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
@@ -41,6 +43,12 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 	private int nodeListIndex;
 
+	private ScalableShapeDrawer shapeDrawer;
+	
+	public RenderNodesProcedure() {
+		shapeDrawer = new ScalableShapeDrawer();
+	}
+	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
@@ -62,6 +70,8 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		// glut.glutSolidSphere(SMALL_SPHERE_RADIUS, NODE_SLICES_DETAIL,
 		// NODE_STACKS_DETAIL);
 		gl.glEndList();
+		
+		shapeDrawer.initialize(gl);
 
 	}
 
@@ -113,7 +123,10 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				gl.glLoadName(index);
 				
 				chooseColor(gl, nodeView, graphicsData);
-				gl.glCallList(nodeListIndex);
+				//gl.glCallList(nodeListIndex);
+				
+				gl.glScalef(SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS);
+				shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
 				
 				gl.glPopMatrix();
 			}
