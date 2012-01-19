@@ -314,13 +314,15 @@ public class Vector3 {
 	
 	/** Treating this vector as a position vector, rotate it about the
 	 * given normal that passes through the origin by the specified
-	 * angle in the right-hand rule direction, in radians
+	 * angle in the right-hand rule direction, in radians.
+	 * 
+	 * The given normal must be perpendicular to this vector.
 	 * 
 	 * @param normal The normal vector used for the rotation
 	 * @param angle The angle in radians to rotate this vector
 	 * @return A new vector representing the rotated vector
 	 */
-	public Vector3 rotate(Vector3 normal, double angle) {
+	public Vector3 rotateOld(Vector3 normal, double angle) {
     	// Parametric equation for circle in 3D space:
     	// P = Rcos(t)u + Rsin(t)nxu + c
     	//
@@ -362,7 +364,7 @@ public class Vector3 {
     	System.out.println("current vector:" + this);
     	System.out.println("normal after normalization:" + rotated);
     	
-    	rotated.crossLocal(this);
+    	rotated.crossLocal(this.normalize());
     	System.out.println("normal after cross product:" + rotated);
     	
     	rotated.multiplyLocal(Math.sin(angle));
@@ -371,6 +373,38 @@ public class Vector3 {
     	System.out.println("current vector multiplied by cos(angle): " + this.multiply(Math.cos(angle)));
     	
     	rotated.addLocal(this.multiply(Math.cos(angle)));
+    	
+    	return rotated;
+    }
+	
+	// Removed requirement for this vector to be perpendicular to the given normal
+	public Vector3 rotate(Vector3 normal, double angle) {
+    	// Parametric equation for circle in 3D space:
+    	// P = Rcos(t)u + Rsin(t)nxu + c
+    	//
+    	// Where:
+    	//  -u is a unit vector from the centre of the circle to any point
+    	// on the circumference
+    	//  -R is the radius
+    	//  -n is a unit vector perpendicular to the plane
+        //  -c is the centre of the circle.
+    	
+		//TODO: obtain a more efficient sin function
+    	Vector3 rotated;
+    	
+    	// Decompose vector to be rotated into 2 components:
+    	// 1. perpendicular to normal
+    	// 2. parallel to normal
+    	Vector3 perpendicularOffset = this.projectNormal(normal);
+    	Vector3 parallelOffset = this.subtract(perpendicularOffset);
+    	
+    	rotated = normal.normalize();
+    	rotated.crossLocal(perpendicularOffset);
+    	rotated.multiplyLocal(Math.sin(angle));
+    	rotated.addLocal(perpendicularOffset.multiply(Math.cos(angle)));
+    	
+    	// Add back the parallel component
+    	rotated.addLocal(parallelOffset);
     	
     	return rotated;
     }
