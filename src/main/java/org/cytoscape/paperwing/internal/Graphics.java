@@ -164,6 +164,7 @@ public class Graphics implements GLEventListener {
 		gl.glEnable(GL.GL_DEPTH_TEST);
 
 		gl.glDepthFunc(GL.GL_LEQUAL);
+		// gl.glDepthFunc(GL2.GL_LESS);
 		// gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_FASTEST);
 		// gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);

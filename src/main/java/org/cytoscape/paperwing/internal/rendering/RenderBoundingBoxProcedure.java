@@ -9,6 +9,7 @@ import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.RenderColor;
+import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
@@ -22,10 +23,12 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-//		drawFullBox(graphicsData);
 		
 		if (graphicsData.getCoordinatorData().isInitialBoundsMatched()) {
-			drawHalfBox(graphicsData);
+			// drawFullBox(graphicsData);
+			
+			drawViewingVolumePortion(graphicsData);
+			// drawHalfBox(graphicsData);
 		}
 	}
 	
@@ -113,5 +116,64 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glEnable(GL2.GL_LIGHTING);
+	}
+	
+	/** Draws a portion of the viewing volume.
+	 * 
+	 * Currently, the stored bounds representing the main camera's view is used as the front
+	 * face of the volume, and the back face is placed at a distance equal to 2 times the distance
+	 * between the front face and the camera.
+	 */
+	private void drawViewingVolumePortion(GraphicsData graphicsData) {
+		
+		GL2 gl = graphicsData.getGlContext();
+		
+		Quadrilateral frontFace = graphicsData.getCoordinatorData().getBounds();
+		Quadrilateral backFace = frontFace.copy();
+		
+		// Move the back face so it is twice the distance away from the depicted camera as the front face
+		backFace.moveTo(frontFace.getCenterPoint().towards(
+				graphicsData.getCoordinatorData().getLastReportedMainCameraPosition(), 2));
+		
+		gl.glDisable(GL2.GL_LIGHTING);
+		gl.glDisable(GL.GL_DEPTH_TEST);
+		
+		gl.glColor3f(0.7f, 0.7f, 0.7f);
+		
+		gl.glBegin(GL2.GL_LINE_STRIP);
+		
+		// Front face
+		RenderToolkit.drawPoint(gl, frontFace.getTopLeft());
+		RenderToolkit.drawPoint(gl, frontFace.getTopRight());
+		RenderToolkit.drawPoint(gl, frontFace.getBottomRight());
+		RenderToolkit.drawPoint(gl, frontFace.getBottomLeft());
+		RenderToolkit.drawPoint(gl, frontFace.getTopLeft());
+		
+		// Back face (includes top left edge)
+		RenderToolkit.drawPoint(gl, backFace.getTopLeft());
+		RenderToolkit.drawPoint(gl, backFace.getBottomLeft());
+		RenderToolkit.drawPoint(gl, backFace.getBottomRight());
+		RenderToolkit.drawPoint(gl, backFace.getTopRight());
+		gl.glEnd();
+		
+		gl.glBegin(GL2.GL_LINES);
+		
+		// Bottom left edge
+		RenderToolkit.drawPoint(gl, frontFace.getBottomLeft());
+		RenderToolkit.drawPoint(gl, backFace.getBottomLeft());
+		
+		// Bottom right edge
+		RenderToolkit.drawPoint(gl, frontFace.getBottomRight());
+		RenderToolkit.drawPoint(gl, backFace.getBottomRight());
+		
+		// Top right edge
+		RenderToolkit.drawPoint(gl, frontFace.getTopRight());
+		RenderToolkit.drawPoint(gl, backFace.getTopRight());
+		
+		gl.glEnd();
+		
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL2.GL_LIGHTING);
+		
 	}
 }

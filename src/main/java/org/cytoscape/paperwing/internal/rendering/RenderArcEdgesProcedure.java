@@ -25,7 +25,7 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final double SEGMENT_RADIUS = 0.009;
+	private static final double SEGMENT_RADIUS = 0.007;
 	private static final int SEGMENT_SLICES = 4;
 	private static final int SEGMENT_STACKS = 1;
 	
@@ -38,7 +38,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
-	private static final int NUM_SEGMENTS = 11;
+	private static final int NUM_SEGMENTS = 3;
 	
 	private int segmentListIndex;
 	

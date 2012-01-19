@@ -53,6 +53,10 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 					// Obtain data from coordinator
 					coordinatorData.setBoundsTo(coordinator.calculateBounds());
 					
+					// Store a copy of the main camera's position
+					coordinatorData.setLastReportedMainCameraPosition(
+							coordinator.getUpdatedMainCameraPosition());
+					
 					// Unset flag
 					coordinator.setMainCameraMoved(false);
 				}
@@ -62,6 +66,9 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 					
 					// Obtain data from coordinator
 					coordinatorData.setBoundsTo(coordinator.calculateBounds());
+					
+					coordinatorData.setLastReportedMainCameraPosition(
+							coordinator.getUpdatedMainCameraPosition());
 					
 					// Unset flag
 					coordinator.setSuggestRecalculateBounds(false);

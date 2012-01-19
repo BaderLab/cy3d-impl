@@ -127,12 +127,9 @@ public class ScalableShapeDrawer {
 		Vector3 zAxisDirection = new Vector3(0, 0, 1);
 		
 		// Points' positions are relative to the center of the shape
-		Vector3 topPoint = new Vector3(0, radius * 4, 0);
+		Vector3 topPoint = new Vector3(0, radius, 0);
 		Vector3 nearLeftPoint = topPoint.rotate(zAxisDirection, Math.toRadians(120));
-		System.out.println("nearLeft after first rotation: " + nearLeftPoint);
-		System.out.println("nearLeft distance: " + nearLeftPoint.magnitude());
-		
-		nearLeftPoint = nearLeftPoint.rotateDebug(yAxisDirection, Math.toRadians(30));
+		nearLeftPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(30));
 		
 		Vector3 farPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(240));
 		Vector3 nearRightPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(120));
@@ -144,14 +141,14 @@ public class ScalableShapeDrawer {
 		Vector3 rightBackNormal = frontNormal.rotate(yAxisDirection, Math.toRadians(120));
 		Vector3 bottomNormal = new Vector3(0, -1, 0);
 		
-		System.out.println("Tetrahedron coordinates: ");
-		System.out.println("top: " + topPoint);
-		System.out.println("nearLeft: " + nearLeftPoint);
-		System.out.println("nearLeft distance: " + nearLeftPoint.magnitude());
-		System.out.println("nearRight: " + nearRightPoint);
-		System.out.println("nearRight distance: " + nearRightPoint.magnitude());
-		System.out.println("far: " + farPoint);
-		System.out.println("far distance: " + farPoint.magnitude());
+//		System.out.println("Tetrahedron coordinates: ");
+//		System.out.println("top: " + topPoint);
+//		System.out.println("nearLeft: " + nearLeftPoint);
+//		System.out.println("nearLeft distance: " + nearLeftPoint.magnitude());
+//		System.out.println("nearRight: " + nearRightPoint);
+//		System.out.println("nearRight distance: " + nearRightPoint.magnitude());
+//		System.out.println("far: " + farPoint);
+//		System.out.println("far distance: " + farPoint.magnitude());
 		
 		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
 		
@@ -165,7 +162,7 @@ public class ScalableShapeDrawer {
 		RenderToolkit.setNormal(gl, leftBackNormal);
 		RenderToolkit.drawPoint(gl, topPoint);
 		RenderToolkit.drawPoint(gl, farPoint);
-		RenderToolkit.drawPoint(gl, nearRightPoint);
+		RenderToolkit.drawPoint(gl, nearLeftPoint);
 		
 		RenderToolkit.setNormal(gl, rightBackNormal);
 		RenderToolkit.drawPoint(gl, topPoint);

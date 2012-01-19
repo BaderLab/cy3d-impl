@@ -9,6 +9,8 @@ public class CoordinatorData {
 	
 	private boolean boundsManuallyChanged;
 	private boolean initialBoundsMatched;
+
+	public Vector3 lastReportedMainCameraPosition;
 	
 	// This class only works with copies of Vector3 objects
 	public CoordinatorData() {
@@ -16,6 +18,8 @@ public class CoordinatorData {
 		
 		boundsManuallyChanged = false;
 		initialBoundsMatched = false;
+		
+		lastReportedMainCameraPosition = new Vector3();
 	}
 
 	public void setBoundsTo(Quadrilateral bounds) {
@@ -40,5 +44,14 @@ public class CoordinatorData {
 
 	public boolean isInitialBoundsMatched() {
 		return initialBoundsMatched;
+	}
+
+	public Vector3 getLastReportedMainCameraPosition() {
+		return lastReportedMainCameraPosition;
+	}
+
+	public void setLastReportedMainCameraPosition(
+			Vector3 lastReportedMainCameraPosition) {
+		this.lastReportedMainCameraPosition.set(lastReportedMainCameraPosition);
 	}
 }

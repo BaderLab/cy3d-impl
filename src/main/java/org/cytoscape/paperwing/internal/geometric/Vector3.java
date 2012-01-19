@@ -343,39 +343,7 @@ public class Vector3 {
     	
     	return rotated;
     }
-	
-	public Vector3 rotateDebug(Vector3 normal, double angle) {
-    	// Parametric equation for circle in 3D space:
-    	// P = Rcos(t)u + Rsin(t)nxu + c
-    	//
-    	// Where:
-    	//  -u is a unit vector from the centre of the circle to any point
-    	// on the circumference
-    	//  -R is the radius
-    	//  -n is a unit vector perpendicular to the plane
-        //  -c is the centre of the circle.
-    	
-		//TODO: obtain a more efficient sin function
-    	Vector3 rotated;
-    	
-    	rotated = normal.normalize();
-    	
-    	
-    	System.out.println("current vector:" + this);
-    	System.out.println("normal after normalization:" + rotated);
-    	
-    	rotated.crossLocal(this.normalize());
-    	System.out.println("normal after cross product:" + rotated);
-    	
-    	rotated.multiplyLocal(Math.sin(angle));
-    	System.out.println("normal after multiplication with sin(angle):" + rotated);
-    	
-    	System.out.println("current vector multiplied by cos(angle): " + this.multiply(Math.cos(angle)));
-    	
-    	rotated.addLocal(this.multiply(Math.cos(angle)));
-    	
-    	return rotated;
-    }
+
 	
 	// Removed requirement for this vector to be perpendicular to the given normal
 	public Vector3 rotate(Vector3 normal, double angle) {
@@ -409,6 +377,18 @@ public class Vector3 {
     	return rotated;
     }
 	
+	/** Treating this and the given vector as position vectors,
+	 * moves this vector towards the given vector such that
+	 * the distance between them becomes equal to "fraction"
+	 * times the original distance.
+	 * 
+	 * @param other The vector to move towards
+	 * @param fraction How much to multiply the distance between the
+	 * vectors. Distance is reduced for values less than 1, increased
+	 * for values greater than 1. Negative values will place this
+	 * vector on the other side of the target vector as in a mirror image.
+	 * @return
+	 */
 	public Vector3 towards(Vector3 other, double fraction) {
 		Vector3 result = other.subtract(this);
 		result.multiplyLocal(fraction);

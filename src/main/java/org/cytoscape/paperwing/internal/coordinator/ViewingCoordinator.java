@@ -113,13 +113,16 @@ public class ViewingCoordinator {
 		}
 	}
 	
-	
 	public Vector3 calculateCameraPosition(Vector3 cameraDirection, double distance) {
 		if (!initialBoundsMatched) {
 			return null;
 		} else {
 			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, distance);
 		}
+	}
+	
+	public Vector3 getUpdatedMainCameraPosition() {
+		return mainCameraCopy.getPosition().copy();
 	}
 	
 	// Claim by a main window rendering object

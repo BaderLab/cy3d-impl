@@ -97,6 +97,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				
 				// TODO: check if negative effects produced by this
 				panel.setIgnoreRepaint(true);
+				// panel.setDoubleBuffered(true);
 				
 				graphics = getGraphicsInstance(networkView, visualLexicon);
 
