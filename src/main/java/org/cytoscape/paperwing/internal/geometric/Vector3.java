@@ -314,7 +314,7 @@ public class Vector3 {
 	
 	/** Treating this vector as a position vector, rotate it about the
 	 * given normal that passes through the origin by the specified
-	 * angle clockwise, in radins
+	 * angle in the right-hand rule direction, in radians
 	 * 
 	 * @param normal The normal vector used for the rotation
 	 * @param angle The angle in radians to rotate this vector
@@ -332,12 +332,44 @@ public class Vector3 {
         //  -c is the centre of the circle.
     	
 		//TODO: obtain a more efficient sin function
-		
     	Vector3 rotated;
     	
     	rotated = normal.normalize();
     	rotated.crossLocal(this);
     	rotated.multiplyLocal(Math.sin(angle));
+    	rotated.addLocal(this.multiply(Math.cos(angle)));
+    	
+    	return rotated;
+    }
+	
+	public Vector3 rotateDebug(Vector3 normal, double angle) {
+    	// Parametric equation for circle in 3D space:
+    	// P = Rcos(t)u + Rsin(t)nxu + c
+    	//
+    	// Where:
+    	//  -u is a unit vector from the centre of the circle to any point
+    	// on the circumference
+    	//  -R is the radius
+    	//  -n is a unit vector perpendicular to the plane
+        //  -c is the centre of the circle.
+    	
+		//TODO: obtain a more efficient sin function
+    	Vector3 rotated;
+    	
+    	rotated = normal.normalize();
+    	
+    	
+    	System.out.println("current vector:" + this);
+    	System.out.println("normal after normalization:" + rotated);
+    	
+    	rotated.crossLocal(this);
+    	System.out.println("normal after cross product:" + rotated);
+    	
+    	rotated.multiplyLocal(Math.sin(angle));
+    	System.out.println("normal after multiplication with sin(angle):" + rotated);
+    	
+    	System.out.println("current vector multiplied by cos(angle): " + this.multiply(Math.cos(angle)));
+    	
     	rotated.addLocal(this.multiply(Math.cos(angle)));
     	
     	return rotated;

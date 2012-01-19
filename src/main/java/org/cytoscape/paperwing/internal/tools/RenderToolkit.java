@@ -27,5 +27,18 @@ public class RenderToolkit {
 				(float) rotateAxis.y(),
 				(float) rotateAxis.z());
 	}
+	
+	public static void drawPoint(GL2 gl, Vector3 point) {
+		gl.glVertex3f((float) point.x(), 
+				(float) point.y(), 
+				(float) point.z());
+	}
 
+	public static void setNormal(GL2 gl, Vector3 normal) {
+		Vector3 normalized = normal.normalize();
+		
+		gl.glNormal3f((float) normalized.x(),
+				(float) normalized.y(),
+				(float) normalized.z());
+	}
 }

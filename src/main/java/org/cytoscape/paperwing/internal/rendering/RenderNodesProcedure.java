@@ -126,7 +126,8 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				//gl.glCallList(nodeListIndex);
 				
 				gl.glScalef(SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS);
-				shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
+				// shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
+				shapeDrawer.drawShape(gl, ShapeType.SHAPE_TETRAHEDRAL);
 				
 				gl.glPopMatrix();
 			}

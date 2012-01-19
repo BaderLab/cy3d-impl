@@ -130,12 +130,12 @@ public class CameraInputHandler implements InputHandler {
 	private void processCameraRoll(Set<Integer> held, SimpleCamera camera) {
 		
 		// Roll camera clockwise
-		if (held.contains(KeyEvent.VK_Z)) {
+		if (held.contains(KeyEvent.VK_X)) {
 			camera.rollClockwise();
 		}
 	
 		// Roll camera counter-clockwise
-		if (held.contains(KeyEvent.VK_X)) {
+		if (held.contains(KeyEvent.VK_Z)) {
 			camera.rollCounterClockwise();
 		}
 	}
