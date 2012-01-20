@@ -390,11 +390,10 @@ public class Vector3 {
 	 * @return
 	 */
 	public Vector3 towards(Vector3 other, double fraction) {
-		Vector3 result = other.subtract(this);
-		result.multiplyLocal(fraction);
-		result.addLocal(this);
-		
-		return result;
+		Vector3 offset = other.subtract(this);
+		offset.multiplyLocal(fraction);
+	
+		return offset.plus(this);
 	}
 	
 	/** Give a string representation of this vector

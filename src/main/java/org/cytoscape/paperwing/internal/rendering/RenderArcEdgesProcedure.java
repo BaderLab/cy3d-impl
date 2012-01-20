@@ -38,7 +38,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
-	private static final int NUM_SEGMENTS = 3;
+	private static final int NUM_SEGMENTS = 11;
 	
 	private int segmentListIndex;
 	

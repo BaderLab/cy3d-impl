@@ -30,6 +30,9 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				coordinatorData.setBoundsTo(coordinator.getMainCameraBounds());
 				coordinatorData.setInitialBoundsMatched(true);
 				coordinator.setInitialBoundsMatched(true);
+				
+				coordinatorData.setLastReportedMainCameraPosition(
+						coordinator.getUpdatedMainCameraPosition());
 			}
 			
 			// This is the regular case

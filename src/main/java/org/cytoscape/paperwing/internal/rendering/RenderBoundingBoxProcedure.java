@@ -119,21 +119,22 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	}
 	
 	/** Draws a portion of the viewing volume.
-	 * 
-	 * Currently, the stored bounds representing the main camera's view is used as the front
-	 * face of the volume, and the back face is placed at a distance equal to 2 times the distance
-	 * between the front face and the camera.
 	 */
 	private void drawViewingVolumePortion(GraphicsData graphicsData) {
 		
 		GL2 gl = graphicsData.getGlContext();
-		
+		Vector3 eyePosition = graphicsData.getCoordinatorData().getLastReportedMainCameraPosition();
 		Quadrilateral frontFace = graphicsData.getCoordinatorData().getBounds();
-		Quadrilateral backFace = frontFace.copy();
+		Quadrilateral backFace;
+
+		double backDistanceMultiplier = -1.2;
 		
 		// Move the back face so it is twice the distance away from the depicted camera as the front face
-		backFace.moveTo(frontFace.getCenterPoint().towards(
-				graphicsData.getCoordinatorData().getLastReportedMainCameraPosition(), 2));
+		backFace = new Quadrilateral(
+				frontFace.getTopLeft().towards(eyePosition, backDistanceMultiplier),
+				frontFace.getTopRight().towards(eyePosition, backDistanceMultiplier),
+				frontFace.getBottomLeft().towards(eyePosition, backDistanceMultiplier),
+				frontFace.getBottomRight().towards(eyePosition, backDistanceMultiplier));
 		
 		gl.glDisable(GL2.GL_LIGHTING);
 		gl.glDisable(GL.GL_DEPTH_TEST);
@@ -154,6 +155,7 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		RenderToolkit.drawPoint(gl, backFace.getBottomLeft());
 		RenderToolkit.drawPoint(gl, backFace.getBottomRight());
 		RenderToolkit.drawPoint(gl, backFace.getTopRight());
+		RenderToolkit.drawPoint(gl, backFace.getTopLeft());
 		gl.glEnd();
 		
 		gl.glBegin(GL2.GL_LINES);

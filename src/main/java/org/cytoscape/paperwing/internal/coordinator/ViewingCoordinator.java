@@ -12,6 +12,10 @@ import org.cytoscape.view.model.CyNetworkView;
 
 public class ViewingCoordinator {
 
+	// Distance between bounds and camera position
+	// TODO: Make into member variable, with adjustable value
+	public static double BOUND_DISTANCE = 0.7;
+	
 	public static double BOUNDS_CHANGE_THRESHOLD = 5e-16;
 	public static double CAMERA_CHANGE_THRESHOLD = 5e-25;
 	
@@ -60,7 +64,7 @@ public class ViewingCoordinator {
 		Quadrilateral bounds;
 		
 		bounds = GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
-				mainCameraCopy.getDirection(), mainCameraCopy.getUp(), mainCameraCopy.getDistance(), verticalFov, aspectRatio);
+				mainCameraCopy.getDirection(), mainCameraCopy.getUp(), BOUND_DISTANCE, verticalFov, aspectRatio);
 		
 		return bounds;
 	}
@@ -109,15 +113,15 @@ public class ViewingCoordinator {
 			return GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
 					mainCameraCopy.getDirection(), 
 					mainCameraCopy.getUp(),
-					mainCameraCopy.getDistance(), verticalFov, aspectRatio);
+					BOUND_DISTANCE, verticalFov, aspectRatio);
 		}
 	}
 	
-	public Vector3 calculateCameraPosition(Vector3 cameraDirection, double distance) {
+	public Vector3 calculateCameraPosition(Vector3 cameraDirection) {
 		if (!initialBoundsMatched) {
 			return null;
 		} else {
-			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, distance);
+			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, BOUND_DISTANCE);
 		}
 	}
 	

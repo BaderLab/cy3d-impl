@@ -53,7 +53,7 @@ public class RenderEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	 * How many straight edge segments to use for approximating a curved edge,
 	 * this value does not have to be static
 	 */
-	private static int QUADRATIC_EDGE_SEGMENTS = 3;
+	private static int QUADRATIC_EDGE_SEGMENTS = 11;
 
 	/** The slices detail level to use for drawing edges */
 	private static int EDGE_SLICES_DETAIL = 3;

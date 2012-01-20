@@ -40,7 +40,7 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 				if (coordinator.isBirdsEyeBoundsMoved()) {
 					
 					// Transfer data from coordinator
-					Vector3 newPosition = coordinator.calculateCameraPosition(camera.getDirection(), camera.getDistance());
+					Vector3 newPosition = coordinator.calculateCameraPosition(camera.getDirection());
 					camera.moveTo(newPosition);
 					coordinator.setMainCameraCopy(camera);
 					
