@@ -20,7 +20,7 @@ import org.cytoscape.paperwing.internal.rendering.RenderLabelsProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
 import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
-import org.cytoscape.paperwing.internal.rendering.text.TextRenderer;
+import org.cytoscape.paperwing.internal.rendering.text.StringRenderer;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class MainGraphicsHandler implements GraphicsHandler {

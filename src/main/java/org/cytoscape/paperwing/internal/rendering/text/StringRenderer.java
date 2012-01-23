@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.media.opengl.GL2;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 
-public class TextRenderer {
+public class StringRenderer {
 	
 	private static final float CHARACTER_SPACING = 0.1f;
 	
@@ -27,7 +27,7 @@ public class TextRenderer {
 		}
 	}
 	
-	public TextRenderer() {
+	public StringRenderer() {
 		characterLists = new HashMap(80);
 	}
 	

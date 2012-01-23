@@ -14,7 +14,6 @@ import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
-import org.cytoscape.paperwing.internal.picking.ShapePicker.PickResults;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 import com.jogamp.newt.event.MouseEvent;
