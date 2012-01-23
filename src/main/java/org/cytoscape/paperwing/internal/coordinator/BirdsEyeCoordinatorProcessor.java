@@ -27,12 +27,10 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 			if (coordinator.isInitialMainCameraInitialized()
 					&& !coordinator.isInitialBoundsMatched()) {
 				
-				coordinatorData.setBoundsTo(coordinator.getMainCameraBounds());
+				coordinatorData.setNearBoundsTo(coordinator.getMainCameraBounds());
+				coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 				coordinatorData.setInitialBoundsMatched(true);
 				coordinator.setInitialBoundsMatched(true);
-				
-				coordinatorData.setLastReportedMainCameraPosition(
-						coordinator.getUpdatedMainCameraPosition());
 			}
 			
 			// This is the regular case
@@ -42,7 +40,13 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				if (coordinatorData.isBoundsManuallyChanged()) {
 					
 					// Transfer data to coordinator
-					coordinator.setBirdsEyeBoundsCopy(coordinatorData.getBounds());
+					coordinator.setBirdsEyeBoundsCopy(coordinatorData.getNearBounds());
+					
+					// Use new information to recalculate far bounds
+					coordinator.getMainCameraCopy().getPosition().set(
+							coordinator.calculateCameraPosition(
+									coordinator.getMainCameraCopy().getDirection()));
+					coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 					
 					// Set flag
 					coordinator.setBirdsEyeBoundsMoved(true);
@@ -50,15 +54,13 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 					// Unset internal flag
 					coordinatorData.setBoundsManuallyChanged(false);
 					
+					
 				// User moved the main camera
 				} else if (coordinator.isMainCameraMoved()) {
 					
 					// Obtain data from coordinator
-					coordinatorData.setBoundsTo(coordinator.calculateBounds());
-					
-					// Store a copy of the main camera's position
-					coordinatorData.setLastReportedMainCameraPosition(
-							coordinator.getUpdatedMainCameraPosition());
+					coordinatorData.setNearBoundsTo(coordinator.calculateBounds());
+					coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 					
 					// Unset flag
 					coordinator.setMainCameraMoved(false);
@@ -68,10 +70,8 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				if (coordinator.isSuggestRecalculateBounds()) {
 					
 					// Obtain data from coordinator
-					coordinatorData.setBoundsTo(coordinator.calculateBounds());
-					
-					coordinatorData.setLastReportedMainCameraPosition(
-							coordinator.getUpdatedMainCameraPosition());
+					coordinatorData.setNearBoundsTo(coordinator.calculateBounds());
+					coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 					
 					// Unset flag
 					coordinator.setSuggestRecalculateBounds(false);

@@ -129,11 +129,11 @@ public class Graphics implements GLEventListener {
 		// Perform picking
 		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
 		
-		// Update data for bird's eye view camera movement
-		coordinatorProcessor.extractData(coordinator, graphicsData);
-		
 		// Check input
 		inputProcessor.processInput(keys, mouse, graphicsData);
+		
+		// Update data for bird's eye view camera movement
+		coordinatorProcessor.extractData(coordinator, graphicsData);
 		
 		// Process Cytoscape data
 		cytoscapeDataProcessor.processCytoscapeData(graphicsData);

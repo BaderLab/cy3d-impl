@@ -10,14 +10,25 @@ import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
+/**
+ * This class is responsible for allowing communication between the main
+ * and bird's eye rendering objects without introducing circular reference schemes,
+ * as well allowing for either of the main and bird's eye pair to be switched during
+ * runtime.
+ *
+ * @author yuedong
+ */
 public class ViewingCoordinator {
 
 	// Distance between bounds and camera position
 	// TODO: Make into member variable, with adjustable value
-	public static double BOUND_DISTANCE = 0.7;
+	public static final double NEAR_BOUNDS_DISTANCE = 0.9;
 	
-	public static double BOUNDS_CHANGE_THRESHOLD = 5e-16;
-	public static double CAMERA_CHANGE_THRESHOLD = 5e-25;
+	// Distance between the back bounds and the camera
+	public static final double FAR_BOUNDS_DISTANCE = 1.1;
+	
+	public static final double BOUNDS_CHANGE_THRESHOLD = 5e-16;
+	public static final double CAMERA_CHANGE_THRESHOLD = 5e-25;
 	
 	private SimpleCamera mainCameraCopy;
 	private Quadrilateral birdsEyeBoundsCopy;
@@ -64,7 +75,7 @@ public class ViewingCoordinator {
 		Quadrilateral bounds;
 		
 		bounds = GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
-				mainCameraCopy.getDirection(), mainCameraCopy.getUp(), BOUND_DISTANCE, verticalFov, aspectRatio);
+				mainCameraCopy.getDirection(), mainCameraCopy.getUp(), NEAR_BOUNDS_DISTANCE, verticalFov, aspectRatio);
 		
 		return bounds;
 	}
@@ -113,7 +124,19 @@ public class ViewingCoordinator {
 			return GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
 					mainCameraCopy.getDirection(), 
 					mainCameraCopy.getUp(),
-					BOUND_DISTANCE, verticalFov, aspectRatio);
+					NEAR_BOUNDS_DISTANCE, verticalFov, aspectRatio);
+		}
+	}
+	
+	// Returns null if main camera not initialized
+	public Quadrilateral calculateBackBounds() {
+		if (!initialMainCameraInitialized) {
+			return null;
+		} else {
+			return GeometryToolkit.generateViewingBounds(mainCameraCopy.getPosition(), 
+					mainCameraCopy.getDirection(), 
+					mainCameraCopy.getUp(),
+					FAR_BOUNDS_DISTANCE, verticalFov, aspectRatio);
 		}
 	}
 	
@@ -121,7 +144,7 @@ public class ViewingCoordinator {
 		if (!initialBoundsMatched) {
 			return null;
 		} else {
-			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, BOUND_DISTANCE);
+			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, NEAR_BOUNDS_DISTANCE);
 		}
 	}
 	

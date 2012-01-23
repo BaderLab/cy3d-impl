@@ -35,7 +35,7 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	private void drawHalfBox(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
-		Quadrilateral bounds = graphicsData.getCoordinatorData().getBounds();
+		Quadrilateral bounds = graphicsData.getCoordinatorData().getNearBounds();
 		double fraction = 0.25;
 		
 		Vector3 topLeft = bounds.getTopLeft();
@@ -93,7 +93,7 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	private void drawFullBox(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 	
-		Quadrilateral bounds = graphicsData.getCoordinatorData().getBounds();
+		Quadrilateral bounds = graphicsData.getCoordinatorData().getNearBounds();
 
 		Vector3 topLeft = bounds.getTopLeft();
 		Vector3 topRight = bounds.getTopRight();
@@ -123,19 +123,10 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	private void drawViewingVolumePortion(GraphicsData graphicsData) {
 		
 		GL2 gl = graphicsData.getGlContext();
-		Vector3 eyePosition = graphicsData.getCoordinatorData().getLastReportedMainCameraPosition();
-		Quadrilateral frontFace = graphicsData.getCoordinatorData().getBounds();
-		Quadrilateral backFace;
+		
+		Quadrilateral frontFace = graphicsData.getCoordinatorData().getNearBounds();
+		Quadrilateral backFace = graphicsData.getCoordinatorData().getFarBounds();
 
-		double backDistanceMultiplier = -1.2;
-		
-		// Move the back face so it is twice the distance away from the depicted camera as the front face
-		backFace = new Quadrilateral(
-				frontFace.getTopLeft().towards(eyePosition, backDistanceMultiplier),
-				frontFace.getTopRight().towards(eyePosition, backDistanceMultiplier),
-				frontFace.getBottomLeft().towards(eyePosition, backDistanceMultiplier),
-				frontFace.getBottomRight().towards(eyePosition, backDistanceMultiplier));
-		
 		gl.glDisable(GL2.GL_LIGHTING);
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		

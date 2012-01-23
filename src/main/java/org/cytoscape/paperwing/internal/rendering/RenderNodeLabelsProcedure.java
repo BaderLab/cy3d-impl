@@ -20,15 +20,18 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderLabelsProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final float TEXT_SCALE = 0.045f;
+	private static final float TEXT_SCALE = 0.0005f;
 	private static final Vector3 TEXT_OFFSET = new Vector3 (0, 0.04, 0);
 	
-	private TextRenderer textRenderer;
-	private Font defaultFont = new Font("Trebuchet MS", Font.PLAIN, 72);
+	private static final float TEXT_CHARACTER_WIDTH = 0.612f;
+	private static final int TEXT_FONT_SIZE = 72;
 	
-	public RenderLabelsProcedure() {
+	private TextRenderer textRenderer;
+	private Font defaultFont = new Font("Trebuchet MS", Font.PLAIN, TEXT_FONT_SIZE);
+	
+	public RenderNodeLabelsProcedure() {
 		textRenderer = new TextRenderer(defaultFont);
 	}
 	
@@ -36,6 +39,7 @@ public class RenderLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	public void initialize(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
+		// Increase rendering efficiency; can set to true if desired
 		textRenderer.setSmoothing(false);
 	}
 
@@ -81,10 +85,10 @@ public class RenderLabelsProcedure implements ReadOnlyGraphicsProcedure {
 					
 //					text = "test" + nodeView.getSUID();
 					textRenderer.draw3D(text, 
-							x + (float) TEXT_OFFSET.x() - text.length() * 0.0085f, 
+							x + (float) TEXT_OFFSET.x() - text.length() * (TEXT_CHARACTER_WIDTH / TEXT_FONT_SIZE), 
 							y + (float) TEXT_OFFSET.y(), 
 							z + (float) TEXT_OFFSET.z(), 
-							0.0005f);
+							TEXT_SCALE);
 				}
 				
 				gl.glPopMatrix();
@@ -94,18 +98,5 @@ public class RenderLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		textRenderer.flush();
 		textRenderer.endRendering();
 		
-	}
-
-	private int getStringWidth(TextRenderer textRenderer, String string) {
-//		FontRenderContext renderContext = textRenderer.getFontRenderContext();
-		
-		int width = 0;
-		
-		for (int i = 0; i < string.length(); i++) {
-			width += textRenderer.getCharWidth(string.charAt(i));
-			
-		}
-		
-		return width;
 	}
 }

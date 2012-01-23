@@ -4,32 +4,37 @@ import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 
 public class CoordinatorData {
-	private Quadrilateral bounds;
-	
+	private Quadrilateral nearBounds;
+	private Quadrilateral farBounds;
 	
 	private boolean boundsManuallyChanged;
 	private boolean initialBoundsMatched;
-
-	public Vector3 lastReportedMainCameraPosition;
 	
 	// This class only works with copies of Vector3 objects
 	public CoordinatorData() {
-		bounds = new Quadrilateral();
+		nearBounds = new Quadrilateral();
+		farBounds = new Quadrilateral();
 		
 		boundsManuallyChanged = false;
 		initialBoundsMatched = false;
-		
-		lastReportedMainCameraPosition = new Vector3();
 	}
 
-	public void setBoundsTo(Quadrilateral bounds) {
-		this.bounds.set(bounds);
+	public void setNearBoundsTo(Quadrilateral nearBounds) {
+		this.nearBounds.set(nearBounds);
 	}
 
-	public Quadrilateral getBounds() {
-		return bounds;
+	public Quadrilateral getNearBounds() {
+		return nearBounds;
 	}
 
+	public void setFarBoundsTo(Quadrilateral backBounds) {
+		this.farBounds.set(backBounds);
+	}
+
+	public Quadrilateral getFarBounds() {
+		return farBounds;
+	}
+	
 	public void setBoundsManuallyChanged(boolean boundsManuallyChanged) {
 		this.boundsManuallyChanged = boundsManuallyChanged;
 	}
@@ -44,14 +49,5 @@ public class CoordinatorData {
 
 	public boolean isInitialBoundsMatched() {
 		return initialBoundsMatched;
-	}
-
-	public Vector3 getLastReportedMainCameraPosition() {
-		return lastReportedMainCameraPosition;
-	}
-
-	public void setLastReportedMainCameraPosition(
-			Vector3 lastReportedMainCameraPosition) {
-		this.lastReportedMainCameraPosition.set(lastReportedMainCameraPosition);
 	}
 }
