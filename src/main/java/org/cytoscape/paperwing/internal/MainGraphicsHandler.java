@@ -39,7 +39,7 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		renderProcedures.add(new RenderNodesProcedure());
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderSelectionBoxProcedure());
-		renderProcedures.add(new RenderNodeLabelsProcedure());
+//		renderProcedures.add(new RenderNodeLabelsProcedure());
 	}
 	
 	@Override
