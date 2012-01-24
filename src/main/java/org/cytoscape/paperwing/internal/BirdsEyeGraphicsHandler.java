@@ -1,6 +1,8 @@
 package org.cytoscape.paperwing.internal;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor;
@@ -16,6 +18,7 @@ import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderBoundingBoxProcedure;
@@ -28,26 +31,21 @@ import org.cytoscape.view.model.VisualLexicon;
 
 public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 
-private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
+private List<ReadOnlyGraphicsProcedure> renderProcedures;
 
 	public BirdsEyeGraphicsHandler() {
-		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
+		renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
 		
-		renderProcedures.put("nodes", new RenderNodesProcedure());
-		renderProcedures.put("edges", new RenderArcEdgesProcedure());
-		renderProcedures.put("boundingBox", new RenderBoundingBoxProcedure());
-		
-		renderProcedures.put("resetScene", new ResetSceneProcedure());
+		renderProcedures.add(new ResetSceneProcedure());
+		renderProcedures.add(new PositionCameraProcedure());
+		renderProcedures.add(new RenderNodesProcedure());
+		renderProcedures.add(new RenderArcEdgesProcedure());
+		renderProcedures.add(new RenderBoundingBoxProcedure());	
 	}
 	
 	@Override
 	public InputProcessor getInputProcessor() {
 		return new BirdsEyeInputProcessor();
-	}
-
-	@Override
-	public void resetSceneForDrawing(GraphicsData graphicsData) {
-		renderProcedures.get("resetScene").execute(graphicsData);
 	}
 
 	@Override
@@ -61,9 +59,9 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 		// FloatBuffer.wrap(lightPosition));
 		
-		renderProcedures.get("edges").execute(graphicsData);
-		renderProcedures.get("nodes").execute(graphicsData);
-		renderProcedures.get("boundingBox").execute(graphicsData);
+		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
+			renderProcedure.execute(graphicsData);
+		}
 	}
 
 	@Override
@@ -122,7 +120,7 @@ private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
 
 	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {
-		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures.values()) {
+		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.initialize(graphicsData);
 		}
 	}

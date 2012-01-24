@@ -1,6 +1,8 @@
 package org.cytoscape.paperwing.internal;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
@@ -13,6 +15,7 @@ import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
 import org.cytoscape.paperwing.internal.picking.DefaultShapePickingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
@@ -25,27 +28,23 @@ import org.cytoscape.view.model.CyNetworkView;
 
 public class MainGraphicsHandler implements GraphicsHandler {
 
-	private Map<String, ReadOnlyGraphicsProcedure> renderProcedures;
+	private List<ReadOnlyGraphicsProcedure> renderProcedures;
 	
 	public MainGraphicsHandler() {
-		renderProcedures = new LinkedHashMap<String, ReadOnlyGraphicsProcedure>();
+		renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
 		
-		renderProcedures.put("nodes", new RenderNodesProcedure());
-		renderProcedures.put("edges", new RenderArcEdgesProcedure());
-		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
-		renderProcedures.put("labels", new RenderNodeLabelsProcedure());
+		renderProcedures.add(new ResetSceneProcedure());
+		renderProcedures.add(new PositionCameraProcedure());
 		
-		renderProcedures.put("resetScene", new ResetSceneProcedure());
+		renderProcedures.add(new RenderNodesProcedure());
+		renderProcedures.add(new RenderArcEdgesProcedure());
+		renderProcedures.add(new RenderSelectionBoxProcedure());
+		renderProcedures.add(new RenderNodeLabelsProcedure());
 	}
 	
 	@Override
 	public InputProcessor getInputProcessor() {
 		return new MainInputProcessor();
-	}
-
-	@Override
-	public void resetSceneForDrawing(GraphicsData graphicsData) {
-		renderProcedures.get("resetScene").execute(graphicsData);
 	}
 
 	@Override
@@ -58,11 +57,10 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		// Code below toggles the light following the camera
 		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 		// FloatBuffer.wrap(lightPosition));
-		
-		renderProcedures.get("edges").execute(graphicsData);
-		renderProcedures.get("nodes").execute(graphicsData);
-		renderProcedures.get("selectionBox").execute(graphicsData);
-		renderProcedures.get("labels").execute(graphicsData);
+
+		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
+			renderProcedure.execute(graphicsData);
+		}
 		
 	}
 
@@ -101,7 +99,7 @@ public class MainGraphicsHandler implements GraphicsHandler {
 	
 	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {
-		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures.values()) {
+		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.initialize(graphicsData);
 		}
 	}

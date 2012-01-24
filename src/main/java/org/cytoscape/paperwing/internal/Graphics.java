@@ -84,7 +84,7 @@ public class Graphics implements GLEventListener {
 		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
-		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 2), new Vector3(0, 0, 0),
+		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 3), new Vector3(0, 0, 0),
 				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4));
 		
 		graphicsData.setNetworkView(networkView);
@@ -137,9 +137,6 @@ public class Graphics implements GLEventListener {
 		
 		// Process Cytoscape data
 		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
-		
-		// Reset the scene for drawing
-		handler.resetSceneForDrawing(graphicsData);
 		
 		// Draw the scene
 		handler.drawScene(graphicsData);

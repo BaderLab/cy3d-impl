@@ -22,9 +22,6 @@ public interface GraphicsHandler {
 	// Call procedures' init methods
 	public void initializeGraphicsProcedures(GraphicsData graphicsData);
 	
-	// Clear the scene
-	public void resetSceneForDrawing(GraphicsData graphicsData);
-	
 	// Draw the scene
 	public void drawScene(GraphicsData graphicsData);
 

@@ -54,6 +54,8 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		String text;
 		
 		textRenderer.setColor(Color.BLACK);
+		
+		gl.glPushMatrix();
 		textRenderer.begin3DRendering();
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
@@ -66,7 +68,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
-				gl.glPushMatrix();
+				
 //				gl.glTranslatef(x, y, z);
 				
 				gl.glColor3f(0.2f, 0.2f, 0.2f);
@@ -90,13 +92,13 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 							z + (float) TEXT_OFFSET.z(), 
 							TEXT_SCALE);
 				}
-				
-				gl.glPopMatrix();
 			}
 		}
 		
 		textRenderer.flush();
 		textRenderer.endRendering();
+		
+		gl.glPopMatrix();
 		
 	}
 }

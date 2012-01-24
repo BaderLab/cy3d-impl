@@ -33,20 +33,10 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
-	
 	/** The default radius of the spherical nodes */
-	private static final float SMALL_SPHERE_RADIUS = 0.102f; // 0.015f
-
-	/** The slices detail level to use for drawing spherical nodes */
-	// 10, 10, 4 // 24, 24, 12 used to be default values for
-	// slices/stacks/slices
-	private static int NODE_SLICES_DETAIL = 12;
-
-	/** The stacks detail level to use for drawing spherical nodes */
-	private static int NODE_STACKS_DETAIL = 12;
+	private static final float NODE_SIZE_RADIUS = 0.102f; // 0.015f
 
 	private Map<NodeShape, ShapeType> cytoscapeShapeMap;
-	
 	private ScalableShapeDrawer shapeDrawer;
 	
 	public RenderNodesProcedure() {
@@ -75,22 +65,6 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				.getSelectedNodeIndices();
 		int hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
-		// Currently supporting the following visual properties
-
-		// VisualProperty<Double> NODE_X_LOCATION
-		// VisualProperty<Double> NODE_Y_LOCATION
-		// VisualProperty<Double> NODE_Z_LOCATION
-		// VisualProperty<Paint> NODE_PAINT
-		// VisualProperty<Boolean> NODE_VISIBLE
-		// VisualProperty<Boolean> NODE_SELECTED
-		// VisualProperty<Double> NODE_WIDTH
-		// VisualProperty<Double> NODE_HEIGHT
-		// VisualProperty<Double> NODE_DEPTH
-
-		// Uncertain about the following visual properties
-
-		// VisualProperty<Paint> NODE_FILL_COLOR
-
 		float x, y, z;
 		int index;
 		ShapeType shapeType;
@@ -117,7 +91,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				chooseColor(gl, nodeView, graphicsData);
 				//gl.glCallList(nodeListIndex);
 				
-				gl.glScalef(SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS);
+				gl.glScalef(NODE_SIZE_RADIUS, NODE_SIZE_RADIUS, NODE_SIZE_RADIUS);
 				
 				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(RichVisualLexicon.NODE_SHAPE));
 				
