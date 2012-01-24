@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
+import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 import org.cytoscape.view.presentation.property.values.NodeShape;
 
@@ -56,7 +58,11 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 		
 		shapeDrawer.initialize(gl);
-
+		
+		cytoscapeShapeMap = new HashMap<NodeShape, ShapeType>(8);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.TRIANGLE, ShapeType.SHAPE_TETRAHEDRAL);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.DIAMOND, ShapeType.SHAPE_CUBIC);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.ELLIPSE, ShapeType.SHAPE_SPHERICAL);
 	}
 
 	@Override
@@ -87,6 +93,8 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 		float x, y, z;
 		int index;
+		ShapeType shapeType;
+		
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
@@ -110,8 +118,14 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				//gl.glCallList(nodeListIndex);
 				
 				gl.glScalef(SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS, SMALL_SPHERE_RADIUS);
-				shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
-				// shapeDrawer.drawShape(gl, ShapeType.SHAPE_TETRAHEDRAL);
+				
+				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(RichVisualLexicon.NODE_SHAPE));
+				
+				if (shapeType != null) {
+					shapeDrawer.drawShape(gl, shapeType);
+				} else {
+					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
+				}
 				
 				gl.glPopMatrix();
 			}
