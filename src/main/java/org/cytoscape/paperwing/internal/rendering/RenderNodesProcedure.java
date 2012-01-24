@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
@@ -19,6 +20,7 @@ import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.values.NodeShape;
 
 public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -41,8 +43,8 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	/** The stacks detail level to use for drawing spherical nodes */
 	private static int NODE_STACKS_DETAIL = 12;
 
-	private int nodeListIndex;
-
+	private Map<NodeShape, ShapeType> cytoscapeShapeMap;
+	
 	private ScalableShapeDrawer shapeDrawer;
 	
 	public RenderNodesProcedure() {
@@ -52,24 +54,6 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
-
-		nodeListIndex = gl.glGenLists(1);
-
-		GLU glu = GLU.createGLU(gl);
-
-		GLUquadric quadric = glu.gluNewQuadric();
-		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
-		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
-
-		// Draw Node
-		// ---------
-
-		gl.glNewList(nodeListIndex, GL2.GL_COMPILE);
-		glu.gluSphere(quadric, SMALL_SPHERE_RADIUS, NODE_SLICES_DETAIL,
-				NODE_STACKS_DETAIL);
-		// glut.glutSolidSphere(SMALL_SPHERE_RADIUS, NODE_SLICES_DETAIL,
-		// NODE_STACKS_DETAIL);
-		gl.glEndList();
 		
 		shapeDrawer.initialize(gl);
 

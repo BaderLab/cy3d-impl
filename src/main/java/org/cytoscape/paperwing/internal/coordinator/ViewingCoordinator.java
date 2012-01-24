@@ -117,7 +117,7 @@ public class ViewingCoordinator {
 	}
 
 	// Returns null if main camera not initialized
-	public Quadrilateral calculateBounds() {
+	public Quadrilateral calculateNearBounds() {
 		if (!initialMainCameraInitialized) {
 			return null;
 		} else {

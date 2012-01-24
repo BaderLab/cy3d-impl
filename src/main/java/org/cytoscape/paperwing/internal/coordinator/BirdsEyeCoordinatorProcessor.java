@@ -59,7 +59,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				} else if (coordinator.isMainCameraMoved()) {
 					
 					// Obtain data from coordinator
-					coordinatorData.setNearBoundsTo(coordinator.calculateBounds());
+					coordinatorData.setNearBoundsTo(coordinator.calculateNearBounds());
 					coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 					
 					// Unset flag
@@ -70,7 +70,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 				if (coordinator.isSuggestRecalculateBounds()) {
 					
 					// Obtain data from coordinator
-					coordinatorData.setNearBoundsTo(coordinator.calculateBounds());
+					coordinatorData.setNearBoundsTo(coordinator.calculateNearBounds());
 					coordinatorData.setFarBoundsTo(coordinator.calculateBackBounds());
 					
 					// Unset flag
