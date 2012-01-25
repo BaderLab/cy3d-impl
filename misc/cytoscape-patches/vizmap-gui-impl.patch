@@ -1,17 +1,30 @@
-Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java
 ===================================================================
---- src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 27648)
-+++ src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(working copy)
-@@ -26,7 +26,7 @@
- 			.getLogger(BypassManager.class);
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(revision 28020)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(working copy)
+@@ -201,7 +201,7 @@
  
- 	// TODO: how can we display compatible VP only?
--	private static final String DEF_RENDERER = "ding";
-+	private static final String DEF_RENDERER = "wind";
+ 		for (VisualLexicon lexicon : lexSet) {
+ 			for (VisualProperty<?> vp : props) {
+-				if (lexicon.getVisualLexiconNode(vp).getChildren().size() == 0)
++				if (lexicon.getVisualLexiconNode(vp) != null && (lexicon.getVisualLexiconNode(vp).getChildren().size() == 0))
+ 					propSet.add(vp);
+ 			}
+ 		}
+@@ -218,7 +218,7 @@
  
- 	// TODO: this should be a public string or enum managed in swing app.
- 	private static final String MENU_KEY = "preferredMenu";
-@@ -48,7 +48,7 @@
+ 		for (VisualLexicon lexicon : lexSet) {
+ 			for (VisualProperty<?> vp : props) {
+-				if (lexicon.getVisualLexiconNode(vp).getChildren().size() == 0
++				if (lexicon.getVisualLexiconNode(vp) != null && lexicon.getVisualLexiconNode(vp).getChildren().size() == 0
+ 						&& lexicon.getVisualLexiconNode(vp).getParent()
+ 								.getVisualProperty() == MinimalVisualLexicon.NETWORK)
+ 					propSet.add(vp);
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
+===================================================================
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 28020)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(working copy)
+@@ -44,7 +44,7 @@
  	}
  
  	public void addBypass(RenderingEngineFactory<?> factory, Map props) {
@@ -20,10 +33,10 @@ Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager
  			return;
  
  		final VisualLexicon lexicon = factory.getVisualLexicon();
-Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java
 ===================================================================
---- src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(revision 27648)
-+++ src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(working copy)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(revision 28020)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(working copy)
 @@ -74,8 +74,8 @@
  		CyApplicationConfiguration cyApplicationConfigurationServiceRef = getService(bc,CyApplicationConfiguration.class);
  		DialogTaskManager dialogTaskManagerServiceRef = getService(bc,DialogTaskManager.class);
@@ -35,3 +48,31 @@ Index: src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java
  		VisualMappingManager vmmServiceRef = getService(bc,VisualMappingManager.class);
  		CyNetworkManager cyNetworkManagerServiceRef = getService(bc,CyNetworkManager.class);
  		CyApplicationManager cyApplicationManagerServiceRef = getService(bc,CyApplicationManager.class);
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java
+===================================================================
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java	(revision 28020)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java	(working copy)
+@@ -12,8 +12,8 @@
+ 
+ 	// Visual Properties which are not compatible with current rendering engine.
+ 	static {
+-		INCOMPATIBLE_VP_SET.add(RichVisualLexicon.NODE_DEPTH);
+-		INCOMPATIBLE_VP_SET.add(RichVisualLexicon.NODE_Z_LOCATION);
++		// INCOMPATIBLE_VP_SET.add(RichVisualLexicon.NODE_DEPTH);
++		// INCOMPATIBLE_VP_SET.add(RichVisualLexicon.NODE_Z_LOCATION);
+ 	}
+ 
+ 	
+Index: vizmap-gui-impl/src/main/resources/default_vizmap.xml
+===================================================================
+--- vizmap-gui-impl/src/main/resources/default_vizmap.xml	(revision 28020)
++++ vizmap-gui-impl/src/main/resources/default_vizmap.xml	(working copy)
+@@ -458,7 +458,7 @@
+             <visualProperty name="NODE_TRANSPARENCY" default="255"/>
+             <visualProperty name="NODE_SIZE" default="35.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_2"/>
+-            <visualProperty name="NODE_FILL_COLOR" default="#00acad"/>
++            <visualProperty name="NODE_FILL_COLOR" default="#797979"/>
+             <visualProperty name="NODE_CUSTOMPAINT_5" default="org.cytoscape.view.presentation.property.DefaultVisualizableVisualProperty$VisualizableImpl@69d41410"/>
+             <visualProperty name="NODE_CUSTOMPAINT_6" default="org.cytoscape.view.presentation.property.DefaultVisualizableVisualProperty$VisualizableImpl@69d41410"/>
+             <visualProperty name="NODE_CUSTOMPAINT_7" default="org.cytoscape.view.presentation.property.DefaultVisualizableVisualProperty$VisualizableImpl@69d41410"/>

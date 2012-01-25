@@ -1,8 +1,8 @@
-Index: src/main/java/org/cytoscape/internal/CyActivator.java
+Index: swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java
 ===================================================================
---- src/main/java/org/cytoscape/internal/CyActivator.java	(revision 27647)
-+++ src/main/java/org/cytoscape/internal/CyActivator.java	(working copy)
-@@ -175,10 +175,10 @@
+--- swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java	(revision 28020)
++++ swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java	(working copy)
+@@ -169,10 +169,10 @@
  		SubmenuTaskManager submenuTaskManagerServiceRef = getService(bc, SubmenuTaskManager.class);
  		RenderingEngineFactory dingRenderingEngineFactoryServiceRef = getService(bc,
  		                                                                         RenderingEngineFactory.class,
@@ -15,16 +15,17 @@ Index: src/main/java/org/cytoscape/internal/CyActivator.java
  		CyProperty bookmarkServiceRef = getService(bc, CyProperty.class,
  		                                           "(cyPropertyName=bookmarks)");
  		BookmarksUtil bookmarksUtilServiceRef = getService(bc, BookmarksUtil.class);
-Index: src/main/java/org/cytoscape/internal/view/NetworkViewManager.java
+Index: swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java
 ===================================================================
---- src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(revision 27647)
-+++ src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(working copy)
-@@ -128,7 +128,7 @@
+--- swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(revision 28020)
++++ swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(working copy)
+@@ -123,7 +123,7 @@
  
  	// TODO: for now, use this as default. But in the future, we should provide
  	// UI to select presentation.
 -	private static final String DEFAULT_PRESENTATION = "ding";
 +	private static final String DEFAULT_PRESENTATION = "wind";
  
- 	private final Map<CyTable, CyNetwork> nameTables;
  	private final CyNetworkViewManager networkViewManager;
+ 	private final CyApplicationManager applicationManager;
+

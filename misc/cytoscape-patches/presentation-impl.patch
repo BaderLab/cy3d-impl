@@ -1,8 +1,8 @@
-Index: src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java
+Index: presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java
 ===================================================================
---- src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(revision 27647)
-+++ src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(working copy)
-@@ -15,7 +15,7 @@
+--- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(revision 28020)
++++ presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(working copy)
+@@ -19,7 +19,7 @@
  	private final Map<View<?>, RenderingEngine<?>> renderingEngineMap;
  	
  	private static final String FACTORY_ID_TAG = "id";
@@ -10,4 +10,16 @@ Index: src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineMan
 +	private static final String DEFAULT_FACTORY_ID = "wind";
  	
  	private VisualLexicon defaultLexicon;
+ 
+Index: presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java
+===================================================================
+--- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java	(revision 28020)
++++ presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java	(working copy)
+@@ -25,7 +25,6 @@
+ 		registerService(bc,renderingEngineManager,RenderingEngineManager.class, renderingEngineManagerProps);
+ 
+ 		registerServiceListener(bc,renderingEngineManager,"addRenderingEngineFactory","removeRenderingEngineFactory",RenderingEngineFactory.class);
+-
+ 	}
+ }
  
