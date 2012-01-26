@@ -295,6 +295,12 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		return arcCoordinates;
 	}
 	
+	// Generate points along the arc, governed by the distance between points on the arc
+	private Vector3[] generateSparseArcCoordinates(Vector3 start, Vector3 end,
+			double radius, double angle, double distance) {
+		return new Vector3[1];
+	}
+	
 	/**
 	 * Finds the center of a circle passing through 2 points, rotated about the displacement axis
 	 * by a certain angle.
@@ -352,5 +358,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			
 			gl.glPopMatrix();
 		}
+	}
+	
+	private void drawSpacedArc(GL2 gl, Vector3[] points) {
+		
 	}
 }

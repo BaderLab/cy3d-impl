@@ -345,7 +345,16 @@ public class Vector3 {
     }
 
 	
-	// Removed requirement for this vector to be perpendicular to the given normal
+	/**
+	 * Rotates this vector about the axis specified by the normal vector,
+	 * by a specified angle, in accordance with the right-hand rule .
+	 * 
+	 * @param normal The normal vector used to perform the rotation
+	 * @param angle The angle, in radians, to rotate about the normal in
+	 * in accordance with the right-hand rule (thumb points along direction
+	 * of normal).
+	 * @return The rotated vector.
+	 */
 	public Vector3 rotate(Vector3 normal, double angle) {
     	// Parametric equation for circle in 3D space:
     	// P = Rcos(t)u + Rsin(t)nxu + c
