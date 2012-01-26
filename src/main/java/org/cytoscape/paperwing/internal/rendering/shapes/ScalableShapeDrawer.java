@@ -16,11 +16,11 @@ public class ScalableShapeDrawer {
 	private static final int SPHERE_STACKS_DETAIL = 12;
 	
 	public static enum ShapeType {
-		SHAPE_SPHERICAL,
-		SHAPE_CUBIC, 
-		SHAPE_TETRAHEDRAL,
-		SHAPE_CONICAL,
-		SHAPE_CYLINDRICAL,
+		SHAPE_SPHERE,
+		SHAPE_CUBE, 
+		SHAPE_TETRAHEDRON,
+		SHAPE_CONE,
+		SHAPE_CYLINDER,
 		SHAPE_DOUGHNUT,
 	}
 	
@@ -51,7 +51,7 @@ public class ScalableShapeDrawer {
 		gl.glEndList();
 		
 		
-		shapeLists.put(ShapeType.SHAPE_SPHERICAL, shapeListIndex);
+		shapeLists.put(ShapeType.SHAPE_SPHERE, shapeListIndex);
 	}
 	
 	// Cube inscribed in a radius 0.5 sphere
@@ -115,7 +115,7 @@ public class ScalableShapeDrawer {
 		
 		gl.glEndList();
 		
-		shapeLists.put(ShapeType.SHAPE_CUBIC, shapeListIndex);
+		shapeLists.put(ShapeType.SHAPE_CUBE, shapeListIndex);
 	}
 	
 	// Tetrahedron inscribed in circle with radius 0.5
@@ -140,15 +140,6 @@ public class ScalableShapeDrawer {
 		Vector3 leftBackNormal = frontNormal.rotate(yAxisDirection, Math.toRadians(240));
 		Vector3 rightBackNormal = frontNormal.rotate(yAxisDirection, Math.toRadians(120));
 		Vector3 bottomNormal = new Vector3(0, -1, 0);
-		
-//		System.out.println("Tetrahedron coordinates: ");
-//		System.out.println("top: " + topPoint);
-//		System.out.println("nearLeft: " + nearLeftPoint);
-//		System.out.println("nearLeft distance: " + nearLeftPoint.magnitude());
-//		System.out.println("nearRight: " + nearRightPoint);
-//		System.out.println("nearRight distance: " + nearRightPoint.magnitude());
-//		System.out.println("far: " + farPoint);
-//		System.out.println("far distance: " + farPoint.magnitude());
 		
 		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
 		
@@ -178,7 +169,7 @@ public class ScalableShapeDrawer {
 		
 		gl.glEndList();
 		
-		shapeLists.put(ShapeType.SHAPE_TETRAHEDRAL, shapeListIndex);
+		shapeLists.put(ShapeType.SHAPE_TETRAHEDRON, shapeListIndex);
 	}
 	
 	public void drawShape(GL2 gl, ShapeType shapeType) {

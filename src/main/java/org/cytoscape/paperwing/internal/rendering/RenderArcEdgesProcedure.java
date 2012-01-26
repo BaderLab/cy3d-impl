@@ -141,25 +141,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		GL2 gl = graphicsData.getGlContext();
-		
-//		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-//			
-//			chooseColor(gl, edgeView, graphicsData);
-//			
-//			CyEdge edge = edgeView.getModel();
-//			Vector3 start = obtainCoordinates(edge.getSource(), networkView, graphicsData.getDistanceScale());
-//			Vector3 end = obtainCoordinates(edge.getTarget(), networkView, graphicsData.getDistanceScale());
-//			
-//			// TODO: Check for case where source() == target(), ie. self-edge
-//			
-//			if (start != null && end != null) {
-//				// Load name for edge picking
-//				gl.glLoadName(edge.getIndex());
-//				
-//				// drawSegment(gl, start, end);
-//				drawArcSegments(gl, start, end, 0.2, Math.PI, 4);
-//			}
-//		}
+	
 		
 		double distanceScale = graphicsData.getDistanceScale();
 		

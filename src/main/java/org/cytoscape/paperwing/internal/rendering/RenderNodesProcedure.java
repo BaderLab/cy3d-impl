@@ -50,9 +50,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		shapeDrawer.initialize(gl);
 		
 		cytoscapeShapeMap = new HashMap<NodeShape, ShapeType>(8);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.TRIANGLE, ShapeType.SHAPE_TETRAHEDRAL);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.DIAMOND, ShapeType.SHAPE_CUBIC);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.ELLIPSE, ShapeType.SHAPE_SPHERICAL);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.TRIANGLE, ShapeType.SHAPE_TETRAHEDRON);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.DIAMOND, ShapeType.SHAPE_CUBE);
+		cytoscapeShapeMap.put(NodeShapeVisualProperty.ELLIPSE, ShapeType.SHAPE_SPHERE);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				if (shapeType != null) {
 					shapeDrawer.drawShape(gl, shapeType);
 				} else {
-					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBIC);
+					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBE);
 				}
 				
 				gl.glPopMatrix();
