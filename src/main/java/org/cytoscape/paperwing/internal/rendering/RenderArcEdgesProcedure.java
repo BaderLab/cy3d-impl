@@ -27,7 +27,7 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final double SEGMENT_RADIUS = 0.007; // 0.007 default
+	private static final float SEGMENT_RADIUS = 0.007f; // 0.007 default
 	private static final int SEGMENT_SLICES = 4;
 	private static final int SEGMENT_STACKS = 1;
 	
@@ -39,6 +39,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		new RenderColor(0.73, 0.73, 0.6);
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
+	
+	private static final float DASHED_EDGE_RADIUS = 0.007f;
+	private static final float DASHED_EDGE_LENGTH = 0.04f;
+	private static final float DASHED_EDGE_SPACING = 0.10f;
+	
+	private static final float DOTTED_EDGE_RADIUS = 0.01f;
+	private static final float DOTTED_EDGE_SPACING = 0.05f;
 	
 	/**
 	 * The number of straight segments used to approximate a curved edge
@@ -161,7 +168,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 						start, end, container.edgeNumber, container.totalCoincidentEdges);
 				
 				// Draw the arc
-				drawRegularArc(gl, points);
+				// drawRegularArc(gl, points);
+				drawDashedArc(gl, points);
 			}
 		}
 	}
@@ -256,7 +264,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 		// return generateArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
 		
-		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, 0.05);
+		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, DASHED_EDGE_SPACING);
 	}
 	
 	/**
@@ -380,7 +388,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			
 			// Setup transformations to draw the shape
 			RenderToolkit.setUpFacingTransformation(gl, points[i], displacement);
-			gl.glScalef((float) SEGMENT_RADIUS, (float) SEGMENT_RADIUS, (float) displacement.magnitude());
+			gl.glScalef(SEGMENT_RADIUS, SEGMENT_RADIUS, (float) displacement.magnitude());
 			
 			// Perform drawing
 			shapeDrawer.drawSegment(gl, EdgeShapeType.REGULAR);
@@ -389,7 +397,23 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		}
 	}
 	
-	private void drawSpacedArc(GL2 gl, Vector3[] points) {
+	private void drawDashedArc(GL2 gl, Vector3[] points) {
+		Vector3 facing;
 		
+		for (int i = 1; i < points.length - 1; i++) {
+			facing = points[i + 1].subtract(points[i - 1]);
+			
+			gl.glPushMatrix();
+			
+			RenderToolkit.setUpFacingTransformation(gl, points[i], facing);
+			gl.glTranslatef(0, 0, -DASHED_EDGE_LENGTH / 2);
+			
+			gl.glScalef(DASHED_EDGE_RADIUS, DASHED_EDGE_RADIUS, DASHED_EDGE_LENGTH);
+			
+			// Perform drawing
+			shapeDrawer.drawSegment(gl, EdgeShapeType.DASHED);
+			
+			gl.glPopMatrix();
+		}
 	}
 }
