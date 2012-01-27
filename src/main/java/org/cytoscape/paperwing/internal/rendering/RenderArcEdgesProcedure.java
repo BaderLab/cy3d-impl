@@ -22,6 +22,7 @@ import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
 import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
@@ -44,8 +45,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final float DASHED_EDGE_LENGTH = 0.04f;
 	private static final float DASHED_EDGE_SPACING = 0.10f;
 	
-	private static final float DOTTED_EDGE_RADIUS = 0.01f;
-	private static final float DOTTED_EDGE_SPACING = 0.05f;
+	private static final float DOTTED_EDGE_RADIUS = 0.012f;
+	private static final float DOTTED_EDGE_SPACING = 0.08f;
 	
 	/**
 	 * The number of straight segments used to approximate a curved edge
@@ -163,13 +164,33 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				// Load name for edge picking
 				gl.glLoadName(edge.getIndex());
 				
-				// General points along the arc
-				Vector3[] points = generateEdgeSpecificArcCoordinates(
+				double[] edgeMetrics = findArcEdgeMetrics(
 						start, end, container.edgeNumber, container.totalCoincidentEdges);
 				
-				// Draw the arc
-				// drawRegularArc(gl, points);
-				drawDashedArc(gl, points);
+				// General points along the arc
+				Vector3[] points;
+				
+				// Draw the correct type of edge depending on the visual property
+				if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+						== LineTypeVisualProperty.EQUAL_DASH) {
+					points = generateSparseArcCoordinates(
+							start, end, edgeMetrics[0], edgeMetrics[1], DASHED_EDGE_SPACING);
+				
+					drawDashedArc(gl, points);
+				} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+						== LineTypeVisualProperty.DOT) {
+					points = generateSparseArcCoordinates(
+							start, end, edgeMetrics[0], edgeMetrics[1], DOTTED_EDGE_SPACING);
+				
+					drawDottedArc(gl, points);
+					
+				// Draw regular edges for the catch-all case
+				} else {
+					points = generateArcCoordinates(
+							start, end, edgeMetrics[0], edgeMetrics[1], NUM_SEGMENTS);
+					
+					drawRegularArc(gl, points);
+				}
 			}
 		}
 	}
@@ -238,7 +259,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	 * @param totalCoincidentEdges The total number of edges that connect the same nodes as this edge
 	 * @return
 	 */
-	private Vector3[] generateEdgeSpecificArcCoordinates(Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
+	private Vector3[] generateEdgeSpecificArcCoordinates(
+			Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
 		
 		// If this is the only edge connecting these nodes, make it straight and simply
 		// return the endpoints
@@ -265,6 +287,28 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		// return generateArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
 		
 		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, DASHED_EDGE_SPACING);
+	}
+	
+	// Return a 2-tuple (circleRadius, rotationAngle)
+	private double[] findArcEdgeMetrics(Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
+
+		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
+		int edgeLevel = (int) (Math.sqrt((double) edgeNumber));
+		int maxLevel = (int) (Math.sqrt((double) totalCoincidentEdges));
+		
+		int edgesInLevel = edgeLevel * 2 + 1;
+		
+		// Smaller edge level -> greater radius
+		double curvedEdgeRadius = start.distance(end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+		
+		// The outmost level is usually not completed
+		if (edgeLevel == maxLevel) {
+			edgesInLevel = (int) (totalCoincidentEdges - Math.pow(maxLevel, 2) + 1);
+		}
+		
+		double edgeRadialAngle = (double) (edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
+
+		return new double[]{curvedEdgeRadius, edgeRadialAngle};
 	}
 	
 	/**
@@ -430,6 +474,24 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			
 			// Perform drawing
 			shapeDrawer.drawSegment(gl, EdgeShapeType.DASHED);
+			
+			gl.glPopMatrix();
+		}
+	}
+	
+	private void drawDottedArc(GL2 gl, Vector3[] points) {
+		Vector3 facing;
+		
+		for (int i = 1; i < points.length - 1; i++) {
+			facing = points[i + 1].subtract(points[i - 1]);
+			
+			gl.glPushMatrix();
+			
+			RenderToolkit.setUpFacingTransformation(gl, points[i], facing);
+			gl.glScalef(DOTTED_EDGE_RADIUS, DOTTED_EDGE_RADIUS, DOTTED_EDGE_RADIUS);
+			
+			// Perform drawing
+			shapeDrawer.drawSegment(gl, EdgeShapeType.DOTTED);
 			
 			gl.glPopMatrix();
 		}

@@ -100,11 +100,11 @@ public class EdgeShapeDrawer {
 		double length = 1.0 / Math.sqrt(2);
 		
 		gl.glNewList(listIndex, GL2.GL_COMPILE);
-		glu.gluCylinder(quadric, length / 2 , length / 2, length,
-				2, 1);
+		glu.gluCylinder(quadric, length, length, length,
+				4, 1);
 		gl.glEndList();
 		
-		segmentLists.put(EdgeShapeType.DASHED, listIndex);
+		segmentLists.put(EdgeShapeType.DOTTED, listIndex);
 	}
 	
 	public void drawSegment (GL2 gl, EdgeShapeType segmentType) {
