@@ -322,14 +322,32 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		double arcAngle = startOffset.angle(endOffset);
 		
-		int increments = (int) (arcAngle / segmentAngle);
+		int halfIncrements = (int) (arcAngle / segmentAngle / 2);
 		
-		// Add 1 to include the end point
-		Vector3[] arcCoordinates = new Vector3[increments + 1]; 
+		
+		// Add 2 to include the start and end points
+		Vector3[] arcCoordinates = new Vector3[2 * halfIncrements + 2]; 
 		Vector3 rotationNormal = startOffset.cross(endOffset);
+
+		Vector3 centerCurvePointOffset = startOffset.rotate(
+				rotationNormal, arcAngle / 2);	
 		
-		for (int i = 0; i < increments; i++) {
-			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, segmentAngle * i));
+		// Manually add the first point
+		arcCoordinates[0] = start.copy();
+		
+		// TODO: Current implementation includes the middle point twice, though it is not
+		// noticeable
+		
+		// Points between the first node and the center point
+		for (int i = 0; i < halfIncrements; i++) {
+			arcCoordinates[(halfIncrements - i)] = circleCenter.plus(
+					centerCurvePointOffset.rotate(rotationNormal, -segmentAngle * i));
+		}
+		
+		// Points between the center point and the second node
+		for (int i = 0; i < halfIncrements; i++) {
+			arcCoordinates[(halfIncrements + i) + 1] = circleCenter.plus(
+					centerCurvePointOffset.rotate(rotationNormal, segmentAngle * i));
 		}
 		
 		// Include the end point
