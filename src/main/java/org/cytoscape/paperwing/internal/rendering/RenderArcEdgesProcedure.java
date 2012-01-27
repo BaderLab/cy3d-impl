@@ -289,7 +289,16 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, DASHED_EDGE_SPACING);
 	}
 	
-	// Return a 2-tuple (circleRadius, rotationAngle)
+	/**
+	 * Return a 2-tuple containing the appropriate radius for the circular edge arc, as well
+	 * as how much it should be rotated in the node-to-node displacement axis.
+	 * 
+	 * @param start The position of the first node
+	 * @param end The position of the second node
+	 * @param edgeNumber The index of this edge amongst the edges that connect the same pair of nodes,
+	 * starting from 1
+	 * @param totalCoincidentEdges The total number of edges that connect this pair of nodes
+	 */
 	private double[] findArcEdgeMetrics(Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
 
 		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
