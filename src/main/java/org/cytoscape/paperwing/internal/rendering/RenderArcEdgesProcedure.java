@@ -254,7 +254,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		double edgeRadialAngle = (double) (edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
 
-		return generateArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
+		// return generateArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
+		
+		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, 0.05);
 	}
 	
 	/**
@@ -287,10 +289,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		double rotation = arcAngle / segments;
 		
 		for (int i = 0; i < segments; i++) {
-			arcCoordinates[i] = startOffset.rotate(rotationNormal, rotation * i);
+			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, rotation * i));
 		}
 		
-		arcCoordinates[segments + 1] = end.copy();
+		arcCoordinates[arcCoordinates.length - 1] = end.copy();
+
 		
 		return arcCoordinates;
 	}
@@ -298,7 +301,33 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	// Generate points along the arc, governed by the distance between points on the arc
 	private Vector3[] generateSparseArcCoordinates(Vector3 start, Vector3 end,
 			double radius, double angle, double distance) {
-		return new Vector3[1];
+		
+		Vector3 circleCenter = findCircleCenter(start, end, radius, angle);
+		Vector3 startOffset = start.subtract(circleCenter);
+		Vector3 endOffset = end.subtract(circleCenter);
+		double offsetLength = startOffset.magnitude();
+		
+		// The angular increment to achieve the desired distance between points on the
+		// arc. This increment is found by applying the cosine law
+		double segmentAngle = GeometryToolkit.saferArcCos(
+				(2 * offsetLength * offsetLength - distance * distance) / (2 * offsetLength * offsetLength));
+		
+		double arcAngle = startOffset.angle(endOffset);
+		
+		int increments = (int) (arcAngle / segmentAngle);
+		
+		// Add 1 to include the end point
+		Vector3[] arcCoordinates = new Vector3[increments + 1]; 
+		Vector3 rotationNormal = startOffset.cross(endOffset);
+		
+		for (int i = 0; i < increments; i++) {
+			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, segmentAngle * i));
+		}
+		
+		// Include the end point
+		arcCoordinates[arcCoordinates.length - 1] = end.copy();
+		
+		return arcCoordinates;
 	}
 	
 	/**
