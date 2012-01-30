@@ -17,7 +17,7 @@ public class WindNodeView extends VisualPropertyKeeper<CyNode> {
 	}
 	
 	@Override
-	public long getSUID() {
+	public Long getSUID() {
 		return suid;
 	}
 

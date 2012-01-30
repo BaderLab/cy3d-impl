@@ -26,7 +26,7 @@ import org.cytoscape.view.model.VisualProperty;
 
 public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
-	private long suid;
+	private Long suid;
 	
 	private CyNetwork network;
 	
@@ -72,7 +72,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	}
 
 	@Override
-	public long getSUID() {
+	public Long getSUID() {
 		return suid;
 	}
 

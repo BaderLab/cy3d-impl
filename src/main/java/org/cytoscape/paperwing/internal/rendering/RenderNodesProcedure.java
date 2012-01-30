@@ -98,7 +98,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				if (shapeType != null) {
 					shapeDrawer.drawShape(gl, shapeType);
 				} else {
-					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBE);
+					shapeDrawer.drawShape(gl, ShapeType.SHAPE_SPHERE);
 				}
 				
 				gl.glPopMatrix();

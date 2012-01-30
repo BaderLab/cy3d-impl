@@ -17,7 +17,7 @@ public class WindEdgeView extends VisualPropertyKeeper<CyEdge> {
 	}
 	
 	@Override
-	public long getSUID() {
+	public Long getSUID() {
 		return suid;
 	}
 
