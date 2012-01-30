@@ -48,6 +48,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final float DOTTED_EDGE_RADIUS = 0.012f;
 	private static final float DOTTED_EDGE_SPACING = 0.08f;
 	
+	private static final double ARC_EDGE_MINIMUM_RADIUS = 0.1;
+	
 	/**
 	 * The number of straight segments used to approximate a curved edge
 	 */
@@ -70,6 +72,12 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// The total number of edges that connect the pair of nodes.
 		protected int totalCoincidentEdges;
+		
+		// Does this edge direct from a node to itself?
+		protected boolean selfEdge;
+		
+		// TODO: Consider storing the edge start and end coordinates in this class
+		// via the analyzeEdges() method
 	}
 	
 	public RenderArcEdgesProcedure() {
@@ -94,6 +102,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		int nodeCount = networkView.getModel().getNodeCount();
 		CyEdge edge;
 		
+		boolean selfEdge;
+		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {			
 			edge = edgeView.getModel();
 			
@@ -116,10 +126,18 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			
 			pairCoincidenceCount.put(identifier, edgeNumber);
 			
+			// Check if the edge leads from a node to itself
+			if (sourceIndex == targetIndex) {
+				selfEdge = true;
+			} else {
+				selfEdge = false;
+			}
+			
 			EdgeViewContainer container = new EdgeViewContainer();
 			container.edgeView = edgeView;
 			container.pairIdentifier = identifier;
 			container.edgeNumber = edgeNumber;
+			container.selfEdge = selfEdge;
 			
 			edgeViewContainers.add(container);
 		}
@@ -158,14 +176,19 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			start = obtainCoordinates(edge.getSource(), networkView, distanceScale);
 			end = obtainCoordinates(edge.getTarget(), networkView, distanceScale);
 			
-			// TODO: Check for cases where the edge goes from a node to itself
-			if (start != null && end != null && end.distance(start) >= MIN_LENGTH) {
+			if (start != null && end != null && 
+					(end.distance(start) >= MIN_LENGTH || container.selfEdge)) {
 				
 				// Load name for edge picking
 				gl.glLoadName(edge.getIndex());
 				
+				// Determine the circle radius as well as rotation angle for the edge
 				double[] edgeMetrics = findArcEdgeMetrics(
-						start, end, container.edgeNumber, container.totalCoincidentEdges);
+						start, end, container.edgeNumber, 
+						container.totalCoincidentEdges, container.selfEdge);
+				
+				// Check if the edge leads from a node to itself, ie. requires arc inversion
+				boolean invert = container.selfEdge;
 				
 				// General points along the arc
 				Vector3[] points;
@@ -174,20 +197,20 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
 						== LineTypeVisualProperty.EQUAL_DASH) {
 					points = generateSparseArcCoordinates(
-							start, end, edgeMetrics[0], edgeMetrics[1], DASHED_EDGE_SPACING);
+							start, end, edgeMetrics[0], edgeMetrics[1], DASHED_EDGE_SPACING, invert);
 				
 					drawDashedArc(gl, points);
 				} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
 						== LineTypeVisualProperty.DOT) {
 					points = generateSparseArcCoordinates(
-							start, end, edgeMetrics[0], edgeMetrics[1], DOTTED_EDGE_SPACING);
+							start, end, edgeMetrics[0], edgeMetrics[1], DOTTED_EDGE_SPACING, invert);
 				
 					drawDottedArc(gl, points);
 					
 				// Draw regular edges for the catch-all case
 				} else {
 					points = generateArcCoordinates(
-							start, end, edgeMetrics[0], edgeMetrics[1], NUM_SEGMENTS);
+							start, end, edgeMetrics[0], edgeMetrics[1], NUM_SEGMENTS, invert);
 					
 					drawRegularArc(gl, points);
 				}
@@ -243,52 +266,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		return coordinates;
 	}
-	
-
-	/**
-	 * Generates a set of edge-specific arc coordinates, so that the set of drawing coordinates
-	 * representing the edge are made to not coincide with other edges that connect the same pair of nodes
-	 * 
-	 * The first of the coordinates is equal to the starting position, and the last is equal to the
-	 * terminal position.
-	 * 
-	 * @param start The starting position of the edge
-	 * @param end The terminal position of the edge
-	 * @param edgeNumber The index of this edge out of all the edges that connect the same pair of nodes,
-	 * with 1 meaning it is the first of all the edges
-	 * @param totalCoincidentEdges The total number of edges that connect the same nodes as this edge
-	 * @return
-	 */
-	private Vector3[] generateEdgeSpecificArcCoordinates(
-			Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
 		
-		// If this is the only edge connecting these nodes, make it straight and simply
-		// return the endpoints
-		if (totalCoincidentEdges == 1 && edgeNumber == 1) {
-			return new Vector3[] {start.copy(), end.copy()};
-		}
-		
-		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
-		int edgeLevel = (int) (Math.sqrt((double) edgeNumber));
-		int maxLevel = (int) (Math.sqrt((double) totalCoincidentEdges));
-		
-		int edgesInLevel = edgeLevel * 2 + 1;
-		
-		// Smaller edge level -> greater radius
-		double curvedEdgeRadius = start.distance(end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
-		
-		// The outmost level is usually not completed
-		if (edgeLevel == maxLevel) {
-			edgesInLevel = (int) (totalCoincidentEdges - Math.pow(maxLevel, 2) + 1);
-		}
-		
-		double edgeRadialAngle = (double) (edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
-
-		// return generateArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, NUM_SEGMENTS);
-		
-		return generateSparseArcCoordinates(start, end, curvedEdgeRadius, edgeRadialAngle, DASHED_EDGE_SPACING);
-	}
-	
 	/**
 	 * Return a 2-tuple containing the appropriate radius for the circular edge arc, as well
 	 * as how much it should be rotated in the node-to-node displacement axis.
@@ -298,9 +276,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	 * @param edgeNumber The index of this edge amongst the edges that connect the same pair of nodes,
 	 * starting from 1
 	 * @param totalCoincidentEdges The total number of edges that connect this pair of nodes
+	 * @param selfEdge Whether or not the edge leads from a node to itself
 	 */
-	private double[] findArcEdgeMetrics(Vector3 start, Vector3 end, int edgeNumber, int totalCoincidentEdges) {
-
+	private double[] findArcEdgeMetrics(Vector3 start, Vector3 end, 
+			int edgeNumber, int totalCoincidentEdges, boolean selfEdge) {
+		
 		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
 		int edgeLevel = (int) (Math.sqrt((double) edgeNumber));
 		int maxLevel = (int) (Math.sqrt((double) totalCoincidentEdges));
@@ -308,7 +288,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		int edgesInLevel = edgeLevel * 2 + 1;
 		
 		// Smaller edge level -> greater radius
-		double curvedEdgeRadius = start.distance(end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+		double curvedEdgeRadius;
+		
+		if (selfEdge) {
+			curvedEdgeRadius = start.distance(end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+		} else {
+			curvedEdgeRadius = ARC_EDGE_MINIMUM_RADIUS * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+		}
 		
 		// The outmost level is usually not completed
 		if (edgeLevel == maxLevel) {
@@ -332,11 +318,14 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	 * the right-hand rule, from the positive z-axis.
 	 * @param segments The number of straight segments to divide the arc into. The number
 	 * of points returned is equal to the number of segments + 1. Must be at least 1.
+	 * @param invert When set to true, generates the coordinates of the arc spanning greater
+	 * than 180 degrees of the circle, instead of the smaller obtuse or acute arc. This
+	 * can be useful for drawing edges from an edge to itself.
 	 * @return An array of position vectors representing the arc, where the first point
 	 * is equal to the start of the arc, and the last point is equal to the end of the arc.
 	 */
 	private Vector3[] generateArcCoordinates(Vector3 start, Vector3 end, 
-			double radius, double angle, int segments) {
+			double radius, double angle, int segments, boolean invert) {
 		
 		Vector3[] arcCoordinates = new Vector3[segments + 1];
 		
@@ -349,6 +338,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		double rotation = arcAngle / segments;
 		
+		if (invert) {
+			arcAngle = 2 * Math.PI - arcAngle;
+			rotation = -rotation;
+		}
+		
 		for (int i = 0; i < segments; i++) {
 			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, rotation * i));
 		}
@@ -359,9 +353,26 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		return arcCoordinates;
 	}
 	
-	// Generate points along the arc, governed by the distance between points on the arc
+	/**
+	 * Similar to generateArcCoordinates(), but the result is governed by the distance
+	 * between points rather than the number of points. Also, the result is calculated
+	 * such that the points are distributed symmetrically between the starting
+	 * and end positions.
+	 * 
+	 * @param start The starting point
+	 * @param end The ending point
+	 * @param radius The radius of the circle whose arc the points lie on
+	 * @param angle The rotation angle of the points along the start-to-end displacement
+	 * axis, by the right-hand rule from the positive z-axis
+	 * @param distance The desired distance between the points
+	 * @param invert Whether to invert the arc on the circle such that instead of generating
+	 * points along the smaller, less than or equal to 180 degrees arc, the arc spanning
+	 * more than 180 degrees is used. This is useful for drawing edges from a node to itself.
+	 * @return An array of points along the arc, where the first and last points correspond
+	 * to the given starting and ending positions.
+	 */
 	private Vector3[] generateSparseArcCoordinates(Vector3 start, Vector3 end,
-			double radius, double angle, double distance) {
+			double radius, double angle, double distance, boolean invert) {
 		
 		Vector3 circleCenter = findCircleCenter(start, end, radius, angle);
 		Vector3 startOffset = start.subtract(circleCenter);
@@ -377,6 +388,12 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		int halfIncrements = (int) (arcAngle / segmentAngle / 2);
 		
+		// Check if it is necessary to invert the arc in the circle, going from an angle
+		// less than or equal to 180 degrees to a reflex angle
+		if (invert) {
+			arcAngle = 2 * Math.PI - arcAngle;
+			segmentAngle = -segmentAngle;
+		}
 		
 		// Add 2 to include the start and end points
 		Vector3[] arcCoordinates = new Vector3[2 * halfIncrements + 2]; 
