@@ -48,15 +48,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final float DOTTED_EDGE_RADIUS = 0.017f;
 	private static final float DOTTED_EDGE_SPACING = 0.057f;
 	
-	private static final double ARC_SELF_EDGE_MINIMUM_RADIUS = 0.04;
+	private static final double ARC_SELF_EDGE_MINIMUM_RADIUS = 0.045;
 	private static final double ARC_SELF_EDGE_RADIUS_FACTOR = 0.007;
-	
-	private static final Vector3 X_UNIT_VECTOR = new Vector3(1, 0, 0);
-	private static final Vector3 Y_UNIT_VECTOR = new Vector3(0, 1, 0);
-	private static final Vector3 Z_UNIT_VECTOR = new Vector3(0, 0, 1);
-	
-	private static final Vector3 SELF_EDGE_DEFAULT_FACING = new Vector3(1, 0, 0);
-	private static final Vector3 SELF_EDGE_DEFAULT_ROTATION_AXIS = new Vector3(0, 1, 0);
 	
 	/**
 	 * The number of straight segments used to approximate a curved edge
@@ -306,10 +299,10 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		double arcAngle = startOffset.angle(endOffset);
 		double rotation = arcAngle / segments;
 		
-		// Invert the angle and the rotation directin if needed
+		// Invert the angle and the rotation direction if needed
 		if (invert) {
 			arcAngle = 2 * Math.PI - arcAngle;
-			rotation = -rotation;
+			rotation = -arcAngle / segments;
 		}
 		
 		for (int i = 0; i < segments; i++) {
@@ -343,12 +336,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		Vector3 startOffset = start.subtract(circleCenter);
 		Vector3 endOffset = end.subtract(circleCenter);
-		double offsetLength = startOffset.magnitude();
+		double radius = startOffset.magnitude();
 		
 		// The angular increment to achieve the desired distance between points on the
 		// arc. This increment is found by applying the cosine law
 		double segmentAngle = GeometryToolkit.saferArcCos(
-				(2 * offsetLength * offsetLength - distance * distance) / (2 * offsetLength * offsetLength));
+				(2 * radius * radius - distance * distance)
+				/ (2 * radius * radius));
 		
 		double arcAngle = startOffset.angle(endOffset);
 		
@@ -367,13 +361,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// Self-edge suspected, use default normal to avoid division by 0
 		if (start.distanceSquared(end) < MIN_LENGTH) {
-			rotationNormal = startOffset.cross(new Vector3(0, -1, 0));
+			rotationNormal = startOffset.cross(new Vector3(0, 1, 0));
 		} else {
 			rotationNormal = startOffset.cross(endOffset);
 		}
 
 		Vector3 centerCurvePointOffset = startOffset.rotate(
-				rotationNormal, arcAngle / 2);	
+				rotationNormal, arcAngle / 2);
 		
 		// Manually add the first point
 		arcCoordinates[0] = start.copy();
