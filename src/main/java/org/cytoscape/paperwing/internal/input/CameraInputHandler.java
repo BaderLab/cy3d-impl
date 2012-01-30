@@ -35,7 +35,8 @@ public class CameraInputHandler implements InputHandler {
 		
 		// Varying distance between camera and camera's target point
 		if (mouse.dWheel() != 0) {
-			camera.zoomOut((double) mouse.dWheel());
+//			camera.zoomOut((double) mouse.dWheel());
+			camera.moveForwardQuickly(-mouse.dWheel());
 			
 			if (!selectedNodeIndices.isEmpty()) {
 				// TODO: Check if this is a suitable place to put this, as

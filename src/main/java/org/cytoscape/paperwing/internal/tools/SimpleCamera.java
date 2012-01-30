@@ -247,6 +247,15 @@ public class SimpleCamera {
 		move(up, -moveSpeed);
 	}
 	
+	/** Translate the camera forwards quickly, using its zooming speed as the movement rate
+	 * 
+	 * @param multiplier The multiplier against the distance moved. A negative
+	 * multiplier results in moving backwards.
+	 */
+	public void moveForwardQuickly(double multiplier) {
+		move(direction, zoomSpeed * multiplier);
+	}
+	
 	/** Translates the camera to a given position. The target position vector is
 	 * also shifted by the same amount as the camera's position vector
 	 * 
