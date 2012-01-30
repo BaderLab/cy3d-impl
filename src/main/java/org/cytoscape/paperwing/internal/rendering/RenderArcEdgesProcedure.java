@@ -41,18 +41,22 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
-	private static final float DASHED_EDGE_RADIUS = 0.007f;
-	private static final float DASHED_EDGE_LENGTH = 0.04f;
-	private static final float DASHED_EDGE_SPACING = 0.10f;
+	private static final float DASHED_EDGE_RADIUS = 0.006f;
+	private static final float DASHED_EDGE_LENGTH = 0.05f;
+	private static final float DASHED_EDGE_SPACING = 0.07f;
 	
-	private static final float DOTTED_EDGE_RADIUS = 0.012f;
-	private static final float DOTTED_EDGE_SPACING = 0.08f;
+	private static final float DOTTED_EDGE_RADIUS = 0.017f;
+	private static final float DOTTED_EDGE_SPACING = 0.057f;
 	
-	private static final double ARC_EDGE_MINIMUM_RADIUS = 0.1;
+	private static final double ARC_SELF_EDGE_MINIMUM_RADIUS = 0.04;
+	private static final double ARC_SELF_EDGE_RADIUS_FACTOR = 0.007;
 	
 	private static final Vector3 X_UNIT_VECTOR = new Vector3(1, 0, 0);
 	private static final Vector3 Y_UNIT_VECTOR = new Vector3(0, 1, 0);
 	private static final Vector3 Z_UNIT_VECTOR = new Vector3(0, 0, 1);
+	
+	private static final Vector3 SELF_EDGE_DEFAULT_FACING = new Vector3(1, 0, 0);
+	private static final Vector3 SELF_EDGE_DEFAULT_ROTATION_AXIS = new Vector3(0, 1, 0);
 	
 	/**
 	 * The number of straight segments used to approximate a curved edge
@@ -290,21 +294,23 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		Vector3 startOffset = start.subtract(circleCenter);
 		Vector3 endOffset = end.subtract(circleCenter);
-		Vector3 rotationNormal = startOffset.cross(endOffset);
+		Vector3 rotationNormal;
 		
-		// TODO: Check if this is a good place to put this
-		if (rotationNormal.magnitude() < MIN_LENGTH) {
-			rotationNormal = startOffset.cross(Y_UNIT_VECTOR);
+		// Self-edge suspected, use default normal to avoid division by 0
+		if (start.distanceSquared(end) < MIN_LENGTH) {
+			rotationNormal = startOffset.cross(new Vector3(0, 1, 0));
+		} else {
+			rotationNormal = startOffset.cross(endOffset);
 		}
 		
 		double arcAngle = startOffset.angle(endOffset);
-		
-		// Invert the angle if needed
-		if (invert) {
-			arcAngle = -2 * Math.PI + arcAngle;
-		}
-		
 		double rotation = arcAngle / segments;
+		
+		// Invert the angle and the rotation directin if needed
+		if (invert) {
+			arcAngle = 2 * Math.PI - arcAngle;
+			rotation = -rotation;
+		}
 		
 		for (int i = 0; i < segments; i++) {
 			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, rotation * i));
@@ -350,14 +356,21 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		// less than or equal to 180 degrees to a reflex angle
 		if (invert) {
 			arcAngle = 2 * Math.PI - arcAngle;
-			segmentAngle = -segmentAngle;
 		}
 		
 		int halfIncrements = Math.abs((int) (arcAngle / segmentAngle / 2));
 		
-		// Add 2 to include the start and end points
-		Vector3[] arcCoordinates = new Vector3[2 * halfIncrements + 2]; 
-		Vector3 rotationNormal = startOffset.cross(endOffset);
+		// The number of points includes the start and end points, but the number is odd
+		// to keep from calculating the middle point twice
+		Vector3[] arcCoordinates = new Vector3[2 * halfIncrements + 1]; 
+		Vector3 rotationNormal;
+		
+		// Self-edge suspected, use default normal to avoid division by 0
+		if (start.distanceSquared(end) < MIN_LENGTH) {
+			rotationNormal = startOffset.cross(new Vector3(0, -1, 0));
+		} else {
+			rotationNormal = startOffset.cross(endOffset);
+		}
 
 		Vector3 centerCurvePointOffset = startOffset.rotate(
 				rotationNormal, arcAngle / 2);	
@@ -365,18 +378,16 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		// Manually add the first point
 		arcCoordinates[0] = start.copy();
 		
-		// TODO: Current implementation includes the middle point twice, though it is not
-		// noticeable
-		
 		// Points between the first node and the center point
 		for (int i = 0; i < halfIncrements; i++) {
 			arcCoordinates[(halfIncrements - i)] = circleCenter.plus(
 					centerCurvePointOffset.rotate(rotationNormal, -segmentAngle * i));
 		}
 		
-		// Points between the center point and the second node
-		for (int i = 0; i < halfIncrements; i++) {
-			arcCoordinates[(halfIncrements + i) + 1] = circleCenter.plus(
+		// Points between the center point and the second node. Start at i = 1
+		// to keep from calculating the middle point twice
+		for (int i = 1; i < halfIncrements; i++) {
+			arcCoordinates[(halfIncrements + i)] = circleCenter.plus(
 					centerCurvePointOffset.rotate(rotationNormal, segmentAngle * i));
 		}
 		
@@ -384,44 +395,6 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		arcCoordinates[arcCoordinates.length - 1] = end.copy();
 		
 		return arcCoordinates;
-	}
-	
-	
-	/**
-	 * Return a 2-tuple containing the appropriate radius for the circular edge arc, as well
-	 * as how much it should be rotated in the node-to-node displacement axis.
-	 * 
-	 * @param container The EdgeViewContainer object holding additional information about the
-	 * edge, including its index amongst the other edges that connect the same pair of nodes
-	 * @param selfEdge Whether or not the edge leads from a node to itself
-	 */
-	private double[] findArcEdgeMetrics(EdgeViewContainer container) {
-		
-		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
-		int edgeLevel = (int) (Math.sqrt((double) container.edgeNumber));
-		int maxLevel = (int) (Math.sqrt((double) container.totalCoincidentEdges));
-		
-		int edgesInLevel = edgeLevel * 2 + 1;
-		
-		
-		double curvedEdgeRadius;
-		
-		if (container.selfEdge) {
-			// For self-edges, want greater edge level -> greater radius
-			curvedEdgeRadius = ARC_EDGE_MINIMUM_RADIUS / (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
-		} else {
-			// For regular edges, want greater edge level -> smaller radius (more curvature)
-			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
-		}
-		
-		// The outmost level is usually not completed
-		if (edgeLevel == maxLevel) {
-			edgesInLevel = (int) (container.totalCoincidentEdges - Math.pow(maxLevel, 2) + 1);
-		}
-		
-		double edgeRadialAngle = (double) (container.edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
-
-		return new double[]{curvedEdgeRadius, edgeRadialAngle};
 	}
 	
 	/**
@@ -440,7 +413,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		double angle = edgeMetrics[1];
 		
 		if (container.selfEdge) {
-			Vector3 offset = Z_UNIT_VECTOR.multiply(radius).rotate(Y_UNIT_VECTOR, angle);
+			Vector3 offset = (new Vector3(1, 0, 0)).multiply(radius).rotate(
+					(new Vector3(0, 1, 0)), angle);
 		
 			return container.start.plus(offset);
 		} else {
@@ -462,7 +436,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			double nearCornerAngle = Math.PI / 2 - (arcAngle / 2);
 		
 			// Set the angle of rotation along the node-to-node displacement axis
-			Vector3 targetDirection = new Vector3(0, 0, 1);
+			Vector3 targetDirection = new Vector3(0, 1, 0);
 			targetDirection = targetDirection.rotate(displacement, angle);
 			
 			// Offset vector that points from first node to the circle's center
@@ -472,6 +446,48 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 			return container.start.plus(circleCenterOffset);
 		}
+	}
+	
+	/**
+	 * Return a 2-tuple containing the appropriate radius for the circular edge arc, as well
+	 * as how much it should be rotated in the node-to-node displacement axis.
+	 * 
+	 * @param container The EdgeViewContainer object holding additional information about the
+	 * edge, including its index amongst the other edges that connect the same pair of nodes
+	 * @param selfEdge Whether or not the edge leads from a node to itself
+	 */
+	private double[] findArcEdgeMetrics(EdgeViewContainer container) {
+		
+		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
+		int edgeLevel = (int) (Math.sqrt((double) container.edgeNumber));
+		int maxLevel = (int) (Math.sqrt((double) container.totalCoincidentEdges));
+		
+		int edgesInLevel = edgeLevel * 2 + 1;
+		
+		double curvedEdgeRadius;
+		
+		if (container.selfEdge) {
+			// For self-edges, want greater edge level -> greater radius
+			curvedEdgeRadius = ARC_SELF_EDGE_MINIMUM_RADIUS
+					+ ARC_SELF_EDGE_RADIUS_FACTOR * Math.pow(edgeLevel, 1.2);
+		} else {
+			// For regular edges, want greater edge level -> smaller radius (more curvature)
+			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+		}
+		
+		// The outmost level is usually not completed
+		if (edgeLevel == maxLevel) {
+			edgesInLevel = (int) (container.totalCoincidentEdges - Math.pow(maxLevel, 2) + 1);
+		}
+		
+		double edgeRadialAngle = (double) (container.edgeNumber - Math.pow(edgeLevel, 2)) / edgesInLevel * Math.PI * 2;
+
+		// Flip the angle by 180 degrees for every other edge level for aesthetic effect
+		if (edgeLevel % 2 == 0) {
+			edgeRadialAngle = Math.PI - edgeRadialAngle;
+		}
+		
+		return new double[]{curvedEdgeRadius, edgeRadialAngle};
 	}
 	
 	private void drawRegularArc(GL2 gl, Vector3[] points) {

@@ -14,7 +14,7 @@ public class EdgeShapeDrawer {
 	private static int REGULAR_CYLINDER_SLICES = 4;
 	private static int REGULAR_CYLINDER_STACKS = 1;
 	
-	private static int DASHED_CYLINDER_SLICES = 4;
+	private static int DASHED_CYLINDER_SLICES = 3;
 	private static int DASHED_CYLINDER_STACKS = 1;
 	
 	public static enum EdgeShapeType {
@@ -100,8 +100,7 @@ public class EdgeShapeDrawer {
 		double length = 1.0 / Math.sqrt(2);
 		
 		gl.glNewList(listIndex, GL2.GL_COMPILE);
-		glu.gluCylinder(quadric, length, length, length,
-				4, 1);
+		glu.gluSphere(quadric, length / 2, 4, 4);
 		gl.glEndList();
 		
 		segmentLists.put(EdgeShapeType.DOTTED, listIndex);
