@@ -6,6 +6,7 @@ import org.cytoscape.paperwing.internal.geometric.Vector3;
 
 public class RenderToolkit {
 
+	
 	/** Set up matrix transformations such that the position is 
 	 * equal to the location vector and the z-axis is in the direction 
 	 * of the given direction
@@ -22,10 +23,13 @@ public class RenderToolkit {
 		Vector3 current = new Vector3(0, 0, 1);
 		Vector3 rotateAxis = current.cross(direction);
 		
-		gl.glRotatef((float) Math.toDegrees(direction.angle(current)), 
-				(float) rotateAxis.x(),
-				(float) rotateAxis.y(),
-				(float) rotateAxis.z());
+		// Make sure the given normal has nonzero length
+		if (direction.magnitudeSquared() > Double.MIN_NORMAL) {
+			gl.glRotatef((float) Math.toDegrees(direction.angle(current)), 
+					(float) rotateAxis.x(),
+					(float) rotateAxis.y(),
+					(float) rotateAxis.z());
+		}
 	}
 	
 	public static void drawPoint(GL2 gl, Vector3 point) {

@@ -266,6 +266,15 @@ public class Vector3 {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 	
+	/** Obtain the square of the magnitude, which is faster than obtaining 
+	 * the magnitude itself for comparison calculations
+	 * 
+	 * @return The square of the magnitude
+	 */
+	public double magnitudeSquared() {
+		return (x * x + y * y + z * z);
+	}
+	
 	/** Set this vector to be equal to itself divided by its magnitude
 	 */
 	public void normalizeLocal() {

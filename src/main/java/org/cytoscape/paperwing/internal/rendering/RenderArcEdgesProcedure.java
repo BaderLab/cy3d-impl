@@ -17,6 +17,7 @@ import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.rendering.shapes.EdgeShapeDrawer;
 import org.cytoscape.paperwing.internal.rendering.shapes.EdgeShapeDrawer.EdgeShapeType;
+import org.cytoscape.paperwing.internal.tools.EdgeCoordinateCalculator;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
@@ -76,6 +77,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// Does this edge direct from a node to itself?
 		protected boolean selfEdge;
+		
+		// Should this edge be a straight edge because it is the only edge between 2 nodes?
+		protected boolean straightEdge;
 		
 		Vector3 start;
 		Vector3 end;
@@ -149,6 +153,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		// Update the value for the total number of edges between this pair of nodes
 		for (EdgeViewContainer container : edgeViewContainers) {
 			container.totalCoincidentEdges = pairCoincidenceCount.get(container.pairIdentifier);
+			
+			// If there was only 1 edge for that pair of nodes, make it a straight edge
+			if (container.totalCoincidentEdges == 1 && !container.selfEdge) {
+				container.straightEdge = true;
+			}
 		}
 		
 		return edgeViewContainers;
@@ -168,48 +177,72 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		Set<EdgeViewContainer> edgeViewContainers = analyzeEdges(networkView, distanceScale);
 		View<CyEdge> edgeView;
-		CyEdge edge;
 		Vector3 circleCenter;
 		
 		for (EdgeViewContainer container : edgeViewContainers) {
 			edgeView = container.edgeView;
-			edge = edgeView.getModel();
 			
 			if (container.start != null && container.end != null && 
 					(container.end.distance(container.start) >= MIN_LENGTH || container.selfEdge)) {
 				
-				// Load name for edge picking
-				gl.glLoadName(edge.getIndex());
-				
 				// Set color
 				chooseColor(gl, edgeView, graphicsData);
 				
-				// Find the arc circle's center
-				circleCenter = findCircleCenter(container);
+				// Load name for edge picking
+				gl.glLoadName(edgeView.getModel().getIndex());
 				
 				// General points along the arc
 				Vector3[] points;
 				
-				// Draw the correct type of edge depending on the visual property
-				if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
-						== LineTypeVisualProperty.EQUAL_DASH) {
-					points = generateSparseArcCoordinates(
-							container.start, container.end, circleCenter, DASHED_EDGE_SPACING, container.selfEdge);
-				
-					drawDashedArc(gl, points);
-				} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
-						== LineTypeVisualProperty.DOT) {
-					points = generateSparseArcCoordinates(
-							container.start, container.end, circleCenter, DOTTED_EDGE_SPACING, container.selfEdge);
-				
-					drawDottedArc(gl, points);
+				if (container.straightEdge) {
 					
-				// Draw regular edges for the catch-all case
+					// Draw the correct type of edge depending on the visual property
+					if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+							== LineTypeVisualProperty.EQUAL_DASH) {
+						points = EdgeCoordinateCalculator.generateStraightEdgeSparseCoordinates(
+								container.start, container.end, DASHED_EDGE_SPACING);
+					
+						drawDashedArc(gl, points);
+					} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+							== LineTypeVisualProperty.DOT) {
+						points = EdgeCoordinateCalculator.generateStraightEdgeSparseCoordinates(
+								container.start, container.end, DOTTED_EDGE_SPACING);
+					
+						drawDottedArc(gl, points);
+						
+					// Draw regular edges for the catch-all case
+					} else {
+						points = EdgeCoordinateCalculator.generateStraightEdgeCoordinates(
+								container.start, container.end, 1);
+						
+						drawRegularArc(gl, points);
+					}
+					
 				} else {
-					points = generateArcCoordinates(
-							container.start, container.end, circleCenter, NUM_SEGMENTS, container.selfEdge);
+					// Find the arc circle's center
+					circleCenter = findCircleCenter(container);
 					
-					drawRegularArc(gl, points);
+					// Draw the correct type of edge depending on the visual property
+					if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+							== LineTypeVisualProperty.EQUAL_DASH) {
+						points = EdgeCoordinateCalculator.generateArcEdgeSparseCoordinates(
+								container.start, container.end, circleCenter, DASHED_EDGE_SPACING, container.selfEdge);
+					
+						drawDashedArc(gl, points);
+					} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+							== LineTypeVisualProperty.DOT) {
+						points = EdgeCoordinateCalculator.generateArcEdgeSparseCoordinates(
+								container.start, container.end, circleCenter, DOTTED_EDGE_SPACING, container.selfEdge);
+					
+						drawDottedArc(gl, points);
+						
+					// Draw regular edges for the catch-all case
+					} else {
+						points = EdgeCoordinateCalculator.generateArcEdgeCoordinates(
+								container.start, container.end, circleCenter, NUM_SEGMENTS, container.selfEdge);
+						
+						drawRegularArc(gl, points);
+					}
 				}
 			}
 		}
@@ -264,132 +297,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		return coordinates;
 	}
 	
-	/**
-	 * Generates points along the arc of a circle connecting 2 positions in 3D space, given
-	 * the desired arc of the circle, the angle to rotate the arc about the displacement axis
-	 * by the right-hand rule from the positive z-axis, and the number of points desired.
-	 * 
-	 * @param start The starting position of the arc
-	 * @param end The terminal position of the arc
-	 * @param circleCenter The center of the circle used to generate the arc
-	 * @param segments The number of straight segments to divide the arc into. The number
-	 * of points returned is equal to the number of segments + 1. Must be at least 1.
-	 * @param invert When set to true, generates the coordinates of the arc spanning greater
-	 * than 180 degrees of the circle, instead of the smaller obtuse or acute arc. This
-	 * can be useful for drawing edges from an edge to itself.
-	 * @return An array of position vectors representing the arc, where the first point
-	 * is equal to the start of the arc, and the last point is equal to the end of the arc.
-	 */
-	private Vector3[] generateArcCoordinates(Vector3 start, Vector3 end, 
-			Vector3 circleCenter, int segments, boolean invert) {
-		
-		Vector3[] arcCoordinates = new Vector3[segments + 1];
-		
-		Vector3 startOffset = start.subtract(circleCenter);
-		Vector3 endOffset = end.subtract(circleCenter);
-		Vector3 rotationNormal;
-		
-		// Self-edge suspected, use default normal to avoid division by 0
-		if (start.distanceSquared(end) < MIN_LENGTH) {
-			rotationNormal = startOffset.cross(new Vector3(0, 1, 0));
-		} else {
-			rotationNormal = startOffset.cross(endOffset);
-		}
-		
-		double arcAngle = startOffset.angle(endOffset);
-		double rotation = arcAngle / segments;
-		
-		// Invert the angle and the rotation direction if needed
-		if (invert) {
-			arcAngle = 2 * Math.PI - arcAngle;
-			rotation = -arcAngle / segments;
-		}
-		
-		for (int i = 0; i < segments; i++) {
-			arcCoordinates[i] = circleCenter.plus(startOffset.rotate(rotationNormal, rotation * i));
-		}
-		
-		arcCoordinates[arcCoordinates.length - 1] = end.copy();
 
-		
-		return arcCoordinates;
-	}
 	
-	/**
-	 * Similar to generateArcCoordinates(), but the result is governed by the distance
-	 * between points rather than the number of points. Also, the result is calculated
-	 * such that the points are distributed symmetrically between the starting
-	 * and end positions.
-	 * 
-	 * @param start The starting point
-	 * @param end The ending point
-	 * @param circleCenter The center of the circle used to generate the arc
-	 * @param distance The desired distance between the points
-	 * @param invert Whether to invert the arc on the circle such that instead of generating
-	 * points along the smaller, less than or equal to 180 degrees arc, the arc spanning
-	 * more than 180 degrees is used. This is useful for drawing edges from a node to itself.
-	 * @return An array of points along the arc, where the first and last points correspond
-	 * to the given starting and ending positions.
-	 */
-	private Vector3[] generateSparseArcCoordinates(Vector3 start, Vector3 end,
-			Vector3 circleCenter, double distance, boolean invert) {
-		
-		Vector3 startOffset = start.subtract(circleCenter);
-		Vector3 endOffset = end.subtract(circleCenter);
-		double radius = startOffset.magnitude();
-		
-		// The angular increment to achieve the desired distance between points on the
-		// arc. This increment is found by applying the cosine law
-		double segmentAngle = GeometryToolkit.saferArcCos(
-				(2 * radius * radius - distance * distance)
-				/ (2 * radius * radius));
-		
-		double arcAngle = startOffset.angle(endOffset);
-		
-		// Check if it is necessary to invert the arc in the circle, going from an angle
-		// less than or equal to 180 degrees to a reflex angle
-		if (invert) {
-			arcAngle = 2 * Math.PI - arcAngle;
-		}
-		
-		int halfIncrements = Math.abs((int) (arcAngle / segmentAngle / 2));
-		
-		// The number of points includes the start and end points, but the number is odd
-		// to keep from calculating the middle point twice
-		Vector3[] arcCoordinates = new Vector3[2 * halfIncrements + 1]; 
-		Vector3 rotationNormal;
-		
-		// Self-edge suspected, use default normal to avoid division by 0
-		if (start.distanceSquared(end) < MIN_LENGTH) {
-			rotationNormal = startOffset.cross(new Vector3(0, 1, 0));
-		} else {
-			rotationNormal = startOffset.cross(endOffset);
-		}
-
-		Vector3 centerCurvePointOffset = startOffset.rotate(
-				rotationNormal, arcAngle / 2);
-		
-		// Manually add the first point
-		arcCoordinates[0] = start.copy();
-		
-		// Points between the first node and the center point
-		for (int i = 0; i < halfIncrements; i++) {
-			arcCoordinates[(halfIncrements - i)] = circleCenter.plus(
-					centerCurvePointOffset.rotate(rotationNormal, -segmentAngle * i));
-		}
-		
-		// Points between the center point and the second node. Start at i = 1
-		// to keep from calculating the middle point twice
-		for (int i = 1; i < halfIncrements; i++) {
-			arcCoordinates[(halfIncrements + i)] = circleCenter.plus(
-					centerCurvePointOffset.rotate(rotationNormal, segmentAngle * i));
-		}
-		
-		// Include the end point
-		arcCoordinates[arcCoordinates.length - 1] = end.copy();
-		
-		return arcCoordinates;
-	}
+	
 	
 	/**
 	 * Finds the center of a circle passing through 2 points, rotated about the displacement axis
@@ -466,7 +376,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					+ ARC_SELF_EDGE_RADIUS_FACTOR * Math.pow(edgeLevel, 1.2);
 		} else {
 			// For regular edges, want greater edge level -> smaller radius (more curvature)
-			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));
+			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));			
 		}
 		
 		// The outmost level is usually not completed
