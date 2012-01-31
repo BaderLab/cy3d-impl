@@ -234,7 +234,5 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 
 	@Override
 	public void printCanvas(java.awt.Graphics printCanvas) {
-		// TODO Auto-generated method stub
-		
 	}
 }

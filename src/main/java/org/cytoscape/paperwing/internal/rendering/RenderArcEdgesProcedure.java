@@ -298,9 +298,6 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	}
 	
 
-	
-	
-	
 	/**
 	 * Finds the center of a circle passing through 2 points, rotated about the displacement axis
 	 * by a certain angle.
@@ -376,7 +373,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					+ ARC_SELF_EDGE_RADIUS_FACTOR * Math.pow(edgeLevel, 1.2);
 		} else {
 			// For regular edges, want greater edge level -> smaller radius (more curvature)
-			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 1.5 / Math.pow(edgeLevel, 2));			
+			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 3.5 / Math.pow(edgeLevel, 2));			
 		}
 		
 		// The outmost level is usually not completed
