@@ -53,7 +53,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
 		WindRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
 		
-		engine.setUpNetworkView(networkViewManager);
+//		engine.setUpNetworkView(networkViewManager);
 		engine.setUpCanvas(container);
 		engine.setUpNetworkViewDestroyedListener(serviceRegistrar);
 		

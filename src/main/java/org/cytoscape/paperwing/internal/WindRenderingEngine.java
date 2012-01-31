@@ -14,6 +14,7 @@ import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.service.util.CyServiceRegistrar;
@@ -54,6 +55,8 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	/** Whether or not the current rendering engine is active */
 	private boolean active;
 	
+	private GLJPanel panel;
+	
 	private CyServiceRegistrar serviceRegistrar;
 	private NetworkViewAboutToBeDestroyedListener networkViewDestroyedListener;
 	
@@ -64,14 +67,16 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		this.viewModel = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.active = false;
+
+//		setUpCanvas(container);
 	}
 	
 	// Needs to be called before setUpCanvas
-	public void setUpNetworkView(CyNetworkViewManager networkViewManager) {
-		if (networkViewManager != null) {
-			this.networkView = networkViewManager.getNetworkView(viewModel.getModel());
-		}
-	}
+//	public void setUpNetworkView(CyNetworkViewManager networkViewManager) {
+//		if (networkViewManager != null) {
+//			this.networkView = networkViewManager.getNetworkView(viewModel.getModel());
+//		}
+//	}
 	
 	/** Set up the canvas by creating and placing it, along with a Graphics
 	 * object, into the container
@@ -80,8 +85,15 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	 * the rendered results
 	 */
 	public void setUpCanvas(Object container) {
+		
+		// TODO: The current presentation API seems to require this cast, check
+		// if there's a way around it
+		this.networkView = (CyNetworkView) viewModel;
+		
 		if (networkView != null) {
-			if (container instanceof JComponent) {			
+			
+			if (container instanceof JComponent) {
+				
 				JComponent component = (JComponent) container;
 				Container focus = component;
 				
@@ -93,7 +105,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				capabilities.setDoubleBuffered(true);
 				
 				// TODO: check whether to use GLCanvas or GLJPanel
-				GLJPanel panel = new GLJPanel(capabilities);
+				panel = new GLJPanel(capabilities);
 				
 				// TODO: check if negative effects produced by this
 				panel.setIgnoreRepaint(true);
@@ -207,8 +219,9 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	@Override
 	public Image createImage(int width, int height) {
 		// TODO Auto-generated method stub
-		return null;
-		//return new BufferedImage(0, width, height);
+		
+		return panel.createImage(width, height);
+		
 	}
 
 	@Override

@@ -19,10 +19,13 @@ import org.cytoscape.model.events.AddedEdgesEvent;
 import org.cytoscape.model.events.AddedEdgesListener;
 import org.cytoscape.model.events.AddedNodesEvent;
 import org.cytoscape.model.events.AddedNodesListener;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
@@ -108,9 +111,22 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		return views;
 	}
 
+	/**
+	 * Center the network
+	 */
 	@Override
 	public void fitContent() {
+		Vector3 networkCenter = NetworkToolkit.findNetworkCenter(this, 1);
 		
+		// Shift the nodes to place the center of the network at the origin
+		for (View<CyNode> nodeView : getNodeViews()) {
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION) - networkCenter.x());
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION) - networkCenter.y());
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION) - networkCenter.z());
+		}
 	}
 
 	@Override
