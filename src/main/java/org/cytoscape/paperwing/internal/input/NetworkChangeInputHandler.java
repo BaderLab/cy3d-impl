@@ -17,6 +17,8 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class NetworkChangeInputHandler implements InputHandler {
 	
+	private static final double NODE_PLACEMENT_DISTANCE = 2.3;
+	
 	@Override
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
 			GraphicsData graphicsData) {
@@ -40,7 +42,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 			// Project mouse coordinates into 3d space to determine where to put the node
 			Vector3 projection = GeometryToolkit.convertScreenTo3d(
 					mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
-					graphicsData.getScreenHeight(), camera.getDistance(), camera);
+					graphicsData.getScreenHeight(), NODE_PLACEMENT_DISTANCE, camera);
 			
 			System.out.println("Node created at: " + projection);
 			
