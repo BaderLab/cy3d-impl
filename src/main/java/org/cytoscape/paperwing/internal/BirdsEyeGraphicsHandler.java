@@ -22,7 +22,6 @@ import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderBoundingBoxProcedure;
-import org.cytoscape.paperwing.internal.rendering.RenderEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
 import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;

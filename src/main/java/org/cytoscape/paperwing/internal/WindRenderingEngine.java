@@ -2,9 +2,11 @@ package org.cytoscape.paperwing.internal;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.util.Properties;
 
@@ -220,8 +222,16 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	public Image createImage(int width, int height) {
 		// TODO Auto-generated method stub
 		
-		return panel.createImage(width, height);
+		// create image to return
+		Image image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);		
+
+		Dimension panelSize = panel.getSize();
 		
+		panel.setSize(width, height);
+		panel.paint(image.getGraphics());
+		panel.setSize(panelSize);
+		
+		return image;
 	}
 
 	@Override
