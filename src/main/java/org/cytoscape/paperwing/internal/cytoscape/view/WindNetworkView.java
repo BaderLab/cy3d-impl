@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
@@ -131,7 +132,26 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public void fitSelected() {
+		// Obtain selected nodes
+		Set<Integer> selectedNodeIndices = new HashSet<Integer>();
 		
+		for (View<CyNode> nodeView : getNodeViews()) {
+			if (nodeView.getVisualProperty(RichVisualLexicon.NODE_SELECTED)) {
+				selectedNodeIndices.add(nodeView.getModel().getIndex());
+			}
+		}
+		
+		Vector3 selectionCenter = NetworkToolkit.findCenter(selectedNodeIndices, this, 1);
+	
+		// Shift the nodes to place the center of the network at the center of the selected group of nodes
+		for (View<CyNode> nodeView : getNodeViews()) {
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION) - selectionCenter.x());
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION) - selectionCenter.y());
+			nodeView.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
+					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION) - selectionCenter.z());
+		}
 	}
 
 	@Override

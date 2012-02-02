@@ -66,6 +66,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		int hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
 		float x, y, z;
+		float width, height, depth;
 		int index;
 		ShapeType shapeType;
 		
@@ -78,6 +79,13 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
 					.floatValue() / distanceScale;
 
+			width = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_WIDTH)
+					.floatValue() / distanceScale;
+			height = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_HEIGHT)
+					.floatValue() / distanceScale;
+			depth = nodeView.getVisualProperty(RichVisualLexicon.NODE_DEPTH)
+					.floatValue() / distanceScale;
+			
 			index = nodeView.getModel().getIndex();
 			
 			// gl.glLoadName(33);
@@ -91,7 +99,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				chooseColor(gl, nodeView, graphicsData);
 				//gl.glCallList(nodeListIndex);
 				
-				gl.glScalef(NODE_SIZE_RADIUS, NODE_SIZE_RADIUS, NODE_SIZE_RADIUS);
+				gl.glScalef(NODE_SIZE_RADIUS * width, 
+						NODE_SIZE_RADIUS * height,
+						NODE_SIZE_RADIUS * depth);
 				
 				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(RichVisualLexicon.NODE_SHAPE));
 				
