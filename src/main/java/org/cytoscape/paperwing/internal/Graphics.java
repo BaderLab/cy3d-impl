@@ -184,8 +184,6 @@ public class Graphics implements GLEventListener {
 		handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
-		
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 
@@ -227,7 +225,7 @@ public class Graphics implements GLEventListener {
 		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
-		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 31);
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 21); // Default shininess 31
 		
 		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
 	}
