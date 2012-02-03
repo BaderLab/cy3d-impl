@@ -61,10 +61,10 @@ public class DefaultValueVault {
 		}
 	}
 	
-	// Override selected values from VisualProperties
-	private void updateDefaultValues() {
-		modifyDefaultValue(RichVisualLexicon.NODE_FILL_COLOR, new Color(120, 120, 120));
-	}
+//	// Override selected values from VisualProperties
+//	private void updateDefaultValues() {
+//		modifyDefaultValue(RichVisualLexicon.NODE_FILL_COLOR, new Color(120, 120, 120));
+//	}
 	
 //	@Override
 //	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty,
@@ -82,23 +82,46 @@ public class DefaultValueVault {
 		}
 	}
 	
-	public void initializeNode(VisualPropertyKeeper<CyNode> keeper) {
-		for (Entry<String, VisualPropertyValueHolder<?>> entry: nodeDefaultValues.entrySet()) {	
-			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
+	/**
+	 * Obtain the default value stored for a given visual property.
+	 * 
+	 * @param <T> The type of the visual property's value
+	 * @param visualProperty The visual property to look for a default value with
+	 * @return The default value of the visual property
+	 */
+	public <T> T getDefaultValue(VisualProperty<T> visualProperty) {
+		Class<?> targetDataType = visualProperty.getTargetDataType();
+		
+		if (defaultValueSets.get(targetDataType) != null) {
+			VisualPropertyValueHolder<T> valueHolder = 
+				(VisualPropertyValueHolder<T>)
+				defaultValueSets.get(targetDataType).get(visualProperty.getIdString());
+		
+			if (valueHolder != null) {
+				return valueHolder.getValue();
+			}
 		}
+		
+		return null;
 	}
 	
-	public void initializeEdge(VisualPropertyKeeper<CyEdge> keeper) {
-		for (Entry<String, VisualPropertyValueHolder<?>> entry: edgeDefaultValues.entrySet()) {	
-			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
-		}
-	}
-	
-	public void initializeNetwork(VisualPropertyKeeper<CyNetwork> keeper) {
-		for (Entry<String, VisualPropertyValueHolder<?>> entry: networkDefaultValues.entrySet()) {	
-			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
-		}
-	}
+//	public void initializeNode(VisualPropertyKeeper<CyNode> keeper) {
+//		for (Entry<String, VisualPropertyValueHolder<?>> entry: nodeDefaultValues.entrySet()) {	
+//			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
+//		}
+//	}
+//	
+//	public void initializeEdge(VisualPropertyKeeper<CyEdge> keeper) {
+//		for (Entry<String, VisualPropertyValueHolder<?>> entry: edgeDefaultValues.entrySet()) {	
+//			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
+//		}
+//	}
+//	
+//	public void initializeNetwork(VisualPropertyKeeper<CyNetwork> keeper) {
+//		for (Entry<String, VisualPropertyValueHolder<?>> entry: networkDefaultValues.entrySet()) {	
+//			keeper.setVisualProperty(entry.getKey(), entry.getValue().getValue());
+//		}
+//	}
 }
 
 

@@ -59,21 +59,18 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		WindNodeView nodeView;
 		for (CyNode node : network.getNodeList()) {
-			nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
-			defaultValues.initializeNode(nodeView);
+			nodeView = new WindNodeView(defaultValues, node);
 			
 			nodeViews.put(node.getIndex(), nodeView);
 		}
 		
 		WindEdgeView edgeView;
 		for (CyEdge edge : network.getEdgeList()) {
-			edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
-			defaultValues.initializeEdge(edgeView);
+			edgeView = new WindEdgeView(defaultValues, edge);
 			
 			edgeViews.put(edge.getIndex(), edgeView);
 		}
 		
-		defaultValues.initializeNetwork(this);
 	}
 	
 	@Override
@@ -169,7 +166,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		matchEdges();
 		
 		// Match the current network view to the currently applied visual style
-		updateToMatchVisualStyle();
+//		updateToMatchVisualStyle();
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -186,8 +183,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				// Found a node without a view?
 				if (nodeViews.get(node.getIndex()) == null) {
 					
-					WindNodeView nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
-					defaultValues.initializeNode(nodeView);
+					WindNodeView nodeView = new WindNodeView(defaultValues, node);
 					
 					nodeViews.put(node.getIndex(), nodeView);
 					
@@ -232,8 +228,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				// Found a edge without a view?
 				if (edgeViews.get(edge.getIndex()) == null) {
 					
-					WindEdgeView edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
-					defaultValues.initializeEdge(edgeView);
+					WindEdgeView edgeView = new WindEdgeView(defaultValues, edge);
 					
 					edgeViews.put(edge.getIndex(), edgeView);
 					
@@ -302,6 +297,19 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
 	}
 
+	@Override
+	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
+		T value = super.getVisualProperty(visualProperty);
+		
+		if (value != null) {
+			// If we were given an explicit value, return it
+			return value;
+		} else {
+			// Otherwise, return the default value
+			return defaultValues.getDefaultValue(visualProperty);
+		}
+	}
+	
 //	@Override
 //	public void handleEvent(AboutToRemoveNodesEvent e) {
 //		if (e.getSource() == network) {

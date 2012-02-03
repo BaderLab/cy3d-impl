@@ -10,7 +10,7 @@ import org.cytoscape.view.model.VisualProperty;
 // value amongst the VisualProperty objects
 public abstract class VisualPropertyKeeper<S> implements View<S>{
 	private Map<String, VisualPropertyValueHolder<?>> valueHolders;
-	
+		
 	public VisualPropertyKeeper() {
 		valueHolders = new HashMap<String, VisualPropertyValueHolder<?>>();
 	}
