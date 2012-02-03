@@ -283,24 +283,13 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		// Update visual properties according to the current visual style
 		VisualStyle visualStyle = visualMappingManager.getVisualStyle(this);
 		
-		for (View<CyNode> nodeView : getNodeViews()) {
+		for (View<? extends CyTableEntry> view : getAllViews()) {
 			for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
-				if (visualProperty.getTargetDataType() == CyNode.class 
+				if (view.getVisualProperty(visualProperty) != null 
 						&& visualStyle.getDefaultValue(visualProperty) != null
 						&& visualStyle.getVisualMappingFunction(visualProperty) == null
 						&& !exemptProperties.contains(visualProperty)) {
-					nodeView.setVisualProperty(visualProperty, (Object) visualStyle.getDefaultValue(visualProperty));
-				}
-			}
-		}
-		
-		for (View<CyEdge> edgeView : getEdgeViews()) {
-			for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
-				if (visualProperty.getTargetDataType() == CyEdge.class 
-						&& visualStyle.getDefaultValue(visualProperty) != null
-						&& visualStyle.getVisualMappingFunction(visualProperty) == null
-						&& !exemptProperties.contains(visualProperty)) {
-					edgeView.setVisualProperty(visualProperty, (Object) visualStyle.getDefaultValue(visualProperty));
+					view.setVisualProperty(visualProperty, (Object) visualStyle.getDefaultValue(visualProperty));
 				}
 			}
 		}

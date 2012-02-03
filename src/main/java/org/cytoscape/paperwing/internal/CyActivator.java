@@ -41,10 +41,6 @@ public class CyActivator extends AbstractCyActivator {
 		WindNetworkViewFactory windNetworkViewFactory =
 			new WindNetworkViewFactory(cyServiceRegistrarRef, windVisualLexicon, visualMappingManagerServiceRef);
 		
-		if (visualMappingManagerServiceRef == null) {
-			System.out.println("failed to find vmm");
-		}
-		
 		Properties windNetworkViewFactoryProps = new Properties();
 		windNetworkViewFactoryProps.setProperty("serviceType", 
 				"factory");
