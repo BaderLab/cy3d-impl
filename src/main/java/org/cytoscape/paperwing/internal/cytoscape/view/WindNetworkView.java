@@ -27,6 +27,8 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.view.vizmap.VisualStyle;
 
 public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
@@ -36,16 +38,20 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	
 	private VisualLexicon visualLexicon;
 	private DefaultValueVault defaultValues;
+	private VisualMappingManager visualMappingManager;
 	
 	// Assumes indices of nodes are unique
 	private Map<Integer, View<CyNode>> nodeViews;
 	private Map<Integer, View<CyEdge>> edgeViews;
 	
-	public WindNetworkView(CyNetwork network, VisualLexicon visualLexicon) {
+	public WindNetworkView(CyNetwork network,
+			VisualLexicon visualLexicon,
+			VisualMappingManager visualMappingManager) {
 		suid = SUIDFactory.getNextSUID();
 		
 		this.network = network;
 		this.visualLexicon = visualLexicon;
+		this.visualMappingManager = visualMappingManager;
 		
 		defaultValues = new DefaultValueVault(visualLexicon);
 		nodeViews = new HashMap<Integer, View<CyNode>>();
@@ -161,6 +167,9 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		matchNodes();
 		matchEdges();
+		
+		// Match the current network view to the currently applied visual style
+		updateToMatchVisualStyle();
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -259,6 +268,44 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		}
 	}
 
+	private void updateToMatchVisualStyle() {
+		
+		// TODO: Make the set declared below a private member field, formalize the set of node or edge specific visual properties
+		// that do not need to be matched with visual style changes, such as 3D position.
+		
+		// These visual properties are object-specific such as x, y, z coordinates
+		// and do not need to be updated according to the visual style
+		Set<VisualProperty<?>> exemptProperties = new HashSet<VisualProperty<?>>();
+		exemptProperties.add(RichVisualLexicon.NODE_X_LOCATION);
+		exemptProperties.add(RichVisualLexicon.NODE_Y_LOCATION);
+		exemptProperties.add(RichVisualLexicon.NODE_Z_LOCATION);
+		
+		// Update visual properties according to the current visual style
+		VisualStyle visualStyle = visualMappingManager.getVisualStyle(this);
+		
+		for (View<CyNode> nodeView : getNodeViews()) {
+			for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
+				if (visualProperty.getTargetDataType() == CyNode.class 
+						&& visualStyle.getDefaultValue(visualProperty) != null
+						&& visualStyle.getVisualMappingFunction(visualProperty) == null
+						&& !exemptProperties.contains(visualProperty)) {
+					nodeView.setVisualProperty(visualProperty, (Object) visualStyle.getDefaultValue(visualProperty));
+				}
+			}
+		}
+		
+		for (View<CyEdge> edgeView : getEdgeViews()) {
+			for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
+				if (visualProperty.getTargetDataType() == CyEdge.class 
+						&& visualStyle.getDefaultValue(visualProperty) != null
+						&& visualStyle.getVisualMappingFunction(visualProperty) == null
+						&& !exemptProperties.contains(visualProperty)) {
+					edgeView.setVisualProperty(visualProperty, (Object) visualStyle.getDefaultValue(visualProperty));
+				}
+			}
+		}
+	}
+	
 	@Override
 	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty,
 			V defaultValue) {

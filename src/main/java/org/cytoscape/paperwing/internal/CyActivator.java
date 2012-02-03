@@ -10,6 +10,7 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.osgi.framework.BundleContext;
 
 public class CyActivator extends AbstractCyActivator {
@@ -24,7 +25,9 @@ public class CyActivator extends AbstractCyActivator {
 				RenderingEngineManager.class);
 		CyServiceRegistrar cyServiceRegistrarRef = getService(bc,
 				CyServiceRegistrar.class);
-
+		VisualMappingManager visualMappingManagerServiceRef = getService(bc, 
+				VisualMappingManager.class);
+		
 		// Wind Visual Lexicon
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
 		
@@ -36,7 +39,11 @@ public class CyActivator extends AbstractCyActivator {
 
 		// Wind NetworkView factory
 		WindNetworkViewFactory windNetworkViewFactory =
-			new WindNetworkViewFactory(cyServiceRegistrarRef, windVisualLexicon);
+			new WindNetworkViewFactory(cyServiceRegistrarRef, windVisualLexicon, visualMappingManagerServiceRef);
+		
+		if (visualMappingManagerServiceRef == null) {
+			System.out.println("failed to find vmm");
+		}
 		
 		Properties windNetworkViewFactoryProps = new Properties();
 		windNetworkViewFactoryProps.setProperty("serviceType", 
