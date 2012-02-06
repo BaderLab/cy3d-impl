@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,7 +30,7 @@ import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final float SEGMENT_RADIUS = 0.007f; // 0.007 default
+	private static final float SEGMENT_RADIUS = 0.013f; // 0.007 default
 	private static final int SEGMENT_SLICES = 4;
 	private static final int SEGMENT_STACKS = 1;
 	
@@ -42,7 +43,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final RenderColor DEFAULT_HOVER_COLOR = 
 		new RenderColor(0.5, 0.5, 0.7);
 	
-	private static final float DASHED_EDGE_RADIUS = 0.006f;
+	private static final float DASHED_EDGE_RADIUS = 0.012f;
 	private static final float DASHED_EDGE_LENGTH = 0.05f;
 	private static final float DASHED_EDGE_SPACING = 0.07f;
 	
@@ -172,6 +173,11 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		GL2 gl = graphicsData.getGlContext();
+		
+		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
+				FloatBuffer.wrap(specularReflection));
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 1);
 		
 		double distanceScale = graphicsData.getDistanceScale();
 		

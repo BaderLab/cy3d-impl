@@ -43,9 +43,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 			Vector3 projection = GeometryToolkit.convertScreenTo3d(
 					mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
 					graphicsData.getScreenHeight(), NODE_PLACEMENT_DISTANCE, camera);
-			
-			System.out.println("Node created at: " + projection);
-			
+				
 			CyNode added = networkView.getModel().addNode();
 			networkView.updateView();
 

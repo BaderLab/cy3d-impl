@@ -155,23 +155,11 @@ public class ViewingCoordinator {
 	// Claim by a main window rendering object
 	public void claimMain() {
 		mainStatus = CoordinatorStatus.CLAIMED_AND_LINKED;
-		
-		//debug
-		System.out.println("Coordinator main claimed: " + this);
-		if (isBirdsEyeClaimed()) {
-			System.out.println("Coordinator setup: " + this);
-		}
 	}
 
 	// Claim by a birds eye view rendering object
 	public void claimBirdsEye() {
 		birdsEyeStatus = CoordinatorStatus.CLAIMED_AND_LINKED;
-		
-		//debug
-		System.out.println("Coordinator birdsEye claimed: " + this);
-		if (isMainClaimed()) {
-			System.out.println("Coordinator setup: " + this);
-		}
 	}
 	
 	public boolean isMainClaimed() {

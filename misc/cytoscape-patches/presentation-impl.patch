@@ -1,6 +1,6 @@
 Index: presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java
 ===================================================================
---- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(revision 28020)
+--- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(revision 28196)
 +++ presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/RenderingEngineManagerImpl.java	(working copy)
 @@ -19,7 +19,7 @@
  	private final Map<View<?>, RenderingEngine<?>> renderingEngineMap;
@@ -13,7 +13,7 @@ Index: presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/
  
 Index: presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java
 ===================================================================
---- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java	(revision 28020)
+--- presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java	(revision 28196)
 +++ presentation-impl/src/main/java/org/cytoscape/view/presentation/internal/CyActivator.java	(working copy)
 @@ -25,7 +25,6 @@
  		registerService(bc,renderingEngineManager,RenderingEngineManager.class, renderingEngineManagerProps);

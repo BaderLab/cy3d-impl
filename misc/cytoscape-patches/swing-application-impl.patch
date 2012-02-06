@@ -1,8 +1,8 @@
 Index: swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java
 ===================================================================
---- swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java	(revision 28020)
+--- swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java	(revision 28196)
 +++ swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.java	(working copy)
-@@ -169,10 +169,10 @@
+@@ -171,10 +171,10 @@
  		SubmenuTaskManager submenuTaskManagerServiceRef = getService(bc, SubmenuTaskManager.class);
  		RenderingEngineFactory dingRenderingEngineFactoryServiceRef = getService(bc,
  		                                                                         RenderingEngineFactory.class,
@@ -17,9 +17,9 @@ Index: swing-application-impl/src/main/java/org/cytoscape/internal/CyActivator.j
  		BookmarksUtil bookmarksUtilServiceRef = getService(bc, BookmarksUtil.class);
 Index: swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java
 ===================================================================
---- swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(revision 28020)
+--- swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(revision 28196)
 +++ swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkViewManager.java	(working copy)
-@@ -123,7 +123,7 @@
+@@ -112,7 +112,7 @@
  
  	// TODO: for now, use this as default. But in the future, we should provide
  	// UI to select presentation.
@@ -28,4 +28,3 @@ Index: swing-application-impl/src/main/java/org/cytoscape/internal/view/NetworkV
  
  	private final CyNetworkViewManager networkViewManager;
  	private final CyApplicationManager applicationManager;
-

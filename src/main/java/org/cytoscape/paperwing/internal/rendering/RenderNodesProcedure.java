@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		new RenderColor(0.5, 0.5, 0.7);
 	
 	/** The default radius of the spherical nodes */
-	private static final float NODE_SIZE_RADIUS = 0.102f; // 0.015f
-
+	private static final float NODE_SIZE_RADIUS = 0.322f; // 0.015f
+	
 	private Map<NodeShape, ShapeType> cytoscapeShapeMap;
 	private ScalableShapeDrawer shapeDrawer;
 	
@@ -59,6 +60,11 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 
+		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
+				FloatBuffer.wrap(specularReflection));
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 21);
+		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
 		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData()

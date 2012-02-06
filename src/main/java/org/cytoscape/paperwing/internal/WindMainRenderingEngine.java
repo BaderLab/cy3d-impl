@@ -41,8 +41,6 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 	public WindMainRenderingEngine(Object container, View<CyNetwork> viewModel,
 			VisualLexicon visualLexicon) {
 		super(container, viewModel, visualLexicon);
-	
-		System.out.println("New WindMain engine: " + this);
 	}
 
 	@Override
