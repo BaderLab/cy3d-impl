@@ -60,6 +60,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private EdgeShapeDrawer shapeDrawer;
 	
+	private float edgeRadiusFactor = 1.0f;
+	
 	// Container for EdgeView objects that also adds information about whether the
 	// edge is part of a series of edges that connect the same pair of nodes
 	private class EdgeViewContainer {
@@ -184,12 +186,19 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		Set<EdgeViewContainer> edgeViewContainers = analyzeEdges(networkView, distanceScale);
 		View<CyEdge> edgeView;
 		Vector3 circleCenter;
+		Number edgeWidth;
 		
 		for (EdgeViewContainer container : edgeViewContainers) {
 			edgeView = container.edgeView;
 			
 			if (container.start != null && container.end != null && 
 					(container.end.distance(container.start) >= MIN_LENGTH || container.selfEdge)) {
+				
+				edgeWidth = container.edgeView.getVisualProperty(RichVisualLexicon.EDGE_WIDTH);
+				
+				if (edgeWidth != null) {
+					edgeRadiusFactor = edgeWidth.floatValue() / 2;
+				}
 				
 				// Set color
 				chooseColor(gl, edgeView, graphicsData);
@@ -407,7 +416,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			
 			// Setup transformations to draw the shape
 			RenderToolkit.setUpFacingTransformation(gl, points[i], displacement);
-			gl.glScalef(SEGMENT_RADIUS, SEGMENT_RADIUS, (float) displacement.magnitude());
+			gl.glScalef(SEGMENT_RADIUS * edgeRadiusFactor, 
+					SEGMENT_RADIUS * edgeRadiusFactor, 
+					(float) displacement.magnitude());
 			
 			// Perform drawing
 			shapeDrawer.drawSegment(gl, EdgeShapeType.REGULAR);
@@ -427,7 +438,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			RenderToolkit.setUpFacingTransformation(gl, points[i], facing);
 			gl.glTranslatef(0, 0, -DASHED_EDGE_LENGTH / 2);
 			
-			gl.glScalef(DASHED_EDGE_RADIUS, DASHED_EDGE_RADIUS, DASHED_EDGE_LENGTH);
+			gl.glScalef(DASHED_EDGE_RADIUS * edgeRadiusFactor,
+					DASHED_EDGE_RADIUS * edgeRadiusFactor, 
+					DASHED_EDGE_LENGTH);
 			
 			// Perform drawing
 			shapeDrawer.drawSegment(gl, EdgeShapeType.DASHED);
@@ -445,7 +458,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			gl.glPushMatrix();
 			
 			RenderToolkit.setUpFacingTransformation(gl, points[i], facing);
-			gl.glScalef(DOTTED_EDGE_RADIUS, DOTTED_EDGE_RADIUS, DOTTED_EDGE_RADIUS);
+			gl.glScalef(DOTTED_EDGE_RADIUS  * edgeRadiusFactor,
+					DOTTED_EDGE_RADIUS * edgeRadiusFactor,
+					DOTTED_EDGE_RADIUS * edgeRadiusFactor);
 			
 			// Perform drawing
 			shapeDrawer.drawSegment(gl, EdgeShapeType.DOTTED);
