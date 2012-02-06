@@ -28,13 +28,30 @@ import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 
+/**
+ * An implementation of the {@link GraphicsHandler} interface used
+ * for bird's eye view rendering objects. This {@link GraphicsHandler}
+ * implementation thusly will not provide support for picking and
+ * advanced input handling, such as node and edge creation via the
+ * keyboard.
+ * 
+ * @author Yue Dong
+ */
 public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 
-private List<ReadOnlyGraphicsProcedure> renderProcedures;
+	/**
+	 * The list of {@link ReadOnlyGraphicsProcedure} objects, or 
+	 * rendering routines, that this {@link GraphicsHandler} employs.
+	 * It may contain modified routines that specifically lower polygon
+	 * detail for nodes or edges that are far away.
+	 */
+	private List<ReadOnlyGraphicsProcedure> renderProcedures;
 
 	public BirdsEyeGraphicsHandler() {
+
+		// Populate the list of rendering routines employed by this handler.
 		renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
-		
+
 		renderProcedures.add(new ResetSceneProcedure());
 		renderProcedures.add(new PositionCameraProcedure());
 		renderProcedures.add(new RenderNodesProcedure());
@@ -69,21 +86,26 @@ private List<ReadOnlyGraphicsProcedure> renderProcedures;
 		
 	}
 
+	/**
+	 * Because this handler is designed for bird's eye view {@link Graphics}
+	 * objects, it returns a dummy {@link ShapePickingProcessor} and does not
+	 * perform any shape picking data processing.
+	 * 
+	 * @return A dummy {@link ShapePickingProcessor} object (no processing is done).
+	 */
 	@Override
 	public ShapePickingProcessor getShapePickingProcessor() {
+		
+		// Return a ShapePickingProcessor that does not do any processing
 		return new ShapePickingProcessor() {
 
 			@Override
 			public void initialize(GraphicsData graphicsData) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void processPicking(MouseMonitor mouse,
 					KeyboardMonitor keys, GraphicsData graphicsData) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 		};
@@ -107,12 +129,15 @@ private List<ReadOnlyGraphicsProcedure> renderProcedures;
 	
 	@Override
 	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
+		
+		// Return a CytoscapeDataProcessor that does not do any processing,
+		// because the bird's eye rendering object will not need to access Cytoscape
+		// data.
 		return new CytoscapeDataProcessor() {
 
 			@Override
 			public void processCytoscapeData(GraphicsData graphicsData) {
-				// TODO Auto-generated method stub
-				
+
 			}
 		};
 	}

@@ -30,8 +30,18 @@ import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 
-/** The main class for the Wind rendering engines responsible for
- * creating graphics with the use of the JOGL (Java OpenGL) library
+/**
+ * This class represents a Wind rendering object, directly called
+ * by the display thread to update the rendered scene for every frame.
+ * 
+ * Its behavior is governed by its {@link GraphicsHandler} object, 
+ * which will determine if and how it handles the following:
+ * - keyboard and mouse input
+ * - calculation related to rendering
+ * - rendering of the network
+ * - communication with other {@link Graphics} objects, such as in the case
+ * of a bird's eye rendering object and a main window rendering object communication
+ * with each other.
  * 
  * @author Paperwing (Yue Dong)
  */

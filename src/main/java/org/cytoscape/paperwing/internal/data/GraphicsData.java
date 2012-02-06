@@ -7,22 +7,34 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.Graphics;
+import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 
+/**
+ * This class represents a data object in which data relevant to the renderer,
+ * such as the position of the camera, the number of frames elapsed, the coordinates
+ * of the current drag selection box, is stored. Information about the current state 
+ * of the network is also stored in this object. 
+ * 
+ * This class is mostly responsible for storing the renderer's data, and allowing 
+ * access to the data through getter and setter objects.
+ * 
+ * @author Paperwing (Yue Dong)
+ */
 public class GraphicsData {
 
 	/** The network view to be rendered */
 	private CyNetworkView networkView;
 	
 	/**
-	 * This value controls distance scaling when converting from node
-	 * coordinates to drawing coordinates
+	 * This value controls distance scaling when converting from Cytoscape
+	 * coordinates (such as from Ding) to the renderer's 3D coordinates
 	 */
 	private float distanceScale = 178.0f; 
-	
+
 	private float verticalFov = 45.0f;
 	
 	/** The camera to use for transformation of 3D scene */
@@ -46,8 +58,27 @@ public class GraphicsData {
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean disableHovering;
 	
+	/** 
+	 * A {@link GraphicsSelectionData} object which is responsible for 
+	 * storing all data related to selection of objects in the network, such
+	 * as indices of currently selected nodes, or the coordinates of the current
+	 * selection box.
+	 * */
 	private GraphicsSelectionData selectionData;
+	
+	/**
+	 * A {@link CoordinatorData} object responsible for storing data related to
+	 * the relevant {@link ViewingCoordinator}, ie. it stores the data related
+	 * to coordination with another {@link Graphics} object, such as in the
+	 * relationship between bird's eye and main window rendering objects.
+	 */
 	private CoordinatorData coordinatorData;
+	
+	/**
+	 * A {@link PickingData} object responsible for storing data related to the 
+	 * current picking state of the renderer, such as the index and type
+	 * of the object that was found under the current mouse cursor.
+	 */
 	private PickingData pickingData;
 	
 	private GL2 glContext;

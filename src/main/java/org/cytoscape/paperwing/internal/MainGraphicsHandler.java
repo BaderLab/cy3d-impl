@@ -25,20 +25,34 @@ import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.paperwing.internal.rendering.text.StringRenderer;
 import org.cytoscape.view.model.CyNetworkView;
 
+/**
+ * An implementation for the {@link GraphicsHandler} interface to be used
+ * for main rendering windows. That is, this handler fully supports keyboard
+ * and mouse input, as well as selection and picking.
+ * 
+ * @author Yue Dong
+ */
 public class MainGraphicsHandler implements GraphicsHandler {
 
+	/**
+	 * The list of {@link ReadOnlyGraphicsProcedure} objects, or
+	 * rendering routines, that this {@link GraphicsHandler} uses.
+	 */
 	private List<ReadOnlyGraphicsProcedure> renderProcedures;
+	
 	
 	public MainGraphicsHandler() {
 		renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
-		
+	
+		// Populate the list of rendering routines that this GraphicsHandler
+		// uses. 
+		// The routines will be executed in the order that they are added.
 		renderProcedures.add(new ResetSceneProcedure());
 		renderProcedures.add(new PositionCameraProcedure());
 		
 		renderProcedures.add(new RenderNodesProcedure());
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderSelectionBoxProcedure());
-//		renderProcedures.add(new RenderNodeLabelsProcedure());
 	}
 	
 	@Override

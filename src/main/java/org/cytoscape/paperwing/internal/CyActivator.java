@@ -13,6 +13,10 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.osgi.framework.BundleContext;
 
+/**
+ * CyActivator object used to import and export services from and to Cytoscape, such
+ * as manager and factory objects.
+ */
 public class CyActivator extends AbstractCyActivator {
 	public CyActivator() {
 		super();
