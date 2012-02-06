@@ -198,6 +198,8 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				
 				if (edgeWidth != null) {
 					edgeRadiusFactor = edgeWidth.floatValue() / 2;
+				} else {
+					edgeRadiusFactor = 1.0f;
 				}
 				
 				// Set color

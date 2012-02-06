@@ -1,6 +1,6 @@
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java
 ===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java	(revision 28196)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java	(revision 28199)
 +++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java	(working copy)
 @@ -9,11 +9,17 @@
  public final class PropertySheetUtil {
@@ -48,7 +48,7 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/Prop
  	}
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java
 ===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(revision 28196)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(revision 28199)
 +++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(working copy)
 @@ -201,7 +201,7 @@
  
@@ -78,22 +78,9 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/Defa
  						continue;
  				}
  				
-Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
-===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 28196)
-+++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(working copy)
-@@ -40,7 +40,7 @@
- 	}
- 
- 	public void addBypass(RenderingEngineFactory<?> factory, Map props) {
--		if (props.containsValue("ding") == false)
-+		if (props.containsValue("wind") == false)
- 			return;
- 
- 		final VisualLexicon lexicon = factory.getVisualLexicon();
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewPanelImpl.java
 ===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewPanelImpl.java	(revision 28196)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewPanelImpl.java	(revision 28199)
 +++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewPanelImpl.java	(working copy)
 @@ -57,6 +57,7 @@
  import org.cytoscape.view.presentation.RenderingEngine;
@@ -143,9 +130,22 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/Defa
  		final VisualStyle currentStyle = selectedManager.getCurrentVisualStyle();
  		currentStyle.apply(dummyview);
  
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
+===================================================================
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 28199)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(working copy)
+@@ -40,7 +40,7 @@
+ 	}
+ 
+ 	public void addBypass(RenderingEngineFactory<?> factory, Map props) {
+-		if (props.containsValue("ding") == false)
++		if (props.containsValue("wind") == false)
+ 			return;
+ 
+ 		final VisualLexicon lexicon = factory.getVisualLexicon();
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java
 ===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(revision 28196)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(revision 28199)
 +++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyActivator.java	(working copy)
 @@ -74,8 +74,8 @@
  		CyApplicationConfiguration cyApplicationConfigurationServiceRef = getService(bc,CyApplicationConfiguration.class);
@@ -160,7 +160,7 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/CyAc
  		CyApplicationManager cyApplicationManagerServiceRef = getService(bc,CyApplicationManager.class);
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java
 ===================================================================
---- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java	(revision 28196)
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java	(revision 28199)
 +++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util/VisualPropertyFilter.java	(working copy)
 @@ -12,8 +12,8 @@
  
@@ -175,8 +175,44 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/util
  	
 Index: vizmap-gui-impl/src/main/resources/default_vizmap.xml
 ===================================================================
---- vizmap-gui-impl/src/main/resources/default_vizmap.xml	(revision 28196)
+--- vizmap-gui-impl/src/main/resources/default_vizmap.xml	(revision 28199)
 +++ vizmap-gui-impl/src/main/resources/default_vizmap.xml	(working copy)
+@@ -44,7 +44,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="SansSerif,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="15.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
+@@ -150,7 +150,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="SansSerif,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="80.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
+@@ -256,7 +256,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="Dialog,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="70.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
+@@ -364,7 +364,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="SansSerif,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
 @@ -458,7 +458,7 @@
              <visualProperty name="NODE_TRANSPARENCY" default="255"/>
              <visualProperty name="NODE_SIZE" default="35.0"/>
@@ -204,3 +240,30 @@ Index: vizmap-gui-impl/src/main/resources/default_vizmap.xml
              <visualProperty name="NODE_CUSTOMGRAPHICS_7"/>
              <visualProperty name="NODE_CUSTOMPAINT_2" default="org.cytoscape.view.presentation.property.DefaultVisualizableVisualProperty$VisualizableImpl@69d41410"/>
              <visualProperty name="NODE_CUSTOMGRAPHICS_POSITION_6" default="C,C,c,0.00,0.00"/>
+@@ -576,7 +576,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="SansSerif,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
+@@ -684,7 +684,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="Monospaced,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
+@@ -790,7 +790,7 @@
+             <visualProperty name="NODE_LABEL_FONT_FACE" default="Dialog,plain,12"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_7" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_8"/>
+-            <visualProperty name="NODE_DEPTH" default="0.0"/>
++            <visualProperty name="NODE_DEPTH" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_SIZE_9" default="50.0"/>
+             <visualProperty name="NODE_CUSTOMGRAPHICS_5"/>
+             <visualProperty name="NODE_SELECTED" default="false"/>
