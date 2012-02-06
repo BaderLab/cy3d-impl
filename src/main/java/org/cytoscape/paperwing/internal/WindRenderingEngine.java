@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
@@ -137,12 +139,33 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				animator = new FPSAnimator(60);
 				animator.add(panel);
 				
+				addStopAnimatorListener(component);
+				
 				// Setup animator start/stop, can be based on gaining/losing focus of the canvas
 				setUpAnimatorStarting(focus, animator);
 				
 				active = true;
 			}
 		}
+	}
+	
+	// Adds a listener to the component containing the GLJPanel to stop the animator
+	// if the GLJPanel is about to be removed
+	private void addStopAnimatorListener(JComponent container) {
+		container.addContainerListener(new ContainerListener(){
+
+			@Override
+			public void componentAdded(ContainerEvent event) {
+			}
+
+			@Override
+			public void componentRemoved(ContainerEvent event) {
+				if (event.getChild() == panel
+						&& animator != null) {
+					animator.stop();
+				}
+			}
+		});
 	}
 	
 	protected abstract void setUpAnimatorStarting(Container container, FPSAnimator animator);
