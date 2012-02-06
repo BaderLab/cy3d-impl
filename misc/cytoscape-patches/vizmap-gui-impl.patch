@@ -1,3 +1,51 @@
+Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java
+===================================================================
+--- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java	(revision 28196)
++++ vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/PropertySheetUtil.java	(working copy)
+@@ -9,11 +9,17 @@
+ public final class PropertySheetUtil {
+ 	
+ 	private static final Set<VisualProperty<?>> BASIC_PROPS = new HashSet<VisualProperty<?>>();
++	private static final Set<VisualProperty<?>> BASIC_3D_PROPS = new HashSet<VisualProperty<?>>();
+ 	
+ 	private static boolean mode = false;
+ 	
+-	// Preset Basic Properties
+ 	static {
++		setUpBasicProperties();
++		setUp3dProperties();
++	}
++	
++	private static void setUpBasicProperties() {
++		// Preset Basic Properties
+ 		BASIC_PROPS.add(RichVisualLexicon.NODE_FILL_COLOR);
+ 		BASIC_PROPS.add(RichVisualLexicon.NODE_SHAPE);
+ 		BASIC_PROPS.add(RichVisualLexicon.NODE_WIDTH);
+@@ -30,6 +36,10 @@
+ 		BASIC_PROPS.add(RichVisualLexicon.NETWORK_BACKGROUND_PAINT);
+ 	}
+ 	
++	private static void setUp3dProperties() {
++		BASIC_3D_PROPS.add(RichVisualLexicon.NODE_DEPTH);
++	}
++	
+ 	public static boolean isBasic(final VisualProperty<?> vp) {
+ 		if(BASIC_PROPS.contains(vp))
+ 			return true;
+@@ -37,6 +47,13 @@
+ 			return false;
+ 	}
+ 	
++	public static boolean isBasic3d(final VisualProperty<?> vp) {
++		if (BASIC_3D_PROPS.contains(vp))
++			return true;
++		else
++			return false;
++	}
++	
+ 	public static boolean isAdvancedMode() {
+ 		return mode;
+ 	}
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java
 ===================================================================
 --- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/DefaultViewEditorImpl.java	(revision 28196)
@@ -20,6 +68,16 @@ Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/Defa
  						&& lexicon.getVisualLexiconNode(vp).getParent()
  								.getVisualProperty() == MinimalVisualLexicon.NETWORK)
  					propSet.add(vp);
+@@ -553,7 +553,8 @@
+ 				
+ 				// Filter based on mode
+ 				if (PropertySheetUtil.isAdvancedMode() == false) {
+-					if (PropertySheetUtil.isBasic(vp) == false)
++					if (!PropertySheetUtil.isBasic(vp)
++							&& !PropertySheetUtil.isBasic3d(vp))
+ 						continue;
+ 				}
+ 				
 Index: vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java
 ===================================================================
 --- vizmap-gui-impl/src/main/java/org/cytoscape/view/vizmap/gui/internal/bypass/BypassManager.java	(revision 28196)
