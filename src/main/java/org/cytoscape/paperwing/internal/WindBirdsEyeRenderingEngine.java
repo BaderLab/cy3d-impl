@@ -44,7 +44,7 @@ public class WindBirdsEyeRenderingEngine extends WindRenderingEngine {
 			VisualLexicon visualLexicon) {
 		super(container, viewModel, visualLexicon);
 		
-//		System.out.println("wind bird's eye created for network: " + viewModel);
+		System.out.println("Bird's eye rendering engine created: " + this);
 	}
 
 	@Override

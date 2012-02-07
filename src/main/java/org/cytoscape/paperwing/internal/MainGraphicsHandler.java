@@ -53,8 +53,6 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		renderProcedures.add(new RenderNodesProcedure());
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderSelectionBoxProcedure());
-		
-		renderProcedures.add(new RenderNodeLabelsProcedure());
 	}
 	
 	@Override
@@ -64,7 +62,13 @@ public class MainGraphicsHandler implements GraphicsHandler {
 
 	@Override
 	public void drawScene(GraphicsData graphicsData) {
-		// TODO Auto-generated method stub
+		
+		// TODO: Seems we had to move this to the draw method to prevent a crash involving a native library
+		// and the VizMapper preview. The cause was likely due to the TextRenderer class being initialized
+		// too early.
+		if (graphicsData.getFramesElapsed() == 1) {
+			renderProcedures.add(new RenderNodeLabelsProcedure());
+		}
 		
 		// Control light positioning
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
