@@ -78,6 +78,9 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.execute(graphicsData);
 		}
+		
+		
+//		System.out.println(graphicsData.getFramesElapsed());
 	}
 
 	@Override

@@ -145,6 +145,8 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				setUpAnimatorStarting(focus, animator);
 				
 				active = true;
+				
+//				System.out.println("placed in canvas");
 			}
 		}
 	}

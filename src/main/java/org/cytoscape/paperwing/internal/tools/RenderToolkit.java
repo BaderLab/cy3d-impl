@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.tools;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 
@@ -44,5 +45,39 @@ public class RenderToolkit {
 		gl.glNormal3f((float) normalized.x(),
 				(float) normalized.y(),
 				(float) normalized.z());
+	}
+	
+	public static Vector3 convert3dToScreen(GL2 gl, Vector3 position) {
+		GLU glu = GLU.createGLU(gl);
+		
+		double modelView[] = new double[16];
+		double projection[] = new double[16];
+		int viewPort[] = new int[4];
+		
+        gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelView, 0);
+        gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
+        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
+        
+        double result[] = new double[4];
+        
+		glu.gluProject(position.x(), position.y(), position.z(), 
+				modelView, 0, projection, 0, viewPort, 0, result, 0);
+		
+		return new Vector3(result[0],
+				result[1],
+				result[2]);
+	}
+	
+	public static Vector3 convert3dToScreen(GL2 gl, Vector3 position, double[] modelView, double[] projection, int[] viewPort) {
+		GLU glu = GLU.createGLU(gl);
+		
+        double result[] = new double[4];
+        
+		glu.gluProject(position.x(), position.y(), position.z(), 
+				modelView, 0, projection, 0, viewPort, 0, result, 0);
+		
+		return new Vector3(result[0],
+				result[1],
+				result[2]);
 	}
 }

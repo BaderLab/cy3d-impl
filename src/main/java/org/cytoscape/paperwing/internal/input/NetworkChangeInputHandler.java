@@ -10,6 +10,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
+import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -43,7 +44,9 @@ public class NetworkChangeInputHandler implements InputHandler {
 			Vector3 projection = GeometryToolkit.convertScreenTo3d(
 					mouse.x(), mouse.y(), graphicsData.getScreenWidth(),
 					graphicsData.getScreenHeight(), NODE_PLACEMENT_DISTANCE, camera);
-				
+			
+//			System.out.println("Input window coordinates: " + mouse.x() + ", " + mouse.y());
+			
 			CyNode added = networkView.getModel().addNode();
 			networkView.updateView();
 
@@ -68,6 +71,8 @@ public class NetworkChangeInputHandler implements InputHandler {
 				// through some way other than the mouse
 				// graphicsData.getSelectionData().setHoverNodeIndex(added.getIndex());
 			}
+			
+//			System.out.println("Node created, window coordinates: " + RenderToolkit.convert3dToScreen(graphicsData.getGlContext(), projection));
 		}
 	}
 	

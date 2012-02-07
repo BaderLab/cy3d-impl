@@ -36,6 +36,7 @@ public class GeometryToolkit {
 		//   fov = 45 deg
 		//   nearDist = 0.2
 		
+		// TODO: Allow a variable field of view, unlike here, to be specified as a parameter
 		double fieldOfView = Math.PI / 4;
 		double nearDistance = 0.2;
 		
