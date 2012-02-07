@@ -50,8 +50,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	private static final float DOTTED_EDGE_RADIUS = 0.017f;
 	private static final float DOTTED_EDGE_SPACING = 0.057f;
 	
-	private static final double ARC_SELF_EDGE_MINIMUM_RADIUS = 0.045;
-	private static final double ARC_SELF_EDGE_RADIUS_FACTOR = 0.007;
+	private static final double ARC_SELF_EDGE_MINIMUM_RADIUS = 0.055; // 0.045 default feb 7, 2012
+	private static final double ARC_SELF_EDGE_RADIUS_FACTOR = 0.008; // 0.007 default feb 7, 2012
+	private static final double ARC_SELF_EDGE_EXPONENTIAL_BASE = 1.25;
 	
 	/**
 	 * The number of straight segments used to approximate a curved edge
@@ -387,7 +388,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		if (container.selfEdge) {
 			// For self-edges, want greater edge level -> greater radius
 			curvedEdgeRadius = ARC_SELF_EDGE_MINIMUM_RADIUS
-					+ ARC_SELF_EDGE_RADIUS_FACTOR * Math.pow(edgeLevel, 1.2);
+					+ ARC_SELF_EDGE_RADIUS_FACTOR * Math.pow(edgeLevel, ARC_SELF_EDGE_EXPONENTIAL_BASE);
 		} else {
 			// For regular edges, want greater edge level -> smaller radius (more curvature)
 			curvedEdgeRadius = container.start.distance(container.end) * (0.5 + (double) 3.5 / Math.pow(edgeLevel, 2));			
