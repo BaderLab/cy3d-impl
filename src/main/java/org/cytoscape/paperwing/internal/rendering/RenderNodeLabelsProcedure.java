@@ -102,11 +102,17 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 //							z + (float) TEXT_OFFSET.z(), 
 //							TEXT_SCALE);
 					
-					
-					Vector3 screenCoordinates = RenderToolkit.convert3dToScreen(gl, new Vector3(x, y, z), modelView, projection, viewPort);
+					Vector3 text3dPosition = new Vector3(x, y, z);
+					Vector3 screenCoordinates = RenderToolkit.convert3dToScreen(gl, text3dPosition, modelView, projection, viewPort);
 //					System.out.println("Node label " + (new Vector3(x, y, z)) + " mapped to: " + screenCoordinates);
 					
-					textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());
+					Vector3 offsetFromCamera = text3dPosition.subtract(graphicsData.getCamera().getPosition());
+					
+					// Only draw the text if the front side of the camera faces it
+					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL 
+							&& graphicsData.getCamera().getDirection().angle(offsetFromCamera) <= Math.PI / 2) {
+						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
+					}
 					
 //					textRenderer.draw(text, 300, 300);
 				}
