@@ -33,7 +33,6 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	private Font defaultFont = new Font("SansSerif", Font.PLAIN, TEXT_FONT_SIZE);
 	
 	public RenderNodeLabelsProcedure() {
-		textRenderer = new TextRenderer(defaultFont);
 	}
 	
 	@Override
@@ -47,6 +46,8 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
+		
+		textRenderer = new TextRenderer(defaultFont);
 
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
