@@ -282,14 +282,14 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		if (edgeView.getVisualProperty(MinimalVisualLexicon.EDGE_SELECTED)) {
 			
 			// Make selected edges appear greener
-			color.multiplyRed(0.7, 0, 1);
+			color.multiplyRed(0.7, 0, 0.7);
 			color.multiplyGreen(1.5, 0.5, 1);
-			color.multiplyBlue(0.7, 0, 1);
+			color.multiplyBlue(0.7, 0, 0.7);
 		} else if (edgeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverEdgeIndex()) {
 			
 			// Make hovered edges appear bluer
-			color.multiplyRed(0.7, 0, 1);
-			color.multiplyGreen(0.7, 0, 1);
+			color.multiplyRed(0.7, 0, 0.7);
+			color.multiplyGreen(0.7, 0, 0.7);
 			color.multiplyBlue(1.5, 0.5, 1);
 		}
 		
