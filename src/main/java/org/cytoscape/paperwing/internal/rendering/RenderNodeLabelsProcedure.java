@@ -2,17 +2,12 @@ package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.font.FontRenderContext;
-import java.util.Set;
 
 import javax.media.opengl.GL2;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
-import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
-import org.cytoscape.paperwing.internal.rendering.text.StringRenderer;
-import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -20,19 +15,17 @@ import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
+// import com.jogamp.graph.curve.opengl.TextRenderer;
 
 public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final float TEXT_SCALE = 0.0005f;
-	private static final Vector3 TEXT_OFFSET = new Vector3 (0, 0.04, 0);
-	
-	private static final float TEXT_CHARACTER_WIDTH = 0.612f;
 	private static final int TEXT_FONT_SIZE = 9;
-	
+	private static final String DEFAULT_FONT_NAME = "SansSerif";
 	private static final Color TEXT_DEFAULT_COLOR = Color.BLACK;
 	
+	private static final Font defaultFont = new Font(DEFAULT_FONT_NAME, Font.PLAIN, TEXT_FONT_SIZE);
+	
 	private TextRenderer textRenderer;
-	private Font defaultFont = new Font("SansSerif", Font.PLAIN, TEXT_FONT_SIZE);
 	
 	public RenderNodeLabelsProcedure() {
 	}
@@ -42,7 +35,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 		
 		// Increase rendering efficiency; can set to true if desired
-		textRenderer.setSmoothing(false);
+		// textRenderer.setSmoothing(false);
 	}
 
 	@Override
@@ -89,8 +82,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 					
 					Vector3 text3dPosition = new Vector3(x, y, z);
 					Vector3 screenCoordinates = RenderToolkit.convert3dToScreen(gl, text3dPosition, modelView, projection, viewPort);
-//					System.out.println("Node label " + (new Vector3(x, y, z)) + " mapped to: " + screenCoordinates);
-					
+
 					Vector3 offsetFromCamera = text3dPosition.subtract(graphicsData.getCamera().getPosition());
 					
 					// Only draw the text if the front side of the camera faces it
