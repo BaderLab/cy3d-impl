@@ -29,6 +29,8 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	private static final float TEXT_CHARACTER_WIDTH = 0.612f;
 	private static final int TEXT_FONT_SIZE = 9;
 	
+	private static final Color TEXT_DEFAULT_COLOR = Color.BLACK;
+	
 	private TextRenderer textRenderer;
 	private Font defaultFont = new Font("SansSerif", Font.PLAIN, TEXT_FONT_SIZE);
 	
@@ -40,7 +42,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 		
 		// Increase rendering efficiency; can set to true if desired
-//		textRenderer.setSmoothing(false);
+		textRenderer.setSmoothing(false);
 	}
 
 	@Override
@@ -63,8 +65,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
 		
 		String text;
-		
-		textRenderer.setColor(Color.BLACK);
+		Color textColor;
 		
 		gl.glPushMatrix();
 		textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
@@ -80,28 +81,11 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
 				
-//				gl.glTranslatef(x, y, z);
-				
 				gl.glColor3f(0.2f, 0.2f, 0.2f);
 				
 				text = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL);
 				
-//				gl.glTranslatef((float) TEXT_OFFSET.x(),
-//						(float) TEXT_OFFSET.y(),
-//						(float) TEXT_OFFSET.z());
-				
 				if (text != null) {
-					
-//					gl.glScalef(TEXT_SCALE, TEXT_SCALE, TEXT_SCALE);
-					// textRenderer.drawCenteredText(gl, text, TEXT_OFFSET);
-					// textRenderer.drawCenteredText(gl, "aac");
-					
-//					text = "test" + nodeView.getSUID();
-//					textRenderer.draw3D(text, 
-//							x + (float) TEXT_OFFSET.x(), 
-//							y + (float) TEXT_OFFSET.y(), 
-//							z + (float) TEXT_OFFSET.z(), 
-//							TEXT_SCALE);
 					
 					Vector3 text3dPosition = new Vector3(x, y, z);
 					Vector3 screenCoordinates = RenderToolkit.convert3dToScreen(gl, text3dPosition, modelView, projection, viewPort);
@@ -112,10 +96,18 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 					// Only draw the text if the front side of the camera faces it
 					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL 
 							&& graphicsData.getCamera().getDirection().angle(offsetFromCamera) <= Math.PI / 2) {
+						
+						// TODO: Check if there is a way around this cast
+						textColor = (Color) nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL_COLOR);
+						if (textColor == null) {
+							
+							// Use black as default if no node label color was found
+							textColor = TEXT_DEFAULT_COLOR;
+						}
+						
+						textRenderer.setColor(textColor);
 						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
 					}
-					
-//					textRenderer.draw(text, 300, 300);
 				}
 			}
 		}
