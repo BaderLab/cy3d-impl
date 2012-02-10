@@ -59,4 +59,10 @@ public class WindBirdsEyeRenderingEngine extends WindRenderingEngine {
 		
 		animator.start();
 	}
+
+	@Override
+	public void setProperties(String key, String value) {
+		// TODO Auto-generated method stub
+		
+	}
 }

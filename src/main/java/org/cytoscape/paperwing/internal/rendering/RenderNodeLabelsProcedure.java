@@ -15,7 +15,14 @@ import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
 import org.cytoscape.view.presentation.property.RichVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
-// import com.jogamp.graph.curve.opengl.TextRenderer;
+
+// Below will be used for JOGL 2.0-b45-20111219
+/*
+import com.jogamp.graph.curve.opengl.RenderState;
+import com.jogamp.graph.curve.opengl.TextRenderer;
+import com.jogamp.graph.curve.opengl.GLRegion;
+import com.jogamp.graph.font.FontFactory;
+*/
 
 public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -23,7 +30,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	private static final String DEFAULT_FONT_NAME = "SansSerif";
 	private static final Color TEXT_DEFAULT_COLOR = Color.BLACK;
 	
-	private static final Font defaultFont = new Font(DEFAULT_FONT_NAME, Font.PLAIN, TEXT_FONT_SIZE);
+	private static final Font TEXT_DEFAULT_FONT = new Font(DEFAULT_FONT_NAME, Font.PLAIN, TEXT_FONT_SIZE);
 	
 	private TextRenderer textRenderer;
 	
@@ -36,14 +43,17 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// Increase rendering efficiency; can set to true if desired
 		// textRenderer.setSmoothing(false);
+		
+		// Temporarily removed -- pausing JOGL update to 2.0-b45-20111219
+//		textRenderer = TextRenderer.create(RenderState.getRenderState(gl), GLRegion.TWO_PASS_DEFAULT_TEXTURE_UNIT);
 	}
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
-		textRenderer = new TextRenderer(defaultFont);
-
+		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
+		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
 		float x, y, z;
@@ -62,7 +72,10 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		
 		gl.glPushMatrix();
 		textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
+		// textRenderer.drawString3D(arg0, arg1, arg2, arg3, arg4, arg5)
 		
+		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
+		// textRenderer.createString(gl, null, 0, "test").
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
 					.floatValue() / distanceScale;
@@ -73,8 +86,6 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
-				
-				gl.glColor3f(0.2f, 0.2f, 0.2f);
 				
 				text = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL);
 				
@@ -96,7 +107,16 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 							// Use black as default if no node label color was found
 							textColor = TEXT_DEFAULT_COLOR;
 						}
+			
+						// Below to be used for JOGL 2.0-b45-20111219's new TextRenderer
+//						gl.glColor3f((float) textColor.getRed() / 255, 
+//								(float) textColor.getGreen() / 255, 
+//								(float) textColor.getBlue() / 255);
 						
+						
+//						textRenderer.drawString3D(gl, FontFactory.getDefault().getDefault(), 
+//								text, new float[]{1.0f, 1.0f, 2.0f}, TEXT_FONT_SIZE, 1024);
+								
 						textRenderer.setColor(textColor);
 						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
 					}

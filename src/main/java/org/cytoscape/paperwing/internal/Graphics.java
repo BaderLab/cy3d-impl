@@ -71,7 +71,7 @@ public class Graphics implements GLEventListener {
 	 * aspects
 	 */
 	public static void initSingleton() {
-		GLProfile.initSingleton(false);
+//		GLProfile.initSingleton(false);
 		//System.out.println("initSingleton called");
 	}
 	

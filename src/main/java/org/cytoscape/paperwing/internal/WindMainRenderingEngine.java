@@ -83,5 +83,11 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 		};
 	}
 
+	@Override
+	public void setProperties(String key, String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }
