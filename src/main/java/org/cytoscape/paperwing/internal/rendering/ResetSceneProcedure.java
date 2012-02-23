@@ -10,7 +10,7 @@ import javax.media.opengl.glu.GLU;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -26,7 +26,7 @@ public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
 		// Obtain the desired network background color
 		Color backgroundColor = (Color) 
 			graphicsData.getNetworkView().getVisualProperty(
-					RichVisualLexicon.NETWORK_BACKGROUND_PAINT);
+					BasicVisualLexicon.NETWORK_BACKGROUND_PAINT);
 		
 		if (backgroundColor != null) {
 			gl.glClearColor(backgroundColor.getRed() / 255f, 

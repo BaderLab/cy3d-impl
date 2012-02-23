@@ -14,7 +14,7 @@ import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class NetworkChangeInputHandler implements InputHandler {
 	
@@ -57,13 +57,13 @@ public class NetworkChangeInputHandler implements InputHandler {
 			// TODO: Maybe throw an exception if viewAdded is null
 			if (viewAdded != null) {
 				viewAdded.setVisualProperty(
-						RichVisualLexicon.NODE_X_LOCATION, projection.x()
+						BasicVisualLexicon.NODE_X_LOCATION, projection.x()
 								* distanceScale);
 				viewAdded.setVisualProperty(
-						RichVisualLexicon.NODE_Y_LOCATION, projection.y()
+						BasicVisualLexicon.NODE_Y_LOCATION, projection.y()
 								* distanceScale);
 				viewAdded.setVisualProperty(
-						RichVisualLexicon.NODE_Z_LOCATION, projection.z()
+						BasicVisualLexicon.NODE_Z_LOCATION, projection.z()
 								* distanceScale);
 
 				// Set the node to be hovered

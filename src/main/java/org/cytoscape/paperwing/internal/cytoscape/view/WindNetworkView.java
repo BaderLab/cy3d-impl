@@ -26,7 +26,7 @@ import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 
@@ -124,12 +124,12 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		// Shift the nodes to place the center of the network at the origin
 		for (View<CyNode> nodeView : getNodeViews()) {
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION) - networkCenter.x());
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION) - networkCenter.y());
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION) - networkCenter.z());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) - networkCenter.x());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) - networkCenter.y());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) - networkCenter.z());
 		}
 	}
 
@@ -139,7 +139,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		Set<Integer> selectedNodeIndices = new HashSet<Integer>();
 		
 		for (View<CyNode> nodeView : getNodeViews()) {
-			if (nodeView.getVisualProperty(RichVisualLexicon.NODE_SELECTED)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
 				selectedNodeIndices.add(nodeView.getModel().getIndex());
 			}
 		}
@@ -148,12 +148,12 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	
 		// Shift the nodes to place the center of the network at the center of the selected group of nodes
 		for (View<CyNode> nodeView : getNodeViews()) {
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION) - selectionCenter.x());
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION) - selectionCenter.y());
-			nodeView.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
-					nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION) - selectionCenter.z());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) - selectionCenter.x());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) - selectionCenter.y());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) - selectionCenter.z());
 		}
 	}
 
@@ -271,9 +271,9 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		// These visual properties are object-specific such as x, y, z coordinates
 		// and do not need to be updated according to the visual style
 		Set<VisualProperty<?>> exemptProperties = new HashSet<VisualProperty<?>>();
-		exemptProperties.add(RichVisualLexicon.NODE_X_LOCATION);
-		exemptProperties.add(RichVisualLexicon.NODE_Y_LOCATION);
-		exemptProperties.add(RichVisualLexicon.NODE_Z_LOCATION);
+		exemptProperties.add(BasicVisualLexicon.NODE_X_LOCATION);
+		exemptProperties.add(BasicVisualLexicon.NODE_Y_LOCATION);
+		exemptProperties.add(BasicVisualLexicon.NODE_Z_LOCATION);
 		
 		// Update visual properties according to the current visual style
 		VisualStyle visualStyle = visualMappingManager.getVisualStyle(this);

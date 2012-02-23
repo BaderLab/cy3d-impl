@@ -12,7 +12,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class DefaultValueVault {
 	
@@ -38,7 +38,7 @@ public class DefaultValueVault {
 		defaultValueSets.put(CyEdge.class, edgeDefaultValues);
 		defaultValueSets.put(CyNetwork.class, networkDefaultValues);
 	
-		// Populate with default values from the relevant VisualLexicon (eg. RichVisualLexicon, MinimalVisualLexicon)
+		// Populate with default values from the relevant VisualLexicon (eg. BasicVisualLexicon, MinimalVisualLexicon)
 		populateDefaultValues();
 		
 		// Override VisualLexicon default values with custom
@@ -63,7 +63,7 @@ public class DefaultValueVault {
 	
 //	// Override selected values from VisualProperties
 //	private void updateDefaultValues() {
-//		modifyDefaultValue(RichVisualLexicon.NODE_FILL_COLOR, new Color(120, 120, 120));
+//		modifyDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, new Color(120, 120, 120));
 //	}
 	
 //	@Override

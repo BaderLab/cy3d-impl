@@ -11,7 +11,7 @@ import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class NetworkToolkit {
 
@@ -31,9 +31,9 @@ public class NetworkToolkit {
 			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
 
 			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+				x += nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
 				visitedCount++;
 			}
 		}
@@ -54,9 +54,9 @@ public class NetworkToolkit {
 			nodeView = networkView.getNodeView(node);
 			
 			if (nodeView != null) {
-				x += nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION);
-				y += nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION);
-				z += nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION);
+				x += nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
 				visitedCount++;
 			}
 		}
@@ -84,9 +84,9 @@ public class NetworkToolkit {
 			
 			if (nodeView != null) {
 			
-				currentPosition.set(nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION),
-						nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION),
-						nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION));
+				currentPosition.set(nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION),
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION),
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION));
 				currentPosition.divideLocal(distanceScale);
 				
 				currentDistanceSquared = networkCenter.distanceSquared(currentPosition);
@@ -112,16 +112,16 @@ public class NetworkToolkit {
 			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
 			
 			if (nodeView != null) {
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_X_LOCATION, 
-						nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
 								+ displacement.x() * distanceScale);
 				
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_Y_LOCATION, 
-						nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
 								+ displacement.y() * distanceScale);
 				
-				nodeView.setVisualProperty(RichVisualLexicon.NODE_Z_LOCATION, 
-						nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
 								+ displacement.z() * distanceScale);
 			}
 		}
@@ -146,7 +146,7 @@ public class NetworkToolkit {
 					row.set(SELECTED_COLUMN_NAME, false);
 				}
 				
-				networkView.getNodeView(node).setVisualProperty(RichVisualLexicon.NODE_SELECTED, false);
+				networkView.getNodeView(node).setVisualProperty(BasicVisualLexicon.NODE_SELECTED, false);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class NetworkToolkit {
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
 		networkView.getNodeView(network.getNode(index)).setVisualProperty(
-				RichVisualLexicon.NODE_SELECTED, selected);
+				BasicVisualLexicon.NODE_SELECTED, selected);
 	}
 
 	public static boolean checkNodeSelected(int index, CyNetworkView networkView) {
@@ -190,7 +190,7 @@ public class NetworkToolkit {
 					row.set(SELECTED_COLUMN_NAME, false);
 				}
 				
-				networkView.getEdgeView(edge).setVisualProperty(RichVisualLexicon.EDGE_SELECTED, false);
+				networkView.getEdgeView(edge).setVisualProperty(BasicVisualLexicon.EDGE_SELECTED, false);
 			}
 		}
 	}
@@ -204,7 +204,7 @@ public class NetworkToolkit {
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
 		networkView.getEdgeView(network.getEdge(index)).setVisualProperty(
-				RichVisualLexicon.EDGE_SELECTED, selected);
+				BasicVisualLexicon.EDGE_SELECTED, selected);
 	}
 	
 	public static boolean checkEdgeSelected(int index, CyNetworkView networkView) {

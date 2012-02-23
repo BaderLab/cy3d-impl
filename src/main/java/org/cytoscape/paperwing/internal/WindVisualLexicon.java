@@ -5,10 +5,10 @@ import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.DoubleVisualProperty;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 /** The visual lexicon for the Wind rendering engines */
-public class WindVisualLexicon extends RichVisualLexicon {
+public class WindVisualLexicon extends BasicVisualLexicon {
 
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> WIND_ROOT = new NullVisualProperty(

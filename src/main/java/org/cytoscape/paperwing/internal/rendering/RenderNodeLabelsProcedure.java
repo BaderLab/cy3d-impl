@@ -11,8 +11,8 @@ import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -77,17 +77,17 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 		// textRenderer.createString(gl, null, 0, "test").
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
+			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
 					.floatValue() / distanceScale;
-			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)
+			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
 					.floatValue() / distanceScale;
-			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
+			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
 					.floatValue() / distanceScale;
 
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
 				
-				text = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL);
+				text = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL);
 				
 				if (text != null) {
 					
@@ -101,7 +101,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 							&& graphicsData.getCamera().getDirection().angle(offsetFromCamera) <= Math.PI / 2) {
 						
 						// TODO: Check if there is a way around this cast
-						textColor = (Color) nodeView.getVisualProperty(MinimalVisualLexicon.NODE_LABEL_COLOR);
+						textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
 						if (textColor == null) {
 							
 							// Use black as default if no node label color was found

@@ -20,9 +20,9 @@ import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.RenderColor;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.values.NodeShape;
 
 public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
@@ -78,23 +78,23 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION)
+			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
 					.floatValue() / distanceScale;
-			y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION)
+			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
 					.floatValue() / distanceScale;
-			z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION)
+			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
 					.floatValue() / distanceScale;
 
-			width = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_WIDTH);
-			height = nodeView.getVisualProperty(MinimalVisualLexicon.NODE_HEIGHT);
-			depth = nodeView.getVisualProperty(RichVisualLexicon.NODE_DEPTH);
+			width = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
+			height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
+			depth = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
 			index = nodeView.getModel().getIndex();
 			
 			// gl.glLoadName(33);
 
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_VISIBLE)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
 				gl.glPushMatrix();
 				gl.glTranslatef(x, y, z);
 				gl.glLoadName(index);
@@ -112,7 +112,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 							depth.floatValue() / distanceScale);
 				}
 				
-				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(RichVisualLexicon.NODE_SHAPE));
+				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
 				
 				if (shapeType != null) {
 					shapeDrawer.drawShape(gl, shapeType);
@@ -127,7 +127,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private void chooseColor(GL2 gl, View<CyNode> nodeView, GraphicsData graphicsData) {
 		Color visualPropertyColor = null;
-		visualPropertyColor = (Color) nodeView.getVisualProperty(RichVisualLexicon.NODE_FILL_COLOR);
+		visualPropertyColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);
 		
 		RenderColor color = new RenderColor(DEFAULT_COLOR);
 		
@@ -137,7 +137,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 					(double) visualPropertyColor.getBlue() / 255);
 		}
 		
-		if (nodeView.getVisualProperty(MinimalVisualLexicon.NODE_SELECTED)) {
+		if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
 			
 			// Make selected nodes appear greener
 			color.multiplyRed(0.7, 0, 0.7);

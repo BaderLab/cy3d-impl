@@ -25,8 +25,8 @@ import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
-import org.cytoscape.view.presentation.property.MinimalVisualLexicon;
-import org.cytoscape.view.presentation.property.RichVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -195,7 +195,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			if (container.start != null && container.end != null && 
 					(container.end.distance(container.start) >= MIN_LENGTH || container.selfEdge)) {
 				
-				edgeWidth = container.edgeView.getVisualProperty(RichVisualLexicon.EDGE_WIDTH);
+				edgeWidth = container.edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH);
 				
 				if (edgeWidth != null) {
 					edgeRadiusFactor = edgeWidth.floatValue() / 2;
@@ -215,13 +215,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				if (container.straightEdge) {
 					
 					// Draw the correct type of edge depending on the visual property
-					if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+					if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
 							== LineTypeVisualProperty.EQUAL_DASH) {
 						points = EdgeCoordinateCalculator.generateStraightEdgeSparseCoordinates(
 								container.start, container.end, DASHED_EDGE_SPACING);
 					
 						drawDashedArc(gl, points);
-					} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+					} else if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
 							== LineTypeVisualProperty.DOT) {
 						points = EdgeCoordinateCalculator.generateStraightEdgeSparseCoordinates(
 								container.start, container.end, DOTTED_EDGE_SPACING);
@@ -241,13 +241,13 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					circleCenter = findCircleCenter(container);
 					
 					// Draw the correct type of edge depending on the visual property
-					if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+					if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
 							== LineTypeVisualProperty.EQUAL_DASH) {
 						points = EdgeCoordinateCalculator.generateArcEdgeSparseCoordinates(
 								container.start, container.end, circleCenter, DASHED_EDGE_SPACING, container.selfEdge);
 					
 						drawDashedArc(gl, points);
-					} else if (edgeView.getVisualProperty(RichVisualLexicon.EDGE_LINE_TYPE)
+					} else if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
 							== LineTypeVisualProperty.DOT) {
 						points = EdgeCoordinateCalculator.generateArcEdgeSparseCoordinates(
 								container.start, container.end, circleCenter, DOTTED_EDGE_SPACING, container.selfEdge);
@@ -269,7 +269,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 	// Picks a color according to the edgeView and passes it to OpenGL
 	private void chooseColor(GL2 gl, View<CyEdge> edgeView, GraphicsData graphicsData) {
 		Color visualPropertyColor = null;
-		visualPropertyColor = (Color) edgeView.getVisualProperty(RichVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT);
+		visualPropertyColor = (Color) edgeView.getVisualProperty(BasicVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT);
 		
 		RenderColor color = new RenderColor(DEFAULT_COLOR);
 		
@@ -279,7 +279,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 					(double) visualPropertyColor.getBlue() / 255);
 		}
 		
-		if (edgeView.getVisualProperty(MinimalVisualLexicon.EDGE_SELECTED)) {
+		if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)) {
 			
 			// Make selected edges appear greener
 			color.multiplyRed(0.7, 0, 0.7);
@@ -304,9 +304,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		View<CyNode> nodeView = networkView.getNodeView(node);
 		
 		if (nodeView != null) {
-			double x = nodeView.getVisualProperty(RichVisualLexicon.NODE_X_LOCATION) / distanceScale;
-			double y = nodeView.getVisualProperty(RichVisualLexicon.NODE_Y_LOCATION) / distanceScale;
-			double z = nodeView.getVisualProperty(RichVisualLexicon.NODE_Z_LOCATION) / distanceScale;
+			double x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) / distanceScale;
+			double y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) / distanceScale;
+			double z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) / distanceScale;
 			
 			// TODO: Perform a check to ensure none of x, y, z are null?
 			coordinates = new Vector3(x, y, z);
