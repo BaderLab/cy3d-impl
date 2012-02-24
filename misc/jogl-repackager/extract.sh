@@ -33,6 +33,12 @@ do
 	unzip -o $i -d extracted_jars/classes >/dev/null
 done
 
+# move native jars
+#for i in `find extract | grep '\.jar$' | grep natives`
+#do
+#	cp $i extracted_jars/classes/`basename $i`
+#done
+
 # combine into single jar
 echo Combining to single jar..
 pushd extracted_jars/classes/
@@ -83,65 +89,65 @@ echo -n "Bundle-NativeCode: " >>$properties_file
 # linux x32 properties
 for i in `find extracted_natives/linux-i586 -type f`
 do
-	echo linux-i586/`basename $i`\; >>$properties_file
+	echo -n linux-i586/`basename $i`\; >>$properties_file
 done
 
-echo osname=linux\; >>$properties_file
-echo processor=x86, >>$properties_file
+echo -n osname=linux\; >>$properties_file
+echo -n processor=x86, >>$properties_file
 
 # linux x64 properties
 for i in `find extracted_natives/linux-amd64 -type f`
 do
-	echo linux-amd64/`basename $i`\; >>$properties_file
+	echo -n linux-amd64/`basename $i`\; >>$properties_file
 done
 
-echo osname=linux\; >>$properties_file
-echo processor=x86-64, >>$properties_file
+echo -n osname=linux\; >>$properties_file
+echo -n processor=x86-64, >>$properties_file
 
 # solaris x32 properties
 for i in `find extracted_natives/solaris-i586 -type f`
 do
-	echo solaris-i586/`basename $i`\; >>$properties_file
+	echo -n solaris-i586/`basename $i`\; >>$properties_file
 done
 
-echo osname=solaris\; >>$properties_file
-echo processor=x86, >>$properties_file
+echo -n osname=solaris\; >>$properties_file
+echo -n processor=x86, >>$properties_file
 
 # solaris x64 properties
 for i in `find extracted_natives/solaris-amd64 -type f`
 do
-	echo solaris-amd64/`basename $i`\; >>$properties_file
+	echo -n solaris-amd64/`basename $i`\; >>$properties_file
 done
 
-echo osname=solaris\; >>$properties_file
-echo processor=x86-64, >>$properties_file
+echo -n osname=solaris\; >>$properties_file
+echo -n processor=x86-64, >>$properties_file
 
 # windows x64 properties
 for i in `find extracted_natives/windows-amd64 -type f`
 do
-	echo windows-amd64/`basename $i`\; >>$properties_file
+	echo -n windows-amd64/`basename $i`\; >>$properties_file
 done
 
-echo osname=win32\; >>$properties_file
-echo processor=x86-64, >>$properties_file
+echo -n osname=win32\; >>$properties_file
+echo -n processor=x86-64, >>$properties_file
 
 # windows x32 properties
 for i in `find extracted_natives/windows-i586 -type f`
 do
-	echo windows-i586/`basename $i`\; >>$properties_file
+	echo -n windows-i586/`basename $i`\; >>$properties_file
 done
 
-echo osname=win32\; >>$properties_file
-echo processor=x86, >>$properties_file
+echo -n osname=win32\; >>$properties_file
+echo -n processor=x86, >>$properties_file
 
 # mac properties
 for i in `find extracted_natives/macosx-universal -type f`
 do
-	echo macosx-universal/`basename $i`\; >>$properties_file
+	echo -n macosx-universal/`basename $i`\; >>$properties_file
 done
 
-echo osname=mac os x\; >>$properties_file
-echo processor=x86\; >>$properties_file
+echo -n osname=mac os x\; >>$properties_file
+echo -n processor=x86\; >>$properties_file
 echo processor=ppc >>$properties_file
 
 echo Fragment-Host=jogl >>$properties_file
