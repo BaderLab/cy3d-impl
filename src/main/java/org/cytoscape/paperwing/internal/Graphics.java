@@ -67,14 +67,6 @@ public class Graphics implements GLEventListener {
 	
 	private GraphicsHandler handler;
 	
-	/** Initialize a singleton that seems to help with JOGL in some compatibility
-	 * aspects
-	 */
-	public static void initSingleton() {
-//		GLProfile.initSingleton(false);
-		//System.out.println("initSingleton called");
-	}
-	
 	/** Create a new Graphics object
 	 * 
 	 * @param networkView The CyNetworkView object, representing the 

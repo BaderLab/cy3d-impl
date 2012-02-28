@@ -30,7 +30,6 @@ public class WindBirdsEyeRenderingEngineFactory extends WindRenderingEngineFacto
 	protected WindRenderingEngine getNewRenderingEngine(Object container,
 			View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
 	
-		System.out.println("WindBirdsEyeRenderingEngineFactory.getNewRenderingEngine() called");
 		return new WindBirdsEyeRenderingEngine(container, viewModel, visualLexicon);
 	}
 	

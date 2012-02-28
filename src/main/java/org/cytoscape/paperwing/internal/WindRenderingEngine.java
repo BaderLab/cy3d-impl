@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
+import javax.media.opengl.GLProfile.ShutdownType;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -84,6 +85,9 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	 */
 	public void setUpCanvas(Object container) {
 		
+		// TODO: Addition of this line prevents an "ERROR: JarContent: Unable to read bytes." when Cytoscape shuts down, why?
+		ShutdownType shutdownType = ShutdownType.COMPLETE;
+		
 		// TODO: The current presentation API seems to require this cast, check
 		// if there's a way around it
 		this.networkView = (CyNetworkView) viewModel;
@@ -98,14 +102,12 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				// Use the system's default version of OpenGL
 				GLProfile profile = GLProfile.getDefault();
 				GLCapabilities capabilities = new GLCapabilities(profile);
-	
 				
 				// TODO: check if this line should be moved to graphics object
 				capabilities.setDoubleBuffered(true);
 				
 				// TODO: check whether to use GLCanvas or GLJPanel
 				panel = new GLJPanel(capabilities);
-				
 				
 				// TODO: check if negative effects produced by this
 				panel.setIgnoreRepaint(true);
