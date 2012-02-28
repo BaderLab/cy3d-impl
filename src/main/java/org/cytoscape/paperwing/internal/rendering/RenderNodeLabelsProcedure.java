@@ -34,14 +34,14 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private TextRenderer textRenderer;
 	
-	public RenderNodeLabelsProcedure() {
-
-		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
+	public RenderNodeLabelsProcedure() {		
 	}
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
+		
+		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
 		
 		// Increase rendering efficiency; can set to true if desired
 		// textRenderer.setSmoothing(false);

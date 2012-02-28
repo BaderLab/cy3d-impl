@@ -53,6 +53,8 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		renderProcedures.add(new RenderNodesProcedure());
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderSelectionBoxProcedure());
+		
+		renderProcedures.add(new RenderNodeLabelsProcedure());
 	}
 	
 	@Override
@@ -67,7 +69,7 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		// and the VizMapper preview. The cause was likely due to the TextRenderer class being initialized
 		// too early.
 		if (graphicsData.getFramesElapsed() == 1) {
-			renderProcedures.add(new RenderNodeLabelsProcedure());
+			
 		}
 		
 		// Control light positioning
