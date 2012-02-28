@@ -14,15 +14,17 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
+// import com.jogamp.opengl.util.awt.TextRenderer;
 
 // Below will be used for JOGL 2.0-b45-20111219
-/*
+
 import com.jogamp.graph.curve.opengl.RenderState;
 import com.jogamp.graph.curve.opengl.TextRenderer;
 import com.jogamp.graph.curve.opengl.GLRegion;
 import com.jogamp.graph.font.FontFactory;
-*/
+import com.jogamp.graph.geom.opengl.SVertex;
+import com.jogamp.opengl.util.glsl.ShaderState;
+
 
 public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -45,14 +47,15 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		// textRenderer.setSmoothing(false);
 		
 		// Temporarily removed -- pausing JOGL update to 2.0-b45-20111219
-//		textRenderer = TextRenderer.create(RenderState.getRenderState(gl), GLRegion.TWO_PASS_DEFAULT_TEXTURE_UNIT);
+		RenderState renderState = RenderState.createRenderState(new ShaderState(), SVertex.factory());
+		textRenderer = TextRenderer.create(RenderState.getRenderState(gl), 0);
 	}
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
-		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
+		// textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
@@ -71,7 +74,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		Color textColor;
 		
 		gl.glPushMatrix();
-		textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
+		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 		// textRenderer.drawString3D(arg0, arg1, arg2, arg3, arg4, arg5)
 		
 		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
@@ -109,23 +112,24 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 						}
 			
 						// Below to be used for JOGL 2.0-b45-20111219's new TextRenderer
-//						gl.glColor3f((float) textColor.getRed() / 255, 
-//								(float) textColor.getGreen() / 255, 
-//								(float) textColor.getBlue() / 255);
+						gl.glColor3f((float) textColor.getRed() / 255, 
+								(float) textColor.getGreen() / 255, 
+								(float) textColor.getBlue() / 255);
 						
 						
-//						textRenderer.drawString3D(gl, FontFactory.getDefault().getDefault(), 
-//								text, new float[]{1.0f, 1.0f, 2.0f}, TEXT_FONT_SIZE, 1024);
+						textRenderer.drawString3D(gl, FontFactory.get(FontFactory.JAVA).getDefault(), 
+								text, new float[]{1.0f, 1.0f, 2.0f}, TEXT_FONT_SIZE, 128);
 								
-						textRenderer.setColor(textColor);
-						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
+//						textRenderer.setColor(textColor);
+//						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
+//						textRenderer.flush();
 					}
 				}
 			}
 		}
 		
-		textRenderer.flush();
-		textRenderer.endRendering();
+		
+//		textRenderer.endRendering();
 		
 		gl.glPopMatrix();
 		
@@ -135,7 +139,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		int width = 0;
 		
 		for (int i = 0; i < text.length(); i++) {
-			width += textRenderer.getCharWidth(text.charAt(i));
+//			width += textRenderer.getCharWidth(text.charAt(i));
 		}
 		
 		return width;
