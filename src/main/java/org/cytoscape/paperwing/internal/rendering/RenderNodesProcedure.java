@@ -14,6 +14,7 @@ import javax.media.opengl.glu.GLUquadric;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer;
 import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
@@ -94,7 +95,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			// gl.glLoadName(33);
 
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)
+					&& graphicsData.getViewingVolume().inside(new Vector3(x, y, z), graphicsData.getNearZ() / 2)) {
+				
 				gl.glPushMatrix();
 				gl.glTranslatef(x, y, z);
 				gl.glLoadName(index);

@@ -71,7 +71,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		
 		String text;
 		Color textColor;
-		
+
 		gl.glPushMatrix();
 		textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 		// textRenderer.drawString3D(arg0, arg1, arg2, arg3, arg4, arg5)
@@ -100,7 +100,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 					
 					// Only draw the text if the front side of the camera faces it
 					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL 
-							&& graphicsData.getCamera().getDirection().angle(offsetFromCamera) <= Math.PI / 2) {
+							&& graphicsData.getViewingVolume().inside(text3dPosition, graphicsData.getNearZ() / 2)) {
 						
 						// TODO: Check if there is a way around this cast
 						textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
@@ -128,7 +128,6 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		}
 		
 		textRenderer.endRendering();
-		
 		gl.glPopMatrix();
 		
 	}

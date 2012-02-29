@@ -195,8 +195,22 @@ public class GeometryToolkit {
 		return Math.abs(Math.cos(angle) * hypotenuse);
 	}
 	
-	/*
-	public static double findHorizontalFieldOfView(double verticalFieldOfView, int screenWidth, int screenHeight) {	
+	
+	/**
+	 * Given the fixed vertical field of view and screen dimensions, calculate the horizontal field of view assuming that 
+	 * it varies according to the current aspect ratio. If the screen dimensions are equal, the returned horizontal field of view
+	 * would be equal to the vertical field of view.
+	 * 
+	 * @param verticalFieldOfView The vertical field of view, in degrees
+	 * @param screenWidth The width of the screen
+	 * @param screenHeight The height of the screen
+	 * @return The calculated horizontal field of view, in degrees
+	 */
+	public static double findHorizontalFieldOfView(double verticalFieldOfView, int screenWidth, int screenHeight) {
+		double screenDistance = (screenHeight / 2) / Math.tan(verticalFieldOfView / 2 * Math.PI / 180);
+		
+		double horizontalFieldOfView = Math.atan(screenWidth / 2 / screenDistance);
+		
+		return (horizontalFieldOfView * 180 / Math.PI);
 	}
-	*/
 }

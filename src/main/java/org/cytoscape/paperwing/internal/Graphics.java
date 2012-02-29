@@ -26,6 +26,7 @@ import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -127,6 +128,13 @@ public class Graphics implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
+		
+		// Re-calculate the viewing volume
+		SimpleCamera camera = graphicsData.getCamera();
+		graphicsData.getViewingVolume().calculateViewingVolume(camera.getPosition(), camera.getDirection(), camera.getUp(), 
+				graphicsData.getNearZ(), graphicsData.getFarZ(), graphicsData.getVerticalFov(), 
+				GeometryToolkit.findHorizontalFieldOfView(graphicsData.getDistanceScale(), 
+						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
 		
 		// Perform picking
 		shapePickingProcessor.processPicking(mouse, keys, graphicsData);

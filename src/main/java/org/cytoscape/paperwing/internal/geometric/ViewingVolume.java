@@ -29,10 +29,19 @@ public class ViewingVolume {
 	private Plane top, bottom;
 	private Plane left, right;
 	
+	public ViewingVolume() {
+		near = new Plane();
+		far = new Plane();
+		top = new Plane();
+		bottom = new Plane();
+		left = new Plane();
+		right = new Plane();
+	}
+	
 	/**
 	 * Tests if a given point is inside the viewing volume.
 	 * 
-	 * @param point
+	 * @param point The test point
 	 * @return <code>true</code> if the point is inside the volume, <code>false</code> otherwise.
 	 */
 	public boolean inside(Vector3 point) {
@@ -50,6 +59,29 @@ public class ViewingVolume {
 	}
 	
 	/**
+	 * Tests if a given point either inside the viewing volume or has a distance to the viewing volume
+	 * not exceeding a certain given value.
+	 * 
+	 * @param point The test point
+	 * @param distance The maximum distance between the point and the volume volume before the point is 
+	 * considered to be outside the viewing volume.
+	 * @return <code>true</code> If the point is inside or within a certain distance from 
+	 */
+	public boolean inside(Vector3 point, double distance) {
+		if (isInsidePlane(point, near, distance) &&
+				isInsidePlane(point, far, distance) &&
+				isInsidePlane(point, top, distance) &&
+				isInsidePlane(point, bottom, distance) &&
+				isInsidePlane(point, left, distance) &&
+				isInsidePlane(point, right, distance)) {
+				
+				return true;
+			} else {
+				return false;
+			}
+	}
+	
+	/**
 	 * Checks if a point is inside the given plane, that is, it lies on the opposite side of the normal.
 	 * 
 	 * @param point The test point
@@ -63,6 +95,26 @@ public class ViewingVolume {
 		double signedDistance = plane.normal.dot(point) + plane.parameterD;
 		
 		if (signedDistance > 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * Checks if a point is inside the given plane. If it is not, this method still returns <code>true</code>
+	 * as long as the point is within a certain distance from the plane.
+	 * 
+	 * @param point The test point
+	 * @param plane The plane to test against
+	 * @param radius The maximum distance the point can be to the plane before it is considered to be outside the plane
+	 * @return <code>true</code> if the point lies on the opposite side of the plane's normal, within the given distance.
+	 * Returns <code>false</code> otherwise.
+	 */
+	private boolean isInsidePlane(Vector3 point, Plane plane, double distance) {
+		double signedDistance = plane.normal.dot(point) + plane.parameterD;
+		
+		if (signedDistance > distance) {
 			return false;
 		} else {
 			return true;
@@ -100,13 +152,46 @@ public class ViewingVolume {
 		double farParameterD = -farNormal.dot(cameraPosition.plus(cameraDirection.multiply(zFar)));
 		far.set(farNormal, farParameterD);
 		
+		// Find the center point on the near plane for later use
+		Vector3 nearCenterPoint = cameraPosition.plus(cameraDirection.multiply(zNear));
+		
 		// Calculate left plane
 		
 		// Rotate 90 degrees past the left plane to obtain the normal
 		Vector3 leftNormal = cameraDirection.rotate(cameraUp, Math.toRadians(horizontalFieldOfView / 2 + 90));
 		
 		// Find a point on the plane to find the D parameter
+		Vector3 leftSamplePosition = cameraLeft.multiply(Math.tan(Math.toRadians(horizontalFieldOfView) / 2) * zNear).plus(nearCenterPoint);
+		double leftParameterD = -leftNormal.dot(leftSamplePosition);
+		left.set(leftNormal, leftParameterD);
 		
+		// Calculate right plane
+		
+		// Rotate 90 degrees past the right plane to obtain the normal
+		Vector3 rightNormal = cameraDirection.rotate(cameraUp, Math.toRadians(horizontalFieldOfView / 2 + 90));
+		
+		// Find a point on the plane to find the D parameter
+		Vector3 rightSamplePosition = cameraLeft.multiply(Math.tan(Math.toRadians(horizontalFieldOfView) / 2) * -zNear).plus(nearCenterPoint);
+		double rightParameterD = -rightNormal.dot(rightSamplePosition);
+		right.set(rightNormal, rightParameterD);
+		
+		// Calculate top plane
+		
+		Vector3 topNormal = cameraDirection.rotate(cameraLeft, -Math.toRadians(verticalFieldOfView / 2 + 90));
+		
+		// Find a point on the plane
+		Vector3 topSamplePosition = cameraUp.multiply(Math.tan(Math.toRadians(verticalFieldOfView) / 2) * zNear).plus(nearCenterPoint);
+		double topParameterD = -topNormal.dot(topSamplePosition);
+		top.set(topNormal, topParameterD);
+		
+		// Calculate bottom plane
+		
+		Vector3 bottomNormal = cameraDirection.rotate(cameraLeft, Math.toRadians(verticalFieldOfView / 2 + 90));
+		
+		// Find a point on the plane
+		Vector3 bottomSamplePosition = cameraUp.multiply(Math.tan(Math.toRadians(verticalFieldOfView) / 2) * -zNear).plus(nearCenterPoint);
+		double bottomParameterD = -bottomNormal.dot(bottomSamplePosition);
+		bottom.set(bottomNormal, bottomParameterD);
 	}
 
 }

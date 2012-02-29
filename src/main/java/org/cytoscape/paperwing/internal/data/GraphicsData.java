@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.geometric.ViewingVolume;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -36,6 +37,8 @@ public class GraphicsData {
 	private float distanceScale = 178.0f; 
 
 	private float verticalFov = 45.0f;
+	
+	private ViewingVolume viewingVolume;
 	
 	/** Distance from eye to the near clipping plane */
 	private float nearZ = 0.2f;
@@ -97,6 +100,7 @@ public class GraphicsData {
 		pickingData = new PickingData();
 		
 		camera = new SimpleCamera();
+		viewingVolume = new ViewingVolume();
 	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
@@ -233,5 +237,13 @@ public class GraphicsData {
 
 	public void setPickingData(PickingData pickingData) {
 		this.pickingData = pickingData;
+	}
+
+	public ViewingVolume getViewingVolume() {
+		return viewingVolume;
+	}
+
+	public void setViewingVolume(ViewingVolume viewingVolume) {
+		this.viewingVolume = viewingVolume;
 	}
 }
