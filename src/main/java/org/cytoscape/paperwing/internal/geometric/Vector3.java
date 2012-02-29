@@ -275,6 +275,14 @@ public class Vector3 {
 		return (x * x + y * y + z * z);
 	}
 	
+	/** Inverts this vector so that the result points in the opposite direction.
+	 * 
+	 * @return A vector representing the invert of this vector.
+	 */
+	public Vector3 invert() {
+		return multiply(-1);
+	}
+	
 	/** Set this vector to be equal to itself divided by its magnitude
 	 */
 	public void normalizeLocal() {

@@ -6,10 +6,22 @@ package org.cytoscape.paperwing.internal.geometric;
 public class ViewingVolume {
 	
 	/**
-	 * A class representing a plane, stored using its parameters A, B, C, D in the equation Ax + By + Cz + D = 0.
+	 * A class representing a plane, stored in the format Ax + By + Cz + D = 0.
+	 * The parameters A, B, C are represented by the normal vector.
 	 */
 	private class Plane {
-		public double a, b, c, d = 0;
+		Vector3 normal = new Vector3(0, 0, 0);
+		double parameterD = 0;
+		
+		/**
+		 * Sets the plane's normal and D parameter to the given values
+		 * @param normal The plane's new normal
+		 * @param parameterD The plane's new D parameter in the equation Ax + By + Cz + D = 0
+		 */
+		public void set(Vector3 normal, double parameterD) {
+			this.normal.set(normal);
+			this.parameterD = parameterD;
+		}
 	}
 	
 	// The 6 planes that bound the viewing volume. The normals of the plane face outward.
@@ -48,7 +60,7 @@ public class ViewingVolume {
 		// Determine which side the point lies on using the distance formula
 		// For information see http://www.lighthouse3d.com/tutorials/maths/plane/
 		
-		double signedDistance = point.x() * plane.a + point.y() * plane.b + point.z() * plane.c + plane.d;
+		double signedDistance = plane.normal.dot(point) + plane.parameterD;
 		
 		if (signedDistance > 0) {
 			return false;
@@ -60,10 +72,40 @@ public class ViewingVolume {
 	/**
 	 * Calculate the boundaries of the viewing volume given the camera orientation, the distance to the near and far clipping planes,
 	 * and the vertical and horizontal fields of view.
+	 * 
+	 * @param cameraPosition The position of the camera or eye
+	 * @param cameraDirection The camera's direction vector
+	 * @param cameraUp The camera's up vector
+	 * @param zNear The distance between the camera and the near clipping plane
+	 * @param zFar The distance between the camera and the far clipping plane
+	 * @param verticalFieldOfView The vertical field of view, in degrees
+	 * @param horizontalFieldOfView The horizontal field of view, in degrees
 	 */
 	public void calculateViewingVolume(Vector3 cameraPosition, Vector3 cameraDirection, Vector3 cameraUp, 
 			double zNear, double zFar, double verticalFieldOfView, double horizontalFieldOfView) {
 		
+		// Calculate the camera's left vector
+		Vector3 cameraLeft = cameraUp.cross(cameraDirection);
+		
+		// Calculate near z plane
+		Vector3 nearNormal = cameraDirection.invert();
+		nearNormal.normalize();
+		
+		double nearParameterD = -nearNormal.dot(cameraPosition.plus(cameraDirection.multiply(zNear)));
+		near.set(nearNormal, nearParameterD);
+		
+		// Calculate far z plane
+		Vector3 farNormal = nearNormal.invert();
+		
+		double farParameterD = -farNormal.dot(cameraPosition.plus(cameraDirection.multiply(zFar)));
+		far.set(farNormal, farParameterD);
+		
+		// Calculate left plane
+		
+		// Rotate 90 degrees past the left plane to obtain the normal
+		Vector3 leftNormal = cameraDirection.rotate(cameraUp, Math.toRadians(horizontalFieldOfView / 2 + 90));
+		
+		// Find a point on the plane to find the D parameter
 		
 	}
 

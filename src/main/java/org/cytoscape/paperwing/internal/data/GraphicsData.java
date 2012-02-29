@@ -37,6 +37,12 @@ public class GraphicsData {
 
 	private float verticalFov = 45.0f;
 	
+	/** Distance from eye to the near clipping plane */
+	private float nearZ = 0.2f;
+	
+	/** Distance from eye to the far clipping plane */
+	private float farZ = 50f;
+	
 	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
 	
@@ -203,6 +209,22 @@ public class GraphicsData {
 
 	public void setVerticalFov(float verticalFov) {
 		this.verticalFov = verticalFov;
+	}
+	
+	public float getNearZ() {
+		return nearZ;
+	}
+
+	public void setNearZ(float nearZ) {
+		this.nearZ = nearZ;
+	}
+
+	public float getFarZ() {
+		return farZ;
+	}
+
+	public void setFarZ(float farZ) {
+		this.farZ = farZ;
 	}
 
 	public PickingData getPickingData() {

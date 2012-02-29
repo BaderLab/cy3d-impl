@@ -246,7 +246,7 @@ public class Graphics implements GLEventListener {
 		gl.glLoadIdentity();
 
 		GLU glu = new GLU();
-		glu.gluPerspective(graphicsData.getVerticalFov(), (float) width / height, 0.2f, 50.0f);
+		glu.gluPerspective(graphicsData.getVerticalFov(), (float) width / height, graphicsData.getNearZ(), graphicsData.getFarZ());
 
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();

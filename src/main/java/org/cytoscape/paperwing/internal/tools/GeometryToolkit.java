@@ -31,7 +31,7 @@ public class GeometryToolkit {
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
 		
-		// Hnear = 2 * tan(fov / 2) * nearDist
+		// Hnear = 2 * tan(fovy / 2) * nearDist
 		// in our case: 
 		//   fov = 45 deg
 		//   nearDist = 0.2
@@ -194,4 +194,9 @@ public class GeometryToolkit {
 		
 		return Math.abs(Math.cos(angle) * hypotenuse);
 	}
+	
+	/*
+	public static double findHorizontalFieldOfView(double verticalFieldOfView, int screenWidth, int screenHeight) {	
+	}
+	*/
 }

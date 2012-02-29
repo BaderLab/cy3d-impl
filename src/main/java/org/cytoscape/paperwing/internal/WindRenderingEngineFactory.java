@@ -42,8 +42,6 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		this.visualLexicon = lexicon;
 		
 		this.serviceRegistrar = serviceRegistrar;
-		
-		Graphics.initSingleton();
 	}
 	
 	@Override
