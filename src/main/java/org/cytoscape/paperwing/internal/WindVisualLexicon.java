@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal;
 
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.VisualProperty;
@@ -27,22 +28,51 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	public static final VisualProperty<Double> NODE_ROLL = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "NODE_ROLL", "Node Model Roll", CyNode.class);
 	
+	public static final VisualProperty<Double> CAMERA_X_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_X_LOCATION", "Camera X Location", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Y_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Y_LOCATION", "Camera Y Location", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Z_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Z_LOCATION", "Camera Z Location", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_PITCH_ANGLE = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_PITCH_ANGLE", "Camera Pitch Angle", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_YAW_ANGLE = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_YAW_ANGLE", "Camera Yaw Angle", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_ROLL_ANGLE = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_ROLL_ANGLE", "Camera Roll Angle", CyNetwork.class);
+	
 	
 	/** Create a new WindVisualLexicon object */
 	public WindVisualLexicon() {
 		super(WIND_ROOT);
 		
-		addVisualProperty(TEST_PROPERTY, NODE);
+		addVisualProperty(CAMERA_X_LOCATION, NETWORK);
+		addVisualProperty(CAMERA_Y_LOCATION, NETWORK);
+		addVisualProperty(CAMERA_Z_LOCATION, NETWORK);
 		
-		addIdentifierMapping(CyNode.class, "testProperty", TEST_PROPERTY);
+		addVisualProperty(CAMERA_PITCH_ANGLE, NETWORK);
+		addVisualProperty(CAMERA_YAW_ANGLE, NETWORK);
+		addVisualProperty(CAMERA_ROLL_ANGLE, NETWORK);
 		
+		createLookupMap();
+	}
+	
+	private void createLookupMap() {
 		addIdentifierMapping(CyNode.class, "nodePitch", NODE_PITCH);
 		addIdentifierMapping(CyNode.class, "nodeYaw", NODE_YAW);
 		addIdentifierMapping(CyNode.class, "nodeRoll", NODE_ROLL);
 		
-		// VisualProperty visualProperty = this.lookup(Double.class, "test");
+		addIdentifierMapping(CyNetwork.class, "cameraX", CAMERA_X_LOCATION);
+		addIdentifierMapping(CyNetwork.class, "cameraY", CAMERA_Y_LOCATION);
+		addIdentifierMapping(CyNetwork.class, "cameraZ", CAMERA_Z_LOCATION);
 		
-		
+		addIdentifierMapping(CyNetwork.class, "cameraPitch", CAMERA_PITCH_ANGLE);
+		addIdentifierMapping(CyNetwork.class, "cameraYaw", CAMERA_YAW_ANGLE);
+		addIdentifierMapping(CyNetwork.class, "cameraRoll", CAMERA_ROLL_ANGLE);
 	}
-
 }
