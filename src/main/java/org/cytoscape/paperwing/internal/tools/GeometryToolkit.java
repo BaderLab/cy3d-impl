@@ -213,4 +213,65 @@ public class GeometryToolkit {
 		
 		return (horizontalFieldOfView * 180 / Math.PI);
 	}
+	
+	/**
+	 * Assuming the initial direction is towards the negative z direction, calculate what
+	 * the direction would be given pitch and yaw angles. The rotations are done by the right-hand rule.
+	 * 
+	 * @param pitch The pitch angle
+	 * @param yaw The yaw angle
+	 * @return The direction vector corresponding to the given pitch and yaw angles.
+	 */
+	public static Vector3 findDirectionVector(double pitch, double yaw) {
+		Vector3 direction = new Vector3(0, 0, -1);
+		
+		// Rotate about x-axis for pitch
+		direction = direction.rotate(new Vector3(1, 0, 0), pitch);
+		
+		// Rotate about y-axis for yaw
+		direction = direction.rotate(new Vector3(0, 1, 0), yaw);
+		
+		return direction;
+	}
+	
+	/**
+	 * Assuming the initial up vector is towards the positive y direction, calculate what the
+	 * up vector would be given the roll angle. The rotations are done by the right-hand rule.
+	 * 
+	 * @param roll The roll angle
+	 * @return The up vector corresponding to the given roll angle.
+	 */
+	public static Vector3 findUpVector(double roll) {
+		Vector3 up = (new Vector3(0, 1, 0)).rotate(new Vector3(0, 0, 1), roll);
+		
+		return up;
+	}
+	
+	/**
+	 * Given the direction and up vectors, calculate the pitch, yaw, and roll angles assuming
+	 * the initial direction is towards the negative z direction and the initial up vector
+	 * is towards the positive y direction.
+	 * 
+	 * @param direction The direction vector
+	 * @param up The up vector
+	 * @return A 3-vector in the form of (pitch, yaw, roll)
+	 */
+	public static Vector3 findPitchYawRoll(Vector3 direction, Vector3 up) {
+		
+		double pitch, yaw, roll;
+		
+		Vector3 pitchProjection = direction.projectNormal(new Vector3(0, 1, 0));
+		pitch = direction.angleAcute(pitchProjection);
+		
+		Vector3 yawProjection = direction.projectNormal(new Vector3(1, 0, 0));
+		yaw = direction.angleAcute(yawProjection);
+		
+		Vector3 rollProjection = up.projectNormal(new Vector3(0, 0, 1));
+		roll = up.angleAcute(rollProjection);
+		
+		// TODO: At certain orientations, the values for pitch and yaw may be indeterminate. If pitch is 90 degrees,
+		// then it doesn't matter what yaw is.
+		
+		return new Vector3(pitch, yaw, roll);
+	}
 }

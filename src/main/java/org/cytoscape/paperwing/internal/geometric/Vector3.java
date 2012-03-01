@@ -6,6 +6,15 @@ package org.cytoscape.paperwing.internal.geometric;
  */
 public class Vector3 {
 	
+	/** A unit vector representing the direction of the positive x-axis. */
+	public static final Vector3 POSITIVE_X_DIRECTION = new Vector3(1, 0, 0);
+	
+	/** A unit vector representing the direction of the positive y-axis. */
+	public static final Vector3 POSITIVE_Y_DIRECTION = new Vector3(0, 1, 0);
+	
+	/** A unit vector representing the direction of the positive z-axis. */
+	public static final Vector3 POSITIVE_Z_DIRECTION = new Vector3(0, 0, 1);
+	
 	/** The x-coordinate */
 	private double x;
 	

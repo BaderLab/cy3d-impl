@@ -4,6 +4,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.presentation.property.BooleanVisualProperty;
 import org.cytoscape.view.presentation.property.DoubleVisualProperty;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -46,6 +47,10 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	public static final VisualProperty<Double> CAMERA_ROLL_ANGLE = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_ROLL_ANGLE", "Camera Roll Angle", CyNetwork.class);
 	
+	public static final VisualProperty<Boolean> SHOW_NODE_LABELS = new BooleanVisualProperty(true, "SHOW_NODE_LABELS", "Show Node Labels", CyNetwork.class);
+	
+	public static final VisualProperty<Boolean> SHOW_EDGE_LABELS = new BooleanVisualProperty(true, "SHOW_EDGE_LABELS", "Show Edge Labels", CyNetwork.class);
+		
 	
 	/** Create a new WindVisualLexicon object */
 	public WindVisualLexicon() {
@@ -58,6 +63,9 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		addVisualProperty(CAMERA_PITCH_ANGLE, NETWORK);
 		addVisualProperty(CAMERA_YAW_ANGLE, NETWORK);
 		addVisualProperty(CAMERA_ROLL_ANGLE, NETWORK);
+		
+		addVisualProperty(SHOW_NODE_LABELS, NETWORK);
+		addVisualProperty(SHOW_EDGE_LABELS, NETWORK);
 		
 		createLookupMap();
 	}
@@ -74,5 +82,8 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		addIdentifierMapping(CyNetwork.class, "cameraPitch", CAMERA_PITCH_ANGLE);
 		addIdentifierMapping(CyNetwork.class, "cameraYaw", CAMERA_YAW_ANGLE);
 		addIdentifierMapping(CyNetwork.class, "cameraRoll", CAMERA_ROLL_ANGLE);
+		
+		addIdentifierMapping(CyNetwork.class, "showNodeLabels", SHOW_NODE_LABELS);
+		addIdentifierMapping(CyNetwork.class, "showEdgeLabels", SHOW_EDGE_LABELS);
 	}
 }
