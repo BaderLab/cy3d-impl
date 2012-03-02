@@ -216,35 +216,46 @@ public class GeometryToolkit {
 	
 	/**
 	 * Assuming the initial direction is towards the negative z direction, calculate what
-	 * the direction would be given pitch and yaw angles. The rotations are done by the right-hand rule.
+	 * the direction would be given yaw and pitch angles. The rotations are done by the right-hand rule.
 	 * 
-	 * @param pitch The pitch angle
 	 * @param yaw The yaw angle
-	 * @return The direction vector corresponding to the given pitch and yaw angles.
+	 * @param pitch The pitch angle
+	 * @return The unit direction vector corresponding to the given yaw and pitch angles.
 	 */
-	public static Vector3 findDirectionVector(double pitch, double yaw) {
+	public static Vector3 findDirectionVector(double yaw, double pitch) {
 		Vector3 direction = new Vector3(0, 0, -1);
-		
-		// Rotate about x-axis for pitch
-		direction = direction.rotate(new Vector3(1, 0, 0), pitch);
 		
 		// Rotate about y-axis for yaw
 		direction = direction.rotate(new Vector3(0, 1, 0), yaw);
 		
-		return direction;
+		Vector3 newAxisX = (new Vector3(1, 0, 0)).rotate(new Vector3(0, 1, 0), yaw);
+		
+		// Rotate about its new x-axis for pitch
+		direction = direction.rotate(newAxisX, pitch);
+		
+		return direction.normalize();
 	}
 	
 	/**
 	 * Assuming the initial up vector is towards the positive y direction, calculate what the
-	 * up vector would be given the roll angle. The rotations are done by the right-hand rule.
+	 * up vector would be given the yaw, pitch, and roll angles. The rotations are done by
+	 * the right-hand rule.
 	 * 
+	 * @param yaw The yaw angle
+	 * @param pitch The pitch angle
 	 * @param roll The roll angle
-	 * @return The up vector corresponding to the given roll angle.
+	 * @return The unit up vector corresponding to the given roll angle.
 	 */
-	public static Vector3 findUpVector(double roll) {
-		Vector3 up = (new Vector3(0, 1, 0)).rotate(new Vector3(0, 0, 1), roll);
+	public static Vector3 findUpVector(double yaw, double pitch, double roll) {
+
+		// Determine the rotated axes
+		Vector3 newAxisX = (new Vector3(1, 0, 0)).rotate(new Vector3(0, 1, 0), yaw);
+		Vector3 newAxisY = (new Vector3(0, 1, 0)).rotate(newAxisX, pitch);
+		Vector3 newAxisZ = newAxisX.cross(newAxisY);
 		
-		return up;
+		Vector3 up = newAxisY.rotate(newAxisZ, roll);
+		
+		return up.normalize();
 	}
 	
 	/**
@@ -261,7 +272,12 @@ public class GeometryToolkit {
 		double pitch, yaw, roll;
 		
 		Vector3 pitchProjection = direction.projectNormal(new Vector3(0, 1, 0));
-		pitch = direction.angleAcute(pitchProjection);
+		
+		if (pitchProjection.magnitudeSquared() < Double.MIN_NORMAL) {
+			pitch = 90;
+		} else {
+			pitch = direction.angleAcute(pitchProjection);
+		}
 		
 		Vector3 yawProjection = direction.projectNormal(new Vector3(1, 0, 0));
 		yaw = direction.angleAcute(yawProjection);
