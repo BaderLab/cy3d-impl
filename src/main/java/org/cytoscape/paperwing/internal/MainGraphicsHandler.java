@@ -23,6 +23,7 @@ import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
 import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.paperwing.internal.rendering.text.StringRenderer;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 
 /**
@@ -82,7 +83,6 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.execute(graphicsData);
 		}
-		
 	}
 
 	@Override

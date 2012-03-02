@@ -18,6 +18,21 @@ public class SimpleCamera {
 	// a variable distance away from the camera. This target point is very
 	// useful for certain rotations and transformations.
 	
+	/** The default camera translational movement speed */
+	public static final double DEFAULT_MOVE_SPEED = 0.04;
+	
+	/**  The default angular speed for camera turning */
+	public static final double DEFAULT_TURN_SPEED = 0.0033;
+	
+	/** The default camera orbit angular speed */
+	public static final double DEFAULT_ORBIT_SPEED = 0.01;
+	
+	/** The default camera rolling angular speed */
+	public static final double DEFAULT_ROLL_SPEED = 0.01;
+	
+	/** The default zooming translational speed */
+	public static final double DEFAULT_ZOOM_SPEED = 0.4;
+	
 	/** The minimum allowed distance between the camera's position vector and
 	 * the target position vector
 	 */
@@ -78,7 +93,7 @@ public class SimpleCamera {
 	 * vectors
 	 */
 	public SimpleCamera() {
-		this(new Vector3(0, 0, 10), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+		this(new Vector3(0, 0, 3), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 	}
 	
 	/** Construct a new SimpleCamera object with specified position,
@@ -91,7 +106,8 @@ public class SimpleCamera {
 	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up) {
 		// TODO: provide constants for default values
 		
-		this(position, target, up, 0.01, 0.002, 0.002, 0.1, 0.4);
+		this(position, target, up, DEFAULT_MOVE_SPEED, DEFAULT_TURN_SPEED, 
+				DEFAULT_ORBIT_SPEED, DEFAULT_ROLL_SPEED, DEFAULT_ZOOM_SPEED);
 	}
 
 	/** Creates a new SimpleCamera object with specified positions,

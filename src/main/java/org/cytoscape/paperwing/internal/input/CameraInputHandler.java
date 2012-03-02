@@ -6,6 +6,7 @@ import java.util.Set;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
@@ -17,6 +18,7 @@ public class CameraInputHandler implements InputHandler {
 			GraphicsData graphicsData) {
 		
 		Set<Integer> held = keys.getHeld();
+		Set<Integer> pressed = keys.getPressed();
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		processCameraTranslation(held, camera);
@@ -25,6 +27,10 @@ public class CameraInputHandler implements InputHandler {
 		
 		processCameraFirstPersonLook(keys, mouse, camera);
 		processCameraZoom(mouse, graphicsData);
+		
+		processResetCamera(held, graphicsData);
+		
+		processDebugAngles(pressed, camera);
 	}
 	
 	private void processCameraZoom(MouseMonitor mouse, GraphicsData graphicsData) {
@@ -138,6 +144,32 @@ public class CameraInputHandler implements InputHandler {
 		// Roll camera counter-clockwise
 		if (held.contains(KeyEvent.VK_Z)) {
 			camera.rollCounterClockwise();
+		}
+	}
+	
+	private void processResetCamera(Set<Integer> held, GraphicsData graphicsData) {
+		
+		// Reset camera
+		if (held.contains(KeyEvent.VK_C)) {
+			graphicsData.setCamera(new SimpleCamera());
+		}
+	}
+	
+	private void processDebugAngles(Set<Integer> pressed, SimpleCamera camera) {
+		
+		if (pressed.contains(KeyEvent.VK_V)) {
+			System.out.println("Camera direction and up vectors: " + camera.getDirection()
+					+ ", " + camera.getUp());
+			
+			Vector3 angles = GeometryToolkit.findYawPitchRoll(camera.getDirection(), camera.getUp());
+			System.out.println("Camera yaw, pitch, roll: " + angles);
+			
+			/*
+			Vector3 direction = GeometryToolkit.findDirectionVector(angles.x(), angles.y());
+			Vector3 up = GeometryToolkit.findUpVector(angles.x(), angles.y(), angles.z());
+			
+			System.out.println("Camera direction and up calculated from Euler angles: " + direction + ", " + up);
+			*/
 		}
 	}
 }
