@@ -90,6 +90,13 @@ public class GraphicsData {
 	 */
 	private PickingData pickingData;
 	
+	/**
+	 * A {@link LightingData} object responsible for storing data related to
+	 * lighting and lights, such as the states of lights and their color
+	 * values.
+	 */
+	private LightingData lightingData;
+	
 	private GL2 glContext;
 	
 	private VisualLexicon visualLexicon;

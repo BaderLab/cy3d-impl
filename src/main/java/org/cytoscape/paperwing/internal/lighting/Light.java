@@ -6,6 +6,12 @@ import org.cytoscape.paperwing.internal.geometric.Vector3;
  * This class represents a light described by the Phong illumination model
  */
 public class Light {
+
+	/** Default value for a color */
+	private static float DEFAULT_COLOR_VALUE = 1.0f;
+	
+	/** Default alpha value for light colors */
+	private static float DEFAULT_ALPHA_VALUE = 1.0f;
 	
 	/** An array containing the color of the ambient component of the light in RGBA format */
 	private float[] ambient;
@@ -19,6 +25,39 @@ public class Light {
 	/** The position of the light in 3D space */
 	private Vector3 position;
 	
+	/** A boolean indicating whether the light is turned on. */
+	private boolean turnedOn;
+	
+	/**
+	 * Creates a light with its position at the origin and white values for all colors
+	 */
+	public Light() {
+		position = new Vector3();
+		turnedOn = false;
+		
+		ambient = new float[4]; 
+		diffuse = new float[4];
+		specular = new float[4];
+		
+		for (int i = 0; i < 3; i++) {
+			ambient[i] = DEFAULT_COLOR_VALUE;
+		    diffuse[i] = DEFAULT_COLOR_VALUE;
+			specular[i] = DEFAULT_COLOR_VALUE;
+		}
+		
+		ambient[3] = DEFAULT_ALPHA_VALUE;
+	    diffuse[3] = DEFAULT_ALPHA_VALUE;
+		specular[3] = DEFAULT_ALPHA_VALUE;
+	}
+	
+	/**
+	 * Creates a new light object with the specified ambient, diffuse, and specular components.
+	 * 
+	 * @param ambient An array containing the color and alpha of the ambient light component, in the form (r, g, b, a)
+	 * @param diffuse An array containing the color and alpha of the diffuse light component, in the form (r, g, b, a)
+	 * @param specular An array containing the color and alpha of the specular light component, in the form (r, g, b, a)
+	 * @param position The position of the light
+	 */
 	public Light(float[] ambient, float[] diffuse, float[] specular, Vector3 position) {
 		// Require 4 parameters for ambient, diffuse, and specular lighting
 		if (ambient.length < 4) {
@@ -34,6 +73,7 @@ public class Light {
 		}
 		
 		this.position = new Vector3(position);
+		turnedOn = false;
 		
 		this.ambient = new float[4]; 
 		this.diffuse = new float[4];
@@ -135,5 +175,23 @@ public class Light {
 	 */
 	public void setPosition(Vector3 position) {
 		this.position.set(position);
+	}
+	
+	/**
+	 * Check whether the light is considered to be turned on.
+	 * 
+	 * @return <code>true</code> if the light is considered to be on, <code>false</code> otherwise.
+	 */
+	public boolean isTurnedOn() {
+		return turnedOn;
+	}
+	
+	/**
+	 * Sets the on/off state associated with the light.
+	 * 
+	 * @param turnedOn Whether the light is considered as on or off.
+	 */
+	public void setTurnedOn(boolean turnedOn) {
+		this.turnedOn = turnedOn;
 	}
 }
