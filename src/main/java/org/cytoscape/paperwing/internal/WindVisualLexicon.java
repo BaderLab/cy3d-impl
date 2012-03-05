@@ -47,10 +47,23 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	public static final VisualProperty<Double> CAMERA_ROLL_ANGLE = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_ROLL_ANGLE", "Camera Roll Angle", CyNetwork.class);
 	
-	public static final VisualProperty<Boolean> SHOW_NODE_LABELS = new BooleanVisualProperty(true, "SHOW_NODE_LABELS", "Show Node Labels", CyNetwork.class);
+	public static final VisualProperty<Boolean> SHOW_NODE_LABELS = new BooleanVisualProperty(
+			true, "SHOW_NODE_LABELS", "Show Node Labels", CyNetwork.class);
 	
-	public static final VisualProperty<Boolean> SHOW_EDGE_LABELS = new BooleanVisualProperty(true, "SHOW_EDGE_LABELS", "Show Edge Labels", CyNetwork.class);
-		
+	public static final VisualProperty<Boolean> SHOW_EDGE_LABELS = new BooleanVisualProperty(
+			true, "SHOW_EDGE_LABELS", "Show Edge Labels", CyNetwork.class);
+	
+	public static final VisualProperty<Double> LIGHT_X_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_X_LOCATION", "Light X Location", CyNetwork.class);
+	
+	public static final VisualProperty<Double> LIGHT_Y_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Y_LOCATION", "Light Y Location", CyNetwork.class);
+	
+	public static final VisualProperty<Double> LIGHT_Z_LOCATION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Z_LOCATION", "Light Z Location", CyNetwork.class);
+	
+	public static final VisualProperty<Boolean> LIGHT_ENABLED = new BooleanVisualProperty(
+			true, "LIGHT_ENABLED", "Light Enablede", CyNetwork.class);
 	
 	/** Create a new WindVisualLexicon object */
 	public WindVisualLexicon() {
