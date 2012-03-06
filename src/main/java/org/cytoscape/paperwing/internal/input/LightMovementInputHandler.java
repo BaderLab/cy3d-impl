@@ -4,6 +4,7 @@ import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.data.LightingData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.lighting.Light;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
@@ -40,32 +41,40 @@ public class LightMovementInputHandler implements InputHandler {
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		// Currently attempts to move only the light at index 0
-		float[] lightPosition = lightingData.getLight(0).getPosition();
-		Vector3 lightCurrentPosition = new Vector3(lightPosition[0], lightPosition[1], lightPosition[2]);
+		Light light = lightingData.getLight(0);
 		
-		lightCurrentPosition.divideLocal(lightPosition[3]); // Since lightPosition contains homogenous coordinates, perform division
+		float[] lightPosition = light.getPosition();
+		Vector3 currentLightPosition = new Vector3(lightPosition[0], lightPosition[1], lightPosition[2]);
+		
+		currentLightPosition.divideLocal(lightPosition[3]); // Since lightPosition contains homogenous coordinates, perform division
 		
 		double mouseProjectionDistance = GeometryToolkit.findOrthogonalDistance(
-				camera.getPosition(), lightCurrentPosition, camera.getDirection());
+				camera.getPosition(), currentLightPosition, camera.getDirection());
 		
 		// Capture mouse position
-		if (mouse.getPressed().contains(MouseEvent.BUTTON2)) {
+		if (mouse.getPressed().contains(MouseEvent.BUTTON3)) {
 			
-			previousMouseProjection.set(
+			currentMouseProjection.set(
 					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, mouseProjectionDistance));
 		}
 		
 		// Capture new mouse position and use displacement to move lights
 		if (mouse.hasMoved() 
-				&& mouse.getHeld().contains(MouseEvent.BUTTON2)
-				&& keys.getHeld().contains(KeyEvent.VK_SHIFT)) {
+				&& mouse.getHeld().contains(MouseEvent.BUTTON3)
+				&& keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 			
+			previousMouseProjection.set(currentMouseProjection);
 			currentMouseProjection.set(
 					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, mouseProjectionDistance));
 			
 			Vector3 displacement = currentMouseProjection.subtract(previousMouseProjection);
 			
+			Vector3 newLightPosition = currentLightPosition.plus(displacement);
 			
+			light.setPosition((float) newLightPosition.x(), 
+					(float) newLightPosition.y(), 
+					(float) newLightPosition.z(), 
+					1.0f);
 		}
 	}
 }

@@ -5,7 +5,9 @@ import java.awt.Paint;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.ContinuousRange;
 import org.cytoscape.view.model.NullDataType;
+import org.cytoscape.view.model.Range;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BooleanVisualProperty;
 import org.cytoscape.view.presentation.property.DoubleVisualProperty;
@@ -16,6 +18,10 @@ import org.cytoscape.view.presentation.property.PaintVisualProperty;
 /** The visual lexicon for the Wind rendering engines */
 public class WindVisualLexicon extends BasicVisualLexicon {
 
+	/** A range from 0.0 to 1.0; useful for values such as color */
+	protected static final Range<Double> ZERO_TO_ONE_DOUBLE_RANGE = new ContinuousRange<Double>(
+			Double.class, 0.0, 1.0, true, true);
+	
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> WIND_ROOT = new NullVisualProperty(
 			"WIND_ROOT_VISUAL_PROPERTY",
@@ -76,19 +82,19 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_AMBIENT_COLOR", "Light Ambient Color", CyNetwork.class);
 
 	public static final VisualProperty<Double> LIGHT_AMBIENT_ALPHA = new DoubleVisualProperty(
-			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_AMBIENT_ALPHA", "Light Ambient Alpha", CyNetwork.class);
+			0.0, ZERO_TO_ONE_DOUBLE_RANGE, "LIGHT_AMBIENT_ALPHA", "Light Ambient Alpha", CyNetwork.class);
 	
 	public static final VisualProperty<Paint> LIGHT_DIFFUSE_COLOR = new PaintVisualProperty(
 			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_DIFFUSE_COLOR", "Light Diffuse Color", CyNetwork.class);
 
 	public static final VisualProperty<Double> LIGHT_DIFFUSE_ALPHA = new DoubleVisualProperty(
-			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_DIFFUSE_ALPHA", "Light Diffuse Alpha", CyNetwork.class);
+			0.0, ZERO_TO_ONE_DOUBLE_RANGE, "LIGHT_DIFFUSE_ALPHA", "Light Diffuse Alpha", CyNetwork.class);
 	
 	public static final VisualProperty<Paint> LIGHT_SPECULAR_COLOR = new PaintVisualProperty(
 			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_SPECULAR_COLOR", "Light Specular Color", CyNetwork.class);
 
 	public static final VisualProperty<Double> LIGHT_SPECULAR_ALPHA = new DoubleVisualProperty(
-			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_SPECULAR_ALPHA", "Light Specular Alpha", CyNetwork.class);
+			0.0, ZERO_TO_ONE_DOUBLE_RANGE, "LIGHT_SPECULAR_ALPHA", "Light Specular Alpha", CyNetwork.class);
 	
 	
 	/** Create a new WindVisualLexicon object */
@@ -105,6 +111,19 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		
 		addVisualProperty(SHOW_NODE_LABELS, NETWORK);
 		addVisualProperty(SHOW_EDGE_LABELS, NETWORK);
+		
+		// Add light-related visual properties
+		addVisualProperty(LIGHT_X_LOCATION, NETWORK);
+		addVisualProperty(LIGHT_Y_LOCATION, NETWORK);
+		addVisualProperty(LIGHT_Z_LOCATION, NETWORK);
+		addVisualProperty(LIGHT_ENABLED, NETWORK);
+		
+		addVisualProperty(LIGHT_AMBIENT_COLOR, NETWORK);
+		addVisualProperty(LIGHT_AMBIENT_ALPHA, NETWORK);
+		addVisualProperty(LIGHT_DIFFUSE_COLOR, NETWORK);
+		addVisualProperty(LIGHT_DIFFUSE_ALPHA, NETWORK);
+		addVisualProperty(LIGHT_SPECULAR_COLOR, NETWORK);
+		addVisualProperty(LIGHT_SPECULAR_ALPHA, NETWORK);
 		
 		createLookupMap();
 	}
@@ -124,5 +143,18 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		
 		addIdentifierMapping(CyNetwork.class, "showNodeLabels", SHOW_NODE_LABELS);
 		addIdentifierMapping(CyNetwork.class, "showEdgeLabels", SHOW_EDGE_LABELS);
+		
+		// Add lighting-related lookup maps
+		addIdentifierMapping(CyNetwork.class, "lightX", LIGHT_X_LOCATION);
+		addIdentifierMapping(CyNetwork.class, "lightY", LIGHT_Y_LOCATION);
+		addIdentifierMapping(CyNetwork.class, "lightZ", LIGHT_Z_LOCATION);
+		addIdentifierMapping(CyNetwork.class, "lightEnabled", LIGHT_ENABLED);
+		
+		addIdentifierMapping(CyNetwork.class, "lightAmbientColor", LIGHT_AMBIENT_COLOR);
+		addIdentifierMapping(CyNetwork.class, "lightAmbientAlpha", LIGHT_AMBIENT_ALPHA);
+		addIdentifierMapping(CyNetwork.class, "lightDiffuseColor", LIGHT_DIFFUSE_COLOR);
+		addIdentifierMapping(CyNetwork.class, "lightDiffuseAlpha", LIGHT_DIFFUSE_ALPHA);
+		addIdentifierMapping(CyNetwork.class, "lightSpecularColor", LIGHT_SPECULAR_COLOR);
+		addIdentifierMapping(CyNetwork.class, "lightSpecularAlpha", LIGHT_SPECULAR_ALPHA);
 	}
 }
