@@ -25,6 +25,7 @@ import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
+import org.cytoscape.paperwing.internal.lighting.LightingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
@@ -66,6 +67,11 @@ public class Graphics implements GLEventListener {
 	private CoordinatorProcessor coordinatorProcessor;
 	private CytoscapeDataProcessor cytoscapeDataProcessor;
 	
+	/**
+	 * The {@link LightingProcessor} object responsible for setting up and maintaining lighting
+	 */
+	private LightingProcessor lightingProcessor;
+	
 	private GraphicsHandler handler;
 	
 	/** Create a new Graphics object
@@ -101,6 +107,7 @@ public class Graphics implements GLEventListener {
 		inputProcessor = handler.getInputProcessor();
 		
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
+		lightingProcessor = handler.getLightingProcessor();
 	}
 	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
@@ -152,6 +159,9 @@ public class Graphics implements GLEventListener {
 		
 		// Process Cytoscape data
 		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
+		
+		// Update lighting
+		lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
 		
 		// Draw the scene
 		handler.drawScene(graphicsData);
@@ -211,6 +221,8 @@ public class Graphics implements GLEventListener {
 		gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global));
 		gl.glShadeModel(GL2.GL_SMOOTH);
 
+		/*
+		
 		float[] ambient = { 0.4f, 0.4f, 0.4f, 1.0f };
 		float[] diffuse = { 0.57f, 0.57f, 0.57f, 1.0f };
 		float[] specular = { 0.79f, 0.79f, 0.79f, 1.0f };
@@ -228,6 +240,8 @@ public class Graphics implements GLEventListener {
 
 		gl.glEnable(GL2.GL_LIGHT0);
 
+		*/
+
 		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
 		
@@ -243,6 +257,8 @@ public class Graphics implements GLEventListener {
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
 		
 		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
+		
+		lightingProcessor.setupLighting(gl, graphicsData.getLightingData());
 	}
 
 	@Override

@@ -17,6 +17,8 @@ import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
+import org.cytoscape.paperwing.internal.lighting.DefaultLightingProcessor;
+import org.cytoscape.paperwing.internal.lighting.LightingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
@@ -143,6 +145,11 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 
 			}
 		};
+	}
+	
+	@Override
+	public LightingProcessor getLightingProcessor() {
+		return new DefaultLightingProcessor();
 	}
 
 	@Override

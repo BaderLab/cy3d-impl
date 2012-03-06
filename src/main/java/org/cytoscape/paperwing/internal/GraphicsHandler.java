@@ -8,6 +8,7 @@ import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
+import org.cytoscape.paperwing.internal.lighting.LightingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.view.model.CyNetworkView;
@@ -69,7 +70,7 @@ public interface GraphicsHandler {
 	public CoordinatorProcessor getCoordinatorProcessor();
 	
 	/**
-	 * Return an intance of a {@link CytoscapeDataProcessor}, which is responsible for
+	 * Return an instance of a {@link CytoscapeDataProcessor}, which is responsible for
 	 * transferring data to and from Cytoscape's data objects, such as {@link CyTable}.
 	 * This could be used to update a value from a {@link CyTable}, or retrieve a value
 	 * from a {@link CyTable}.
@@ -80,6 +81,14 @@ public interface GraphicsHandler {
 	 */
 	public CytoscapeDataProcessor getCytoscapeDataProcessor();
 	
+	/**
+	 * Return an instance of a {@link LightingProcessor} that is responsible for setting
+	 * up and maintaining scene lighting.
+	 * 
+	 * @return A {@link LightingProcessor} object responsible for setting up and updating
+	 * the scene lighting as necessary.
+	 */
+	public LightingProcessor getLightingProcessor();
 	
 	/**
 	 * This method should be called before the first frame of rendering. It will initialize

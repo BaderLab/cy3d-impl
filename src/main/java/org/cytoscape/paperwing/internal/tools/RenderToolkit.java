@@ -3,7 +3,9 @@ package org.cytoscape.paperwing.internal.tools;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
+import org.cytoscape.paperwing.internal.data.LightingData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
+import org.cytoscape.paperwing.internal.lighting.Light;
 
 public class RenderToolkit {
 

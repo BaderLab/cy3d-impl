@@ -18,7 +18,9 @@ import org.cytoscape.paperwing.internal.data.LightingData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
+import org.cytoscape.paperwing.internal.lighting.DefaultLightingProcessor;
 import org.cytoscape.paperwing.internal.lighting.Light;
+import org.cytoscape.paperwing.internal.lighting.LightingProcessor;
 import org.cytoscape.paperwing.internal.picking.DefaultShapePickingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
@@ -46,7 +48,6 @@ public class MainGraphicsHandler implements GraphicsHandler {
 	 * rendering routines, that this {@link GraphicsHandler} uses.
 	 */
 	private List<ReadOnlyGraphicsProcedure> renderProcedures;
-	
 	
 	public MainGraphicsHandler() {
 		renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
@@ -139,10 +140,17 @@ public class MainGraphicsHandler implements GraphicsHandler {
 	}
 	
 	@Override
+	public LightingProcessor getLightingProcessor() {
+		return new DefaultLightingProcessor();
+	}
+	
+	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {
 		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.initialize(graphicsData);
 		}
 	}
+
+
 	
 }

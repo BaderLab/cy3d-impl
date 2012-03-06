@@ -23,6 +23,15 @@ public class LightingData {
 	}
 	
 	/**
+	 * Obtain all the currently stored lights.
+	 * 
+	 * @return All the currently stored lights.
+	 */
+	public Light[] getLights() {
+		return lights;
+	}
+	
+	/**
 	 * Create a default {@link LightingData} object with default lights, all turned off.
 	 */
 	public LightingData() {

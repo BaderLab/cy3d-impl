@@ -105,6 +105,7 @@ public class GraphicsData {
 		selectionData = new GraphicsSelectionData();
 		coordinatorData = new CoordinatorData();
 		pickingData = new PickingData();
+		lightingData = new LightingData();
 		
 		camera = new SimpleCamera();
 		viewingVolume = new ViewingVolume();
