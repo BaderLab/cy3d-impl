@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.data;
 
+import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.lighting.Light;
 
 /**
@@ -12,6 +13,32 @@ public class LightingData {
 	
 	/** The array of lights present in the scene */
 	private Light[] lights;
+	
+	/** The previous projected position of lights used for drag-moving lights */
+	private Vector3[] lightPreviousProjections;
+	
+	/** The current projected position of lights used for drag-moving lights */
+	private Vector3[] lightCurrentProjections;
+
+	/** The projected distance of a light 
+	
+	/**
+	 * Create a default {@link LightingData} object with default lights, all turned off.
+	 */
+	public LightingData() {
+		lights = new Light[NUM_LIGHTS];
+		
+		lightPreviousProjections = new Vector3[NUM_LIGHTS];
+		lightCurrentProjections = new Vector3[NUM_LIGHTS];
+		
+		for (int i = 0; i < NUM_LIGHTS; i++) {
+			lights[i] = new Light();
+			
+			lightPreviousProjections[i] = new Vector3();
+			lightCurrentProjections[i] = new Vector3();
+		}
+		
+	}
 	
 	/** 
 	 * Obtain the light with the given index 
@@ -31,13 +58,7 @@ public class LightingData {
 		return lights;
 	}
 	
-	/**
-	 * Create a default {@link LightingData} object with default lights, all turned off.
-	 */
-	public LightingData() {
-		lights = new Light[NUM_LIGHTS];
-		for (int i = 0; i < NUM_LIGHTS; i++) {
-			lights[i] = new Light();
-		}
-	}
+	
+	
+	
 }
