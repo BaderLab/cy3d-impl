@@ -253,4 +253,12 @@ public class GraphicsData {
 	public void setViewingVolume(ViewingVolume viewingVolume) {
 		this.viewingVolume = viewingVolume;
 	}
+
+	public LightingData getLightingData() {
+		return lightingData;
+	}
+
+	public void setLightingData(LightingData lightingData) {
+		this.lightingData = lightingData;
+	}
 }

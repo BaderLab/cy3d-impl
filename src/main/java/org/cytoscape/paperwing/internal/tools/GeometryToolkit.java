@@ -221,22 +221,22 @@ public class GeometryToolkit {
 	 * This method assumes the Z-X-Y convention, that is, the first rotation is done with respect
 	 * to the Z-axis and the last rotation is done with respect to the Y-axis.
 	 * 
-	 * @param yaw The yaw angle
-	 * @param pitch The pitch angle
-	 * @param roll The roll angle
+	 * @param yaw The yaw angle, in degrees
+	 * @param pitch The pitch angle, in degrees
+	 * @param roll The roll angle, in degrees
 	 * @return The unit direction vector corresponding to the given yaw and pitch angles.
 	 */
 	public static Vector3 findDirectionVector(double yaw, double pitch, double roll) {
-		Vector3 direction = new Vector3(0, 0, -1);
 		
-		direction = direction.rotate(new Vector3(0, 0, 1), roll);
+		Vector3 newAxisX = (new Vector3(1, 0, 0).rotate(new Vector3(0, 0, 1), Math.toRadians(roll)));
+		Vector3 newAxisY = (new Vector3(0, 1, 0).rotate(new Vector3(0, 0, 1), Math.toRadians(roll)));
 		
-		Vector3 newAxisX = (new Vector3(1, 0, 0)).rotate(new Vector3(0, 1, 0), yaw);
+		newAxisY = newAxisY.rotate(newAxisX, Math.toRadians(pitch));
+		newAxisX = newAxisX.rotate(newAxisY, Math.toRadians(yaw));
 		
-		// Rotate about its new x-axis for pitch
-		direction = direction.rotate(newAxisX, pitch);
+		Vector3 newAxisZ = newAxisX.cross(newAxisY);
 		
-		return direction.normalize();
+		return newAxisZ.invert().normalize();
 	}
 	
 	// Older method; rotates about axes in order Y-X-Z
@@ -259,8 +259,8 @@ public class GeometryToolkit {
 	 * up vector would be given the yaw, pitch, and roll angles. The rotations are done by
 	 * the right-hand rule.
 	 * 
-	 * This method assumes the Z-X-Y convention, that is, the first rotation is done with respect
-	 * to the Z-axis and the last rotation is done with respect to the Y-axis.
+	 * This method assumes the Z-Y-X convention, that is, the first rotation is done with respect
+	 * to the Z-axis and the last rotation is done with respect to the X-axis.
 	 * 
 	 * @param yaw The yaw angle
 	 * @param pitch The pitch angle
@@ -270,13 +270,23 @@ public class GeometryToolkit {
 	public static Vector3 findUpVector(double yaw, double pitch, double roll) {
 
 		// Determine the rotated axes
-		Vector3 newAxisX = (new Vector3(1, 0, 0)).rotate(new Vector3(0, 1, 0), yaw);
-		Vector3 newAxisY = (new Vector3(0, 1, 0)).rotate(newAxisX, pitch);
+		// Vector3 newAxisY = (new Vector3(0, 1, 0)).rotate(new Vector3(0, 0, 1), roll);
+		// Vector3 newAxisX = (new Vector3(0, 1, 0)).rotate(new Vector3(0, 0, 1), roll);
+		
+		// rotate by z, change x and y
+		// rotate by new x, y is in final position
+		// rotate by new y, x is in final position
+		// obtain z in final position (cross product)
+		
+		Vector3 newAxisX = (new Vector3(1, 0, 0).rotate(new Vector3(0, 0, 1), Math.toRadians(roll)));
+		Vector3 newAxisY = (new Vector3(0, 1, 0).rotate(new Vector3(0, 0, 1), Math.toRadians(roll)));
+		
+		newAxisY = newAxisY.rotate(newAxisX, Math.toRadians(pitch));
+		newAxisX = newAxisX.rotate(newAxisY, Math.toRadians(yaw));
+		
 		Vector3 newAxisZ = newAxisX.cross(newAxisY);
 		
-		Vector3 up = newAxisY.rotate(newAxisZ, roll);
-		
-		return up.normalize();
+		return newAxisY.normalize();
 	}
 	
 	// Older method; rotates about axes in order Y-X-Z
@@ -297,8 +307,8 @@ public class GeometryToolkit {
 	 * the initial direction is towards the negative z direction and the initial up vector
 	 * is towards the positive y direction.
 	 * 
-	 * This method assumes the Z-X-Y convention, that is, the first rotation is done with respect
-	 * to the Z-axis and the last rotation is done with respect to the Y-axis.
+	 * This method assumes the Z-Y-X convention, that is, the first rotation is done with respect
+	 * to the Z-axis and the last rotation is done with respect to the X-axis.
 	 * 
 	 * @param direction The direction vector
 	 * @param up The up vector
@@ -312,16 +322,16 @@ public class GeometryToolkit {
 		Vector3 newAxisX = newAxisY.cross(newAxisZ);
 		
 		// Calculate the vector representing the line of nodes for the Tait-Bryan convention
-		Vector3 lineOfNodes = (newAxisY).cross(new Vector3(0, 0, 1));
+		Vector3 lineOfNodes = (new Vector3(0, 0, 1)).cross(newAxisX);
 		
-		// This vector is perpendicular to the line of nodes and the fixed z axis
-		Vector3 intermediateY = lineOfNodes.rotate(new Vector3(0, 0, 1), Math.PI / 2);
+		// This vector is perpendicular to the line of nodes
+		Vector3 lineOfNodesPerpendicular = lineOfNodes.rotate(new Vector3(0, 0, 1), -Math.PI / 2);
 		
 		double yaw, pitch, roll;
 		
-		yaw = newAxisX.angle(lineOfNodes);
-		pitch = newAxisY.angle(intermediateY);
-		roll = (new Vector3(0, 1, 0)).angle(intermediateY);
+		yaw = newAxisX.angle(lineOfNodesPerpendicular);
+		pitch = newAxisY.angle(lineOfNodes);		
+		roll = (new Vector3(0, 1, 0)).angle(lineOfNodes);
 		
 		Vector3 result = new Vector3(yaw, pitch, roll);
 		result.multiplyLocal(180.0 / Math.PI);

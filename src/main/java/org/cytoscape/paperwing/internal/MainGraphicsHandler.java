@@ -1,9 +1,12 @@
 package org.cytoscape.paperwing.internal;
 
+import java.nio.FloatBuffer;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.media.opengl.GL2;
 
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
@@ -11,8 +14,11 @@ import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.data.LightingData;
+import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
 import org.cytoscape.paperwing.internal.input.MainInputProcessor;
+import org.cytoscape.paperwing.internal.lighting.Light;
 import org.cytoscape.paperwing.internal.picking.DefaultShapePickingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
 import org.cytoscape.paperwing.internal.rendering.PositionCameraProcedure;
@@ -66,13 +72,6 @@ public class MainGraphicsHandler implements GraphicsHandler {
 	@Override
 	public void drawScene(GraphicsData graphicsData) {
 		
-		// TODO: Seems we had to move this to the draw method to prevent a crash involving a native library
-		// and the VizMapper preview. The cause was likely due to the TextRenderer class being initialized
-		// too early.
-		if (graphicsData.getFramesElapsed() == 1) {
-			
-		}
-		
 		// Control light positioning
 		float[] lightPosition = { -4.0f, 4.0f, 6.0f, 1.0f };
 		
@@ -87,8 +86,29 @@ public class MainGraphicsHandler implements GraphicsHandler {
 
 	@Override
 	public void setupLighting(GraphicsData graphicsData) {
-		// TODO Auto-generated method stub
 		
+		GL2 gl = graphicsData.getGlContext();
+		LightingData lightingData = graphicsData.getLightingData();
+	
+		Light light0 = lightingData.getLight(0);
+		light0.setAmbient(0.4f, 0.4f, 0.4f, 1.0f);
+		light0.setDiffuse(0.57f, 0.57f, 0.57f, 1.0f);
+		light0.setSpecular(0.79f, 0.79f, 0.79f, 1.0f);
+		light0.setPosition(-4.0f, 4.0f, 6.0f, 1.0f);
+		light0.setTurnedOn(true);
+		
+		for (int i = 0; i < LightingData.NUM_LIGHTS; i++) {
+			Light light = lightingData.getLight(i);
+		
+			if (light.isTurnedOn()) {
+				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, FloatBuffer.wrap(light.getAmbient()));
+				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, FloatBuffer.wrap(light.getDiffuse()));
+				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, FloatBuffer.wrap(light.getSpecular()));
+				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, FloatBuffer.wrap(light.getPosition()));
+	
+				gl.glEnable(GL2.GL_LIGHT0 + i);
+			}
+		}
 	}
 
 	@Override

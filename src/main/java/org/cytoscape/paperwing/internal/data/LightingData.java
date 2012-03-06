@@ -8,12 +8,16 @@ import org.cytoscape.paperwing.internal.lighting.Light;
 public class LightingData {
 	
 	/** The total number of lights. OpenGL specifies 8 as the minimum number of lights supported by hardware. */
-	private static int NUM_LIGHTS = 8;
+	public static final int NUM_LIGHTS = 8;
 	
 	/** The array of lights present in the scene */
 	private Light[] lights;
 	
-	/** Obtain the light with the given index */
+	/** 
+	 * Obtain the light with the given index 
+	 * 
+	 * @param index The index of the desired light, ranging from 0 to LightingData.NUM_LIGHTS (default 8)
+	 */
 	public Light getLight(int index) {
 		return lights[index];
 	}

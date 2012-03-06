@@ -30,7 +30,7 @@ public class CameraInputHandler implements InputHandler {
 		
 		processResetCamera(held, graphicsData);
 		
-		processDebugAngles(pressed, camera);
+		processDebugAngles(held, camera);
 	}
 	
 	private void processCameraZoom(MouseMonitor mouse, GraphicsData graphicsData) {
@@ -155,21 +155,21 @@ public class CameraInputHandler implements InputHandler {
 		}
 	}
 	
-	private void processDebugAngles(Set<Integer> pressed, SimpleCamera camera) {
+	private void processDebugAngles(Set<Integer> held, SimpleCamera camera) {
 		
-		if (pressed.contains(KeyEvent.VK_V)) {
+		if (held.contains(KeyEvent.VK_V)) {
 			System.out.println("Camera direction and up vectors: " + camera.getDirection()
 					+ ", " + camera.getUp());
 			
 			Vector3 angles = GeometryToolkit.findYawPitchRoll(camera.getDirection(), camera.getUp());
 			System.out.println("Camera yaw, pitch, roll: " + angles);
-			
-			/*
-			Vector3 direction = GeometryToolkit.findDirectionVector(angles.x(), angles.y());
+		
+			Vector3 direction = GeometryToolkit.findDirectionVector(angles.x(), angles.y(), angles.z());
 			Vector3 up = GeometryToolkit.findUpVector(angles.x(), angles.y(), angles.z());
 			
-			System.out.println("Camera direction and up calculated from Euler angles: " + direction + ", " + up);
-			*/
+			System.out.println("Camera direction and up calculated from angles: " + direction + ", " + up);
+			
+			System.out.println("Differences: " + (direction.subtract(camera.getDirection()).magnitudeSquared() + up.subtract(camera.getUp()).magnitudeSquared()));
 		}
 	}
 }

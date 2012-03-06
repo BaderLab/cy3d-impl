@@ -131,8 +131,13 @@ public class Graphics implements GLEventListener {
 		
 		// Re-calculate the viewing volume
 		SimpleCamera camera = graphicsData.getCamera();
-		graphicsData.getViewingVolume().calculateViewingVolume(camera.getPosition(), camera.getDirection(), camera.getUp(), 
-				graphicsData.getNearZ(), graphicsData.getFarZ(), graphicsData.getVerticalFov(), 
+		graphicsData.getViewingVolume().calculateViewingVolume(
+				camera.getPosition(), 
+				camera.getDirection(), 
+				camera.getUp(), 
+				graphicsData.getNearZ(), 
+				graphicsData.getFarZ(), 
+				graphicsData.getVerticalFov(), 
 				GeometryToolkit.findHorizontalFieldOfView(graphicsData.getDistanceScale(), 
 						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
 		
@@ -235,7 +240,7 @@ public class Graphics implements GLEventListener {
 		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
-		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 21); // Default shininess 31
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
 		
 		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
 	}

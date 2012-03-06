@@ -1,5 +1,8 @@
 package org.cytoscape.paperwing.internal;
 
+import java.awt.Color;
+import java.awt.Paint;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.NullDataType;
@@ -8,6 +11,7 @@ import org.cytoscape.view.presentation.property.BooleanVisualProperty;
 import org.cytoscape.view.presentation.property.DoubleVisualProperty;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.PaintVisualProperty;
 
 /** The visual lexicon for the Wind rendering engines */
 public class WindVisualLexicon extends BasicVisualLexicon {
@@ -53,6 +57,9 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	public static final VisualProperty<Boolean> SHOW_EDGE_LABELS = new BooleanVisualProperty(
 			true, "SHOW_EDGE_LABELS", "Show Edge Labels", CyNetwork.class);
 	
+	// Light visual properties
+	// =======================
+	
 	public static final VisualProperty<Double> LIGHT_X_LOCATION = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_X_LOCATION", "Light X Location", CyNetwork.class);
 	
@@ -63,7 +70,26 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Z_LOCATION", "Light Z Location", CyNetwork.class);
 	
 	public static final VisualProperty<Boolean> LIGHT_ENABLED = new BooleanVisualProperty(
-			true, "LIGHT_ENABLED", "Light Enablede", CyNetwork.class);
+			true, "LIGHT_ENABLED", "Light Enabled", CyNetwork.class);
+	
+	public static final VisualProperty<Paint> LIGHT_AMBIENT_COLOR = new PaintVisualProperty(
+			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_AMBIENT_COLOR", "Light Ambient Color", CyNetwork.class);
+
+	public static final VisualProperty<Double> LIGHT_AMBIENT_ALPHA = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_AMBIENT_ALPHA", "Light Ambient Alpha", CyNetwork.class);
+	
+	public static final VisualProperty<Paint> LIGHT_DIFFUSE_COLOR = new PaintVisualProperty(
+			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_DIFFUSE_COLOR", "Light Diffuse Color", CyNetwork.class);
+
+	public static final VisualProperty<Double> LIGHT_DIFFUSE_ALPHA = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_DIFFUSE_ALPHA", "Light Diffuse Alpha", CyNetwork.class);
+	
+	public static final VisualProperty<Paint> LIGHT_SPECULAR_COLOR = new PaintVisualProperty(
+			new Color(255, 255, 255), PAINT_RANGE, "LIGHT_SPECULAR_COLOR", "Light Specular Color", CyNetwork.class);
+
+	public static final VisualProperty<Double> LIGHT_SPECULAR_ALPHA = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_SPECULAR_ALPHA", "Light Specular Alpha", CyNetwork.class);
+	
 	
 	/** Create a new WindVisualLexicon object */
 	public WindVisualLexicon() {

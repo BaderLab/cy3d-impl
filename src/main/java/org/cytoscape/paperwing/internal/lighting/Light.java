@@ -22,8 +22,8 @@ public class Light {
 	/** An array containing the color of the specular component of the light in RGBA format */
 	private float[] specular;
 	
-	/** The position of the light in 3D space */
-	private Vector3 position;
+	/** An array containing the position of the lights in homogenous coordinates, format (x, y, z, w) */
+	private float[] position;
 	
 	/** A boolean indicating whether the light is turned on. */
 	private boolean turnedOn;
@@ -32,22 +32,24 @@ public class Light {
 	 * Creates a light with its position at the origin and white values for all colors
 	 */
 	public Light() {
-		position = new Vector3();
 		turnedOn = false;
 		
 		ambient = new float[4]; 
 		diffuse = new float[4];
 		specular = new float[4];
+		position = new float[4];
 		
 		for (int i = 0; i < 3; i++) {
 			ambient[i] = DEFAULT_COLOR_VALUE;
 		    diffuse[i] = DEFAULT_COLOR_VALUE;
 			specular[i] = DEFAULT_COLOR_VALUE;
+			position[i] = 0;
 		}
 		
 		ambient[3] = DEFAULT_ALPHA_VALUE;
 	    diffuse[3] = DEFAULT_ALPHA_VALUE;
 		specular[3] = DEFAULT_ALPHA_VALUE;
+		position[3] = 1;
 	}
 	
 	/**
@@ -56,9 +58,9 @@ public class Light {
 	 * @param ambient An array containing the color and alpha of the ambient light component, in the form (r, g, b, a)
 	 * @param diffuse An array containing the color and alpha of the diffuse light component, in the form (r, g, b, a)
 	 * @param specular An array containing the color and alpha of the specular light component, in the form (r, g, b, a)
-	 * @param position The position of the light
+	 * @param position An array containing the position of the light in homogenous coordinates, in the form (x, y, z, w)
 	 */
-	public Light(float[] ambient, float[] diffuse, float[] specular, Vector3 position) {
+	public Light(float[] ambient, float[] diffuse, float[] specular, float[] position) {
 		// Require 4 parameters for ambient, diffuse, and specular lighting
 		if (ambient.length < 4) {
 			throw new IllegalArgumentException("Array for light ambient property has less than 4 elements.");
@@ -72,18 +74,23 @@ public class Light {
 			throw new IllegalArgumentException("Array for light specular property has less than 4 elements.");
 		}
 		
-		this.position = new Vector3(position);
+		if (position.length < 4) {
+			throw new IllegalArgumentException("Array containing light position in homogenous coordinates has less than 4 elements.");
+		}
+
 		turnedOn = false;
 		
 		this.ambient = new float[4]; 
 		this.diffuse = new float[4];
 		this.specular = new float[4];
+		this.position = new float[4];
 		
 		// Copy light properties
 		for (int i = 0; i < 4; i++) {
 			this.ambient[i] = ambient[i];
 			this.diffuse[i] = diffuse[i];
 			this.specular[i] = specular[i];
+			this.position[i] = position[i];
 		}
 	}
 	
@@ -119,7 +126,7 @@ public class Light {
 	 * 
 	 * @return A {@link Vector3} containing the 3D coordinates of the light.
 	 */
-	public Vector3 getPosition() {
+	public float[] getPosition() {
 		return position;
 	}
 	
@@ -173,8 +180,11 @@ public class Light {
 	 * 
 	 * @param position The new position represented by a {@link Vector3} object.
 	 */
-	public void setPosition(Vector3 position) {
-		this.position.set(position);
+	public void setPosition(float x, float y, float z, float w) {
+		position[0] = x;
+		position[1] = y;
+		position[2] = z;
+		position[3] = w;
 	}
 	
 	/**
