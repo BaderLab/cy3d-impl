@@ -9,6 +9,7 @@ import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.processing.BirdsEyeCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
@@ -135,16 +136,7 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 	@Override
 	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
 		
-		// Return a CytoscapeDataProcessor that does not do any processing,
-		// because the bird's eye rendering object will not need to access Cytoscape
-		// data.
-		return new CytoscapeDataProcessor() {
-
-			@Override
-			public void processCytoscapeData(GraphicsData graphicsData) {
-
-			}
-		};
+		return new BirdsEyeCytoscapeDataProcessor();
 	}
 	
 	@Override
