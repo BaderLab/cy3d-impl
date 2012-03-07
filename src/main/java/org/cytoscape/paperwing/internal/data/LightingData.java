@@ -14,36 +14,29 @@ public class LightingData {
 	/** The array of lights present in the scene */
 	private Light[] lights;
 	
-	/** The previous projected position of lights used for drag-moving lights */
-	private Vector3[] lightPreviousProjections;
-	
-	/** The current projected position of lights used for drag-moving lights */
-	private Vector3[] lightCurrentProjections;
-
-	/** The projected distance of a light 
+	/**
+	 * An array of booleans that indicates whether a representation of a light should be drawn to show its position
+	 */
+	private boolean[] displayLight;
 	
 	/**
 	 * Create a default {@link LightingData} object with default lights, all turned off.
 	 */
 	public LightingData() {
 		lights = new Light[NUM_LIGHTS];
-		
-		lightPreviousProjections = new Vector3[NUM_LIGHTS];
-		lightCurrentProjections = new Vector3[NUM_LIGHTS];
+		displayLight = new boolean[NUM_LIGHTS];
 		
 		for (int i = 0; i < NUM_LIGHTS; i++) {
 			lights[i] = new Light();
-			
-			lightPreviousProjections[i] = new Vector3();
-			lightCurrentProjections[i] = new Vector3();
+			displayLight[i] = false;
 		}
-		
 	}
 	
 	/** 
 	 * Obtain the light with the given index 
 	 * 
 	 * @param index The index of the desired light, ranging from 0 to LightingData.NUM_LIGHTS (default 8)
+	 * @return The {@link Light} object representing the desired light.
 	 */
 	public Light getLight(int index) {
 		return lights[index];
@@ -58,7 +51,14 @@ public class LightingData {
 		return lights;
 	}
 	
-	
-	
+	/**
+	 * Check if a representation of the given light should be drawn to indicate its position.
+	 * 
+	 * @param index The index of the light, ranging from 0 to LightingData.NUM_LIGHTS (default 8)
+	 * @return Whether or not the light at the given index should be drawn.
+	 */
+	public boolean displayLight(int index) {
+		return displayLight[index];
+	}
 	
 }

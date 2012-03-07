@@ -220,7 +220,6 @@ public class Graphics implements GLEventListener {
 		gl.glEnable(GL2.GL_LIGHTING);
 		gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global));
 		gl.glShadeModel(GL2.GL_SMOOTH);
-
 		/*
 		
 		float[] ambient = { 0.4f, 0.4f, 0.4f, 1.0f };

@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.input;
 
+import org.cytoscape.paperwing.internal.WindVisualLexicon;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.data.LightingData;
@@ -8,6 +9,7 @@ import org.cytoscape.paperwing.internal.lighting.Light;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
+import org.cytoscape.view.model.CyNetworkView;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
@@ -75,6 +77,16 @@ public class LightMovementInputHandler implements InputHandler {
 					(float) newLightPosition.y(), 
 					(float) newLightPosition.z(), 
 					1.0f);
+			
+			updateLightVisualProperties(light, graphicsData.getNetworkView());
 		}
+	}
+	
+	private void updateLightVisualProperties(Light light, CyNetworkView networkView) {
+		float[] lightPosition = light.getPosition();
+		
+		networkView.setVisualProperty(WindVisualLexicon.LIGHT_X_LOCATION, (double) lightPosition[0]);
+		networkView.setVisualProperty(WindVisualLexicon.LIGHT_Y_LOCATION, (double) lightPosition[1]);
+		networkView.setVisualProperty(WindVisualLexicon.LIGHT_Z_LOCATION, (double) lightPosition[2]);
 	}
 }
