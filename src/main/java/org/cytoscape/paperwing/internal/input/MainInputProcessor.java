@@ -21,6 +21,7 @@ public class MainInputProcessor implements InputProcessor {
 		inputHandlers.add(new NetworkChangeInputHandler());
 	
 		inputHandlers.add(new LightMovementInputHandler());
+		inputHandlers.add(new ContextMenuInputHandler());
 	}
 	
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,

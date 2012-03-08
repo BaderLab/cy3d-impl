@@ -61,4 +61,13 @@ public class LightingData {
 		return displayLight[index];
 	}
 	
+	/**
+	 * Set whether a light at a given index should be drawn to indicate its position.
+	 * 
+	 * @param index The index of the light, ranging from 0 to LightingData.NUM_LIGHTS (default 8)
+	 * @param display Whether or not a representation of the light should be drawn to indicate its position.
+	 */
+	public void setDisplayLight(int index, boolean display) {
+		displayLight[index] = display;
+	}
 }

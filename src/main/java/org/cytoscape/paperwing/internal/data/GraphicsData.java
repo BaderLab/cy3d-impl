@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.data;
 
+import java.awt.Component;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,6 +67,8 @@ public class GraphicsData {
 	
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean disableHovering;
+	
+	private Component container;
 	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
@@ -261,5 +264,13 @@ public class GraphicsData {
 
 	public void setLightingData(LightingData lightingData) {
 		this.lightingData = lightingData;
+	}
+
+	public void setContainer(Component container) {
+		this.container = container;
+	}
+
+	public Component getContainer() {
+		return container;
 	}
 }

@@ -177,8 +177,6 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		GL2 gl = graphicsData.getGlContext();
 		
-		gl.glDisable(GL2.GL_LIGHTING);
-		
 		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
@@ -266,8 +264,6 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				}
 			}
 		}
-		
-		gl.glEnable(GL2.GL_LIGHTING);
 	}
 	
 	// Picks a color according to the edgeView and passes it to OpenGL

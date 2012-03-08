@@ -123,6 +123,8 @@ public class Graphics implements GLEventListener {
 		
 		component.addKeyListener(keys);
 		component.addFocusListener(keys);
+		
+		graphicsData.setContainer(component);
 	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as

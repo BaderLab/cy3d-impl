@@ -1,5 +1,7 @@
 package org.cytoscape.paperwing.internal.input;
 
+import javax.swing.JPopupMenu;
+
 import org.cytoscape.paperwing.internal.WindVisualLexicon;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
@@ -54,16 +56,16 @@ public class LightMovementInputHandler implements InputHandler {
 				camera.getPosition(), currentLightPosition, camera.getDirection());
 		
 		// Capture mouse position
-		if (mouse.getPressed().contains(MouseEvent.BUTTON3)) {
+		if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 			
 			currentMouseProjection.set(
-					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, mouseProjectionDistance));
+					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, mouseProjectionDistance));			
 		}
 		
 		// Capture new mouse position and use displacement to move lights
 		if (mouse.hasMoved() 
-				&& mouse.getHeld().contains(MouseEvent.BUTTON3)
-				&& keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+				&& mouse.getHeld().contains(MouseEvent.BUTTON1)
+				&& keys.getHeld().contains(KeyEvent.VK_ALT)) {
 			
 			previousMouseProjection.set(currentMouseProjection);
 			currentMouseProjection.set(
@@ -79,7 +81,14 @@ public class LightMovementInputHandler implements InputHandler {
 					1.0f);
 			
 			updateLightVisualProperties(light, graphicsData.getNetworkView());
+			
+			lightingData.setDisplayLight(0, true);
 		}
+		
+		if (mouse.getReleased().contains(MouseEvent.BUTTON1)) {
+			lightingData.setDisplayLight(0, false);
+		}
+		
 	}
 	
 	private void updateLightVisualProperties(Light light, CyNetworkView networkView) {

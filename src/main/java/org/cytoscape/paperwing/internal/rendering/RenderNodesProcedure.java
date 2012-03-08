@@ -64,7 +64,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
 				FloatBuffer.wrap(specularReflection));
-		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 21);
+		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();

@@ -36,15 +36,18 @@ public class RenderLightsProcedure implements ReadOnlyGraphicsProcedure {
 		
 		// Draw the light at index 0
 		Light light = lightingData.getLight(0);
-		float[] lightPosition = light.getPosition();
 		
-		gl.glPushMatrix();
-		gl.glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
-		
-		gl.glColor3f(1.0f, 1.0f, 0.6f);
-		shapeDrawer.drawShape(gl, ShapeType.SHAPE_SPHERE);
-				
-		gl.glPopMatrix();
+		if (lightingData.displayLight(0)) {
+			float[] lightPosition = light.getPosition();
+			
+			gl.glPushMatrix();
+			gl.glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
+			
+			gl.glColor3f(1.0f, 1.0f, 0.6f);
+			shapeDrawer.drawShape(gl, ShapeType.SHAPE_SPHERE);
+					
+			gl.glPopMatrix();
+		}
 	}
 
 }
