@@ -3,14 +3,19 @@ package org.cytoscape.paperwing.internal;
 import java.util.Properties;
 
 import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkViewFactory;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
+import org.cytoscape.task.EdgeViewTaskFactory;
+import org.cytoscape.task.NetworkViewTaskFactory;
+import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.work.TaskFactory;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -75,6 +80,10 @@ public class CyActivator extends AbstractCyActivator {
 				RenderingEngineFactory.class,
 				windBirdsEyeRenderingEngineFactoryProps);
 
-		
+		// Register service to collect references to relevant task factories for the right-click context menu
+		TaskFactoryListener taskFactoryListerner = new TaskFactoryListener();
+		registerServiceListener(bc, taskFactoryListerner, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListerner, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListerner, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
 	}
 }
