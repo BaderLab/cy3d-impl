@@ -43,6 +43,18 @@ public class TaskFactoryListener implements CyListener {
 		// printTaskFactoryDetails(taskFactory, properties);
 	}
 	
+	public Map<NodeViewTaskFactory, Map<String, String>> getNodeViewTaskFactories() {
+		return nodeViewTaskFactories;
+	}
+	
+	public Map<EdgeViewTaskFactory, Map<String, String>> getEdgeViewTaskFactories() {
+		return edgeViewTaskFactories;
+	}
+	
+	public Map<NetworkViewTaskFactory, Map<String, String>> getNetworkViewTaskFactories() {
+		return networkViewTaskFactories;
+	}
+	
 	public void removeNodeViewTaskFactory(NodeViewTaskFactory taskFactory, Map<String, String> properties) {
 		nodeViewTaskFactories.put(taskFactory, properties);
 	}

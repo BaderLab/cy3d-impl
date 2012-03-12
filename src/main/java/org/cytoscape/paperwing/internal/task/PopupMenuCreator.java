@@ -1,6 +1,8 @@
 package org.cytoscape.paperwing.internal.task;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JPopupMenu;
 
@@ -18,21 +20,24 @@ public class PopupMenuCreator {
 
 	public void createNodeMenu(View<CyNode> nodeView, 
 			CyNetworkView networkView, 
-			Collection<NodeViewTaskFactory> taskFactories,
+			Map<NodeViewTaskFactory, Map<String, String>> taskFactories,
 			DialogTaskManager taskManager) {
 	
 		JPopupMenu menu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(menu);
 		
 		if (taskFactories.size() == 1) {
-			NodeViewTaskFactory nodeViewTaskFactory = taskFactories.iterator().next();
+			NodeViewTaskFactory nodeViewTaskFactory = taskFactories.keySet().iterator().next();
 			
 			nodeViewTaskFactory.setNodeView(nodeView, networkView);
 			taskManager.execute(nodeViewTaskFactory);
 			
 		} else if (taskFactories.size() > 1) {
-			for (NodeViewTaskFactory taskFactory : taskFactories) {
+			for (Entry<NodeViewTaskFactory, Map<String, String>> entry : taskFactories.entrySet()) {
+
+				entry.getKey().setNodeView(nodeView, networkView);
 				
+		
 			}
 		}
 		
