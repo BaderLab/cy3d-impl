@@ -16,6 +16,8 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TaskFactory;
+import org.cytoscape.work.TaskManager;
+import org.cytoscape.work.swing.DialogTaskManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -36,6 +38,16 @@ public class CyActivator extends AbstractCyActivator {
 				CyServiceRegistrar.class);
 		VisualMappingManager visualMappingManagerServiceRef = getService(bc, 
 				VisualMappingManager.class);
+		
+		// TaskManager object used to execute tasks
+		DialogTaskManager cyDialogTaskManager = getService(bc,
+				DialogTaskManager.class);
+		
+		// Register service to collect references to relevant task factories for the right-click context menu
+		TaskFactoryListener taskFactoryListener = new TaskFactoryListener();
+		registerServiceListener(bc, taskFactoryListener, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
 		
 		// Wind Visual Lexicon
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
@@ -58,7 +70,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Main RenderingEngine factory
 		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, cyServiceRegistrarRef);
+				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 		
 		Properties windMainRenderingEngineFactoryProps = new Properties();
 		windMainRenderingEngineFactoryProps.setProperty("serviceType",
@@ -70,7 +82,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Bird's Eye RenderingEngine factory
 		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, cyServiceRegistrarRef);
+				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 		
 		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
 		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType",
@@ -80,10 +92,7 @@ public class CyActivator extends AbstractCyActivator {
 				RenderingEngineFactory.class,
 				windBirdsEyeRenderingEngineFactoryProps);
 
-		// Register service to collect references to relevant task factories for the right-click context menu
-		TaskFactoryListener taskFactoryListerner = new TaskFactoryListener();
-		registerServiceListener(bc, taskFactoryListerner, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
-		registerServiceListener(bc, taskFactoryListerner, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
-		registerServiceListener(bc, taskFactoryListerner, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
+		
+		
 	}
 }

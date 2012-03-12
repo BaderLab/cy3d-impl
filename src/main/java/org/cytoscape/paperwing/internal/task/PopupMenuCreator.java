@@ -7,20 +7,58 @@ import javax.swing.JPopupMenu;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.JMenuTracker;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 /**
  * This class is responsible for creating and populating pop-up menus created when right-clicking the network.
  */
 public class PopupMenuCreator {
 
-	public void createNodeMenu(View<CyNode> nodeView, Collection<NodeViewTaskFactory> taskFactories) {
+	public void createNodeMenu(View<CyNode> nodeView, 
+			CyNetworkView networkView, 
+			Collection<NodeViewTaskFactory> taskFactories,
+			DialogTaskManager taskManager) {
 	
 		JPopupMenu menu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(menu);
 		
-		for (NodeViewTaskFactory taskFactory : taskFactories) {
+		if (taskFactories.size() == 1) {
+			NodeViewTaskFactory nodeViewTaskFactory = taskFactories.iterator().next();
 			
+			nodeViewTaskFactory.setNodeView(nodeView, networkView);
+			taskManager.execute(nodeViewTaskFactory);
+			
+		} else if (taskFactories.size() > 1) {
+			for (NodeViewTaskFactory taskFactory : taskFactories) {
+				
+			}
 		}
+		
+		
+		/*
+		
+		// build a menu of actions if more than factory exists
+		if ( usableTFs.size() > 1) {
+			String nodeLabel = network.getRow(nv.getModel()).get("name",String.class);
+			JPopupMenu menu = new JPopupMenu(nodeLabel);
+			JMenuTracker tracker = new JMenuTracker(menu);
+
+			for ( NodeViewTaskFactory nvtf : usableTFs ) {
+				nvtf.setNodeView(nv, m_view);
+				createMenuItem(nv, menu, nvtf, tracker, m_view.nodeViewTFs.get( nvtf ));
+			}
+
+			menu.show(invoker, x, y);
+
+		// execute the task directly if only one factory exists
+		} else if ( usableTFs.size() == 1) {
+			NodeViewTaskFactory tf  = usableTFs.iterator().next();
+			tf.setNodeView(nv, m_view);
+			executeTask(tf);
+		}
+		
+		*/
 	}
 }

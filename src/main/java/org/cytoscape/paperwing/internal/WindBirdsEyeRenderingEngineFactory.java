@@ -1,17 +1,13 @@
 package org.cytoscape.paperwing.internal;
 
-import java.util.Properties;
-
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
-import org.cytoscape.view.presentation.RenderingEngine;
-import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 /** This class is capable of creating instances of the WindMapRenderingEngine
  * 
@@ -22,8 +18,11 @@ public class WindBirdsEyeRenderingEngineFactory extends WindRenderingEngineFacto
 	public WindBirdsEyeRenderingEngineFactory(
 			CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager,
-			VisualLexicon lexicon, CyServiceRegistrar serviceRegistrar) {
-		super(networkViewManager, renderingEngineManager, lexicon, serviceRegistrar);
+			VisualLexicon lexicon,
+			TaskFactoryListener taskFactoryListener,
+			DialogTaskManager taskManager,
+			CyServiceRegistrar serviceRegistrar) {
+		super(networkViewManager, renderingEngineManager, lexicon, taskFactoryListener, taskManager, serviceRegistrar);
 	}
 
 	@Override

@@ -11,9 +11,11 @@ import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.geometric.ViewingVolume;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 /**
  * This class represents a data object in which data relevant to the renderer,
@@ -69,6 +71,12 @@ public class GraphicsData {
 	private boolean disableHovering;
 	
 	private Component container;
+	
+	/** A {@link TaskFactoryListener} object that can be used to obtain the current set of task factories */
+	private TaskFactoryListener taskFactoryListener;
+	
+	/** A task manager that can be used to execute tasks ccreated by TaskFactory objects */
+	private DialogTaskManager taskManager;
 	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
@@ -272,5 +280,21 @@ public class GraphicsData {
 
 	public Component getContainer() {
 		return container;
+	}
+
+	public TaskFactoryListener getTaskFactoryListener() {
+		return taskFactoryListener;
+	}
+
+	public void setTaskFactoryListener(TaskFactoryListener taskFactoryListener) {
+		this.taskFactoryListener = taskFactoryListener;
+	}
+
+	public DialogTaskManager getTaskManager() {
+		return taskManager;
+	}
+
+	public void setTaskManager(DialogTaskManager taskManager) {
+		this.taskManager = taskManager;
 	}
 }

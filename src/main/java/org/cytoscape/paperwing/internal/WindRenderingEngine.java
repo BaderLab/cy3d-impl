@@ -18,6 +18,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -26,6 +27,7 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedEvent;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.presentation.RenderingEngine;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -147,6 +149,10 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 //				System.out.println("placed in canvas");
 			}
 		}
+	}
+	
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+		graphics.setupTaskFactories(taskFactoryListener, taskManager);
 	}
 	
 	// Adds a listener to the component containing the GLJPanel to stop the animator

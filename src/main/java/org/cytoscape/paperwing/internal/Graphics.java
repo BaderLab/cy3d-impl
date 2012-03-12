@@ -27,10 +27,12 @@ import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.lighting.LightingProcessor;
 import org.cytoscape.paperwing.internal.picking.ShapePickingProcessor;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 /**
  * This class represents a Wind rendering object, directly called
@@ -125,6 +127,15 @@ public class Graphics implements GLEventListener {
 		component.addFocusListener(keys);
 		
 		graphicsData.setContainer(component);
+	}
+	
+	/**
+	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
+	 * @param listener
+	 */
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+		graphicsData.setTaskFactoryListener(taskFactoryListener);
+		graphicsData.setTaskManager(taskManager);
 	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as

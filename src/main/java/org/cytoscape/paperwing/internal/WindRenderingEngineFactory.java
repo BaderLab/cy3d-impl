@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
+import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -11,6 +12,8 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.work.TaskFactory;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 /** The RenderingEngineFactory for the WindRenderingEngine
  * 
@@ -28,6 +31,12 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	/** The visual lexicon for the wind rendering engine */
 	private final VisualLexicon visualLexicon;
 	
+	/** A listener used to obtain the set of {@link TaskFactory} objects for use with creating context menus */
+	private TaskFactoryListener taskFactoryListener;
+	
+	/** A task manager object that can be used to execute tasks created by TaskFactory objects */
+	private DialogTaskManager taskManager;
+	
 	/** The service registrar used to listen for events regarding when
 	 * the Graphics object is to be removed
 	 */
@@ -36,11 +45,15 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	/** Construct a new WindRenderingEngineFactory object */
 	public WindRenderingEngineFactory(CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
+			TaskFactoryListener taskFactoryListener,
+			DialogTaskManager taskManager,
 			CyServiceRegistrar serviceRegistrar) {	
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		
+		this.taskFactoryListener = taskFactoryListener;
+		this.taskManager = taskManager;
 		this.serviceRegistrar = serviceRegistrar;
 	}
 	

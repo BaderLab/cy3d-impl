@@ -7,12 +7,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.paperwing.internal.task.PopupMenuCreator;
 
 /**
  * Input handler responsible for creating the right-click context menu.
  */
 public class ContextMenuInputHandler implements InputHandler {
 
+	private PopupMenuCreator popupMenuCreator;
+	
+	public ContextMenuInputHandler() {
+		popupMenuCreator = new PopupMenuCreator();
+	}
+	
 	@Override
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
 			GraphicsData graphicsData) {

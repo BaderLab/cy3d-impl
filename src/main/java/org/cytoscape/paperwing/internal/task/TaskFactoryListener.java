@@ -27,14 +27,20 @@ public class TaskFactoryListener implements CyListener {
 	
 	public void addNodeViewTaskFactory(NodeViewTaskFactory taskFactory, Map<String, String> properties) {
 		nodeViewTaskFactories.put(taskFactory, properties);
+		
+		// printTaskFactoryDetails(taskFactory, properties);
 	}
 	
 	public void addEdgeViewTaskFactory(EdgeViewTaskFactory taskFactory, Map<String, String> properties) {
 		edgeViewTaskFactories.put(taskFactory, properties);
+		
+		// printTaskFactoryDetails(taskFactory, properties);
 	}
 	
 	public void addNetworkViewTaskFactory(NetworkViewTaskFactory taskFactory, Map<String, String> properties) {
 		networkViewTaskFactories.put(taskFactory, properties);
+		
+		// printTaskFactoryDetails(taskFactory, properties);
 	}
 	
 	public void removeNodeViewTaskFactory(NodeViewTaskFactory taskFactory, Map<String, String> properties) {
@@ -47,5 +53,10 @@ public class TaskFactoryListener implements CyListener {
 	
 	public void removeNetworkViewTaskFactory(NetworkViewTaskFactory taskFactory, Map<String, String> properties) {
 		networkViewTaskFactories.put(taskFactory, properties);
+	}
+	
+	private void printTaskFactoryDetails(TaskFactory taskFactory, Map<String, String> properties) {
+		System.out.println("TaskFactory added: " + taskFactory);
+		System.out.println("Properties: " + properties);
 	}
 }
