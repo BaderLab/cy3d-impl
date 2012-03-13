@@ -14,6 +14,8 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
+import org.cytoscape.task.EdgeViewTaskFactory;
+import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.GravityTracker;
 import org.cytoscape.util.swing.JMenuTracker;
@@ -25,6 +27,7 @@ import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.TaskFactoryPredicate;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.swing.DynamicSubmenuListener;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /**
  * This class is responsible for creating and populating pop-up menus created when right-clicking the network.
@@ -32,12 +35,37 @@ import org.cytoscape.work.swing.DynamicSubmenuListener;
 public class PopupMenuCreator {
 	
 	private DialogTaskManager taskManager;
+	private SubmenuTaskManager submenuTaskManager;
 	
 	// Large value to be used for the gravity value of org.cytoscape.util.swing.GravityTracker
 	private double largeValue = Double.MAX_VALUE / 2.0;
 
-	public PopupMenuCreator(DialogTaskManager taskManager) {
+	public PopupMenuCreator(DialogTaskManager taskManager, SubmenuTaskManager submenuTaskManager) {
 		this.taskManager = taskManager;
+		this.submenuTaskManager = submenuTaskManager;
+	}
+	
+	public JPopupMenu createEdgeMenu(View<CyEdge> edgeView, 
+			CyNetworkView networkView, 
+			VisualLexicon visualLexicon,
+			Map<EdgeViewTaskFactory, Map<String, Object>> taskFactories) {
+		
+		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuTracker tracker = new JMenuTracker(popupMenu);
+		
+		if (taskFactories.size() >= 1) {
+			for (Entry<EdgeViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
+
+				EdgeViewTaskFactory edgeViewTaskFactory = entry.getKey();
+				Map<String, Object> properties = entry.getValue();
+				
+				edgeViewTaskFactory.setEdgeView(edgeView, networkView);
+				
+				createMenuItem(edgeView, visualLexicon, popupMenu, edgeViewTaskFactory, tracker, properties);
+			}
+		}
+		
+		return popupMenu;
 	}
 	
 	public JPopupMenu createNodeMenu(View<CyNode> nodeView, 
@@ -62,7 +90,27 @@ public class PopupMenuCreator {
 		
 		return popupMenu;
 	}
+	
+	public JPopupMenu createNetworkMenu(CyNetworkView networkView, VisualLexicon visualLexicon,
+			Map<NetworkViewTaskFactory, Map<String, Object>> taskFactories) {
+		
+		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuTracker tracker = new JMenuTracker(popupMenu);
+		
+		if (taskFactories.size() >= 1) {
+			for (Entry<NetworkViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
 
+				NetworkViewTaskFactory networkViewTaskFactory = entry.getKey();
+				Map<String, Object> properties = entry.getValue();
+				
+				networkViewTaskFactory.setNetworkView(networkView);
+				
+				createMenuItem(null, visualLexicon, popupMenu, networkViewTaskFactory, tracker, properties);
+			}
+		}
+		
+		return popupMenu;
+	}
 	
 	private void createMenuItem(View<?> view, VisualLexicon visualLexicon, JPopupMenu popupMenu, TaskFactory taskFactory,
 	                            JMenuTracker tracker, Map<String, Object> properties) {
@@ -87,6 +135,17 @@ public class PopupMenuCreator {
 		
 		// Below based on implementation from Ding
 
+		// check if the menus are created dynamically, and if so add the listener
+		final Object preferredTaskManager = properties.get("preferredTaskManager");
+		if ( preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
+			if (title == null)
+				title = "Dynamic";
+			DynamicSubmenuListener submenu = submenuTaskManager.getConfiguration(taskFactory);
+	        submenu.setMenuTitle(title);
+			popupMenu.addPopupMenuListener(submenu);
+			return;
+		}
+
 		
 		Boolean useCheckBoxMenuItem = Boolean.parseBoolean(String.valueOf(properties.get("useCheckBoxMenuItem")));
 		Object targetVisualProperty = properties.get("targetVP");
@@ -94,7 +153,7 @@ public class PopupMenuCreator {
 		
 		// Update value for isSelected
 		if(view != null) {
-			if (targetVisualProperty != null && targetVisualProperty instanceof String ) {
+			if (targetVisualProperty != null && targetVisualProperty instanceof String) {
 
 				Class<?> targetClass = CyNetwork.class;
 				
@@ -108,7 +167,7 @@ public class PopupMenuCreator {
 					isSelected = false;
 				else
 					isSelected = view.isValueLocked(visualProperty);
-			} else if ( targetVisualProperty instanceof VisualProperty )
+			} else if ( targetVisualProperty instanceof VisualProperty)
 				isSelected = view.isValueLocked((VisualProperty<?>) targetVisualProperty);
 		}
 		
@@ -140,7 +199,7 @@ public class PopupMenuCreator {
 			// otherwise just use the preferred menu as the menuitem name
 			} else {
 				title = preferredMenu;
-				popupMenu.add( createMenuItem(taskFactory, title, useCheckBoxMenuItem, tooltip) );
+				popupMenu.add(createMenuItem(taskFactory, title, useCheckBoxMenuItem, tooltip));
 			}
 
 		// title and preferred menu
@@ -155,7 +214,7 @@ public class PopupMenuCreator {
 		AbstractAction action = new AbstractAction(title){
 
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent event) {
 				taskManager.execute(taskFactory);
 			}
 			

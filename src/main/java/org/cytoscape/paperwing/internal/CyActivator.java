@@ -18,6 +18,7 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -42,6 +43,9 @@ public class CyActivator extends AbstractCyActivator {
 		// TaskManager object used to execute tasks
 		DialogTaskManager cyDialogTaskManager = getService(bc,
 				DialogTaskManager.class);
+		
+		SubmenuTaskManager cySubmenuTaskManager = getService(bc,
+				SubmenuTaskManager.class);
 		
 		// Register service to collect references to relevant task factories for the right-click context menu
 		TaskFactoryListener taskFactoryListener = new TaskFactoryListener();

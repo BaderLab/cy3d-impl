@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.task.PopupMenuCreator;
@@ -35,27 +36,37 @@ public class ContextMenuInputHandler implements InputHandler {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		int nodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
-		CyNode node = networkView.getModel().getNode(nodeIndex);
+		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
+		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
 		
-		View<CyNode> nodeView = null;
-		if (node != null) {
-			nodeView = networkView.getNodeView(node);
-		}
-		
-		if (pressed.contains(MouseEvent.BUTTON3) && nodeView != null) {
+		if (pressed.contains(MouseEvent.BUTTON3)) {
 			
+			JPopupMenu popupMenu = null;
 			
-			
-			JPopupMenu popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
-					networkView, graphicsData.getVisualLexicon(), 
-					graphicsData.getTaskFactoryListener().getNodeViewTaskFactories());
-			
+			if (node != null) {
+				View<CyNode> nodeView = networkView.getNodeView(node);;
+				
+				popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
+						networkView, graphicsData.getVisualLexicon(), 
+						graphicsData.getTaskFactoryListener().getNodeViewTaskFactories());
+			} else if (edge != null) {
+				View<CyEdge> edgeView = networkView.getEdgeView(edge);
+				
+				popupMenu = popupMenuCreator.createEdgeMenu(edgeView, 
+						networkView, graphicsData.getVisualLexicon(), 
+						graphicsData.getTaskFactoryListener().getEdgeViewTaskFactories());
+			} else {
+				popupMenu = popupMenuCreator.createNetworkMenu(networkView, 
+						graphicsData.getVisualLexicon(),
+						graphicsData.getTaskFactoryListener().getNetworkViewTaskFactories());
+			}
 			
 			// menu.add(new JMenuItem("Sample Action"));
 			
-			System.out.println("Creating context menu at : " + mouse.x() + ", " + mouse.y());
-			popupMenu.show(graphicsData.getContainer(), mouse.x(), mouse.y());
+			if (popupMenu != null) {
+				popupMenu.show(graphicsData.getContainer(), mouse.x(), mouse.y());
+			}
 		}
+		
 	}
 }
