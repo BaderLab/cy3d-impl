@@ -8,6 +8,7 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /** This class is capable of creating instances of the WindMapRenderingEngine
  * 
@@ -21,8 +22,10 @@ public class WindBirdsEyeRenderingEngineFactory extends WindRenderingEngineFacto
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
+			SubmenuTaskManager submenuTaskManager,
 			CyServiceRegistrar serviceRegistrar) {
-		super(networkViewManager, renderingEngineManager, lexicon, taskFactoryListener, taskManager, serviceRegistrar);
+		super(networkViewManager, renderingEngineManager, lexicon, taskFactoryListener,
+				taskManager, submenuTaskManager, serviceRegistrar);
 	}
 
 	@Override

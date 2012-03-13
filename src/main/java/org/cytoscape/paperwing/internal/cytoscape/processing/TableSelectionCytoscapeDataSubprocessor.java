@@ -5,11 +5,14 @@ import java.util.Set;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 /**
  * This {@link CytoscapeDataSubprocessor} is used to update data in the relevant {@link CyTable}
@@ -25,6 +28,8 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		
 		// Update CyTable with the currently selected set of nodes and edges
 		processSelectionData(graphicsData);
+		
+		processUpdateSelected(graphicsData);
 	}
 	
 	// Performs selection in Cytoscape data objects, such as CyTable
@@ -52,6 +57,26 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		for (int index : selectionData.getSelectedEdgeIndices()) {
 			if (!NetworkToolkit.checkEdgeSelected(index, networkView)) {
 				NetworkToolkit.setEdgeSelected(index, networkView, true);
+			}
+		}
+	}
+	
+	// Checks if nodes and edges were made to be selected by other components of Cytoscape
+	private void processUpdateSelected(GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
+		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
+		
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+				selectedNodeIndices.add(nodeView.getModel().getIndex());
+			}
+		}
+		
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+			if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)) {
+				selectedEdgeIndices.add(edgeView.getModel().getIndex());
 			}
 		}
 	}

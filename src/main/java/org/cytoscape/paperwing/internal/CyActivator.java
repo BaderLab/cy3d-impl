@@ -74,7 +74,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Main RenderingEngine factory
 		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cySubmenuTaskManager, cyServiceRegistrarRef);
 		
 		Properties windMainRenderingEngineFactoryProps = new Properties();
 		windMainRenderingEngineFactoryProps.setProperty("serviceType",
@@ -86,7 +86,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Bird's Eye RenderingEngine factory
 		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cySubmenuTaskManager, cyServiceRegistrarRef);
 		
 		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
 		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType",

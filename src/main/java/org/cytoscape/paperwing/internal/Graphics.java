@@ -33,6 +33,7 @@ import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /**
  * This class represents a Wind rendering object, directly called
@@ -133,9 +134,11 @@ public class Graphics implements GLEventListener {
 	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
 	 * @param listener
 	 */
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
+			DialogTaskManager taskManager, SubmenuTaskManager submenuTaskManager) {
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
+		graphicsData.setSubmenuTaskManager(submenuTaskManager);
 	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as

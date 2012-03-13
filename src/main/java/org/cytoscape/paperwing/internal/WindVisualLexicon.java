@@ -57,6 +57,24 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	public static final VisualProperty<Double> CAMERA_ROLL_ANGLE = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_ROLL_ANGLE", "Camera Roll Angle", CyNetwork.class);
 	
+	public static final VisualProperty<Double> CAMERA_X_DIRECTION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_X_DIRECTION", "Camera X Direction", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Y_DIRECTION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Y_DIRECTION", "Camera Y Direction", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Z_DIRECTION = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Z_DIRECTION", "Camera Z Direction", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_X_UP = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_X_UP", "Camera X Up", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Y_UP = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Y_UP", "Camera Y Up", CyNetwork.class);
+	
+	public static final VisualProperty<Double> CAMERA_Z_UP = new DoubleVisualProperty(
+			0.0, ARBITRARY_DOUBLE_RANGE, "CAMERA_Z_UP", "Camera Z Up", CyNetwork.class);
+			
 	public static final VisualProperty<Boolean> SHOW_NODE_LABELS = new BooleanVisualProperty(
 			true, "SHOW_NODE_LABELS", "Show Node Labels", CyNetwork.class);
 	
@@ -109,6 +127,14 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		addVisualProperty(CAMERA_YAW_ANGLE, NETWORK);
 		addVisualProperty(CAMERA_ROLL_ANGLE, NETWORK);
 		
+		addVisualProperty(CAMERA_X_DIRECTION, NETWORK);
+		addVisualProperty(CAMERA_Y_DIRECTION, NETWORK);
+		addVisualProperty(CAMERA_Z_DIRECTION, NETWORK);
+		
+		addVisualProperty(CAMERA_X_UP, NETWORK);
+		addVisualProperty(CAMERA_Y_UP, NETWORK);
+		addVisualProperty(CAMERA_Z_UP, NETWORK);
+		
 		addVisualProperty(SHOW_NODE_LABELS, NETWORK);
 		addVisualProperty(SHOW_EDGE_LABELS, NETWORK);
 		
@@ -140,6 +166,14 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 		addIdentifierMapping(CyNetwork.class, "cameraPitch", CAMERA_PITCH_ANGLE);
 		addIdentifierMapping(CyNetwork.class, "cameraYaw", CAMERA_YAW_ANGLE);
 		addIdentifierMapping(CyNetwork.class, "cameraRoll", CAMERA_ROLL_ANGLE);
+		
+		addIdentifierMapping(CyNetwork.class, "cameraDirectionX", CAMERA_X_DIRECTION);
+		addIdentifierMapping(CyNetwork.class, "cameraDirectionY", CAMERA_Y_DIRECTION);
+		addIdentifierMapping(CyNetwork.class, "cameraDirectionZ", CAMERA_Z_DIRECTION);
+		
+		addIdentifierMapping(CyNetwork.class, "cameraUpX", CAMERA_X_UP);
+		addIdentifierMapping(CyNetwork.class, "cameraUpY", CAMERA_Y_UP);
+		addIdentifierMapping(CyNetwork.class, "cameraUpZ", CAMERA_Z_UP);
 		
 		addIdentifierMapping(CyNetwork.class, "showNodeLabels", SHOW_NODE_LABELS);
 		addIdentifierMapping(CyNetwork.class, "showEdgeLabels", SHOW_EDGE_LABELS);

@@ -34,6 +34,9 @@ import org.cytoscape.work.swing.SubmenuTaskManager;
  */
 public class PopupMenuCreator {
 	
+	/** For creating popup menu items for the network, only use task factories that match the preferred action*/
+	private static final String NETWORK_PREFFERED_ACTION = "NEW";
+	
 	private DialogTaskManager taskManager;
 	private SubmenuTaskManager submenuTaskManager;
 	
@@ -103,9 +106,13 @@ public class PopupMenuCreator {
 				NetworkViewTaskFactory networkViewTaskFactory = entry.getKey();
 				Map<String, Object> properties = entry.getValue();
 				
-				networkViewTaskFactory.setNetworkView(networkView);
+				Object preferredAction = properties.get("preferredAction");
 				
-				createMenuItem(null, visualLexicon, popupMenu, networkViewTaskFactory, tracker, properties);
+				if (preferredAction != null && preferredAction.toString().equals(NETWORK_PREFFERED_ACTION)) {
+					networkViewTaskFactory.setNetworkView(networkView);
+					
+					createMenuItem(null, visualLexicon, popupMenu, networkViewTaskFactory, tracker, properties);
+				}
 			}
 		}
 		
@@ -136,8 +143,8 @@ public class PopupMenuCreator {
 		// Below based on implementation from Ding
 
 		// check if the menus are created dynamically, and if so add the listener
-		final Object preferredTaskManager = properties.get("preferredTaskManager");
-		if ( preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
+		Object preferredTaskManager = properties.get("preferredTaskManager");
+		if (preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
 			if (title == null)
 				title = "Dynamic";
 			DynamicSubmenuListener submenu = submenuTaskManager.getConfiguration(taskFactory);

@@ -29,7 +29,8 @@ public class ContextMenuInputHandler implements InputHandler {
 
 	private void processNetworkRightClickMenu(MouseMonitor mouse, GraphicsData graphicsData){
 		if (popupMenuCreator == null) {
-			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager());
+			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager(),
+					graphicsData.getSubmenuTaskManager());
 		}
 		
 		Set<Integer> pressed = mouse.getPressed();

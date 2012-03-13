@@ -14,6 +14,7 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /** The RenderingEngineFactory for the WindRenderingEngine
  * 
@@ -37,6 +38,8 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	/** A task manager object that can be used to execute tasks created by TaskFactory objects */
 	private DialogTaskManager taskManager;
 	
+	private SubmenuTaskManager submenuTaskManager;
+	
 	/** The service registrar used to listen for events regarding when
 	 * the Graphics object is to be removed
 	 */
@@ -47,6 +50,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
+			SubmenuTaskManager submenuTaskManager,
 			CyServiceRegistrar serviceRegistrar) {	
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
@@ -54,6 +58,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
+		this.submenuTaskManager = submenuTaskManager;
 		this.serviceRegistrar = serviceRegistrar;
 	}
 	
@@ -67,7 +72,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 //		engine.setUpNetworkView(networkViewManager);
 		engine.setUpCanvas(container);
 		engine.setUpNetworkViewDestroyedListener(serviceRegistrar);
-		engine.setupTaskFactories(taskFactoryListener, taskManager);
+		engine.setupTaskFactories(taskFactoryListener, taskManager, submenuTaskManager);
 		
 		// System.out.println("returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);

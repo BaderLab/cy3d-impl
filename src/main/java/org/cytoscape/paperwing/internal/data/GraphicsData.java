@@ -16,6 +16,7 @@ import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /**
  * This class represents a data object in which data relevant to the renderer,
@@ -77,6 +78,8 @@ public class GraphicsData {
 	
 	/** A task manager that can be used to execute tasks ccreated by TaskFactory objects */
 	private DialogTaskManager taskManager;
+	
+	private SubmenuTaskManager submenuTaskManager;
 	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
@@ -296,5 +299,13 @@ public class GraphicsData {
 
 	public void setTaskManager(DialogTaskManager taskManager) {
 		this.taskManager = taskManager;
+	}
+
+	public void setSubmenuTaskManager(SubmenuTaskManager submenuTaskManager) {
+		this.submenuTaskManager = submenuTaskManager;
+	}
+
+	public SubmenuTaskManager getSubmenuTaskManager() {
+		return submenuTaskManager;
 	}
 }

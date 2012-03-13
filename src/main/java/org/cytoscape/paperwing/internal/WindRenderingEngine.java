@@ -28,6 +28,7 @@ import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedEvent;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.work.swing.SubmenuTaskManager;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -151,8 +152,10 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		}
 	}
 	
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
-		graphics.setupTaskFactories(taskFactoryListener, taskManager);
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
+			DialogTaskManager taskManager, 
+			SubmenuTaskManager submenuTaskManager) {
+		graphics.setupTaskFactories(taskFactoryListener, taskManager,  submenuTaskManager);
 	}
 	
 	// Adds a listener to the component containing the GLJPanel to stop the animator
