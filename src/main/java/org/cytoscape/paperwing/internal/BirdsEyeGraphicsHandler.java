@@ -74,8 +74,8 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 		// compiled into a re-usable display list
 		renderProcedureLists = new HashMap<Class<? extends ReadOnlyGraphicsProcedure>, Integer>();
 		
-		renderProcedureLists.put(RenderNodesProcedure.class, null);
-		renderProcedureLists.put(RenderArcEdgesProcedure.class, null);
+//		renderProcedureLists.put(RenderNodesProcedure.class, null);
+//		renderProcedureLists.put(RenderArcEdgesProcedure.class, null);
 	}
 	
 	@Override

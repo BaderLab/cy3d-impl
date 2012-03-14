@@ -55,8 +55,6 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
 		
-		
-		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
 		float x, y, z;
