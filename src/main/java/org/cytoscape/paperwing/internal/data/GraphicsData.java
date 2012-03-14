@@ -48,7 +48,7 @@ public class GraphicsData {
 	private float nearZ = 0.2f;
 	
 	/** Distance from eye to the far clipping plane */
-	private float farZ = 50f;
+	private float farZ = 500f;
 	
 	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
@@ -70,6 +70,15 @@ public class GraphicsData {
 	
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean disableHovering;
+	
+	/** The display list for drawing the entire scene, minus the transformations performed to setup the scene */
+	private int sceneList = 0;
+	
+	/** Whether the scene has been updated and needs to be redrawn */
+	private boolean updateScene = false;
+	
+	/** Whether to display the current frames per second */
+	private boolean showFPS = false;
 	
 	private Component container;
 	
@@ -308,4 +317,29 @@ public class GraphicsData {
 	public SubmenuTaskManager getSubmenuTaskManager() {
 		return submenuTaskManager;
 	}
+
+	public void setUpdateScene(boolean updateScene) {
+		this.updateScene = updateScene;
+	}
+
+	public boolean getUpdateScene() {
+		return updateScene;
+	}
+
+	public void setSceneList(int sceneList) {
+		this.sceneList = sceneList;
+	}
+
+	public int getSceneList() {
+		return sceneList;
+	}
+
+	public void setShowFPS(boolean showFPS) {
+		this.showFPS = showFPS;
+	}
+
+	public boolean getShowFPS() {
+		return showFPS;
+	}
+	
 }

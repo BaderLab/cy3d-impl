@@ -20,7 +20,8 @@ public class EdgeShapeDrawer {
 	public static enum EdgeShapeType {
 		REGULAR,
 		DASHED,
-		DOTTED
+		DOTTED,
+		REGULAR_LINE_BASED // Test drawing edges using OpenGL lines instead of polygons
 	}
 	
 	private Map<EdgeShapeType, Integer> segmentLists;
@@ -33,6 +34,7 @@ public class EdgeShapeDrawer {
 		initializeCylinder(gl);
 		initializeDashedCylinder(gl);
 		initializeDottedShape(gl);
+		initializeLineBasedSegment(gl);
 	}
 	
 	/**
@@ -106,6 +108,25 @@ public class EdgeShapeDrawer {
 		segmentLists.put(EdgeShapeType.DOTTED, listIndex);
 	}
 	
+	/**
+	 * Performs initialization for drawing a segment of a line, but uses OpenGL lines instead of polygons to perform the drawing.
+	 * The segment has length 1, and extends from the origin towards the positive z-axis.
+	 */
+	public void initializeLineBasedSegment(GL2 gl) {
+		int listIndex = gl.glGenLists(1);
+		
+		gl.glNewList(listIndex, GL2.GL_COMPILE);
+		gl.glBegin(GL2.GL_LINES);
+		
+		gl.glVertex3f(0.0f, 0.0f, 0.0f);
+		gl.glVertex3f(0.0f, 0.0f, 1.0f);
+		
+		gl.glEnd();
+		gl.glEndList();
+
+		segmentLists.put(EdgeShapeType.REGULAR_LINE_BASED, listIndex);
+	}
+	
 	public void drawSegment (GL2 gl, EdgeShapeType segmentType) {
 		Integer segmentList = segmentLists.get(segmentType);
 		
@@ -113,4 +134,6 @@ public class EdgeShapeDrawer {
 			gl.glCallList(segmentList);
 		}
 	}
+	
+
 }

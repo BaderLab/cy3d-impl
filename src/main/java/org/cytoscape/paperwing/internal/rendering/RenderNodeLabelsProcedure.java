@@ -127,6 +127,10 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 			}
 		}
 		
+		if (graphicsData.getShowFPS()) {
+
+		}
+		
 		textRenderer.endRendering();
 		gl.glPopMatrix();
 		

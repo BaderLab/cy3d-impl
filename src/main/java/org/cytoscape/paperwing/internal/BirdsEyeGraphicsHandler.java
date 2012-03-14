@@ -1,9 +1,13 @@
 package org.cytoscape.paperwing.internal;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.media.opengl.GL2;
 
 import org.cytoscape.paperwing.internal.coordinator.BirdsEyeCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
@@ -49,7 +53,12 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 	 * detail for nodes or edges that are far away.
 	 */
 	private List<ReadOnlyGraphicsProcedure> renderProcedures;
-
+	
+	/**
+	 * A Map containing rendering procedures that have re-usable display lists.
+	 */
+	Map<Class<? extends ReadOnlyGraphicsProcedure>, Integer> renderProcedureLists;
+	
 	public BirdsEyeGraphicsHandler() {
 
 		// Populate the list of rendering routines employed by this handler.
@@ -60,6 +69,13 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 		renderProcedures.add(new RenderNodesProcedure());
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderBoundingBoxProcedure());	
+		
+		// Initialize the dictionary of display lists to be used for rendering procedures that can be
+		// compiled into a re-usable display list
+		renderProcedureLists = new HashMap<Class<? extends ReadOnlyGraphicsProcedure>, Integer>();
+		
+		renderProcedureLists.put(RenderNodesProcedure.class, null);
+		renderProcedureLists.put(RenderArcEdgesProcedure.class, null);
 	}
 	
 	@Override
@@ -78,10 +94,29 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 		// gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,
 		// FloatBuffer.wrap(lightPosition));
 		
-		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
-			renderProcedure.execute(graphicsData);
-		}
+		GL2 gl = graphicsData.getGlContext();
 		
+		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
+			// Does this rendering procedure have a re-usable display list?
+			if (renderProcedureLists.get(renderProcedure.getClass()) != null) {
+				
+				// Is it time to update the display list?
+				if (graphicsData.getUpdateScene() || graphicsData.getFramesElapsed() <= 2) {
+					gl.glNewList(renderProcedureLists.get(renderProcedure.getClass()), GL2.GL_COMPILE_AND_EXECUTE);
+					renderProcedure.execute(graphicsData);
+					gl.glEndList();
+					
+					graphicsData.setUpdateScene(false);
+				// If not, call the current list
+				} else {
+					gl.glCallList(renderProcedureLists.get(renderProcedure.getClass()));
+				}
+			} else {
+				renderProcedure.execute(graphicsData);
+			}
+			
+//			renderProcedure.execute(graphicsData);
+		}
 		
 //		System.out.println(graphicsData.getFramesElapsed());
 	}
@@ -146,10 +181,23 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 
 	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+		
 		for (ReadOnlyGraphicsProcedure renderProcedure : renderProcedures) {
 			renderProcedure.initialize(graphicsData);
 		}
+		
+		for (Entry<Class<? extends ReadOnlyGraphicsProcedure>, Integer> entry : renderProcedureLists.entrySet()) {
+			renderProcedureLists.put(entry.getKey(), gl.glGenLists(1));
+		}
 	}
 
-
+	@Override
+	public void dispose(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+		
+		for (Integer list : renderProcedureLists.values()) {
+			gl.glDeleteLists(list, 1);
+		}
+	}
 }

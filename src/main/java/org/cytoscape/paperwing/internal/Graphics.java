@@ -188,6 +188,9 @@ public class Graphics implements GLEventListener {
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
 		coordinatorProcessor.unlinkCoordinator(coordinator);
+		
+		GL2 gl = autoDrawable.getGL().getGL2();
+		gl.glDeleteLists(graphicsData.getSceneList(), 1);
 	}
 
 	/** Initialize the Graphics object, performing certain
@@ -225,6 +228,8 @@ public class Graphics implements GLEventListener {
 		handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
+		
+		graphicsData.setSceneList(gl.glGenLists(1));
 	}
 
 

@@ -114,10 +114,17 @@ public interface GraphicsHandler {
 	/**
 	 * Sets up the lighting. Should be called before the first frame of rendering.
 	 * 
-	 * @param graphicsData @param graphicsData The current {@link GraphicsData} object containing information
+	 * @param graphicsData The current {@link GraphicsData} object containing information
 	 * about the current state of rendering as well as the current state of the network.
 	 */
 	public void setupLighting(GraphicsData graphicsData);
+	
+	/**
+	 * Called when the GraphicsHandler is about to be disposed, to perform any necessary cleanup
+	 * @param graphicsData The current {@link GraphicsData} object containing information
+	 * about the current state of rendering as well as the current state of the network.
+	 */
+	public void dispose(GraphicsData graphicsData);
 }
 
 
