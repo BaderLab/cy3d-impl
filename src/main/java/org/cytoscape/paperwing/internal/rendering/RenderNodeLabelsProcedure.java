@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal.rendering;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.text.DecimalFormat;
 
 import javax.media.opengl.GL2;
 
@@ -121,16 +122,19 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 								
 						textRenderer.setColor(textColor);
 						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
-						textRenderer.flush();
+						
 					}
 				}
 			}
 		}
 		
 		if (graphicsData.getShowFPS()) {
+			double frameRate = graphicsData.getFrameRateTracker().getFrameRate();
 
+			textRenderer.draw("FPS: " + (int) frameRate, 1, 1);
 		}
 		
+		textRenderer.flush();
 		textRenderer.endRendering();
 		gl.glPopMatrix();
 		

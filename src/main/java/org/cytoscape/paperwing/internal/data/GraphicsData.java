@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal.data;
 
 import java.awt.Component;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
@@ -12,6 +13,7 @@ import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.geometric.ViewingVolume;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
+import org.cytoscape.paperwing.internal.tools.FrameRateTracker;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -71,9 +73,6 @@ public class GraphicsData {
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean disableHovering;
 	
-	/** The display list for drawing the entire scene, minus the transformations performed to setup the scene */
-	private int sceneList = 0;
-	
 	/** Whether the scene has been updated and needs to be redrawn */
 	private boolean updateScene = false;
 	
@@ -82,10 +81,13 @@ public class GraphicsData {
 	
 	private Component container;
 	
+	/** A framerate tracker used to calculate the current number of frames per second. */
+	private FrameRateTracker frameRateTracker;
+	
 	/** A {@link TaskFactoryListener} object that can be used to obtain the current set of task factories */
 	private TaskFactoryListener taskFactoryListener;
 	
-	/** A task manager that can be used to execute tasks ccreated by TaskFactory objects */
+	/** A task manager that can be used to execute tasks created by TaskFactory objects */
 	private DialogTaskManager taskManager;
 	
 	private SubmenuTaskManager submenuTaskManager;
@@ -132,6 +134,7 @@ public class GraphicsData {
 		
 		camera = new SimpleCamera();
 		viewingVolume = new ViewingVolume();
+		frameRateTracker = new FrameRateTracker();
 	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
@@ -326,20 +329,16 @@ public class GraphicsData {
 		return updateScene;
 	}
 
-	public void setSceneList(int sceneList) {
-		this.sceneList = sceneList;
-	}
-
-	public int getSceneList() {
-		return sceneList;
-	}
-
 	public void setShowFPS(boolean showFPS) {
 		this.showFPS = showFPS;
 	}
 
 	public boolean getShowFPS() {
 		return showFPS;
+	}
+
+	public FrameRateTracker getFrameRateTracker() {
+		return frameRateTracker;
 	}
 	
 }

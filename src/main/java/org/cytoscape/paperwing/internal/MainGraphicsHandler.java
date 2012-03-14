@@ -70,15 +70,15 @@ public class MainGraphicsHandler implements GraphicsHandler {
 		renderProcedures.add(new RenderArcEdgesProcedure());
 		renderProcedures.add(new RenderSelectionBoxProcedure());
 		
-		// renderProcedures.add(new RenderNodeLabelsProcedure());
+		renderProcedures.add(new RenderNodeLabelsProcedure());
 		renderProcedures.add(new RenderLightsProcedure());
 		
 		// Initialize the dictionary of display lists to be used for rendering procedures that can be
 		// compiled into a re-usable display list
 		renderProcedureLists = new HashMap<Class<? extends ReadOnlyGraphicsProcedure>, Integer>();
 		
-		renderProcedureLists.put(RenderNodesProcedure.class, null);
-		renderProcedureLists.put(RenderArcEdgesProcedure.class, null);
+//		renderProcedureLists.put(RenderNodesProcedure.class, null);
+//		renderProcedureLists.put(RenderArcEdgesProcedure.class, null);
 	}
 	
 	@Override

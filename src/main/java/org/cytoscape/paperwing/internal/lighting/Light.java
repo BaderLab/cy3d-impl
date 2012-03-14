@@ -3,7 +3,7 @@ package org.cytoscape.paperwing.internal.lighting;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 
 /**
- * This class represents a light described by the Phong illumination model
+ * This class represents a light described by its position and its ambient, diffuse, and specular light components.
  */
 public class Light {
 

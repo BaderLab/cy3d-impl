@@ -3,6 +3,9 @@ package org.cytoscape.paperwing.internal.picking;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -15,6 +18,8 @@ import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.KeyboardMonitor;
 import org.cytoscape.paperwing.internal.input.MouseMonitor;
 import org.cytoscape.paperwing.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
@@ -34,7 +39,6 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	public static final int NO_INDEX = -1; // Value representing that no node
 											// or edge index is being held
 
-	
 	private ReadOnlyGraphicsProcedure drawNodesProcedure;
 	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
 	
@@ -45,6 +49,8 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
+		GL2 gl = graphicsData.getGlContext();
+		
 		drawNodesProcedure.initialize(graphicsData);
 		drawEdgesProcedure.initialize(graphicsData);
 	}
@@ -174,7 +180,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
 		// Render nodes for picking
 		drawNodesProcedure.execute(graphicsData);
-
+		
 		gl.glPopName();
 		gl.glPopName();
 
@@ -183,7 +189,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
 		// Render edges for picking
 		drawEdgesProcedure.execute(graphicsData);
-
+		
 		gl.glPopName();
 		gl.glPopName();
 	}
