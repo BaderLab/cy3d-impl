@@ -10,6 +10,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
@@ -142,9 +143,13 @@ public class NetworkChangeInputHandler implements InputHandler {
 				}
 			}
 			
-			networkView.getModel().removeNodes(nodesToBeRemoved);
-			networkView.getModel().removeEdges(edgesToBeRemoved);
+			// Remove the node and edge entries from the CyTable
+			NetworkToolkit.deselectEdges(selectedEdgeIndices, networkView);
+			NetworkToolkit.deselectNodes(selectedNodeIndices, networkView);
 			
+			networkView.getModel().removeEdges(edgesToBeRemoved);
+			networkView.getModel().removeNodes(nodesToBeRemoved);
+
 			selectedNodeIndices.clear();
 			selectedEdgeIndices.clear();
 			
