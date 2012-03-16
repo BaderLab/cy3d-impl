@@ -46,6 +46,8 @@ public class EdgeAnalyser {
 	/** The frame number that the generated edge data is current for */
 	private Long currentFrame;
 	
+	private Long lastCalculatedTime = 0L;
+	
 	public EdgeAnalyser() {
 		edgeContainers = new HashMap<View<CyEdge>, AugmentedEdgeContainer>();
 		currentFrame = 0L;
@@ -61,9 +63,13 @@ public class EdgeAnalyser {
 	 * @return An up-to-date set of analyzed edge data to be used for rendering.
 	 */
 	public Collection<AugmentedEdgeContainer> getAnalyzedEdges(CyNetworkView networkView, double distanceScale, Long currentFrame) {
-		if (this.currentFrame != currentFrame) {
+
+		if (currentFrame - this.currentFrame > 0) {
 			calculateEdgeProperties(networkView, distanceScale);
 			calculateEdgeCoordinates();
+			this.currentFrame = currentFrame;
+		} else {
+			// System.out.println("Reusing edge data");
 		}
 		
 		return edgeContainers.values();		
@@ -135,14 +141,22 @@ public class EdgeAnalyser {
 			}
 		}
 		
+		Collection<View<CyEdge>> edgeViews = networkView.getEdgeViews();
+		
 		// Update the value for the total number of edges between this pair of nodes
 		for (AugmentedEdgeContainer container : edgeContainers.values()) {
+			
 			container.setTotalCoincidentEdges(pairCoincidenceCount.get(container.getPairIdentifier()));
 			
 			// If there was only 1 edge for that pair of nodes, make it a straight edge
 			if (container.getTotalCoincidentEdges() == 1 && !container.isSelfEdge()) {
 				container.setStraightEdge(true);
 			}
+			
+			// Check if this edge container holds an edge that is no longer in the network
+//			if (!edgeViews.contains(container.getEdgeView())) {
+//				edgeContainers.remove(container.getEdgeView());
+//			}
 		}
 	}
 	
