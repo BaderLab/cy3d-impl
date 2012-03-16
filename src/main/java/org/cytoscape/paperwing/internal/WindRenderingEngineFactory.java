@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal;
 
 import java.util.Properties;
 
+import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
@@ -73,6 +74,8 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		engine.setUpCanvas(container);
 		engine.setUpNetworkViewDestroyedListener(serviceRegistrar);
 		engine.setupTaskFactories(taskFactoryListener, taskManager, submenuTaskManager);
+		
+//		serviceRegistrar.registerService(engine.getSetCurrentRenderingEngineListener(), SetCurrentRenderingEngineListener.class, new Properties());
 		
 		// System.out.println("returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);

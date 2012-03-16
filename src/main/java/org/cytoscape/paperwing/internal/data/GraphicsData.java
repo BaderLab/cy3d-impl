@@ -10,6 +10,7 @@ import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
+import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.geometric.ViewingVolume;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
@@ -92,6 +93,8 @@ public class GraphicsData {
 	
 	private SubmenuTaskManager submenuTaskManager;
 	
+	private EdgeAnalyser edgeAnalyser;
+	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
 	 * storing all data related to selection of objects in the network, such
@@ -135,6 +138,7 @@ public class GraphicsData {
 		camera = new SimpleCamera();
 		viewingVolume = new ViewingVolume();
 		frameRateTracker = new FrameRateTracker();
+		edgeAnalyser = new EdgeAnalyser();
 	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
@@ -339,6 +343,14 @@ public class GraphicsData {
 
 	public FrameRateTracker getFrameRateTracker() {
 		return frameRateTracker;
+	}
+
+	public void setEdgeAnalyser(EdgeAnalyser edgeAnalyser) {
+		this.edgeAnalyser = edgeAnalyser;
+	}
+
+	public EdgeAnalyser getEdgeAnalyser() {
+		return edgeAnalyser;
 	}
 	
 }

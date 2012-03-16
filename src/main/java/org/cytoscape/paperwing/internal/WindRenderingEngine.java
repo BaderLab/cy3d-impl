@@ -17,6 +17,9 @@ import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+
+import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
+import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
@@ -61,6 +64,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	private CyServiceRegistrar serviceRegistrar;
 	private NetworkViewAboutToBeDestroyedListener networkViewDestroyedListener;
+	private SetCurrentRenderingEngineListener setCurrentRenderingEngineListener;
 	
 	/** Create a new WindRenderingEngine object */
 	public WindRenderingEngine(Object container, View<CyNetwork> viewModel, 
@@ -179,9 +183,11 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	protected abstract void setUpAnimatorStarting(Container container, FPSAnimator animator);
 	
+	//public void setUpListeners(CyServiceRegistrar serviceRegistrar) {
 	public void setUpNetworkViewDestroyedListener(CyServiceRegistrar serviceRegistrar) {
 		this.serviceRegistrar = serviceRegistrar;
 		
+		// NetworkViewDestroyedEvent listener
 		if (networkViewDestroyedListener == null) {
 			networkViewDestroyedListener = getAboutToBeRemovedListener();
 
@@ -190,6 +196,24 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 					NetworkViewAboutToBeDestroyedListener.class,
 					new Properties());
 		}
+		
+		/*
+		if (setCurrentRenderingEngineListener == null) {
+			final RenderingEngine<CyNetwork> renderingEngine = this; 
+			
+			setCurrentRenderingEngineListener = new SetCurrentRenderingEngineListener() {
+				
+				@Override
+				public void handleEvent(SetCurrentRenderingEngineEvent e) {
+					if (e.getRenderingEngine() != renderingEngine) {
+						animator.stop();
+					} else {
+						animator.start();
+					}
+				}
+			};
+		}
+		*/
 	}
 	
 	
