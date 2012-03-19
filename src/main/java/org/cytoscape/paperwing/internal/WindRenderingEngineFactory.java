@@ -72,7 +72,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		
 //		engine.setUpNetworkView(networkViewManager);
 		engine.setUpCanvas(container);
-		engine.setUpNetworkViewDestroyedListener(serviceRegistrar);
+		engine.setUpListeners(serviceRegistrar);
 		engine.setupTaskFactories(taskFactoryListener, taskManager, submenuTaskManager);
 		
 //		serviceRegistrar.registerService(engine.getSetCurrentRenderingEngineListener(), SetCurrentRenderingEngineListener.class, new Properties());

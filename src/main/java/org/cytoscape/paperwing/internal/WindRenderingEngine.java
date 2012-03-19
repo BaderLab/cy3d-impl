@@ -183,8 +183,8 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	protected abstract void setUpAnimatorStarting(Container container, FPSAnimator animator);
 	
-	//public void setUpListeners(CyServiceRegistrar serviceRegistrar) {
-	public void setUpNetworkViewDestroyedListener(CyServiceRegistrar serviceRegistrar) {
+	public void setUpListeners(CyServiceRegistrar serviceRegistrar) {
+	//public void setUpNetworkViewDestroyedListener(CyServiceRegistrar serviceRegistrar) {
 		this.serviceRegistrar = serviceRegistrar;
 		
 		// NetworkViewDestroyedEvent listener
@@ -197,7 +197,6 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 					new Properties());
 		}
 		
-		/*
 		if (setCurrentRenderingEngineListener == null) {
 			final RenderingEngine<CyNetwork> renderingEngine = this; 
 			
@@ -212,8 +211,11 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 					}
 				}
 			};
+			
+			serviceRegistrar.registerService(setCurrentRenderingEngineListener,
+					SetCurrentRenderingEngineListener.class,
+					new Properties());
 		}
-		*/
 	}
 	
 	
@@ -240,6 +242,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 					animator.stop();
 					
 					serviceRegistrar.unregisterService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class);
+					serviceRegistrar.unregisterService(setCurrentRenderingEngineListener, SetCurrentRenderingEngineListener.class);
 				}
 			}
 		};
