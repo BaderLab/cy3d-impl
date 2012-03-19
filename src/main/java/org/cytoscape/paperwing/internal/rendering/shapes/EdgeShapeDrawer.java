@@ -112,7 +112,7 @@ public class EdgeShapeDrawer {
 	 * Performs initialization for drawing a segment of a line, but uses OpenGL lines instead of polygons to perform the drawing.
 	 * The segment has length 1, and extends from the origin towards the positive z-axis.
 	 */
-	public void initializeLineBasedSegment(GL2 gl) {
+	private void initializeLineBasedSegment(GL2 gl) {
 		int listIndex = gl.glGenLists(1);
 		
 		gl.glNewList(listIndex, GL2.GL_COMPILE);

@@ -20,7 +20,7 @@ public class MainInputProcessor implements InputProcessor {
 		inputHandlers.add(new SelectionInputHandler());
 		inputHandlers.add(new NetworkChangeInputHandler());
 	
-		inputHandlers.add(new LightMovementInputHandler());
+		// inputHandlers.add(new LightMovementInputHandler());
 		inputHandlers.add(new ContextMenuInputHandler());
 		
 		inputHandlers.add(new DebugInputHandler());

@@ -12,6 +12,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.EdgeCoordinateCalculator;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
+import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -112,15 +113,11 @@ public class EdgeAnalyser {
 			
 			edge = edgeView.getModel();
 			
-			// Assign an identifier to each pair of nodes
 			sourceIndex = edge.getSource().getIndex();
 			targetIndex = edge.getTarget().getIndex();
 			
-			if (sourceIndex >= targetIndex) {
-				identifier = (long) nodeCount * sourceIndex + targetIndex;
-			} else {
-				identifier = (long) nodeCount * targetIndex + sourceIndex;
-			}
+			// Assign an identifier to each pair of nodes
+			identifier = NetworkToolkit.obtainPairIdentifier(edge.getSource(), edge.getTarget(), networkView.getNodeViews().size());
 			
 			// Assign a value that represents how many edges have been found between this pair
 			if (!pairCoincidenceCount.containsKey(identifier)) {
@@ -141,8 +138,8 @@ public class EdgeAnalyser {
 			}
 			
 			// Find edge start and end points
-			edgeContainer.setStart(obtainCoordinates(edge.getSource(), networkView, distanceScale));
-			edgeContainer.setEnd(obtainCoordinates(edge.getTarget(), networkView, distanceScale));
+			edgeContainer.setStart(NetworkToolkit.obtainNodeCoordinates(edge.getSource(), networkView, distanceScale));
+			edgeContainer.setEnd(NetworkToolkit.obtainNodeCoordinates(edge.getTarget(), networkView, distanceScale));
 			
 			// Determine if edge has sufficient length to be drawn
 			if (edgeContainer.getStart() != null && edgeContainer.getEnd() != null && 
@@ -338,24 +335,5 @@ public class EdgeAnalyser {
 				edgeContainer.setCoordinates(points);
 			}
 		}
-	}
-	
-	// Obtain the coordinates of a given node, eg. source or target node
-	// Returns null if failed to find coordinates
-	private Vector3 obtainCoordinates(CyNode node, CyNetworkView networkView, double distanceScale) {
-		Vector3 coordinates = null;
-		
-		View<CyNode> nodeView = networkView.getNodeView(node);
-		
-		if (nodeView != null) {
-			double x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) / distanceScale;
-			double y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) / distanceScale;
-			double z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) / distanceScale;
-			
-			// TODO: Perform a check to ensure none of x, y, z are null?
-			coordinates = new Vector3(x, y, z);
-		}
-		
-		return coordinates;
 	}
 }

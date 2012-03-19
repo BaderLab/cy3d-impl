@@ -31,6 +31,7 @@ import org.cytoscape.paperwing.internal.rendering.RenderArcEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderBoundingBoxProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderNodesProcedure;
 import org.cytoscape.paperwing.internal.rendering.RenderSelectionBoxProcedure;
+import org.cytoscape.paperwing.internal.rendering.RenderSimplifiedEdgesProcedure;
 import org.cytoscape.paperwing.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -148,7 +149,6 @@ public class BirdsEyeGraphicsHandler implements GraphicsHandler {
 			public void processPicking(MouseMonitor mouse,
 					KeyboardMonitor keys, GraphicsData graphicsData) {
 			}
-			
 		};
 	}
 
