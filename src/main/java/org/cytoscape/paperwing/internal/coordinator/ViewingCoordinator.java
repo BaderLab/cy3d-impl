@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.jar.Manifest;
 
+import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
@@ -41,6 +42,8 @@ public class ViewingCoordinator {
 	private boolean initialMainCameraInitialized = false;
 	private boolean initialBoundsMatched = false;
 	private boolean suggestRecalculateBounds = false;
+	
+	private EdgeAnalyser mainEdgeAnalyser = null;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -281,5 +284,13 @@ public class ViewingCoordinator {
 
 	public boolean isSuggestRecalculateBounds() {
 		return suggestRecalculateBounds;
+	}
+
+	public void setMainEdgeAnalyser(EdgeAnalyser mainEdgeAnalyser) {
+		this.mainEdgeAnalyser = mainEdgeAnalyser;
+	}
+
+	public EdgeAnalyser getMainEdgeAnalyser() {
+		return mainEdgeAnalyser;
 	}
 }

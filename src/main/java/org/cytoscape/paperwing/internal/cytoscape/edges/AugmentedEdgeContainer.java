@@ -13,7 +13,7 @@ public class AugmentedEdgeContainer {
 	private View<CyEdge> edgeView;
 	
 	// Identifies the pair of nodes that the edge connects
-	private long pairIdentifier;
+	private Long pairIdentifier = null;
 	
 	// The index of this edge compared to all the other edges that connect the same pair
 	// of nodes. If this is the first of 7 edges that connect the same pair of nodes, its
@@ -45,11 +45,11 @@ public class AugmentedEdgeContainer {
 		this.edgeView = edgeView;
 	}
 
-	public long getPairIdentifier() {
+	public Long getPairIdentifier() {
 		return pairIdentifier;
 	}
 
-	public void setPairIdentifier(long pairIdentifier) {
+	public void setPairIdentifier(Long pairIdentifier) {
 		this.pairIdentifier = pairIdentifier;
 	}
 

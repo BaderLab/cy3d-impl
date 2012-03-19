@@ -50,7 +50,7 @@ public class LightMovementInputHandler implements InputHandler {
 		float[] lightPosition = light.getPosition();
 		Vector3 currentLightPosition = new Vector3(lightPosition[0], lightPosition[1], lightPosition[2]);
 		
-		currentLightPosition.divideLocal(lightPosition[3]); // Since lightPosition contains homogenous coordinates, perform division
+		currentLightPosition.divideLocal(lightPosition[3]); // Since lightPosition contains homogenous coordinates, perform division by w
 		
 		double mouseProjectionDistance = GeometryToolkit.findOrthogonalDistance(
 				camera.getPosition(), currentLightPosition, camera.getDirection());

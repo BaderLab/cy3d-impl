@@ -29,7 +29,7 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		// Update CyTable with the currently selected set of nodes and edges
 		processSelectionData(graphicsData);
 		
-		processUpdateSelected(graphicsData);
+		// processUpdateSelected(graphicsData);
 	}
 	
 	// Performs selection in Cytoscape data objects, such as CyTable
@@ -69,13 +69,15 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+			if (NetworkToolkit.checkNodeSelected(nodeView.getModel().getIndex(), networkView)) {
+//			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
 				selectedNodeIndices.add(nodeView.getModel().getIndex());
 			}
 		}
 		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-			if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)) {
+			if (NetworkToolkit.checkNodeSelected(edgeView.getModel().getIndex(), networkView)) {
+//			if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)) {
 				selectedEdgeIndices.add(edgeView.getModel().getIndex());
 			}
 		}

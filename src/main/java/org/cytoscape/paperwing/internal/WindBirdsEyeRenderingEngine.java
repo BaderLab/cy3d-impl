@@ -17,6 +17,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
+import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedEvent;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
@@ -53,16 +54,12 @@ public class WindBirdsEyeRenderingEngine extends WindRenderingEngine {
 		
 		return new Graphics(networkView, visualLexicon, new BirdsEyeGraphicsHandler());
 	}
-	
-	@Override
-	protected void setUpAnimatorStarting(Container container, FPSAnimator animator) {
-		
-		animator.start();
-	}
 
 	@Override
-	public void setProperties(String key, String value) {
-		// TODO Auto-generated method stub
+	protected SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(
+			FPSAnimator animator) {
 		
+		// Cytoscape creates a new RenderingEngine instance every time the current RenderingEngine changes
+		return null;
 	}
 }

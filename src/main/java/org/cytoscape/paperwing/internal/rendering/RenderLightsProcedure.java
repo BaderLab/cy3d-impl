@@ -14,6 +14,8 @@ import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer.Sha
  */
 public class RenderLightsProcedure implements ReadOnlyGraphicsProcedure {
 
+	public static final float LIGHT_RADIUS = 0.1f;
+	
 	private ScalableShapeDrawer shapeDrawer;
 	
 	public RenderLightsProcedure() {
@@ -44,6 +46,7 @@ public class RenderLightsProcedure implements ReadOnlyGraphicsProcedure {
 			gl.glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
 			
 			gl.glColor3f(1.0f, 1.0f, 0.6f);
+			gl.glScalef(LIGHT_RADIUS, LIGHT_RADIUS, LIGHT_RADIUS);
 			shapeDrawer.drawShape(gl, ShapeType.SHAPE_SPHERE);
 					
 			gl.glPopMatrix();

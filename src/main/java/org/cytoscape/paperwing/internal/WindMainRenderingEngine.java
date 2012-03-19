@@ -15,6 +15,8 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
+import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
+import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedEvent;
 import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
@@ -51,43 +53,24 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 		
 		return new Graphics(networkView, visualLexicon, new MainGraphicsHandler());
 	}
-	
-	
-	@Override
-	protected void setUpAnimatorStarting(Container container, FPSAnimator animator) {
-		animator.start();
-		
-		// TODO: Disabled focus listener to let visual property changes appear
-		// container.addFocusListener(getContainerFocusListener(animator));
-	}
-	
-	private FocusListener getContainerFocusListener(final FPSAnimator animator) {
 
-		return new FocusListener() {
+	@Override
+	protected SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(
+			final FPSAnimator animator) {
+		final RenderingEngine<CyNetwork> renderingEngine = this;
+
+		return new SetCurrentRenderingEngineListener() {
 			
 			@Override
-			public void focusGained(FocusEvent event) {
-				if (!event.isTemporary()) {
-					//System.out.println("Animator started for: " + this);
+			public void handleEvent(SetCurrentRenderingEngineEvent e) {
+				if (e.getRenderingEngine() == renderingEngine) {
+					System.out.println("Current network view changed, starting animator for " + this + ".");
 					animator.start();
-				}
-			}
-
-			@Override
-			public void focusLost(FocusEvent event) {
-				if (!event.isTemporary()) {
-					//System.out.println("Animator stopped for: " + this);
+				} else {
+					System.out.println("Current network view changed, stopping animator for " + this + ".");
 					animator.stop();
 				}
 			}
 		};
 	}
-
-	@Override
-	public void setProperties(String key, String value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 }

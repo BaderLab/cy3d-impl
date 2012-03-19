@@ -143,15 +143,11 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				
 				animator = new FPSAnimator(60);
 				animator.add(panel);
+				animator.start();
 				
 				addStopAnimatorListener(component);
 				
-				// Setup animator start/stop, can be based on gaining/losing focus of the canvas
-				setUpAnimatorStarting(focus, animator);
-				
 				active = true;
-				
-//				System.out.println("placed in canvas");
 			}
 		}
 	}
@@ -181,10 +177,9 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		});
 	}
 	
-	protected abstract void setUpAnimatorStarting(Container container, FPSAnimator animator);
+	
 	
 	public void setUpListeners(CyServiceRegistrar serviceRegistrar) {
-	//public void setUpNetworkViewDestroyedListener(CyServiceRegistrar serviceRegistrar) {
 		this.serviceRegistrar = serviceRegistrar;
 		
 		// NetworkViewDestroyedEvent listener
@@ -200,25 +195,14 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		if (setCurrentRenderingEngineListener == null) {
 			final RenderingEngine<CyNetwork> renderingEngine = this; 
 			
-			setCurrentRenderingEngineListener = new SetCurrentRenderingEngineListener() {
-				
-				@Override
-				public void handleEvent(SetCurrentRenderingEngineEvent e) {
-					if (e.getRenderingEngine() != renderingEngine) {
-						animator.stop();
-					} else {
-						animator.start();
-					}
-				}
-			};
-			
-			serviceRegistrar.registerService(setCurrentRenderingEngineListener,
-					SetCurrentRenderingEngineListener.class,
-					new Properties());
+			setCurrentRenderingEngineListener = getSetCurrentRenderingEngineListener(animator);
+			if (setCurrentRenderingEngineListener != null) {
+				serviceRegistrar.registerService(setCurrentRenderingEngineListener,
+						SetCurrentRenderingEngineListener.class,
+						new Properties());
+			}
 		}
 	}
-	
-	
 	
 	
 	/** Return a listener to listen to events regarding when the graphics
@@ -242,11 +226,16 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 					animator.stop();
 					
 					serviceRegistrar.unregisterService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class);
-					serviceRegistrar.unregisterService(setCurrentRenderingEngineListener, SetCurrentRenderingEngineListener.class);
+					
+					if (setCurrentRenderingEngineListener != null) {
+						serviceRegistrar.unregisterService(setCurrentRenderingEngineListener, SetCurrentRenderingEngineListener.class);
+					}
 				}
 			}
 		};
 	}
+	
+	protected abstract SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(FPSAnimator animator);
 	
 	/** Return whether the rendering engine is active */
 	public boolean isActive() {
@@ -271,6 +260,11 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		return null;
 	}
 
+	@Override
+	public void setProperties(String key, String value) {
+		// TODO Auto-generated method stub
+	}
+	
 	@Override
 	public Printable createPrintable() {
 		// TODO Auto-generated method stub

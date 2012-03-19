@@ -3,6 +3,7 @@ package org.cytoscape.paperwing.internal.cytoscape.edges;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,8 +47,6 @@ public class EdgeAnalyser {
 	/** The frame number that the generated edge data is current for */
 	private Long currentFrame;
 	
-	private Long lastCalculatedTime = 0L;
-	
 	public EdgeAnalyser() {
 		edgeContainers = new HashMap<View<CyEdge>, AugmentedEdgeContainer>();
 		currentFrame = 0L;
@@ -68,8 +67,22 @@ public class EdgeAnalyser {
 			calculateEdgeProperties(networkView, distanceScale);
 			calculateEdgeCoordinates();
 			this.currentFrame = currentFrame;
-		} else {
-			// System.out.println("Reusing edge data");
+		}
+		
+		// Prepare to remove edgeContainers for edges that are no longer in the network
+		Set<AugmentedEdgeContainer> edgeContainersToBeRemoved = new HashSet<AugmentedEdgeContainer>();
+		
+		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
+			// Check if this edge container holds an edge that is no longer in the network
+			if (networkView.getModel().getEdge(edgeContainer.getEdgeView().getModel().getIndex()) == null) {
+				edgeContainersToBeRemoved.add(edgeContainer);
+			}
+		}
+		
+		for (AugmentedEdgeContainer edgeContainer : edgeContainersToBeRemoved) {
+			edgeContainers.remove(edgeContainer.getEdgeView());
+			
+			System.out.println("Removed edge " + edgeContainer.getEdgeView().getSUID());
 		}
 		
 		return edgeContainers.values();		
@@ -87,10 +100,9 @@ public class EdgeAnalyser {
 		int nodeCount = networkView.getModel().getNodeCount();
 		CyEdge edge;
 		
-		AugmentedEdgeContainer edgeContainer;
-		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-			edgeContainer = edgeContainers.get(edgeView);
+			
+			AugmentedEdgeContainer edgeContainer = edgeContainers.get(edgeView);
 			
 			if (edgeContainer == null) {
 				edgeContainer = new AugmentedEdgeContainer();
@@ -140,23 +152,25 @@ public class EdgeAnalyser {
 				edgeContainer.setSufficientLength(false);
 			}
 		}
+
 		
-		Collection<View<CyEdge>> edgeViews = networkView.getEdgeViews();
 		
 		// Update the value for the total number of edges between this pair of nodes
-		for (AugmentedEdgeContainer container : edgeContainers.values()) {
+		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
 			
-			container.setTotalCoincidentEdges(pairCoincidenceCount.get(container.getPairIdentifier()));
+			Long pairIdentifier = edgeContainer.getPairIdentifier();
+			Integer totalCoincidentEdgesCount = pairCoincidenceCount.get(pairIdentifier);
+		
+			if (totalCoincidentEdgesCount != null) {
+				
+			edgeContainer.setTotalCoincidentEdges(totalCoincidentEdgesCount);
 			
-			// If there was only 1 edge for that pair of nodes, make it a straight edge
-			if (container.getTotalCoincidentEdges() == 1 && !container.isSelfEdge()) {
-				container.setStraightEdge(true);
+				// If there was only 1 edge for that pair of nodes, make it a straight edge
+				if (edgeContainer.getTotalCoincidentEdges() == 1 && !edgeContainer.isSelfEdge()) {
+					edgeContainer.setStraightEdge(true);
+				}
+			
 			}
-			
-			// Check if this edge container holds an edge that is no longer in the network
-//			if (!edgeViews.contains(container.getEdgeView())) {
-//				edgeContainers.remove(container.getEdgeView());
-//			}
 		}
 	}
 	
