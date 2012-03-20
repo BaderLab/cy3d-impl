@@ -85,13 +85,13 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	// =======================
 	
 	public static final VisualProperty<Double> LIGHT_X_LOCATION = new DoubleVisualProperty(
-			1.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_X_LOCATION", "Light X Location", CyNetwork.class);
+			200.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_X_LOCATION", "Light X Location", CyNetwork.class);
 	
 	public static final VisualProperty<Double> LIGHT_Y_LOCATION = new DoubleVisualProperty(
-			1.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Y_LOCATION", "Light Y Location", CyNetwork.class);
+			0.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Y_LOCATION", "Light Y Location", CyNetwork.class);
 	
 	public static final VisualProperty<Double> LIGHT_Z_LOCATION = new DoubleVisualProperty(
-			2.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Z_LOCATION", "Light Z Location", CyNetwork.class);
+			400.0, ARBITRARY_DOUBLE_RANGE, "LIGHT_Z_LOCATION", "Light Z Location", CyNetwork.class);
 	
 	public static final VisualProperty<Boolean> LIGHT_ENABLED = new BooleanVisualProperty(
 			true, "LIGHT_ENABLED", "Light Enabled", CyNetwork.class);

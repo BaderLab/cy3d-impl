@@ -3,12 +3,14 @@ package org.cytoscape.paperwing.internal;
 import java.util.Properties;
 
 import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkViewFactory;
+import org.cytoscape.paperwing.internal.layouts.SphericalLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
+import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
@@ -19,6 +21,7 @@ import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.swing.SubmenuTaskManager;
+import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -97,6 +100,15 @@ public class CyActivator extends AbstractCyActivator {
 				windBirdsEyeRenderingEngineFactoryProps);
 
 		
+		UndoSupport undoSupportServiceRef = getService(bc, UndoSupport.class);
 		
+		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupportServiceRef);
+		Properties sphericalLayoutAlgorithmProps = new Properties();
+		sphericalLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
+		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
+		sphericalLayoutAlgorithmProps.setProperty("title",sphericalLayoutAlgorithm.toString());
+		sphericalLayoutAlgorithmProps.setProperty("menuGravity","10.2");
+		
+		registerService(bc,sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
 	}
 }

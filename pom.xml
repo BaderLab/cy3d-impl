@@ -57,6 +57,11 @@
 			<version>${cytoscape.version}</version>
 		</dependency>
 		
+		<dependency>
+		 	<groupId>org.cytoscape</groupId>
+			<artifactId>layout-api</artifactId>
+		 </dependency>
+		
 		<!-- Dependencies used for context menus -->
 		<dependency>
 			<groupId>org.cytoscape</groupId>
