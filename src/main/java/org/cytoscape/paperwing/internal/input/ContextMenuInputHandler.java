@@ -28,46 +28,46 @@ public class ContextMenuInputHandler implements InputHandler {
 	}
 
 	private void processNetworkRightClickMenu(MouseMonitor mouse, GraphicsData graphicsData){
-		if (popupMenuCreator == null) {
-			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager(),
-					graphicsData.getSubmenuTaskManager());
-		}
-		
-		Set<Integer> pressed = mouse.getPressed();
-		
-		CyNetworkView networkView = graphicsData.getNetworkView();
-		
-		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
-		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
-		
-		if (pressed.contains(MouseEvent.BUTTON3)) {
-			
-			JPopupMenu popupMenu = null;
-			
-			if (node != null) {
-				View<CyNode> nodeView = networkView.getNodeView(node);;
-				
-				popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
-						networkView, graphicsData.getVisualLexicon(), 
-						graphicsData.getTaskFactoryListener().getNodeViewTaskFactories());
-			} else if (edge != null) {
-				View<CyEdge> edgeView = networkView.getEdgeView(edge);
-				
-				popupMenu = popupMenuCreator.createEdgeMenu(edgeView, 
-						networkView, graphicsData.getVisualLexicon(), 
-						graphicsData.getTaskFactoryListener().getEdgeViewTaskFactories());
-			} else {
-				popupMenu = popupMenuCreator.createNetworkMenu(networkView, 
-						graphicsData.getVisualLexicon(),
-						graphicsData.getTaskFactoryListener().getNetworkViewTaskFactories());
-			}
-			
-			// menu.add(new JMenuItem("Sample Action"));
-			
-			if (popupMenu != null) {
-				popupMenu.show(graphicsData.getContainer(), mouse.x(), mouse.y());
-			}
-		}
-		
+//		if (popupMenuCreator == null) {
+//			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager(),
+//					graphicsData.getSubmenuTaskManager());
+//		}
+//		
+//		Set<Integer> pressed = mouse.getPressed();
+//		
+//		CyNetworkView networkView = graphicsData.getNetworkView();
+//		
+//		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
+//		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
+//		
+//		if (pressed.contains(MouseEvent.BUTTON3)) {
+//			
+//			JPopupMenu popupMenu = null;
+//			
+//			if (node != null) {
+//				View<CyNode> nodeView = networkView.getNodeView(node);;
+//				
+//				popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
+//						networkView, graphicsData.getVisualLexicon(), 
+//						graphicsData.getTaskFactoryListener().getNodeViewTaskFactories());
+//			} else if (edge != null) {
+//				View<CyEdge> edgeView = networkView.getEdgeView(edge);
+//				
+//				popupMenu = popupMenuCreator.createEdgeMenu(edgeView, 
+//						networkView, graphicsData.getVisualLexicon(), 
+//						graphicsData.getTaskFactoryListener().getEdgeViewTaskFactories());
+//			} else {
+//				popupMenu = popupMenuCreator.createNetworkMenu(networkView, 
+//						graphicsData.getVisualLexicon(),
+//						graphicsData.getTaskFactoryListener().getNetworkViewTaskFactories());
+//			}
+//			
+//			// menu.add(new JMenuItem("Sample Action"));
+//			
+//			if (popupMenu != null) {
+//				popupMenu.show(graphicsData.getContainer(), mouse.x(), mouse.y());
+//			}
+//		}
+//		
 	}
 }

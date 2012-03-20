@@ -99,10 +99,7 @@ public class CyActivator extends AbstractCyActivator {
 				RenderingEngineFactory.class,
 				windBirdsEyeRenderingEngineFactoryProps);
 
-		
-		UndoSupport undoSupportServiceRef = getService(bc, UndoSupport.class);
-		
-		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupportServiceRef);
+		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm();
 		Properties sphericalLayoutAlgorithmProps = new Properties();
 		sphericalLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");

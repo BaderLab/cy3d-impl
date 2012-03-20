@@ -74,7 +74,11 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		 * drawSingleSelectEdge(gl, bottomLeft, bottomRight);
 		 **/
 
-		gl.glDisable(GL2.GL_LIGHTING);
+		boolean disabledLighting = false;
+		if (gl.glIsEnabled(GL2.GL_LIGHTING)) {
+			gl.glDisable(GL2.GL_LIGHTING);
+			disabledLighting = true;
+		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
 		
@@ -95,7 +99,9 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		// gl.glEnd();
 
 		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL2.GL_LIGHTING);
+		if (disabledLighting) {
+			gl.glEnable(GL2.GL_LIGHTING);
+		}
 	}
 
 }

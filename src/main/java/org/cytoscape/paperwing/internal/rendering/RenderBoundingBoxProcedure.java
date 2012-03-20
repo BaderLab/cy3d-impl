@@ -56,7 +56,11 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		Vector3 bottomRightUp = bottomRight.towards(topRight, fraction);
 		Vector3 bottomRightLeft = bottomRight.towards(bottomLeft, fraction);
 		
-		gl.glDisable(GL2.GL_LIGHTING);
+		boolean disabledLighting = false;
+		if (gl.glIsEnabled(GL2.GL_LIGHTING)) {
+			gl.glDisable(GL2.GL_LIGHTING);
+			disabledLighting = true;
+		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		
 		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
@@ -87,7 +91,9 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glEnd();
 		
 		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL2.GL_LIGHTING);
+		if (disabledLighting) {
+			gl.glEnable(GL2.GL_LIGHTING);
+		}
 	}
 
 	private void drawFullBox(GraphicsData graphicsData) {
@@ -101,7 +107,11 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		Vector3 bottomLeft = bounds.getBottomLeft();
 		Vector3 bottomRight = bounds.getBottomRight();
 		
-		gl.glDisable(GL2.GL_LIGHTING);
+		boolean disabledLighting = false;
+		if (gl.glIsEnabled(GL2.GL_LIGHTING)) {
+			gl.glDisable(GL2.GL_LIGHTING);
+			disabledLighting = true;
+		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		
 		gl.glColor3f(0.7f, 0.7f, 0.7f);
@@ -115,7 +125,9 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glEnd();
 		
 		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL2.GL_LIGHTING);
+		if (disabledLighting) {
+			gl.glEnable(GL2.GL_LIGHTING);
+		}
 	}
 	
 	/** Draws a portion of the viewing volume.
@@ -127,7 +139,11 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		Quadrilateral frontFace = graphicsData.getCoordinatorData().getNearBounds();
 		Quadrilateral backFace = graphicsData.getCoordinatorData().getFarBounds();
 
-		gl.glDisable(GL2.GL_LIGHTING);
+		boolean disabledLighting = false;
+		if (gl.glIsEnabled(GL2.GL_LIGHTING)) {
+			gl.glDisable(GL2.GL_LIGHTING);
+			disabledLighting = true;
+		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		
 		gl.glColor3f(0.7f, 0.7f, 0.7f);
@@ -166,7 +182,8 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glEnd();
 		
 		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL2.GL_LIGHTING);
-		
+		if (disabledLighting) {
+			gl.glEnable(GL2.GL_LIGHTING);
+		}
 	}
 }

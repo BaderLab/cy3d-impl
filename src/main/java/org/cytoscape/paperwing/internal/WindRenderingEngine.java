@@ -109,7 +109,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				// Use the system's default version of OpenGL
 				GLProfile profile = GLProfile.getDefault();
 				GLCapabilities capabilities = new GLCapabilities(profile);
-				
+				capabilities.setHardwareAccelerated(true);
 				// TODO: check if this line should be moved to graphics object
 				capabilities.setDoubleBuffered(true);
 				

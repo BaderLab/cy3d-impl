@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.layout.AbstractBasicLayoutTask;
+import org.cytoscape.view.layout.AbstractLayoutAlgorithmContext;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -11,9 +12,12 @@ import org.cytoscape.work.TaskMonitor;
 
 public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 
-	public SphericalLayoutAlgorithmTask(CyNetworkView networkView, String name,
-			boolean selectedOnly, Set<View<CyNode>> staticNodes) {
-		super(networkView, name, selectedOnly, staticNodes);
+	private SphericalLayoutContext context;
+	
+	public SphericalLayoutAlgorithmTask(String name,
+			SphericalLayoutContext context) {
+		super(name, context);
+		this.context = context;
 	}
 
 	@Override
@@ -28,9 +32,12 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		double x, y, z;
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = Math.cos((double) current / nodeCount * Math.PI * 2);
-			y = Math.sin((double) current / nodeCount * Math.PI * 2);
-			z = -Math.sin((double) current / nodeCount * Math.PI * 2);
+			
+			double phi = Math.random() * Math.PI * 2;
+			
+			x = Math.cos((double) current / nodeCount * Math.PI * 2) * Math.sin(phi);
+			y = Math.sin((double) current / nodeCount * Math.PI * 2) * Math.sin(phi);
+			z = Math.cos(phi);
 			
 			x *= sphereRadius;
 			y *= sphereRadius;
