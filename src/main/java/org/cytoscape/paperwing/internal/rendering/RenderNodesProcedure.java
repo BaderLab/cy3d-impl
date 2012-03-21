@@ -96,7 +96,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)
-					&& graphicsData.getViewingVolume().inside(new Vector3(x, y, z), graphicsData.getNearZ() / 2)) {
+					&& graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
 				gl.glPushMatrix();
 				gl.glTranslatef(x, y, z);

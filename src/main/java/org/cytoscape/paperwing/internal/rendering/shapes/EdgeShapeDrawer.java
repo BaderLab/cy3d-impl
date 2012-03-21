@@ -11,7 +11,7 @@ import org.cytoscape.paperwing.internal.rendering.shapes.ScalableShapeDrawer.Sha
 
 public class EdgeShapeDrawer {
 	
-	private static int REGULAR_CYLINDER_SLICES = 4;
+	private static int REGULAR_CYLINDER_SLICES = 3;
 	private static int REGULAR_CYLINDER_STACKS = 1;
 	
 	private static int DASHED_CYLINDER_SLICES = 3;

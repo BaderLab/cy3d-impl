@@ -41,7 +41,7 @@ public class GraphicsData {
 	 * This value controls distance scaling when converting from Cytoscape
 	 * coordinates (such as from Ding) to the renderer's 3D coordinates
 	 */
-	private float distanceScale = 178.0f; 
+	private float distanceScale = 180.0f; 
 
 	private float verticalFov = 45.0f;
 	

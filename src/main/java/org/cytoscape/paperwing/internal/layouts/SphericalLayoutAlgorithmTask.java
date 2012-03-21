@@ -33,10 +33,34 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			
-			double phi = Math.random() * Math.PI * 2;
+			/*
+			int nodesPerLevel = (int) Math.max(Math.sqrt(nodeCount), 1);
 			
-			x = Math.cos((double) current / nodeCount * Math.PI * 2) * Math.sin(phi);
-			y = Math.sin((double) current / nodeCount * Math.PI * 2) * Math.sin(phi);
+			// The fraction should range from 0 to 1
+			double levelFraction = Math.floor(current / nodesPerLevel) * nodesPerLevel / nodeCount;
+		
+			double thetaLimit = 0.1;
+			double phiLimit = 0.1;
+			
+			// double theta = Math.PI / 2 - (Math.PI * thetaLimit + (double) level / numLevels * Math.PI * (1 - 2 * thetaLimit));	
+			double theta = Math.PI / 2 - (Math.PI * thetaLimit + levelFraction * Math.PI * (1 - 2 * thetaLimit));
+			double phi = Math.PI * phiLimit + (double) (current % nodesPerLevel) / nodesPerLevel * Math.PI * (2 - 2 * phiLimit);
+			
+			phi = 2;
+			*/
+			
+			int numLevels = (int) Math.sqrt(nodeCount);
+			
+			int level = (current / numLevels) * numLevels;
+			
+			double thetaLimit = 0.1;
+			double phiLimit = 0.1;
+				
+			double theta = Math.PI / 2 - (Math.PI * thetaLimit + (double) level / nodeCount * Math.PI * (1 - 2 * thetaLimit));
+			double phi = Math.PI * phiLimit + (double) (current % numLevels) / numLevels * Math.PI * (2 - 2 * phiLimit);			
+			
+			x = Math.cos(theta) * Math.sin(phi);
+			y = Math.sin(theta) * Math.sin(phi);
 			z = Math.cos(phi);
 			
 			x *= sphereRadius;
