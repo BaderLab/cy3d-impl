@@ -109,18 +109,13 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 							textColor = TEXT_DEFAULT_COLOR;
 						}
 			
-						// Below to be used for JOGL 2.0-b45-20111219's new TextRenderer
-//						gl.glColor3f((float) textColor.getRed() / 255, 
-//								(float) textColor.getGreen() / 255, 
-//								(float) textColor.getBlue() / 255);
-						
-						
-//						textRenderer.drawString3D(gl, FontFactory.getDefault().getDefault(), 
-//								text, new float[]{1.0f, 1.0f, 2.0f}, TEXT_FONT_SIZE, 1024);
-								
-						textRenderer.setColor(textColor);
-						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
-						
+						// If we are set to not draw all node labels, only show labels for hovered and selected nodes
+						if (graphicsData.getShowAllNodeLabels()
+								|| graphicsData.getSelectionData().getHoverNodeIndex() == nodeView.getModel().getIndex()
+								|| nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+							textRenderer.setColor(textColor);
+							textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
+						}
 					}
 				}
 			}
@@ -132,7 +127,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 			textRenderer.draw("FPS: " + (int) frameRate, 1, 1);
 		}
 		
-		textRenderer.flush();
+		// textRenderer.flush();
 		textRenderer.endRendering();
 		gl.glPopMatrix();
 		

@@ -102,7 +102,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 		double newDistance = farthestNode.distance(networkCenter);
 		
 		// Further increase the distance needed
-		newDistance *= 2.5;
+		newDistance *= 3;
 		// newDistance = Math.max(newDistance, coordinator.getCurrentMainCamera().getPosition().distance(networkCenter) * 2);
 		newDistance = Math.max(newDistance, 5);
 		

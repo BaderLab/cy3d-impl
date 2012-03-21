@@ -80,6 +80,9 @@ public class GraphicsData {
 	/** Whether to display the current frames per second */
 	private boolean showFPS = false;
 	
+	/** Whether to display all node labels */
+	private boolean showAllNodeLabels = true;
+	
 	private Component container;
 	
 	/** A framerate tracker used to calculate the current number of frames per second. */
@@ -340,6 +343,14 @@ public class GraphicsData {
 	public boolean getShowFPS() {
 		return showFPS;
 	}
+	
+	public void setShowAllNodeLabels(boolean showAllNodeLabels) {
+		this.showAllNodeLabels = showAllNodeLabels;
+	}
+
+	public boolean getShowAllNodeLabels() {
+		return showAllNodeLabels;
+	}
 
 	public FrameRateTracker getFrameRateTracker() {
 		return frameRateTracker;
@@ -352,5 +363,4 @@ public class GraphicsData {
 	public EdgeAnalyser getEdgeAnalyser() {
 		return edgeAnalyser;
 	}
-	
 }

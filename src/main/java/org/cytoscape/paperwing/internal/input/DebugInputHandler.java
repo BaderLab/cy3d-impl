@@ -25,6 +25,10 @@ public class DebugInputHandler implements InputHandler {
 		if (pressed.contains(KeyEvent.VK_K)) {
 			graphicsData.setShowFPS(!graphicsData.getShowFPS());
 		}
+		
+		if (pressed.contains(KeyEvent.VK_L)) {
+			graphicsData.setShowAllNodeLabels(!graphicsData.getShowAllNodeLabels());
+		}
 	}
 
 }
