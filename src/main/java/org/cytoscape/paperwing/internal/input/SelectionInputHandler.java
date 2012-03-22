@@ -11,6 +11,7 @@ import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
+import org.cytoscape.paperwing.internal.layouts.SphericalLayoutAlgorithmTask;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 
@@ -71,6 +72,14 @@ public class SelectionInputHandler implements InputHandler {
 						
 					} else {
 						selectedNodeIndices.add(newHoverNodeIndex);
+						
+						// Debug: Find size of biggest clique containing this node
+						
+						/*
+						System.out.println("Size of clique: " + SphericalLayoutAlgorithmTask.findCliques(
+								graphicsData.getNetworkView().getModel()).get(
+										graphicsData.getNetworkView().getModel().getNode(newHoverNodeIndex)).size());
+						*/
 					}
 					
 				} else if (newHoverEdgeIndex != NO_INDEX) {

@@ -1,11 +1,15 @@
 package org.cytoscape.paperwing.internal.layouts;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.cytoscape.model.CyEdge.Type;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
@@ -31,8 +35,6 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 
 	@Override
 	protected void doLayout(TaskMonitor taskMonitor) {
-
-		/*
 		
 		// Break graph into partitions
 		List<LayoutPartition> partitions = PartitionUtil.partition(networkView, false, null);
@@ -41,8 +43,8 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		
 		System.out.println("Number of partitions: " + numPartitions);
 		
-		double xOffsetAmount = 1000;
-		double yOffsetAmount = 1000;
+		double xOffsetAmount = 200;
+		double yOffsetAmount = 200;
 		
 		Collection<View<CyNode>> partitionNodeViews;
 		
@@ -54,16 +56,14 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 				partitionNodeViews.add(nodeView);
 			}
 			
-			
-			
 			partition.offset(count * xOffsetAmount, count * yOffsetAmount);
+			
+			arrangeAsSphere(partitionNodeViews);
 			
 			count++;
 		}
-		
-		*/
 	
-		arrangeAsSphere(networkView.getNodeViews());
+		// arrangeAsSphere(networkView.getNodeViews());
 		
 	}
 	
@@ -147,6 +147,68 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		return 100 + nodeCount;
 	}
 
+	private Map<CyNode, Collection<CyNode>> findCliques(CyNetwork network) {
+		// TODO: Implement optimization by partitioning the graph before finding cliques
+		
+		Collection<CyNode> nodesList = new HashSet<CyNode>(network.getNodeList());
+		
+		// A map that maps every node to the biggest clique containing that node
+		Map<CyNode, Collection<CyNode>> cliques = new HashMap<CyNode, Collection<CyNode>>();
+		
+		// Find the largest clique containing each node
+		for (CyNode currentNode : nodesList) {
+
+			Collection<CyNode> clique = new HashSet<CyNode>();
+			clique.add(currentNode);
+
+			// Loop through every neighbor of the current node
+			for (CyNode neighbor : network.getNeighborList(currentNode, Type.ANY)) {
+
+				boolean addToCurrentClique = true;
+				
+				for (CyNode cliqueNode : clique) {
+					if (network.getConnectingEdgeList(cliqueNode, neighbor, Type.ANY).isEmpty()) {
+						addToCurrentClique = false;
+					}
+				}
+				
+				if (addToCurrentClique) {
+					clique.add(neighbor);
+				}
+			}
+			
+			cliques.put(currentNode, clique);
+		}
+		
+		return cliques;
+	}
+	
+	// Find the largest clique containing a given node from a given network
+	private Collection<CyNode> findLargestClique(CyNode node, CyNetwork network) {
+		Collection<CyNode> clique = new HashSet<CyNode>();
+		clique.add(node);
+		
+		List<CyNode> neighbors = network.getNeighborList(node, Type.ANY);
+		
+		// Loop through every neighbor of the current node
+		for (CyNode neighbor : neighbors) {
+
+			boolean addToCurrentClique = true;
+			
+			for (CyNode cliqueNode : clique) {
+				if (network.getConnectingEdgeList(cliqueNode, neighbor, Type.ANY).isEmpty()) {
+					addToCurrentClique = false;
+				}
+			}
+			
+			if (addToCurrentClique) {
+				clique.add(neighbor);
+			}
+		}
+		
+		return clique;
+	}
+	
 	/**
 	 * Return a list of all cliques in the given set of nodes, sorted in order of decreasing size.
 	 * A clique is a subgraph where there is an edge between any 2 nodes.
@@ -154,8 +216,50 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 	 * @param nodeViews The set of node view objects that should be used to find cliques.
 	 * @return A list of cliques found, sorted in order of decreasing size.
 	 */
-	private List<Collection<View<CyNode>>> findCliques(Collection<View<CyNode>> nodeViews) {
-		List<Collection<View<CyNode>>> cliques = new LinkedList<Collection<View<CyNode>>>();
+	private List<Collection<CyNode>> findCliquesOld(CyNetwork network) {
+		List<Collection<CyNode>> cliques = new LinkedList<Collection<CyNode>>();
+		
+		// TODO: Implement optimization by partitioning the graph before finding cliques
+		
+		Collection<CyNode> nodesToBeVisited = new HashSet<CyNode>(network.getNodeList());
+		Collection<CyNode> nodesPlacedInClique;
+		
+		Collection<CyNode> clique;
+		CyNode currentNode;
+		
+		// Find the largest clique containing each node
+		while(!nodesToBeVisited.isEmpty()) {
+			currentNode = nodesToBeVisited.iterator().next();
+			
+			clique = new HashSet<CyNode>();
+			clique.add(currentNode);
+
+			nodesPlacedInClique = new HashSet<CyNode>();
+			nodesPlacedInClique.add(currentNode);
+			
+			// Loop through every potential neighbor for the current node
+			for (CyNode potentialNeighbor : nodesToBeVisited) {
+				if (potentialNeighbor != currentNode) {
+					boolean addToCurrentClique = true;
+					
+					for (CyNode cliqueNode : clique) {
+						if (!network.containsEdge(potentialNeighbor, cliqueNode)
+								&& !network.containsEdge(cliqueNode, potentialNeighbor)) {
+							
+							addToCurrentClique = false;
+						}
+					}
+					
+					if (addToCurrentClique) {
+						clique.add(potentialNeighbor);
+						nodesPlacedInClique.add(potentialNeighbor);
+					}
+				}
+			}
+			
+			cliques.add(clique);
+			nodesToBeVisited.removeAll(nodesPlacedInClique);
+		}
 		
 		return null;
 	}
