@@ -15,6 +15,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.task.EdgeViewTaskFactory;
+import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.task.TunableEdgeViewTaskFactory;
@@ -129,6 +130,28 @@ public class PopupMenuCreator {
 					createMenuItem(null, visualLexicon, popupMenu, taskFactory, null, tracker, properties);
 				}
 			}
+		}
+		
+		return popupMenu;
+	}
+	
+	public JPopupMenu createNetworkLocationMenu(CyNetworkView networkView, VisualLexicon visualLexicon,
+			Map<NetworkViewLocationTaskFactory, Map<String, Object>> taskFactories) {
+		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuTracker tracker = new JMenuTracker(popupMenu);
+		
+		for (Entry<NetworkViewLocationTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
+
+			NetworkViewLocationTaskFactory networkViewLocationTaskFactory = entry.getKey();
+			Map<String, Object> properties = entry.getValue();
+			
+			// TODO: Ding implementation for the NetworkViewLocation Task objects also takes 2D coordinates for 
+			// the source of the event. Determine if appropriate to support NetworkViewLocation Tasks.
+			
+			/*
+			TaskFactory taskFactory = taskFactoryProvider.createFor(networkViewLocationTaskFactory, networkView);
+				createMenuItem(null, visualLexicon, popupMenu, taskFactory, null, tracker, properties);
+			*/
 		}
 		
 		return popupMenu;

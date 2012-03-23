@@ -43,27 +43,49 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		
 		System.out.println("Number of partitions: " + numPartitions);
 		
-		double xOffsetAmount = 200;
-		double yOffsetAmount = 200;
+		double xOffsetAmount = 0;
+		double yOffsetAmount = 0;
+		double largestRadius = -1;
 		
 		Collection<View<CyNode>> partitionNodeViews;
+		
+		Map<LayoutPartition, Double> partitionRadii = new HashMap<LayoutPartition, Double>();
 		
 		for (LayoutPartition partition : partitions) {
 			partitionNodeViews = new HashSet<View<CyNode>>();
 			
 			for (LayoutNode layoutNode : partition.getNodeList()) {
 				View<CyNode> nodeView = layoutNode.getNodeView();
+				
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) + xOffsetAmount);
+				
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) + yOffsetAmount);
+				
+				
 				partitionNodeViews.add(nodeView);
 			}
-			
-			partition.offset(count * xOffsetAmount, count * yOffsetAmount);
-			
 			arrangeAsSphere(partitionNodeViews);
+			
+			double subgraphRadius = findSubgraphRadius(partitionNodeViews);
+			partitionRadii.put(partition, subgraphRadius);
+			
+			xOffsetAmount += subgraphRadius + 50;
+			
+			if (subgraphRadius > largestRadius) {
+				largestRadius = subgraphRadius;
+			}
 			
 			count++;
 		}
+		
 	
 		// arrangeAsSphere(networkView.getNodeViews());
+		
+	}
+	
+	private void arrangeAsBox(Collection<View<CyNode>> nodeViews) {
 		
 	}
 	
@@ -78,13 +100,23 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		
 		for (View<CyNode> nodeView : nodeViews) {
 			
-			int nodesPerLevel = (int) Math.max(Math.sqrt(nodeCount), 1);
+			int nodesPerLevel = (int) Math.max(Math.sqrt(nodeCount), 3);
 			
 			// The fraction should range from 0 to 1
 			double levelFraction = Math.floor(current / nodesPerLevel) * nodesPerLevel / nodeCount;
 		
 			double thetaLimit = 0.0;
-			double phiLimit = 0.05;
+			
+			// Perform a correction for small numbers of nodes
+			double phiLimit = 0.20 - Math.min((double) nodeCount / 125, 1) * 0.15;
+			
+			/*
+			if (nodeCount < 25) {
+				phiLimit = 0.15;
+			} else {
+				phiLimit = 0.05;
+			}
+			*/
 			
 			// double theta = Math.PI / 2 - (Math.PI * thetaLimit + (double) level / numLevels * Math.PI * (1 - 2 * thetaLimit));	
 			double theta = Math.PI / 2 - (Math.PI * thetaLimit + levelFraction * Math.PI * (2 - 2 * thetaLimit));
@@ -262,5 +294,33 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Find the radius of the subgraph formed by the given set of nodes. This radius can be useful
+	 * for determining the spacing between graph partitions.
+	 * @return
+	 */
+	private double findSubgraphRadius(Collection<View<CyNode>> nodeViews) {
+		
+		// Obtain the average node position
+		Vector3 averagePosition = findCenter(nodeViews);
+		
+		double maxDistanceSquared = -1;
+		View<CyNode> farthestNode = null;
+		double distanceSquared;
+		
+		for (View<CyNode> nodeView : nodeViews) {
+			distanceSquared = Math.pow(nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) - averagePosition.x(), 2)
+				+ Math.pow(nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) - averagePosition.y(), 2)
+				+ Math.pow(nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) - averagePosition.z(), 2);
+			
+			if (distanceSquared > maxDistanceSquared) {
+				maxDistanceSquared = distanceSquared;
+				farthestNode = nodeView;
+			}
+		}
+		
+		return Math.sqrt(maxDistanceSquared);
 	}
 }

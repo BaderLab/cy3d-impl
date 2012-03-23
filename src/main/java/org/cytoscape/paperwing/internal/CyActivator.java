@@ -8,6 +8,7 @@ import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
+import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
@@ -55,6 +56,7 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(bc, taskFactoryListener, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
 		registerServiceListener(bc, taskFactoryListener, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
 		registerServiceListener(bc, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
 		
 		// Wind Visual Lexicon
 		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
@@ -104,7 +106,7 @@ public class CyActivator extends AbstractCyActivator {
 		sphericalLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
 		sphericalLayoutAlgorithmProps.setProperty("title",sphericalLayoutAlgorithm.toString());
-		sphericalLayoutAlgorithmProps.setProperty("menuGravity","10.2");
+		sphericalLayoutAlgorithmProps.setProperty("menuGravity","10.5");
 		
 		registerService(bc,sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
 	}
