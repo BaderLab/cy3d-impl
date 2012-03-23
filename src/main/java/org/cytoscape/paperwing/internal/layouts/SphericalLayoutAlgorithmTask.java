@@ -37,52 +37,99 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 	protected void doLayout(TaskMonitor taskMonitor) {
 		
 		// Break graph into partitions
-		List<LayoutPartition> partitions = PartitionUtil.partition(networkView, false, null);
-		int numPartitions = partitions.size();
-		int count = 0;
+		List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
+		int numPartitions = layoutPartitions.size();
 		
 		System.out.println("Number of partitions: " + numPartitions);
 		
-		double xOffsetAmount = 0;
-		double yOffsetAmount = 0;
-		double largestRadius = -1;
+		Collection<Collection<View<CyNode>>> partitions = new HashSet<Collection<View<CyNode>>>(layoutPartitions.size());
 		
 		Collection<View<CyNode>> partitionNodeViews;
 		
-		Map<LayoutPartition, Double> partitionRadii = new HashMap<LayoutPartition, Double>();
-		
-		for (LayoutPartition partition : partitions) {
+		for (LayoutPartition partition : layoutPartitions) {
 			partitionNodeViews = new HashSet<View<CyNode>>();
 			
 			for (LayoutNode layoutNode : partition.getNodeList()) {
 				View<CyNode> nodeView = layoutNode.getNodeView();
-				
-				nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
-						nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) + xOffsetAmount);
-				
-				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
-						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) + yOffsetAmount);
-				
-				
 				partitionNodeViews.add(nodeView);
 			}
-			arrangeAsSphere(partitionNodeViews);
 			
-			double subgraphRadius = findSubgraphRadius(partitionNodeViews);
-			partitionRadii.put(partition, subgraphRadius);
-			
-			xOffsetAmount += subgraphRadius + 50;
-			
-			if (subgraphRadius > largestRadius) {
-				largestRadius = subgraphRadius;
-			}
-			
-			count++;
+			partitions.add(partitionNodeViews);
 		}
 		
-	
-		// arrangeAsSphere(networkView.getNodeViews());
+		for (Collection<View<CyNode>> partition : partitions) {
+			arrangeAsSphere(partition);
+		}
 		
+		arrangePartitions(partitions);
+	}
+	
+	private void arrangePartitions(Collection<Collection<View<CyNode>>> partitions) {
+		// Consider sorting partitions in order of decreasing radius?
+		
+		Map<Collection<View<CyNode>>, Double> partitionRadii = new HashMap<Collection<View<CyNode>>, Double>(partitions.size());
+		
+		// Basic approach: 1 partition per cube
+		int cubeLength = (int) Math.ceil(Math.pow(partitions.size(), 1.0/3));
+		
+		// System.out.println("cubeLength: " + cubeLength);
+		
+		// Average position of all nodes
+		Vector3 averageTotalNodePosition = new Vector3();
+		int totalNodeCount = 0;
+		
+		double largestRadius = -1;
+		
+		for (Collection<View<CyNode>> partition : partitions) {
+			averageTotalNodePosition.addLocal(findCenter(partition).multiply(partition.size()));
+			totalNodeCount += partition.size();
+			
+			double partitionRadius = findSubgraphRadius(partition);
+			partitionRadii.put(partition, partitionRadius);
+			
+			if (partitionRadius > largestRadius) {
+				largestRadius = partitionRadius;
+			}
+		}
+		
+		largestRadius = Math.max(largestRadius, 50);
+		largestRadius *= 2;
+		
+		// Calculate the average position of all nodes by using the average position of partitions weighted by their node count
+		averageTotalNodePosition.divideLocal(totalNodeCount);
+		
+		int count = 0;
+		for (Collection<View<CyNode>> partition : partitions) {
+			int x = count % cubeLength;
+			int y = count / cubeLength % cubeLength;
+			int z = count / cubeLength / cubeLength;
+			
+			// TODO: Need to set offset so that total average node position is preserved
+			Vector3 offset = new Vector3(x * largestRadius, y * largestRadius, z * largestRadius);
+			double halfCubeActualLength = (double) (cubeLength - 1) / 2 * largestRadius;
+			offset.subtractLocal(halfCubeActualLength, halfCubeActualLength, halfCubeActualLength);
+			
+			displaceNodes(partition, offset.plus(averageTotalNodePosition));
+			
+			// System.out.println(new Vector3(x, y, z));
+			count++;
+		}
+	}
+	
+	// Displace a set of nodes such that their average of position is moved to the given point.
+	// Each node's position relative to the average position should remain unchanged.
+	private void displaceNodes(Collection<View<CyNode>> nodeViews, Vector3 target) {
+		Vector3 currentCenter = findCenter(nodeViews);
+		Vector3 displacement = target.subtract(currentCenter);
+		
+		for (View<CyNode> nodeView : nodeViews) {
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION,
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) + displacement.x());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION,
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) + displacement.y());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION,
+					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) + displacement.z());
+		}
 	}
 	
 	private void arrangeAsBox(Collection<View<CyNode>> nodeViews) {

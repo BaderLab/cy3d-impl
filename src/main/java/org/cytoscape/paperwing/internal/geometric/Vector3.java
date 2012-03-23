@@ -140,6 +140,18 @@ public class Vector3 {
 		return new Vector3(x - other.x, y - other.y, z - other.z);
 	}
 	
+	/** Subtract the specified values from the coordinates of this vector
+	 * 
+	 * @param x X-coordinate
+	 * @param y Y-coordinate
+	 * @param z Z-coordinate
+	 */
+	public void subtractLocal(double x, double y, double z) {
+		this.x -= x;
+		this.y -= y;
+		this.z -= z;
+	}
+	
 	/** Find the angle (<180 degrees) between this vector and another vector
 	 * 
 	 * @param other The other vector used to find the angle 
