@@ -4,12 +4,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.jar.Manifest;
 
+import javax.media.opengl.GLAnimatorControl;
+
 import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
+
+import com.jogamp.opengl.util.FPSAnimator;
 
 /**
  * This class is responsible for allowing communication between the main
@@ -44,6 +48,8 @@ public class ViewingCoordinator {
 	private boolean suggestRecalculateBounds = false;
 	
 	private EdgeAnalyser mainEdgeAnalyser = null;
+	
+	private GLAnimatorControl birdsEyeAnimatorControl = null;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -292,5 +298,13 @@ public class ViewingCoordinator {
 
 	public EdgeAnalyser getMainEdgeAnalyser() {
 		return mainEdgeAnalyser;
+	}
+
+	public void setBirdsEyeAnimatorControl(GLAnimatorControl birdsEyeAnimatorControl) {
+		this.birdsEyeAnimatorControl = birdsEyeAnimatorControl;
+	}
+
+	public GLAnimatorControl getBirdsEyeAnimatorControl() {
+		return birdsEyeAnimatorControl;
 	}
 }

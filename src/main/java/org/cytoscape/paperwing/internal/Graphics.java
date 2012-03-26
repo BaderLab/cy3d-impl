@@ -221,6 +221,7 @@ public class Graphics implements GLEventListener {
 		
 		graphicsData.setStartTime(System.nanoTime());
 		graphicsData.setGlContext(gl);
+		graphicsData.setAnimatorControl(drawable.getAnimator());
 		
 		handler.initializeGraphicsProcedures(graphicsData);
 		handler.setupLighting(graphicsData);

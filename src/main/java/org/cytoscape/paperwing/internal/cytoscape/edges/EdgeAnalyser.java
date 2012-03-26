@@ -82,8 +82,6 @@ public class EdgeAnalyser {
 		
 		for (AugmentedEdgeContainer edgeContainer : edgeContainersToBeRemoved) {
 			edgeContainers.remove(edgeContainer.getEdgeView());
-			
-			System.out.println("Removed edge " + edgeContainer.getEdgeView().getSUID());
 		}
 		
 		return edgeContainers.values();		

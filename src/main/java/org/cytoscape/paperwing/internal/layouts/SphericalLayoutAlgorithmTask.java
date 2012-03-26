@@ -40,8 +40,6 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
 		int numPartitions = layoutPartitions.size();
 		
-		System.out.println("Number of partitions: " + numPartitions);
-		
 		Collection<Collection<View<CyNode>>> partitions = new HashSet<Collection<View<CyNode>>>(layoutPartitions.size());
 		
 		Collection<View<CyNode>> partitionNodeViews;
@@ -133,7 +131,6 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 	}
 	
 	private void arrangeAsBox(Collection<View<CyNode>> nodeViews) {
-		
 	}
 	
 	private void arrangeAsSphere(Collection<View<CyNode>> nodeViews) {

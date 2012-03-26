@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.cytoscape.processing;
 
+import java.util.List;
 import java.util.Set;
 
 import org.cytoscape.model.CyEdge;
@@ -7,6 +8,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
@@ -29,7 +31,7 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		// Update CyTable with the currently selected set of nodes and edges
 		processSelectionData(graphicsData);
 		
-		// processUpdateSelected(graphicsData);
+		processUpdateSelected(graphicsData);
 	}
 	
 	// Performs selection in Cytoscape data objects, such as CyTable
@@ -68,18 +70,10 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
 		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
 		
-		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			if (NetworkToolkit.checkNodeSelected(nodeView.getModel().getIndex(), networkView)) {
-//			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-				selectedNodeIndices.add(nodeView.getModel().getIndex());
-			}
-		}
+		List<CyNode> tableSelectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 		
-		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-			if (NetworkToolkit.checkNodeSelected(edgeView.getModel().getIndex(), networkView)) {
-//			if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)) {
-				selectedEdgeIndices.add(edgeView.getModel().getIndex());
-			}
+		for (CyNode node : tableSelectedNodes) {
+			selectedNodeIndices.add(node.getIndex());
 		}
 	}
 	

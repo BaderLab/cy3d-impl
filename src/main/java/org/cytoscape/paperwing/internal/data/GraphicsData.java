@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.Graphics;
@@ -20,6 +21,8 @@ import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.swing.SubmenuTaskManager;
+
+import com.jogamp.opengl.util.FPSAnimator;
 
 /**
  * This class represents a data object in which data relevant to the renderer,
@@ -97,6 +100,9 @@ public class GraphicsData {
 	private SubmenuTaskManager submenuTaskManager;
 	
 	private EdgeAnalyser edgeAnalyser;
+	
+	/** The {@link GLAnimatorControl} object used to control the animator which automatically makes calls to redraw the scene */
+	private GLAnimatorControl animatorControl;
 	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
@@ -362,5 +368,13 @@ public class GraphicsData {
 
 	public EdgeAnalyser getEdgeAnalyser() {
 		return edgeAnalyser;
+	}
+
+	public void setAnimatorControl(GLAnimatorControl animatorControl) {
+		this.animatorControl = animatorControl;
+	}
+
+	public GLAnimatorControl getAnimatorControl() {
+		return animatorControl;
 	}
 }
