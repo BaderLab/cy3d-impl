@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.jar.Manifest;
 
 import javax.media.opengl.GLAnimatorControl;
+import javax.swing.SwingUtilities;
 
+import org.cytoscape.paperwing.internal.AnimatorController;
 import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
 import org.cytoscape.paperwing.internal.geometric.Quadrilateral;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
@@ -49,7 +51,8 @@ public class ViewingCoordinator {
 	
 	private EdgeAnalyser mainEdgeAnalyser = null;
 	
-	private GLAnimatorControl birdsEyeAnimatorControl = null;
+	private GLAnimatorControl birdsEyeAnimatorControl;
+	private AnimatorController mainAnimatorController;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -306,5 +309,13 @@ public class ViewingCoordinator {
 
 	public GLAnimatorControl getBirdsEyeAnimatorControl() {
 		return birdsEyeAnimatorControl;
+	}
+
+	public void setMainAnimatorController(AnimatorController mainAnimatorController) {
+		this.mainAnimatorController = mainAnimatorController;
+	}
+
+	public AnimatorController getMainAnimatorController() {
+		return mainAnimatorController;
 	}
 }

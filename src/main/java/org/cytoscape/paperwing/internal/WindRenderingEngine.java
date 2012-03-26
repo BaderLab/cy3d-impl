@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.util.Properties;
 
+import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLProfile.ShutdownType;
@@ -148,6 +149,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				animator.start();
 				
 				addStopAnimatorListener(component);
+				graphics.setAnimatorControl(animator);
 				
 				active = true;
 			}
@@ -163,7 +165,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	// Adds a listener to the component containing the GLJPanel to stop the animator
 	// if the GLJPanel is about to be removed
 	private void addStopAnimatorListener(JComponent container) {
-		container.addContainerListener(new ContainerListener(){
+		container.addContainerListener(new ContainerListener() {
 
 			@Override
 			public void componentAdded(ContainerEvent event) {

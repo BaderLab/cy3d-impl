@@ -20,6 +20,8 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 	public void extractData(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
 		
+		coordinator.setBirdsEyeAnimatorControl(graphicsData.getAnimatorControl());
+		
 		if (coordinator.isMainClaimed()) {
 			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
 			

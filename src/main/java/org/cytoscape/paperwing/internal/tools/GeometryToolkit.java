@@ -97,7 +97,7 @@ public class GeometryToolkit {
 		
 		Vector3 yOffset = cameraUp.copy();
 		yOffset.multiplyLocal(planeDistance * Math.tan(verticalFov / 360.0 * Math.PI));
-		System.out.println("yOffset: " + yOffset);
+
 		Vector3 xOffset = cameraDirection.copy(); // xOffset will be the camera's right vector
 		xOffset.crossLocal(cameraUp);
 		xOffset.multiplyLocal(yOffset.magnitude() * aspectRatio); // aspect = width / length

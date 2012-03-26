@@ -10,6 +10,7 @@ import java.awt.event.FocusListener;
 import java.awt.print.Printable;
 import java.util.Properties;
 
+import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;

@@ -9,6 +9,7 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.glu.GLU;
 
+import org.cytoscape.paperwing.internal.AnimatorController;
 import org.cytoscape.paperwing.internal.Graphics;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
@@ -103,6 +104,8 @@ public class GraphicsData {
 	
 	/** The {@link GLAnimatorControl} object used to control the animator which automatically makes calls to redraw the scene */
 	private GLAnimatorControl animatorControl;
+	
+	private AnimatorController animatorController;
 	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
@@ -376,5 +379,13 @@ public class GraphicsData {
 
 	public GLAnimatorControl getAnimatorControl() {
 		return animatorControl;
+	}
+
+	public void setAnimatorController(AnimatorController animatorController) {
+		this.animatorController = animatorController;
+	}
+
+	public AnimatorController getAnimatorController() {
+		return animatorController;
 	}
 }

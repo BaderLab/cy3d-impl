@@ -7,13 +7,17 @@
 
 package org.cytoscape.paperwing.internal;
 import java.awt.Component;
+import java.awt.Container;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
+import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
+import javax.swing.JInternalFrame;
+
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -130,6 +134,10 @@ public class Graphics implements GLEventListener {
 		graphicsData.setContainer(component);
 	}
 	
+	public void setAnimatorControl(GLAnimatorControl animatorControl) {
+		graphicsData.setAnimatorControl(animatorControl);
+	}
+	
 	/**
 	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
 	 * @param listener
@@ -184,6 +192,18 @@ public class Graphics implements GLEventListener {
 		
 		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
 		graphicsData.getFrameRateTracker().advanceFrame();
+		
+		// Pause rendering unless a keyboard or mouse button is held down to conserve CPU/GPU/power resources
+		if (handler instanceof MainGraphicsHandler) {
+			if (!graphicsData.getAnimatorController().hasKeysDown()) {
+				graphicsData.getAnimatorControl().stop();
+			}
+		} else if (handler instanceof BirdsEyeGraphicsHandler) {
+			if (coordinator.getMainAnimatorController() != null && !coordinator.getMainAnimatorController().hasKeysDown()) {
+				graphicsData.getAnimatorControl().stop();
+			}
+		}
+		
 	}
 
 	@Override
@@ -221,12 +241,26 @@ public class Graphics implements GLEventListener {
 		
 		graphicsData.setStartTime(System.nanoTime());
 		graphicsData.setGlContext(gl);
-		graphicsData.setAnimatorControl(drawable.getAnimator());
 		
 		handler.initializeGraphicsProcedures(graphicsData);
 		handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
+		
+		if (handler instanceof MainGraphicsHandler) {
+
+			// Add an AnimatorController as a listener that keeps the animator running only when at least 1 button is pressed
+			AnimatorController controller = new AnimatorController(graphicsData.getAnimatorControl());
+			controller.setCoordinator(coordinator);
+			
+			Component component = graphicsData.getContainer();
+			component.addKeyListener(controller);
+			component.addMouseListener(controller);
+			component.addMouseMotionListener(controller);
+			component.addMouseWheelListener(controller);
+			
+			graphicsData.setAnimatorController(controller);
+		}
 	}
 
 

@@ -19,6 +19,8 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 	public void extractData(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
 		
+		coordinator.setMainAnimatorController(graphicsData.getAnimatorController());
+		
 		if (coordinator.isBirdsEyeClaimed()) {
 			SimpleCamera camera = graphicsData.getCamera();
 			
