@@ -27,7 +27,7 @@ public class SelectionInputHandler implements InputHandler {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
 		//TODO: Check whether to have this method here or in MainCytoscapeDataProcessor
-//		processClearToBeDeselected(selectionData);
+		processClearToBeDeselected(selectionData);
 		
 		processDeselectOther(keys, mouse, graphicsData);
 		processSingleSelection(keys, mouse, graphicsData);

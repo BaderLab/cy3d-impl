@@ -127,40 +127,32 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 */
 	@Override
 	public void fitContent() {
-		Vector3 networkCenter = NetworkToolkit.findNetworkCenter(this, 1);
+		if (networkCamera != null) {
+			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
+		}
 		
-		// Shift the nodes to place the center of the network at the origin
-		for (View<CyNode> nodeView : getNodeViews()) {
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) - networkCenter.x());
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) - networkCenter.y());
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) - networkCenter.z());
+		if (animatorController != null) {
+			animatorController.startAnimator();
 		}
 	}
 
 	@Override
 	public void fitSelected() {
 		// Obtain selected nodes
-		Set<Integer> selectedNodeIndices = new HashSet<Integer>();
+		Set<View<CyNode>> selectedNodeViews = new HashSet<View<CyNode>>();
 		
 		for (View<CyNode> nodeView : getNodeViews()) {
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-				selectedNodeIndices.add(nodeView.getModel().getIndex());
+				selectedNodeViews.add(nodeView);
 			}
 		}
 		
-		Vector3 selectionCenter = NetworkToolkit.findCenter(selectedNodeIndices, this, 1);
-	
-		// Shift the nodes to place the center of the network at the center of the selected group of nodes
-		for (View<CyNode> nodeView : getNodeViews()) {
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) - selectionCenter.x());
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION) - selectionCenter.y());
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
-					nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION) - selectionCenter.z());
+		if (networkCamera != null) {
+			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
+		}
+		
+		if (animatorController != null) {
+			animatorController.startAnimator();
 		}
 	}
 
@@ -174,6 +166,10 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		// Match the current network view to the currently applied visual style
 //		updateToMatchVisualStyle();
+		
+		if (animatorController != null) {
+			animatorController.startAnimator();
+		}
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts

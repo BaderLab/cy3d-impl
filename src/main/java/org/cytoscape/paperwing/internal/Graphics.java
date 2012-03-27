@@ -262,6 +262,7 @@ public class Graphics implements GLEventListener {
 			
 			graphicsData.setAnimatorController(controller);
 			((WindNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
+			((WindNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
 		}
 	}
 

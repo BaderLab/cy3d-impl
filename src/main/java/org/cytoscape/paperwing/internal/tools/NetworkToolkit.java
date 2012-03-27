@@ -60,16 +60,18 @@ public class NetworkToolkit {
 	 * @param nodeViews The node views to be fit into the current view
 	 * @param distanceScale The distance scaling used to convert between Cytoscape and render coordinates. Cytoscape coordinates
 	 * are divided by this scale to obtain renderer coordinates.
+	 * @param distanceFactor The multiplier against the distance from the center of the nodes to the farthest node used to place the camera
 	 * @param minDistance The minimum distance between the camera and the average node position.
 	 */
-	public static void fitInView(SimpleCamera camera, Collection<View<CyNode>> nodeViews, double distanceScale, double minDistance) {
+	public static void fitInView(SimpleCamera camera, Collection<View<CyNode>> nodeViews, 
+			double distanceScale, double distanceFactor, double minDistance) {
 		Vector3 center = NetworkToolkit.findCenter(nodeViews, distanceScale);
 		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(nodeViews, center, distanceScale);
 		
 		double newDistance = farthestNode.distance(center);
 		
 		// Further increase the distance needed
-		newDistance *= 3;
+		newDistance *= distanceFactor;
 		
 		// Enforce minimum distance
 		newDistance = Math.max(newDistance, minDistance);
@@ -153,7 +155,7 @@ public class NetworkToolkit {
 	 */
 	public static Vector3 findFarthestNodeFromCenter(Collection<View<CyNode>> nodeViews, Vector3 networkCenter, double distanceScale) {
 		double currentDistanceSquared;
-		double maxDistanceSquared = 0;
+		double maxDistanceSquared = -1;
 		
 		Vector3 currentPosition = new Vector3();
 		Vector3 maxPosition = new Vector3();
@@ -200,6 +202,32 @@ public class NetworkToolkit {
 		
 		for (Integer index : nodeIndices) {
 			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
+			
+			if (nodeView != null) {
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
+								+ displacement.x() * distanceScale);
+				
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
+								+ displacement.y() * distanceScale);
+				
+				nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
+						nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
+								+ displacement.z() * distanceScale);
+			}
+		}
+	}
+	
+	/**
+	 * Moves all of the given nodes by the given displacement vector.
+	 * 
+	 * @param nodeViews The node view objects to move
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates
+	 * @param displacement The displacement vector
+	 */
+	public static void displaceNodes(Collection<View<CyNode>> nodeViews, double distanceScale, Vector3 displacement) {
+		for (View<CyNode> nodeView : nodeViews) {
 			
 			if (nodeView != null) {
 				nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 

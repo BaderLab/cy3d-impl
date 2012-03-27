@@ -44,8 +44,6 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 	public WindMainRenderingEngine(Object container, View<CyNetwork> viewModel,
 			VisualLexicon visualLexicon) {
 		super(container, viewModel, visualLexicon);
-		
-		System.out.println("Main rendering engine created: " + this);
 	}
 
 	@Override
@@ -65,10 +63,8 @@ public class WindMainRenderingEngine extends WindRenderingEngine {
 			@Override
 			public void handleEvent(SetCurrentRenderingEngineEvent e) {
 				if (e.getRenderingEngine() == renderingEngine) {
-					System.out.println("Current network view changed, starting animator for " + this + ".");
 					animator.start();
 				} else {
-					System.out.println("Current network view changed, stopping animator for " + this + ".");
 					animator.stop();
 				}
 			}

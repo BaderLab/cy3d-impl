@@ -85,7 +85,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		for (AugmentedEdgeContainer container : edgeContainers) {
 			edgeView = container.getEdgeView();
 			
-			if (container.isSufficientLength()) {
+			if (container.isSufficientLength() && edgeView.getVisualProperty(BasicVisualLexicon.EDGE_VISIBLE)) {
 				
 				edgeWidth = edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH);
 				

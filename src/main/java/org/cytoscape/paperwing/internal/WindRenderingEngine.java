@@ -226,7 +226,6 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 				// System.out.println("Current engine: " + selfPointer);
 				
 				if (evt.getNetworkView() == networkView) {
-					System.out.println("Rendering engine about to be removed, stopping animator");
 					animator.stop();
 					
 					serviceRegistrar.unregisterService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class);

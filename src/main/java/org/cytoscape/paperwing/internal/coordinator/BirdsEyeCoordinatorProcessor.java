@@ -126,7 +126,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 		
 		*/
 		
-		NetworkToolkit.fitInView(camera, graphicsData.getNetworkView().getNodeViews(), graphicsData.getDistanceScale(), 5.0);
+		NetworkToolkit.fitInView(camera, graphicsData.getNetworkView().getNodeViews(), graphicsData.getDistanceScale(), 3.0, 5.0);
 	}
 	
 

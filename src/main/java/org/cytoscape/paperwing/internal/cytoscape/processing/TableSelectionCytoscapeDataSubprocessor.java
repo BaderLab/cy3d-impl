@@ -69,6 +69,7 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 		
 		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
 		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
+		// selectedNodeIndices.clear();
 		
 		List<CyNode> tableSelectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 		

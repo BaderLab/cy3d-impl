@@ -31,6 +31,7 @@ public class MainCytoscapeDataProcessor implements CytoscapeDataProcessor {
 		// Populate the list of subprocessors; they are called in the order added.
 		subprocessors.add(new TableSelectionCytoscapeDataSubprocessor());
 		subprocessors.add(new LightingCytoscapeDataSubprocessor());
+		subprocessors.add(new CameraCytoscapeDataSubprocessor());
 	}
 	
 	@Override
