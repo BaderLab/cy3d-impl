@@ -24,6 +24,7 @@ import com.jogamp.opengl.util.FPSAnimator;
 import org.cytoscape.paperwing.internal.coordinator.CoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkView;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.input.InputProcessor;
@@ -260,6 +261,7 @@ public class Graphics implements GLEventListener {
 			component.addMouseWheelListener(controller);
 			
 			graphicsData.setAnimatorController(controller);
+			((WindNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
 		}
 	}
 

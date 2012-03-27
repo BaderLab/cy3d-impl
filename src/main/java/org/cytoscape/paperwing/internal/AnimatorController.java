@@ -116,7 +116,7 @@ public class AnimatorController implements KeyListener, MouseListener, MouseMoti
 		return coordinator;
 	}
 
-	private void startAnimator() {
+	public void startAnimator() {
 		animatorControl.start();
 		
 		if (coordinator.isBirdsEyeClaimed() && coordinator.getBirdsEyeAnimatorControl() != null) {
@@ -124,7 +124,7 @@ public class AnimatorController implements KeyListener, MouseListener, MouseMoti
 		}
 	}
 	
-	private void stopAnimator() {
+	public void stopAnimator() {
 		animatorControl.stop();
 		
 		if (coordinator.isBirdsEyeClaimed() && coordinator.getBirdsEyeAnimatorControl() != null) {

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkView;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.view.layout.AbstractBasicLayoutTask;
@@ -60,6 +61,10 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		}
 		
 		arrangePartitions(partitions);
+		
+		if (networkView instanceof WindNetworkView) {
+			((WindNetworkView) networkView).getAnimatorController().startAnimator();
+		}
 	}
 	
 	private void arrangePartitions(Collection<Collection<View<CyNode>>> partitions) {

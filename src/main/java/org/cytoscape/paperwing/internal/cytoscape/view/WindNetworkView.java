@@ -7,10 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.media.opengl.GLAnimatorControl;
+
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.model.SUIDFactory;
 import org.cytoscape.model.events.AboutToRemoveEdgesEvent;
 import org.cytoscape.model.events.AboutToRemoveEdgesListener;
@@ -20,8 +22,10 @@ import org.cytoscape.model.events.AddedEdgesEvent;
 import org.cytoscape.model.events.AddedEdgesListener;
 import org.cytoscape.model.events.AddedNodesEvent;
 import org.cytoscape.model.events.AddedNodesListener;
+import org.cytoscape.paperwing.internal.AnimatorController;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
+import org.cytoscape.paperwing.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -39,6 +43,9 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private VisualLexicon visualLexicon;
 	private DefaultValueVault defaultValues;
 	private VisualMappingManager visualMappingManager;
+	
+	private AnimatorController animatorController;
+	private SimpleCamera networkCamera = null;
 	
 	// Assumes indices of nodes are unique
 	private Map<Integer, View<CyNode>> nodeViews;
@@ -104,8 +111,8 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	}
 
 	@Override
-	public Collection<View<? extends CyTableEntry>> getAllViews() {
-		Collection<View<? extends CyTableEntry>> views = new HashSet<View<? extends CyTableEntry>>();
+	public Collection<View<? extends CyIdentifiable>> getAllViews() {
+		Collection<View<? extends CyIdentifiable>> views = new HashSet<View<? extends CyIdentifiable>>();
 		
 		// Return views for Node, Edge, Network
 		views.addAll(getNodeViews());
@@ -278,7 +285,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		// Update visual properties according to the current visual style
 		VisualStyle visualStyle = visualMappingManager.getVisualStyle(this);
 		
-		for (View<? extends CyTableEntry> view : getAllViews()) {
+		for (View<? extends CyIdentifiable> view : getAllViews()) {
 			for (VisualProperty<?> visualProperty : visualLexicon.getAllVisualProperties()) {
 				if (view.getVisualProperty(visualProperty) != null 
 						&& visualStyle.getDefaultValue(visualProperty) != null
@@ -308,6 +315,22 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			// Otherwise, return the default value
 			return defaultValues.getDefaultValue(visualProperty);
 		}
+	}
+
+	public void setAnimatorController(AnimatorController animatorController) {
+		this.animatorController = animatorController;
+	}
+
+	public AnimatorController getAnimatorController() {
+		return animatorController;
+	}
+
+	public void setNetworkCamera(SimpleCamera networkCamera) {
+		this.networkCamera = networkCamera;
+	}
+
+	public SimpleCamera getNetworkCamera() {
+		return networkCamera;
 	}
 	
 //	@Override

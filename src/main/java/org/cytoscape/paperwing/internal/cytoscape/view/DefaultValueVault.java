@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyTableEntry;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -21,7 +21,7 @@ public class DefaultValueVault {
 	private Map<String, VisualPropertyValueHolder<?>> edgeDefaultValues;
 	private Map<String, VisualPropertyValueHolder<?>> networkDefaultValues;
 	
-	private Map<Class<? extends CyTableEntry>,
+	private Map<Class<? extends CyIdentifiable>,
 		Map<String, VisualPropertyValueHolder<?>>> defaultValueSets;
 	
 	private VisualLexicon visualLexicon;
@@ -33,7 +33,7 @@ public class DefaultValueVault {
 		edgeDefaultValues = new HashMap<String, VisualPropertyValueHolder<?>>();
 		networkDefaultValues = new HashMap<String, VisualPropertyValueHolder<?>>();
 		
-		defaultValueSets = new HashMap<Class<? extends CyTableEntry>, Map<String, VisualPropertyValueHolder<?>>>();
+		defaultValueSets = new HashMap<Class<? extends CyIdentifiable>, Map<String, VisualPropertyValueHolder<?>>>();
 		defaultValueSets.put(CyNode.class, nodeDefaultValues);
 		defaultValueSets.put(CyEdge.class, edgeDefaultValues);
 		defaultValueSets.put(CyNetwork.class, networkDefaultValues);

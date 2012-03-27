@@ -1,10 +1,14 @@
 package org.cytoscape.paperwing.internal.coordinator;
 
+import java.util.Collection;
+
+import org.cytoscape.model.CyNode;
 import org.cytoscape.paperwing.internal.data.CoordinatorData;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.NetworkToolkit;
 import org.cytoscape.paperwing.internal.tools.SimpleCamera;
+import org.cytoscape.view.model.View;
 
 public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 
@@ -98,6 +102,8 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 		// Update the birds eye view camera
 		camera.set(mainCameraCopy);
 		
+		/*
+	
 		Vector3 networkCenter = NetworkToolkit.findNetworkCenter(graphicsData.getNetworkView(), graphicsData.getDistanceScale());
 		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(graphicsData.getNetworkView(), networkCenter, graphicsData.getDistanceScale());
 		
@@ -117,7 +123,13 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 
 		camera.moveTo(networkCenter.plus(offset));
 		camera.setDistance(newDistance);
+		
+		*/
+		
+		NetworkToolkit.fitInView(camera, graphicsData.getNetworkView().getNodeViews(), graphicsData.getDistanceScale(), 5.0);
 	}
+	
+
 	
 	@Override
 	public void unlinkCoordinator(ViewingCoordinator coordinator) {

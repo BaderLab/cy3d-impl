@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.tools;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.cytoscape.model.CyColumn;
@@ -17,6 +18,14 @@ public class NetworkToolkit {
 
 	private static final String SELECTED_COLUMN_NAME = "selected";
 	
+	/**
+	 * Find the average position of a given set of nodes.
+	 * 
+	 * @param nodeIndices The indices of nodes whose average position is to be found
+	 * @param networkView The network view containing the nodes
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates.
+	 * @return The average position
+	 */
 	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
 		if (nodeIndices.isEmpty()) {
 			return null;
@@ -43,7 +52,70 @@ public class NetworkToolkit {
 		
 		return result;
 	}
+	
+	/**
+	 * Position the given camera as to fit all of the given nodes in the current view.
+	 * 
+	 * @param camera The camera to position
+	 * @param nodeViews The node views to be fit into the current view
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and render coordinates. Cytoscape coordinates
+	 * are divided by this scale to obtain renderer coordinates.
+	 * @param minDistance The minimum distance between the camera and the average node position.
+	 */
+	public static void fitInView(SimpleCamera camera, Collection<View<CyNode>> nodeViews, double distanceScale, double minDistance) {
+		Vector3 center = NetworkToolkit.findCenter(nodeViews, distanceScale);
+		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(nodeViews, center, distanceScale);
+		
+		double newDistance = farthestNode.distance(center);
+		
+		// Further increase the distance needed
+		newDistance *= 3;
+		
+		// Enforce minimum distance
+		newDistance = Math.max(newDistance, minDistance);
+		
+		Vector3 offset = camera.getDirection().multiply(-newDistance);
+		
+		camera.moveTo(center.plus(offset));
+		camera.setDistance(newDistance);
+	}
+	
+	/**
+	 * Obtain the average position of a set of nodes.
+	 * 
+	 * @param nodeViews The node views whose average position is to be obtained
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and render coordinates. Cytoscape coordinates
+	 * are divided by this scale to obtain renderer coordinates.
+	 * @return The average position
+	 */
+	public static Vector3 findCenter(Collection<View<CyNode>> nodeViews, double distanceScale) {
+		double x = 0, y = 0, z = 0;
+		int visitedCount = 0;
+		
+		for (View<CyNode> nodeView : nodeViews) {
+			
+			if (nodeView != null) {
+				x += nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+				y += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+				z += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
+				visitedCount++;
+			}
+		}
+		
+		Vector3 result = new Vector3(x, y, z);
+		result.divideLocal(distanceScale * visitedCount);
+		
+		return result;
+	}
 
+	/**
+	 * Obtain the average position of nodes in a network.
+	 *
+	 * @param networkView The network to find the average position of
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and render coordinates. Cytoscape coordinates
+	 * are divided by this scale to obtain renderer coordinates.
+	 * @return The average position
+	 */
 	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
@@ -70,17 +142,23 @@ public class NetworkToolkit {
 		return result;
 	}
 
-	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, Vector3 networkCenter, double distanceScale) {
+	/**
+	 * Find the position of the node that is farthest from a given position.
+	 * 
+	 * @param nodeViews The node views used to find the farthest node
+	 * @param networkCenter The position used as the center, to determine the farthest node
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and render coordinates. Cytoscape coordinates
+	 * are divided by this scale to obtain renderer coordinates.
+	 * @return The position of the farthest node
+	 */
+	public static Vector3 findFarthestNodeFromCenter(Collection<View<CyNode>> nodeViews, Vector3 networkCenter, double distanceScale) {
 		double currentDistanceSquared;
 		double maxDistanceSquared = 0;
 		
 		Vector3 currentPosition = new Vector3();
 		Vector3 maxPosition = new Vector3();
 		
-		View<CyNode> nodeView;
-		
-		for (CyNode node : networkView.getModel().getNodeList()) {
-			nodeView = networkView.getNodeView(node);
+		for (View<CyNode> nodeView : nodeViews) {
 			
 			if (nodeView != null) {
 			
@@ -100,11 +178,23 @@ public class NetworkToolkit {
 		
 		return maxPosition;
 	}
+	
+	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, Vector3 networkCenter, double distanceScale) {
+		return findFarthestNodeFromCenter(networkView.getNodeViews(), networkCenter, distanceScale);
+	}
 
 	public static Vector3 findFarthestNodeFromCenter(CyNetworkView networkView, double distanceScale) {
 		return findFarthestNodeFromCenter(networkView, findNetworkCenter(networkView, distanceScale), distanceScale);
 	}
 
+	/**
+	 * Moves all of a given set of nodes by an amount specified by a displacement vector.
+	 * 
+	 * @param nodeIndices The indices of nodes to move
+	 * @param networkView The network view containing the nodes
+	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates
+	 * @param displacement The displacement vector
+	 */
 	public static void displaceNodes(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale, Vector3 displacement) {
 		View<CyNode> nodeView;
 		
