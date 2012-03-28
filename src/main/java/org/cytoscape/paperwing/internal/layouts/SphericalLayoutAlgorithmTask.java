@@ -61,10 +61,6 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		}
 		
 		arrangePartitions(partitions);
-		
-		if (networkView instanceof WindNetworkView) {
-			((WindNetworkView) networkView).getAnimatorController().startAnimator();
-		}
 	}
 	
 	private void arrangePartitions(Collection<Collection<View<CyNode>>> partitions) {
@@ -136,6 +132,7 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 	}
 	
 	private void arrangeAsBox(Collection<View<CyNode>> nodeViews) {
+		
 	}
 	
 	private void arrangeAsSphere(Collection<View<CyNode>> nodeViews) {
@@ -159,29 +156,9 @@ public class SphericalLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 			// Perform a correction for small numbers of nodes
 			double phiLimit = 0.20 - Math.min((double) nodeCount / 125, 1) * 0.15;
 			
-			/*
-			if (nodeCount < 25) {
-				phiLimit = 0.15;
-			} else {
-				phiLimit = 0.05;
-			}
-			*/
-			
 			// double theta = Math.PI / 2 - (Math.PI * thetaLimit + (double) level / numLevels * Math.PI * (1 - 2 * thetaLimit));	
 			double theta = Math.PI / 2 - (Math.PI * thetaLimit + levelFraction * Math.PI * (2 - 2 * thetaLimit));
 			double phi = Math.PI * phiLimit + (double) (current % nodesPerLevel) / (nodesPerLevel - 1) * Math.PI * (1 - 2 * phiLimit);
-			
-			/*
-			int numLevels = (int) Math.sqrt(nodeCount);
-			
-			int level = (current / numLevels) * numLevels;
-			
-			double thetaLimit = 0.1;
-			double phiLimit = 0.1;
-				
-			double theta = Math.PI / 2 - (Math.PI * thetaLimit + (double) level / nodeCount * Math.PI * (1 - 2 * thetaLimit));
-			double phi = Math.PI * phiLimit + (double) (current % numLevels) / numLevels * Math.PI * (2 - 2 * phiLimit);			
-			*/
 			
 			x = Math.cos(theta) * Math.sin(phi);
 			y = Math.sin(theta) * Math.sin(phi);

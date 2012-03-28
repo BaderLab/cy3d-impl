@@ -8,6 +8,10 @@
 package org.cytoscape.paperwing.internal;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -140,6 +144,29 @@ public class Graphics implements GLEventListener {
 		
 		if (handler instanceof MainGraphicsHandler) {
 			((WindNetworkView) graphicsData.getNetworkView()).setContainer(component);
+		} else if (handler instanceof BirdsEyeGraphicsHandler) {
+			
+			// Add mouse listeners to render the updated scene when the Bird's eye view
+			// is clicked or encounters mouse drag movement
+			component.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mousePressed(MouseEvent e) {
+					if (coordinator != null 
+							&& coordinator.getMainAnimatorController() != null) {
+						coordinator.getMainAnimatorController().startAnimator();
+					}
+				}
+			});
+			
+			component.addMouseMotionListener(new MouseMotionAdapter() {
+				@Override
+				public void mouseDragged(MouseEvent e) {
+					if (coordinator != null 
+							&& coordinator.getMainAnimatorController() != null) {
+						coordinator.getMainAnimatorController().startAnimator();
+					}
+				}
+			});
 		}
 	}
 	
@@ -208,7 +235,8 @@ public class Graphics implements GLEventListener {
 				graphicsData.getAnimatorControl().stop();
 			}
 		} else if (handler instanceof BirdsEyeGraphicsHandler) {
-			if (coordinator.getMainAnimatorController() != null && !coordinator.getMainAnimatorController().hasKeysDown()) {
+			if (coordinator.getMainAnimatorController() != null 
+					&& !coordinator.getMainAnimatorController().hasKeysDown()) {
 				graphicsData.getAnimatorControl().stop();
 			}
 		}

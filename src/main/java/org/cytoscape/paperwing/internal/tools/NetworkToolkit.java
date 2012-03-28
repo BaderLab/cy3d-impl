@@ -26,11 +26,7 @@ public class NetworkToolkit {
 	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {
-		if (nodeIndices.isEmpty()) {
-			return null;
-		}
-		
+	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {		
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		
@@ -48,7 +44,10 @@ public class NetworkToolkit {
 		}
 		
 		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(distanceScale * visitedCount);
+		
+		if (visitedCount != 0) { 
+			result.divideLocal(distanceScale * visitedCount);
+		}
 		
 		return result;
 	}
@@ -105,7 +104,9 @@ public class NetworkToolkit {
 		}
 		
 		Vector3 result = new Vector3(x, y, z);
-		result.divideLocal(distanceScale * visitedCount);
+		if (visitedCount != 0) { 
+			result.divideLocal(distanceScale * visitedCount);
+		}
 		
 		return result;
 	}
@@ -118,7 +119,7 @@ public class NetworkToolkit {
 	 * are divided by this scale to obtain renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {
+	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {		
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		

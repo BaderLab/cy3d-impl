@@ -144,14 +144,14 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 */
 	@Override
 	public void fitContent() {
-		if (networkCamera != null) {
-			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
-			networkCentered = true;
-		}
+		fitNodesInView();
 		
 		if (animatorController != null) {
 			animatorController.startAnimator();
 		}
+		
+		// Request focus for the network view to be ready for keyboard input
+		requestNetworkFocus();
 	}
 
 	@Override
@@ -172,6 +172,9 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		if (animatorController != null) {
 			animatorController.startAnimator();
 		}
+		
+		// Request focus for the network view to be ready for keyboard input
+		requestNetworkFocus();
 	}
 
 	@Override
@@ -190,16 +193,14 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			animatorController.startAnimator();
 		}
 		
-		if (networkCamera != null && !networkCentered) {
-			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
-			networkCentered = true;
+		// Center the network if it hasn't been centered yet
+		if (!networkCentered) {
+			fitNodesInView();
 		}
 		
 		// Request focus after the network has been updated, such as via clicking a toolbar button,
 		// in order to be ready to receive keyboard and mouse input
-		if (container != null) {
-			container.requestFocus();
-		}
+		requestNetworkFocus();
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -367,51 +368,24 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		return container;
 	}
 	
-//	@Override
-//	public void handleEvent(AboutToRemoveNodesEvent e) {
-//		if (e.getSource() == network) {
-//			for (CyNode node : e.getNodes()) {
-//				nodeViews.remove(node.getIndex());
-//			}
-//		}
-//	}
-//	
-//	@Override
-//	public void handleEvent(AboutToRemoveEdgesEvent e) {
-//		if (e.getSource() == network) {
-//			for (CyEdge edge : e.getEdges()) {
-//				edgeViews.remove(edge.getIndex());
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void handleEvent(AddedNodesEvent e) {
-//		if (e.getSource() == network) {
-//			WindNodeView nodeView;
-//			
-//			for (CyNode node : e.getPayloadCollection()) {
-//				nodeView = new WindNodeView(node, SUIDFactory.getNextSUID());
-//				defaultValues.initializeNode(nodeView);
-//				
-//				nodeViews.put(node.getIndex(), nodeView);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void handleEvent(AddedEdgesEvent e) {
-//		if (e.getSource() == network) {
-//			WindEdgeView edgeView;
-//			
-//			for (CyEdge edge : e.getPayloadCollection()) {
-//				edgeView = new WindEdgeView(edge, SUIDFactory.getNextSUID());
-//				defaultValues.initializeEdge(edgeView);
-//				
-//				edgeViews.put(edge.getIndex(), edgeView);
-//			}
-//		}
-//	}
+	/**
+	 * Attempts to adjust the view to show all nodes by using the network camera.
+	 */
+	private void fitNodesInView() {
+		if (networkCamera != null) {
+			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
+			networkCentered = true;
+		}
+	}
+	
+	/**
+	 * Requests focus for this network view so that it is ready to accept mouse and keyboard input.
+	 */
+	private void requestNetworkFocus() {
+		if (container != null) {
+			container.requestFocus();
+		}
+	}
 
 	
 

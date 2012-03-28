@@ -24,6 +24,7 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 	
 	@Override
 	public void processCytoscapeData(GraphicsData graphicsData) {
+		
 	}
 	
 	/**

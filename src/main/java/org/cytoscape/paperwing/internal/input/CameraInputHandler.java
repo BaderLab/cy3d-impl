@@ -163,7 +163,7 @@ public class CameraInputHandler implements InputHandler {
 		// Reset camera
 		if (held.contains(KeyEvent.VK_C)) {
 			graphicsData.getCamera().set(new SimpleCamera());
-			graphicsData.getNetworkView().updateView();
+			graphicsData.getNetworkView().fitContent();
 		}
 	}
 	

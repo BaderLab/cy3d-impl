@@ -10,6 +10,8 @@ import javax.media.opengl.glu.GLUquadric;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.RenderToolkit;
 
+import com.jogamp.opengl.util.gl2.GLUT;
+
 public class ScalableShapeDrawer {
 	
 	private static final int SPHERE_SLICES_DETAIL = 12;
@@ -61,6 +63,7 @@ public class ScalableShapeDrawer {
 		int shapeListIndex = gl.glGenLists(1);
 
 		GLU glu = GLU.createGLU(gl);
+		GLUT glut = new GLUT();
 		
 		GLUquadric quadric = glu.gluNewQuadric();
 		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
@@ -73,9 +76,13 @@ public class ScalableShapeDrawer {
 		
 		gl.glPushMatrix();
 		//gl.glScalef(halfLength, halfLength, halfLength);
-		gl.glTranslatef(0.0f, 0.0f, -0.5f);
+		//gl.glTranslatef(0.0f, 0.0f, -0.5f);
 		
-		glu.gluCylinder(quadric, 1.0, 1.0, 1.0, 4, 1);
+		//glu.gluCylinder(quadric, 1.0, 1.0, 1.0, 4, 1);
+		
+		glut.glutSolidCube(0.5f);
+		// gl.glColor3f(0.0f, 0.0f, 0.0f);
+		// glut.glutWireCube(0.5f);
 		
 		gl.glPopMatrix();
 		
@@ -145,7 +152,7 @@ public class ScalableShapeDrawer {
 		
 		gl.glEndList();
 		
-		shapeLists.put(ShapeType.SHAPE_CUBE, shapeListIndex);
+		shapeLists.put(ShapeType.SHAPE_CUBE_SLICED_CORNERS, shapeListIndex);
 	}
 	
 	// Tetrahedron inscribed in circle with radius 0.5
