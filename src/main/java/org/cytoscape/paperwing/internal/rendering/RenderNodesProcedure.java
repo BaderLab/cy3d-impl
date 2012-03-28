@@ -143,9 +143,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
 			
 			// Make selected nodes appear greener
-			color.multiplyRed(0.7, 0, 0.7);
+			color.multiplyRed(0.7, 0, 0.3);
 			color.multiplyGreen(1.5, 0.5, 1);
-			color.multiplyBlue(0.7, 0, 0.7);
+			color.multiplyBlue(0.7, 0, 0.3);
 		} else if (nodeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverNodeIndex()) {
 			// Make hovered nodes appear bluer
 			color.multiplyRed(0.7, 0, 0.7);

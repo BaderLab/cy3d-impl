@@ -2,6 +2,7 @@ package org.cytoscape.paperwing.internal.input;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Set;
 
 import org.cytoscape.model.CyEdge;
@@ -9,6 +10,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.layouts.SphericalLayoutAlgorithmTask;
@@ -27,7 +29,7 @@ public class SelectionInputHandler implements InputHandler {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
 		//TODO: Check whether to have this method here or in MainCytoscapeDataProcessor
-		processClearToBeDeselected(selectionData);
+		// processClearToBeDeselected(selectionData);
 		
 		processDeselectOther(keys, mouse, graphicsData);
 		processSingleSelection(keys, mouse, graphicsData);
@@ -44,6 +46,7 @@ public class SelectionInputHandler implements InputHandler {
 	// Performs single selection, and deselection of previously selected objects
 	private void processSingleSelection(KeyboardMonitor keys,
 			MouseMonitor mouse, GraphicsData graphicsData) {
+		CyNetworkView networkView = graphicsData.getNetworkView();
 		int newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		int newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 		
@@ -52,13 +55,6 @@ public class SelectionInputHandler implements InputHandler {
 		selectionData.setHoverNodeIndex(newHoverNodeIndex);
 		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
 		
-		Set<Integer> selectedNodeIndices = selectionData.getSelectedNodeIndices();
-		Set<Integer> selectedEdgeIndices = selectionData.getSelectedEdgeIndices();
-	
-		// These are needed to keep track of to-be removed objects for faster Cytoscape data processing
-		Set<Integer> toBeDeselectedNodeIndices = selectionData.getToBeDeselectedNodeIndices();
-		Set<Integer> toBeDeselectedEdgeIndices = selectionData.getToBeDeselectedEdgeIndices();
-		
 		if (!selectionData.isDragSelectMode()
 				&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				
@@ -66,29 +62,22 @@ public class SelectionInputHandler implements InputHandler {
 				
 				if (newHoverNodeIndex != NO_INDEX) {
 					
-					if (selectedNodeIndices.contains(newHoverNodeIndex)) {
-						selectedNodeIndices.remove(newHoverNodeIndex);
-						toBeDeselectedNodeIndices.add(newHoverNodeIndex);
-						
+					if (NetworkToolkit.checkNodeSelected(newHoverNodeIndex, networkView)) {
+						// Deselect the node if it was already selected
+						NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, false);
 					} else {
-						selectedNodeIndices.add(newHoverNodeIndex);
-						
-						// Debug: Find size of biggest clique containing this node
-						
-						/*
-						System.out.println("Size of clique: " + SphericalLayoutAlgorithmTask.findCliques(
-								graphicsData.getNetworkView().getModel()).get(
-										graphicsData.getNetworkView().getModel().getNode(newHoverNodeIndex)).size());
-						*/
+						// Select the node if it was not selected
+						NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, true);
 					}
 					
 				} else if (newHoverEdgeIndex != NO_INDEX) {
 		
-					if (selectedEdgeIndices.contains(newHoverEdgeIndex)) {
-						selectedEdgeIndices.remove(newHoverEdgeIndex);
-						toBeDeselectedEdgeIndices.add(newHoverEdgeIndex);
+					if (NetworkToolkit.checkEdgeSelected(newHoverEdgeIndex, networkView)) {
+						// Deselect the edge if it was already selected
+						NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, false);
 					} else {
-						selectedEdgeIndices.add(newHoverEdgeIndex);
+						// Select the edge if it was not selected
+						NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, true);
 					}
 				}
 			}
@@ -98,24 +87,25 @@ public class SelectionInputHandler implements InputHandler {
 	private void processDeselectOther(KeyboardMonitor keys, MouseMonitor mouse,
 			GraphicsData graphicsData) {
 		
+		CyNetworkView networkView = graphicsData.getNetworkView();
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		
-		Set<Integer> selectedNodeIndices = selectionData.getSelectedNodeIndices();
-		Set<Integer> selectedEdgeIndices = selectionData.getSelectedEdgeIndices();
-		
+
 		if (mouse.getPressed().contains(MouseEvent.BUTTON1)) { 
 			if (!selectionData.isDragSelectMode() 
 					&& !keys.getHeld().contains(KeyEvent.VK_SHIFT)
 					&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 					
-					//&& graphicsData.getPickingData().getClosestPickedNodeIndex() == NO_INDEX
-					//&& graphicsData.getPickingData().getClosestPickedEdgeIndex() == NO_INDEX) {
-				
-				selectionData.getToBeDeselectedNodeIndices().addAll(selectedNodeIndices);
-				selectionData.getToBeDeselectedEdgeIndices().addAll(selectedEdgeIndices);
-				
-				selectedNodeIndices.clear();
-				selectedEdgeIndices.clear();
+				// Deselect currently selected nodes
+				List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
+				for (CyNode node : selectedNodes) {
+					NetworkToolkit.setNodeSelected(node.getIndex(), networkView, false);
+				}
+
+				// Deselect currently selected edges
+				List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(networkView.getModel(), "selected", true);
+				for (CyEdge edge : selectedEdges) {
+					NetworkToolkit.setEdgeSelected(edge.getIndex(), networkView, false);
+				}
 			}
 		}
 		
@@ -126,6 +116,7 @@ public class SelectionInputHandler implements InputHandler {
 			GraphicsData graphicsData) {
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+		CyNetworkView networkView = graphicsData.getNetworkView();
 		
 		if (!keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 		
@@ -156,9 +147,19 @@ public class SelectionInputHandler implements InputHandler {
 				selectionData.setDragSelectMode(false);
 				selectionData.setSelectTopLeftFound(false);
 				
+				
+				for (Integer index : graphicsData.getPickingData().getPickedNodeIndices()) {
+					NetworkToolkit.setNodeSelected(index, networkView, true);
+				}
+				
+				for (Integer index : graphicsData.getPickingData().getPickedEdgeIndices()) {
+					NetworkToolkit.setEdgeSelected(index, networkView, true);
+				}
+				
+				/*
 				selectionData.getSelectedNodeIndices().addAll(graphicsData.getPickingData().getPickedNodeIndices());
 				selectionData.getSelectedEdgeIndices().addAll(graphicsData.getPickingData().getPickedEdgeIndices());
-				
+				*/
 				
 			}
 		}

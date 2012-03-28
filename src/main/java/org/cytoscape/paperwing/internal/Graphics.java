@@ -116,6 +116,10 @@ public class Graphics implements GLEventListener {
 		
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
 		lightingProcessor = handler.getLightingProcessor();
+		
+		if (handler instanceof MainGraphicsHandler) {
+			((WindNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
+		}
 	}
 	
 	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
@@ -133,6 +137,10 @@ public class Graphics implements GLEventListener {
 		component.addFocusListener(keys);
 		
 		graphicsData.setContainer(component);
+		
+		if (handler instanceof MainGraphicsHandler) {
+			((WindNetworkView) graphicsData.getNetworkView()).setContainer(component);
+		}
 	}
 	
 	public void setAnimatorControl(GLAnimatorControl animatorControl) {
@@ -262,7 +270,6 @@ public class Graphics implements GLEventListener {
 			
 			graphicsData.setAnimatorController(controller);
 			((WindNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
-			((WindNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
 		}
 	}
 

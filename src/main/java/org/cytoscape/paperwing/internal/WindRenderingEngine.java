@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -24,6 +26,7 @@ import javax.swing.JInternalFrame;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.paperwing.internal.constants.GraphicsConstants;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
@@ -262,11 +265,6 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public void setProperties(String key, String value) {
-		// TODO Auto-generated method stub
-	}
 	
 	@Override
 	public Printable createPrintable() {
@@ -300,5 +298,10 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 
 	@Override
 	public void printCanvas(java.awt.Graphics printCanvas) {
+	}
+	
+	@Override
+	public String getRenderingEngineID() {
+		return GraphicsConstants.RENDERING_ENGINE_ID;
 	}
 }

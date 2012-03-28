@@ -195,9 +195,9 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 	}
 
 	@Override
-	public void focusGained(FocusEvent event) {
+	public void focusGained(FocusEvent event) {	
 	}
-
+	
 	@Override
 	public void focusLost(FocusEvent event) {
 		// Release all keys
@@ -206,6 +206,4 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 		ignoreNext = true;
 		hasNew = true;
 	}
-	
-
 }

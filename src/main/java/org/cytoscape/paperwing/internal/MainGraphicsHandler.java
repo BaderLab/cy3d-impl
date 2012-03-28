@@ -15,6 +15,7 @@ import org.cytoscape.paperwing.internal.coordinator.MainCoordinatorProcessor;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.cytoscape.paperwing.internal.cytoscape.processing.MainCytoscapeDataProcessor;
+import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkView;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.LightingData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;

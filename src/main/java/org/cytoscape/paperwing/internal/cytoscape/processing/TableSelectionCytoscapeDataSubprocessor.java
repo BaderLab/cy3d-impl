@@ -24,58 +24,6 @@ public class TableSelectionCytoscapeDataSubprocessor implements CytoscapeDataSub
 	
 	@Override
 	public void processCytoscapeData(GraphicsData graphicsData) {
-		
-		// Note: For the below method, Ding does not fill in selected states, so for now the 3d renderer will not do so either.
-		// initializeTableSelectionState(graphicsData);
-		
-		// Update CyTable with the currently selected set of nodes and edges
-		processSelectionData(graphicsData);
-		
-		processUpdateSelected(graphicsData);
-	}
-	
-	// Performs selection in Cytoscape data objects, such as CyTable
-	private void processSelectionData(GraphicsData graphicsData) {
-		
-		CyNetworkView networkView = graphicsData.getNetworkView();
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		
-		Set<Integer> toBeDeselectedNodeIndices = selectionData.getToBeDeselectedNodeIndices();
-		Set<Integer> toBeDeselectedEdgeIndices = selectionData.getToBeDeselectedEdgeIndices();
-		
-		NetworkToolkit.deselectNodes(toBeDeselectedNodeIndices, networkView);
-		NetworkToolkit.deselectEdges(toBeDeselectedEdgeIndices, networkView);
-		toBeDeselectedNodeIndices.clear();
-		toBeDeselectedEdgeIndices.clear();
-		
-		// Select nodes
-		for (int index : selectionData.getSelectedNodeIndices()) {
-			if (!NetworkToolkit.checkNodeSelected(index, networkView)) {
-				NetworkToolkit.setNodeSelected(index, networkView, true);
-			}
-		}
-		
-		// Select edges
-		for (int index : selectionData.getSelectedEdgeIndices()) {
-			if (!NetworkToolkit.checkEdgeSelected(index, networkView)) {
-				NetworkToolkit.setEdgeSelected(index, networkView, true);
-			}
-		}
-	}
-	
-	// Checks if nodes and edges were made to be selected by other components of Cytoscape
-	private void processUpdateSelected(GraphicsData graphicsData) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
-		
-		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
-		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
-		// selectedNodeIndices.clear();
-		
-		List<CyNode> tableSelectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
-		
-		for (CyNode node : tableSelectedNodes) {
-			selectedNodeIndices.add(node.getIndex());
-		}
 	}
 	
 	/**

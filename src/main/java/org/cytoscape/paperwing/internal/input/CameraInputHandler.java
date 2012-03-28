@@ -1,8 +1,13 @@
 package org.cytoscape.paperwing.internal.input;
 
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
+import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.data.GraphicsSelectionData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
@@ -35,7 +40,7 @@ public class CameraInputHandler implements InputHandler {
 	
 	private void processCameraZoom(MouseMonitor mouse, GraphicsData graphicsData) {
 		SimpleCamera camera = graphicsData.getCamera();
-		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
+		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
@@ -44,9 +49,15 @@ public class CameraInputHandler implements InputHandler {
 //			camera.zoomOut((double) mouse.dWheel());
 			camera.moveForwardQuickly(-mouse.dWheel());
 			
-			if (!selectedNodeIndices.isEmpty()) {
-				// TODO: Check if this is a suitable place to put this, as
-				// it helps to make node dragging smoother
+			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
+			
+			if (!selectedNodes.isEmpty()) {
+				Set<Integer> selectedNodeIndices = new HashSet<Integer>();
+				
+				for (CyNode node : selectedNodes) {
+					selectedNodeIndices.add(node.getIndex());
+				}
+				
 				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 			}
@@ -151,7 +162,8 @@ public class CameraInputHandler implements InputHandler {
 		
 		// Reset camera
 		if (held.contains(KeyEvent.VK_C)) {
-			graphicsData.setCamera(new SimpleCamera());
+			graphicsData.getCamera().set(new SimpleCamera());
+			graphicsData.getNetworkView().updateView();
 		}
 	}
 	

@@ -11,6 +11,7 @@ import javax.media.opengl.glu.GLU;
 
 import org.cytoscape.paperwing.internal.AnimatorController;
 import org.cytoscape.paperwing.internal.Graphics;
+import org.cytoscape.paperwing.internal.constants.GraphicsConstants;
 import org.cytoscape.paperwing.internal.coordinator.ViewingCoordinator;
 import org.cytoscape.paperwing.internal.cytoscape.edges.EdgeAnalyser;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
@@ -45,7 +46,7 @@ public class GraphicsData {
 	 * This value controls distance scaling when converting from Cytoscape
 	 * coordinates (such as from Ding) to the renderer's 3D coordinates
 	 */
-	private float distanceScale = 180.0f; 
+	private float distanceScale = GraphicsConstants.DEFAULT_DISTANCE_SCALE; 
 
 	private float verticalFov = 45.0f;
 	

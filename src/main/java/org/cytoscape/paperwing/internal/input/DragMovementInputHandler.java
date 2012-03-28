@@ -41,8 +41,6 @@ public class DragMovementInputHandler implements InputHandler {
 			selectedNodeViews.add(networkView.getNodeView(node));
 		}
 		
-		System.out.println("Selected node count: " + selectedNodes.size() + ", " + selectedNodeViews.size());
-		
 		if (selectedNodeViews.isEmpty()) {
 			return;
 		}

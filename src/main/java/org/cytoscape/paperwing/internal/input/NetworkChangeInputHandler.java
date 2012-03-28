@@ -2,11 +2,13 @@ package org.cytoscape.paperwing.internal.input;
 
 import java.awt.event.KeyEvent;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyEdge.Type;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.paperwing.internal.data.GraphicsData;
 import org.cytoscape.paperwing.internal.geometric.Vector3;
 import org.cytoscape.paperwing.internal.tools.GeometryToolkit;
@@ -78,9 +80,9 @@ public class NetworkChangeInputHandler implements InputHandler {
 	}
 	
 	private static void processCreateEdge(Set<Integer> pressed, GraphicsData graphicsData) {
-		
-		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
 		CyNetworkView networkView = graphicsData.getNetworkView();
+		
+		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 		
 		// Create edges between nodes
 		if (pressed.contains(KeyEvent.VK_J)) {
@@ -89,9 +91,9 @@ public class NetworkChangeInputHandler implements InputHandler {
 
 			if (hoverNode != null) {
 
-				for (Integer index : selectedNodeIndices) {
+				for (CyNode node : selectedNodes) {
 					networkView.getModel().addEdge(
-							networkView.getModel().getNode(index),
+							node,
 							hoverNode, false);
 
 				}
@@ -108,39 +110,26 @@ public class NetworkChangeInputHandler implements InputHandler {
 		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
+		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
+		List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(networkView.getModel(), "selected", true);
+		
 		// Delete selected edges/nodes
 		if (pressed.contains(KeyEvent.VK_DELETE)) {
 			Set<CyEdge> edgesToBeRemoved = new LinkedHashSet<CyEdge>();
 			Set<CyNode> nodesToBeRemoved = new LinkedHashSet<CyNode>();
 			
-			// Remove nodes
-			CyNode nodeToBeRemoved;
-			
-			for (Integer index : selectedNodeIndices) {
-				nodeToBeRemoved = networkView.getModel().getNode(index);
-				
-				if (nodeToBeRemoved != null ) {
-					nodesToBeRemoved.add(nodeToBeRemoved);
-					
-					// TODO: Check if use of Type.ANY for any edge is correct
-					// TODO: Check if this addAll method properly skips adding
-					// edges already in the edgesToBeRemovedList
-					edgesToBeRemoved.addAll(networkView.getModel()
-							.getAdjacentEdgeList(nodeToBeRemoved,
-									Type.ANY));
-				}
-				
+			// Prepare to remove nodes
+			for (CyNode node : selectedNodes) {
+
+				nodesToBeRemoved.add(node);
+				edgesToBeRemoved.addAll(networkView.getModel()
+						.getAdjacentEdgeList(node,
+								Type.ANY));
 			}
 
-			// Remove edges
-			CyEdge edgeToBeRemoved;
-			
-			for (Integer index : selectedEdgeIndices) {
-				edgeToBeRemoved = networkView.getModel().getEdge(index);
-				
-				if (edgeToBeRemoved != null) {
-					edgesToBeRemoved.add(edgeToBeRemoved);
-				}
+			// Prepare to remove edges
+			for (CyEdge edge : selectedEdges) {
+				edgesToBeRemoved.add(edge);
 			}
 			
 			// Remove the node and edge entries from the CyTable

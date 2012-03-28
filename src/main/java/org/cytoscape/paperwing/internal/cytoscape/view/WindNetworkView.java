@@ -1,5 +1,6 @@
 package org.cytoscape.paperwing.internal.cytoscape.view;
 
+import java.awt.Component;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,11 +46,26 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private VisualMappingManager visualMappingManager;
 	
 	private AnimatorController animatorController;
+	
+	/**
+	 * The camera associated with the main network viewing window used to
+	 * perform operations such as fitting all nodes onto the screen
+	 */
 	private SimpleCamera networkCamera = null;
+	
+	/**
+	 * The container associated with the network view, used to request
+	 * input focus after actions such as the user clicking a button on the 
+	 * toolbar
+	 */
+	private Component container = null;
 	
 	// Assumes indices of nodes are unique
 	private Map<Integer, View<CyNode>> nodeViews;
 	private Map<Integer, View<CyEdge>> edgeViews;
+	
+	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
+	private boolean networkCentered;
 	
 	public WindNetworkView(CyNetwork network,
 			VisualLexicon visualLexicon,
@@ -78,6 +94,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			edgeViews.put(edge.getIndex(), edgeView);
 		}
 		
+		networkCentered = false;
 	}
 	
 	@Override
@@ -129,6 +146,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	public void fitContent() {
 		if (networkCamera != null) {
 			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
+			networkCentered = true;
 		}
 		
 		if (animatorController != null) {
@@ -167,8 +185,20 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		// Match the current network view to the currently applied visual style
 //		updateToMatchVisualStyle();
 		
+		// Render at least 1 more frame to reflect changes in network
 		if (animatorController != null) {
 			animatorController.startAnimator();
+		}
+		
+		if (networkCamera != null && !networkCentered) {
+			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
+			networkCentered = true;
+		}
+		
+		// Request focus after the network has been updated, such as via clicking a toolbar button,
+		// in order to be ready to receive keyboard and mouse input
+		if (container != null) {
+			container.requestFocus();
 		}
 	}
 	
@@ -327,6 +357,14 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	public SimpleCamera getNetworkCamera() {
 		return networkCamera;
+	}
+
+	public void setContainer(Component container) {
+		this.container = container;
+	}
+
+	public Component getContainer() {
+		return container;
 	}
 	
 //	@Override

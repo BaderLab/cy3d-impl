@@ -101,7 +101,6 @@ public class KeyboardMonitor implements KeyListener, FocusListener {
 
 	@Override
 	public void focusGained(FocusEvent event) {
-		
 	}
 
 	@Override
