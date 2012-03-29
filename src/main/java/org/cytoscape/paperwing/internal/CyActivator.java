@@ -3,6 +3,7 @@ package org.cytoscape.paperwing.internal;
 import java.util.Properties;
 
 import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkViewFactory;
+import org.cytoscape.paperwing.internal.layouts.GridLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.layouts.SphericalLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
 import org.cytoscape.service.util.AbstractCyActivator;
@@ -107,7 +108,14 @@ public class CyActivator extends AbstractCyActivator {
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
 		sphericalLayoutAlgorithmProps.setProperty("title",sphericalLayoutAlgorithm.toString());
 		sphericalLayoutAlgorithmProps.setProperty("menuGravity","10.5");
+		registerService(bc, sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
 		
-		registerService(bc,sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
+		GridLayoutAlgorithm gridLayoutAlgorithm = new GridLayoutAlgorithm();
+		Properties gridLayoutAlgorithmProps = new Properties();
+		gridLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
+		gridLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
+		gridLayoutAlgorithmProps.setProperty("title", gridLayoutAlgorithm.toString());
+		gridLayoutAlgorithmProps.setProperty("menuGravity","10.49");
+		registerService(bc, gridLayoutAlgorithm, CyLayoutAlgorithm.class, gridLayoutAlgorithmProps);
 	}
 }

@@ -107,6 +107,19 @@ public class Vector3 {
 		return new Vector3(x + other.x, y + other.y, z + other.z);
 	}
 	
+	/** Return a new vector equal to the result of this plus a vector
+	 * with the given coordinates
+	 * 
+	 * @param x The x-coordinate of the vector to add
+	 * @param y The y-coordinate of the vector to add
+	 * @param z The z-coordinate of the vector to add
+	 * @return A new vector representing the result of this plus a vector
+	 * with the given coordinates
+	 */
+	public Vector3 plus(double x, double y, double z) {
+		return new Vector3(this.x + x, this.y + y, this.z + z);
+	}
+	
 	/** Add another vector to this vector, such that this vector becomes
 	 * the sum
 	 * 
@@ -138,6 +151,18 @@ public class Vector3 {
 	 */
 	public Vector3 subtract(Vector3 other) {
 		return new Vector3(x - other.x, y - other.y, z - other.z);
+	}
+	
+	/** Subtract a 3-vector with the specified coordinates from this vector
+	 * 
+	 * @param x The x-coordinate of the vector to subtract
+	 * @param y The y-coordinate of the vector to subtract
+	 * @param z The z-coordinate of the vector to subtract
+	 * @return A new vector representing the result of this minus a vector
+	 * with the given coordinates
+	 */
+	public Vector3 subtract(double x, double y, double z) {
+		return new Vector3(this.x - x, this.y - y, this.z - z);
 	}
 	
 	/** Subtract the specified values from the coordinates of this vector

@@ -165,6 +165,10 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			}
 		}
 		
+		if (selectedNodeViews.isEmpty()) {
+			return;
+		}
+		
 		if (networkCamera != null) {
 			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
 		}
