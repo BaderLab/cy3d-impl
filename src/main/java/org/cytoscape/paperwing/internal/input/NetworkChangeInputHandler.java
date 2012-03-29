@@ -1,6 +1,7 @@
 package org.cytoscape.paperwing.internal.input;
 
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -106,8 +107,6 @@ public class NetworkChangeInputHandler implements InputHandler {
 	
 	private static void processDeleteSelection(Set<Integer> pressed, GraphicsData graphicsData) {
 		
-		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
-		Set<Integer> selectedEdgeIndices = graphicsData.getSelectionData().getSelectedEdgeIndices();
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
 		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
@@ -122,6 +121,7 @@ public class NetworkChangeInputHandler implements InputHandler {
 			for (CyNode node : selectedNodes) {
 
 				nodesToBeRemoved.add(node);
+
 				edgesToBeRemoved.addAll(networkView.getModel()
 						.getAdjacentEdgeList(node,
 								Type.ANY));
@@ -133,14 +133,11 @@ public class NetworkChangeInputHandler implements InputHandler {
 			}
 			
 			// Remove the node and edge entries from the CyTable
-			NetworkToolkit.deselectEdges(selectedEdgeIndices, networkView);
-			NetworkToolkit.deselectNodes(selectedNodeIndices, networkView);
+			NetworkToolkit.deselectEdges(edgesToBeRemoved, networkView);
+			NetworkToolkit.deselectNodes(nodesToBeRemoved, networkView);
 			
 			networkView.getModel().removeEdges(edgesToBeRemoved);
 			networkView.getModel().removeNodes(nodesToBeRemoved);
-
-			selectedNodeIndices.clear();
-			selectedEdgeIndices.clear();
 			
 			// TODO: Not sure if this call is needed
 			networkView.updateView();

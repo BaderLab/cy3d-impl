@@ -248,16 +248,13 @@ public class NetworkToolkit {
 	
 	
 	// Updates data in CyTable as well as View<CyNode>
-	public static void deselectNodes(Set<Integer> nodeIndices, CyNetworkView networkView) {
+	public static void deselectNodes(Set<CyNode> nodes, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultNodeTable();
 		
-		CyNode node;
 		CyRow row;
 		
-		for (int index : nodeIndices) {
-			node = network.getNode(index);
-			
+		for (CyNode node : nodes) {
 			if (node != null) {
 				row = table.getRow(node.getSUID());
 				
@@ -291,15 +288,13 @@ public class NetworkToolkit {
 	}
 	
 	// Updates data in CyTable as well as View<CyNode>
-	public static void deselectEdges(Set<Integer> edgeIndices, CyNetworkView networkView) {
+	public static void deselectEdges(Set<CyEdge> edges, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultEdgeTable();
 		
-		CyEdge edge;
 		CyRow row;
 		
-		for (int index : edgeIndices) {
-			edge = network.getEdge(index);
+		for (CyEdge edge : edges) {
 			
 			if (edge != null) {
 				
