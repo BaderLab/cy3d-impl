@@ -3,6 +3,7 @@ package org.cytoscape.paperwing.internal;
 import java.util.Properties;
 
 import org.cytoscape.paperwing.internal.cytoscape.view.WindNetworkViewFactory;
+import org.cytoscape.paperwing.internal.layouts.BoxLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.layouts.GridLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.layouts.SphericalLayoutAlgorithm;
 import org.cytoscape.paperwing.internal.task.TaskFactoryListener;
@@ -117,5 +118,15 @@ public class CyActivator extends AbstractCyActivator {
 		gridLayoutAlgorithmProps.setProperty("title", gridLayoutAlgorithm.toString());
 		gridLayoutAlgorithmProps.setProperty("menuGravity","10.49");
 		registerService(bc, gridLayoutAlgorithm, CyLayoutAlgorithm.class, gridLayoutAlgorithmProps);
+		
+		BoxLayoutAlgorithm boxLayoutAlgorithm = new BoxLayoutAlgorithm();
+		Properties boxLayoutAlgorithmProps = new Properties();
+		boxLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
+		boxLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
+		boxLayoutAlgorithmProps.setProperty("title", boxLayoutAlgorithm.toString());
+		boxLayoutAlgorithmProps.setProperty("menuGravity","10.51");
+		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
+		
+		
 	}
 }

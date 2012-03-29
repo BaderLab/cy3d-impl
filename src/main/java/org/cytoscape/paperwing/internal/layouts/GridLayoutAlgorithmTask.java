@@ -58,98 +58,39 @@ public class GridLayoutAlgorithmTask extends AbstractBasicLayoutTask {
 		}
 		
 		for (Collection<View<CyNode>> partition : partitions) {
-			arrangeAsBox(partition, 270);
+			arrangeAsGrid(partition, 130);
 		}
 		
 		LayoutToolkit.arrangePartitions(partitions);
 	}
 	
-	private void arrangeAsBox(Collection<View<CyNode>> nodeViews, double nodeSpacing) {		
-		int nodeCount = nodeViews.size();
-		int nodesPerFace = (int) Math.ceil(nodeCount / 6.0);
+	private void arrangeAsGrid(Collection<View<CyNode>> nodeViews, double spacing) {		
 		
-		int sideLength = (int) Math.ceil(Math.sqrt(nodesPerFace));
-		double halfSideLength = sideLength / 2.0;
+		int cubeLength = (int) Math.ceil(Math.pow(nodeViews.size(), 1.0/3));
 		
+		// System.out.println("cubeLength: " + cubeLength);
+		
+		// Average position of all nodes
 		Vector3 center = LayoutToolkit.findCenter(nodeViews);
 		
-		// The position of the top-left corner of a face
-		Vector3 faceCorner;
-		// A unit vector pointing rightwards from the current corner
-		Vector3 faceRight = new Vector3();
-		// A unit vector pointing downwards from the current corner
-		Vector3 faceDown = new Vector3();
-		
 		int count = 0;
-		for (View<CyNode> nodeView : nodeViews) {
-			int face = count / nodesPerFace;
 		
-			switch (face) {
-				// Front face (positive z direction)
-				case 0:
-					faceCorner = center.plus(-halfSideLength * nodeSpacing, 
-							halfSideLength * nodeSpacing,
-							halfSideLength * nodeSpacing);
-					faceRight.set(1, 0, 0);
-					faceDown.set(0, -1, 0);
-					break;
-				// Back face (negative z direction)
-				case 1:
-					faceCorner = center.plus(halfSideLength * nodeSpacing, 
-							halfSideLength * nodeSpacing,
-							-halfSideLength * nodeSpacing);
-					faceRight.set(-1, 0, 0);
-					faceDown.set(0, -1, 0);
-					break;
-				// Left face (negative x direction)
-				case 2:
-					faceCorner = center.plus(-halfSideLength * nodeSpacing, 
-							halfSideLength * nodeSpacing,
-							-halfSideLength * nodeSpacing);
-					faceRight.set(0, 0, 1);
-					faceDown.set(0, -1, 0);
-					break;
-				// Right face (positive x direction)
-				case 3:
-					faceCorner = center.plus(halfSideLength * nodeSpacing, 
-							halfSideLength * nodeSpacing,
-							halfSideLength * nodeSpacing);
-					faceRight.set(0, 0, -1);
-					faceDown.set(0, -1, 0);
-					break;
-				// Top face (positive y direction)
-				case 4:
-					faceCorner = center.plus(-halfSideLength * nodeSpacing, 
-							halfSideLength * nodeSpacing,
-							-halfSideLength * nodeSpacing);
-					faceRight.set(1, 0, 0);
-					faceDown.set(0, 0, 1);
-					break;
-				// Bottom face (negative y direction)
-				case 5:
-					faceCorner = center.plus(-halfSideLength * nodeSpacing, 
-							-halfSideLength * nodeSpacing,
-							halfSideLength * nodeSpacing);
-					faceRight.set(1, 0, 0);
-					faceDown.set(0, 0, -1);
-					break;
-				default:
-					throw new IllegalStateException("Current node cannot be allocated to a face of the arrangement cube.");
-			}
+		for (View<CyNode> nodeView : nodeViews) {
+			int x = count % cubeLength;
+			int y = count / cubeLength % cubeLength;
+			int z = count / cubeLength / cubeLength;
 			
-			// The row that this node belongs to on the current face
-			int row = (count % nodesPerFace) % sideLength + 1;
+			// TODO: Need to set offset so that total average node position is preserved
+			Vector3 offset = new Vector3(x * spacing, y * spacing, z * spacing);
+			double halfCubeActualLength = (double) (cubeLength - 1) / 2 * spacing;
+			offset.subtractLocal(halfCubeActualLength, halfCubeActualLength, halfCubeActualLength);
+
+			Vector3 nodeNewPosition = offset.plus(center);
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, nodeNewPosition.x());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, nodeNewPosition.y());
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, nodeNewPosition.z());
 			
-			// The column that this node belongs to on the current face
-			int column = (count % nodesPerFace) / sideLength + 1;
-			
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, 
-					faceCorner.x() + faceRight.x() * nodeSpacing * column + faceDown.x() * nodeSpacing * row);
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, 
-					faceCorner.y() + faceRight.y() * nodeSpacing * column + faceDown.y() * nodeSpacing * row);
-			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION, 
-					faceCorner.z() + faceRight.z() * nodeSpacing * column + faceDown.z() * nodeSpacing * row);
-			
+			// System.out.println(new Vector3(x, y, z));
 			count++;
 		}
 	}
