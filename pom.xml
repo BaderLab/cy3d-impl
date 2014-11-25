@@ -1,119 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<parent>
-		<groupId>org.cytoscape</groupId>
-		<artifactId>impl-parent</artifactId>
-		<version>3.0.0-alpha8-SNAPSHOT</version>
-	</parent>
-	<properties>
-		<bundle.symbolicName>org.cytoscape.paperwing-impl</bundle.symbolicName>
-		<bundle.namespace>org.cytoscape.paperwing</bundle.namespace>
-		<cytoscape.version>3.0.0-alpha8-SNAPSHOT</cytoscape.version>
-	</properties>
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
 	<groupId>org.cytoscape</groupId>
-	<artifactId>paperwing-impl</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<name>${bundle.symbolicName} [${bundle.namespace}]</name>
+	<artifactId>cy3d-impl</artifactId>
+	<version>0.0.1</version>
+	<modelVersion>4.0.0</modelVersion>
+	<name>Cytoscape 3D Renderer</name>
 	<packaging>bundle</packaging>
-	<dependencies>
-		<dependency>
-			<groupId>cytoscape-temp</groupId>
-			<artifactId>jogl</artifactId>
-			
-			<version>2.0-b48-20120215</version>
-			
-			<!--
-			<version>2.0-b45-20111219</version>
-			<version>2.0-b23-20110303</version>
-			-->
-		</dependency>
-	
-        <dependency>
-            <groupId>org.cytoscape</groupId>
-            <artifactId>model-api</artifactId>
-            <version>${cytoscape.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.cytoscape</groupId>
-        	<artifactId>swing-application-api</artifactId>
-        	<version>${cytoscape.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.cytoscape</groupId>
-        	<artifactId>viewmodel-api</artifactId>
-        	<version>${cytoscape.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.cytoscape</groupId>
-			<artifactId>application-api</artifactId>
-			<version>${cytoscape.version}</version>
-		</dependency>
-        <dependency>
-			<groupId>org.cytoscape</groupId>
-			<artifactId>service-api</artifactId>
-			<version>${cytoscape.version}</version>
-		</dependency>
-		
-		<dependency>
-		 	<groupId>org.cytoscape</groupId>
-			<artifactId>layout-api</artifactId>
-		 </dependency>
-		
-		<!-- Dependencies used for context menus -->
-		<dependency>
-			<groupId>org.cytoscape</groupId>
-			<artifactId>core-task-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.cytoscape</groupId>
-			<artifactId>swing-util-api</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	
+
+	<properties>
+		<bundle.symbolicName>org.cytoscape.cy3d-impl</bundle.symbolicName>
+		<bundle.namespace>org.cytoscape.cy3d</bundle.namespace>
+	</properties>
+
 	<repositories>
 		<repository>
-			<id>cytoscape_thirdparty</id>
+			<id>cytoscape_snapshots</id>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<name>Cytoscape Snapshots</name>
+			<url>http://code.cytoscape.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>cytoscape_releases</id>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-			<name>Wrapped Third Party Libraries</name>
-			<url>http://cytoscape.wodaklab.org/nexus/content/repositories/thirdparty/</url>
+			<name>Cytoscape Releases</name>
+			<url>http://code.cytoscape.org/nexus/content/repositories/releases/</url>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.ops4j</groupId>
-				<artifactId>maven-pax-plugin</artifactId>
-				<version>${maven-pax-plugin.version}</version>
-				<extensions>true</extensions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<optimize>true</optimize>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+					<compilerArguments>
+						<Xmaxwarns>10000</Xmaxwarns>
+						<Xmaxerrs>10000</Xmaxerrs>
+					</compilerArguments>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>${maven-bundle-plugin.version}</version>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<_include>-osgi.bnd</_include>
+						<Export-Package>!${bundle.namespace}.*,!org.cytoscape.graph.*,!org.cytoscape.util.intr.*,!org.cytoscape.spacial.*</Export-Package>
+						<Private-Package>${bundle.namespace}.*,org.cytoscape.graph.*,org.cytoscape.util.intr.*,org.cytoscape.spacial.*</Private-Package>
+						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>event-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>model-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>presentation-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>core-task-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>swing-util-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>vizmap-gui-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>work-swing-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>session-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>swing-application-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
+		<!-- 3rd party library -->
+		<dependency>
+	     	<groupId>org.jogamp.gluegen</groupId>
+	     	<artifactId>gluegen-rt-main</artifactId>
+	     	<version>2.0.2</version>
+	   	</dependency>
+	   	<dependency>
+		     <groupId>org.jogamp.jogl</groupId>
+		     <artifactId>jogl-all-main</artifactId>
+	     	<version>2.0.2</version>
+	   	</dependency>
+	   
+		<!-- Testing -->
+		
+	</dependencies>
+
 </project>
