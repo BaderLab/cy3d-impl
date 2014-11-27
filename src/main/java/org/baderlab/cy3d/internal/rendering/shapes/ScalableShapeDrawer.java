@@ -1,0 +1,219 @@
+package org.baderlab.cy3d.internal.rendering.shapes;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUquadric;
+
+import org.baderlab.cy3d.internal.geometric.Vector3;
+import org.baderlab.cy3d.internal.tools.RenderToolkit;
+
+import com.jogamp.opengl.util.gl2.GLUT;
+
+public class ScalableShapeDrawer {
+	
+	private static final int SPHERE_SLICES_DETAIL = 12;
+	private static final int SPHERE_STACKS_DETAIL = 12;
+	
+	public static enum ShapeType {
+		SHAPE_SPHERE,
+		SHAPE_CUBE, 
+		SHAPE_CUBE_SLICED_CORNERS,
+		SHAPE_TETRAHEDRON,
+		SHAPE_CONE,
+		SHAPE_CYLINDER,
+		SHAPE_DOUGHNUT,
+	}
+	
+	private Map<ShapeType, Integer> shapeLists;
+	
+	public ScalableShapeDrawer() {
+		shapeLists = new HashMap<ShapeType, Integer>(12);
+	}
+	
+	public void initialize(GL2 gl) {
+		initializeSphere(gl);
+		initializeCube(gl);
+		initializeCubeSlicedCorners(gl);
+		initializeTetrahedron(gl);
+	}
+	
+	// Diameter 1 sphere
+	private void initializeSphere(GL2 gl) {
+		int shapeListIndex = gl.glGenLists(1);
+
+		GLU glu = GLU.createGLU(gl);
+
+		GLUquadric quadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
+		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
+		
+		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
+		glu.gluSphere(quadric, 0.5, SPHERE_SLICES_DETAIL, SPHERE_STACKS_DETAIL); 
+		gl.glEndList();
+		
+		
+		shapeLists.put(ShapeType.SHAPE_SPHERE, shapeListIndex);
+	}
+	
+	// Cube inscribed in a radius 0.5 sphere
+	private void initializeCube(GL2 gl) {
+		int shapeListIndex = gl.glGenLists(1);
+
+		GLU glu = GLU.createGLU(gl);
+		GLUT glut = new GLUT();
+		
+		GLUquadric quadric = glu.gluNewQuadric();
+		glu.gluQuadricDrawStyle(quadric, GLU.GLU_FILL);
+		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
+		
+		float halfLength = (float) (1.0 / Math.sqrt(2) / 2);
+		
+		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
+		// gl.glBegin(GL2.GL_TRIANGLE_STRIP);
+		
+		gl.glPushMatrix();
+		//gl.glScalef(halfLength, halfLength, halfLength);
+		//gl.glTranslatef(0.0f, 0.0f, -0.5f);
+		
+		//glu.gluCylinder(quadric, 1.0, 1.0, 1.0, 4, 1);
+		
+		glut.glutSolidCube(0.5f);
+		// gl.glColor3f(0.0f, 0.0f, 0.0f);
+		// glut.glutWireCube(0.5f);
+		
+		gl.glPopMatrix();
+		
+		gl.glEndList();
+		
+		shapeLists.put(ShapeType.SHAPE_CUBE, shapeListIndex);
+	}
+	
+	// Cube inscribed in a radius 0.5 sphere
+	private void initializeCubeSlicedCorners(GL2 gl) {
+		int shapeListIndex = gl.glGenLists(1);
+
+		float halfLength = (float) (1.0 / Math.sqrt(2) / 2);
+		
+		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
+		// gl.glBegin(GL2.GL_TRIANGLE_STRIP);
+		
+		gl.glPushMatrix();
+		gl.glScalef(halfLength, halfLength, halfLength);
+		
+		gl.glBegin(GL2.GL_QUADS);
+		
+		// +y face
+		gl.glNormal3i(0, 1, 0);
+		gl.glVertex3i(-1, 1, -1); // -x, -z
+		gl.glVertex3i(1, 1, -1); // +x, -z
+		gl.glVertex3i(1, 1, 1); // +x, +z
+		gl.glVertex3i(-1, 1, 1); // -x, +z
+		
+		// +z face
+		gl.glNormal3i(0, 0, 1);
+		gl.glVertex3i(-1, 1, 1);
+		gl.glVertex3i(1, 1, 1);
+		gl.glVertex3i(1, -1, 1);
+		gl.glVertex3i(-1, -1, 1);
+		
+		// +x face
+		gl.glNormal3i(1, 0, 0);
+		gl.glVertex3i(1, 1, 1);
+		gl.glVertex3i(1, 1, -1);
+		gl.glVertex3i(1, -1, -1);
+		gl.glVertex3i(1, -1, 1);
+		
+		// -y face
+		gl.glNormal3i(0, -1, 0);
+		gl.glVertex3i(-1, -1, -1);
+		gl.glVertex3i(1, -1, -1);
+		gl.glVertex3i(1, -1, 1);
+		gl.glVertex3i(-1, -1, 1);
+		
+		// -z face
+		gl.glNormal3i(0, 0, -1);
+		gl.glVertex3i(-1, 1, -1);
+		gl.glVertex3i(1, 1, -1);
+		gl.glVertex3i(1, -1, -1);
+		gl.glVertex3i(-1, -1, -1);
+		
+		// -x face
+		gl.glNormal3i(-1, 0, 0);
+		gl.glVertex3i(-1, 1, 1);
+		gl.glVertex3i(-1, 1, -1);
+		gl.glVertex3i(-1, -1, -1);
+		gl.glVertex3i(-1, -1, 1);
+		
+		gl.glEnd();
+		gl.glPopMatrix();
+		
+		gl.glEndList();
+		
+		shapeLists.put(ShapeType.SHAPE_CUBE_SLICED_CORNERS, shapeListIndex);
+	}
+	
+	// Tetrahedron inscribed in circle with radius 0.5
+	private void initializeTetrahedron(GL2 gl) {
+		int shapeListIndex = gl.glGenLists(1);
+
+		double radius = 0.5;
+		Vector3 yAxisDirection = new Vector3(0, 1, 0);
+		Vector3 zAxisDirection = new Vector3(0, 0, 1);
+		
+		// Points' positions are relative to the center of the shape
+		Vector3 topPoint = new Vector3(0, radius, 0);
+		Vector3 nearLeftPoint = topPoint.rotate(zAxisDirection, Math.toRadians(120));
+		nearLeftPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(30));
+		
+		Vector3 farPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(240));
+		Vector3 nearRightPoint = nearLeftPoint.rotate(yAxisDirection, Math.toRadians(120));
+		
+		Vector3 frontNormal = topPoint.plus(nearLeftPoint).plus(nearRightPoint);
+		frontNormal.normalizeLocal();
+		
+		Vector3 leftBackNormal = frontNormal.rotate(yAxisDirection, Math.toRadians(240));
+		Vector3 rightBackNormal = frontNormal.rotate(yAxisDirection, Math.toRadians(120));
+		Vector3 bottomNormal = new Vector3(0, -1, 0);
+		
+		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
+		
+		gl.glBegin(GL2.GL_TRIANGLES);
+		
+		RenderToolkit.setNormal(gl, frontNormal);
+		RenderToolkit.drawPoint(gl, topPoint);
+		RenderToolkit.drawPoint(gl, nearRightPoint);
+		RenderToolkit.drawPoint(gl, nearLeftPoint);
+		
+		RenderToolkit.setNormal(gl, leftBackNormal);
+		RenderToolkit.drawPoint(gl, topPoint);
+		RenderToolkit.drawPoint(gl, farPoint);
+		RenderToolkit.drawPoint(gl, nearLeftPoint);
+		
+		RenderToolkit.setNormal(gl, rightBackNormal);
+		RenderToolkit.drawPoint(gl, topPoint);
+		RenderToolkit.drawPoint(gl, nearRightPoint);
+		RenderToolkit.drawPoint(gl, farPoint);
+		
+		RenderToolkit.setNormal(gl, bottomNormal);
+		RenderToolkit.drawPoint(gl, nearRightPoint);
+		RenderToolkit.drawPoint(gl, farPoint);
+		RenderToolkit.drawPoint(gl, nearLeftPoint);
+
+		gl.glEnd();
+		
+		gl.glEndList();
+		
+		shapeLists.put(ShapeType.SHAPE_TETRAHEDRON, shapeListIndex);
+	}
+	
+	public void drawShape(GL2 gl, ShapeType shapeType) {
+		Integer listIndex = shapeLists.get(shapeType);
+		
+		if (listIndex != null) {
+			gl.glCallList(listIndex);
+		}
+	}
+}
