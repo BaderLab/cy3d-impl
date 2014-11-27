@@ -93,6 +93,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>event-api</artifactId>
 			<version>3.2.0</version>
@@ -110,6 +115,11 @@
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>core-task-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>swing-application-api</artifactId>
 			<version>3.2.0</version>
 		</dependency>
 		<dependency>
@@ -132,12 +142,17 @@
 			<artifactId>session-api</artifactId>
 			<version>3.2.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.cytoscape</groupId>
-			<artifactId>swing-application-api</artifactId>
+			<artifactId>service-api</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.cytoscape</groupId>
+		    <artifactId>layout-api</artifactId>
+		    <version>3.2.0</version>
+		</dependency>
+
 
 		<!-- 3rd party library -->
 		<dependency>
