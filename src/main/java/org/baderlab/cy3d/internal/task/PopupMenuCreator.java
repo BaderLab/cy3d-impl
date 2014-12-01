@@ -1,7 +1,6 @@
 package org.baderlab.cy3d.internal.task;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,7 +9,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -18,8 +16,6 @@ import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
-import org.cytoscape.task.TunableEdgeViewTaskFactory;
-import org.cytoscape.task.TunableNodeViewTaskFactory;
 import org.cytoscape.util.swing.GravityTracker;
 import org.cytoscape.util.swing.JMenuTracker;
 import org.cytoscape.view.model.CyNetworkView;
@@ -29,8 +25,6 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.work.TaskFactory;
 //import org.cytoscape.work.TaskFactoryPredicate;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.work.swing.DynamicSubmenuListener;
-import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /**
  * This class is responsible for creating and populating pop-up menus created when right-clicking the network.
@@ -41,16 +35,14 @@ public class PopupMenuCreator {
 	private static final String NETWORK_PREFFERED_ACTION = "NEW";
 	
 	private DialogTaskManager taskManager;
-	private SubmenuTaskManager submenuTaskManager;
 	
 	private TaskFactoryProvider taskFactoryProvider;
 	
 	// Large value to be used for the gravity value of org.cytoscape.util.swing.GravityTracker
 	private double largeValue = Double.MAX_VALUE / 2.0;
 
-	public PopupMenuCreator(DialogTaskManager taskManager, SubmenuTaskManager submenuTaskManager) {
+	public PopupMenuCreator(DialogTaskManager taskManager) {
 		this.taskManager = taskManager;
-		this.submenuTaskManager = submenuTaskManager;
 		
 		this.taskFactoryProvider = new TaskFactoryProvider();
 	}
@@ -69,10 +61,11 @@ public class PopupMenuCreator {
 				Map<String, Object> properties = entry.getValue();
 				
 				Object context = null; // TunableContext
-				if (edgeViewTaskFactory instanceof TunableEdgeViewTaskFactory<?>) {
-					context = ((TunableEdgeViewTaskFactory<?>) edgeViewTaskFactory).createTunableContext(
-							edgeView, networkView);
-				}
+				// MKTODO what?
+//				if (edgeViewTaskFactory instanceof TunableEdgeViewTaskFactory<?>) {
+//					context = ((TunableEdgeViewTaskFactory<?>) edgeViewTaskFactory).createTunableContext(
+//							edgeView, networkView);
+//				}
 				
 //				edgeViewTaskFactory.setEdgeView(edgeView, networkView);
 				TaskFactory taskFactory = taskFactoryProvider.createFor(edgeViewTaskFactory, edgeView, networkView);
@@ -97,10 +90,11 @@ public class PopupMenuCreator {
 				Map<String, Object> properties = entry.getValue();
 				
 				Object context = null;
-				if (nodeViewTaskFactory instanceof TunableNodeViewTaskFactory<?>) {
-					context = ((TunableNodeViewTaskFactory<?>) nodeViewTaskFactory).createTunableContext(
-							nodeView, networkView);
-				}
+				// MKTODO what?
+//				if (nodeViewTaskFactory instanceof TunableNodeViewTaskFactory<?>) {
+//					context = ((TunableNodeViewTaskFactory<?>) nodeViewTaskFactory).createTunableContext(
+//							nodeView, networkView);
+//				}
 				
 				TaskFactory taskFactory = taskFactoryProvider.createFor(nodeViewTaskFactory, nodeView, networkView);
 				createMenuItem(nodeView, visualLexicon, popupMenu, taskFactory, context, tracker, properties);
@@ -181,15 +175,17 @@ public class PopupMenuCreator {
 		// Below based on implementation from Ding
 
 		// check if the menus are created dynamically, and if so add the listener
-		Object preferredTaskManager = properties.get("preferredTaskManager");
-		if (preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
-			if (title == null)
-				title = "Dynamic";
-			DynamicSubmenuListener submenu = submenuTaskManager.getConfiguration(taskFactory, context);
-	        submenu.setMenuTitle(title);
-			popupMenu.addPopupMenuListener(submenu);
-			return;
-		}
+		
+		// MKTODO what the heck did I just comment out?
+//		Object preferredTaskManager = properties.get("preferredTaskManager");
+//		if (preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
+//			if (title == null)
+//				title = "Dynamic";
+//			DynamicSubmenuListener submenu = submenuTaskManager.getConfiguration(taskFactory, context);
+//	        submenu.setMenuTitle(title);
+//			popupMenu.addPopupMenuListener(submenu);
+//			return;
+//		}
 
 		
 		Boolean useCheckBoxMenuItem = Boolean.parseBoolean(String.valueOf(properties.get("useCheckBoxMenuItem")));

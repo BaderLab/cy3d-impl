@@ -3,27 +3,21 @@ package org.baderlab.cy3d.internal.rendering;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
-import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
-import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.values.NodeShape;
 
 public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
@@ -90,7 +84,9 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
 			depth = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
-			index = nodeView.getModel().getIndex();
+			// MKTODO
+			index = 0;
+//			index = nodeView.getModel().getIndex();
 			
 			// gl.glLoadName(33);
 
@@ -146,12 +142,14 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			color.multiplyRed(0.7, 0, 0.3);
 			color.multiplyGreen(1.5, 0.5, 1);
 			color.multiplyBlue(0.7, 0, 0.3);
-		} else if (nodeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverNodeIndex()) {
-			// Make hovered nodes appear bluer
-			color.multiplyRed(0.7, 0, 0.7);
-			color.multiplyGreen(0.7, 0, 0.7);
-			color.multiplyBlue(1.5, 0.5, 1);
-		}
+		} 
+		// MKTODO fix selection
+//		else if (nodeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverNodeIndex()) {
+//			// Make hovered nodes appear bluer
+//			color.multiplyRed(0.7, 0, 0.7);
+//			color.multiplyGreen(0.7, 0, 0.7);
+//			color.multiplyBlue(1.5, 0.5, 1);
+//		}
 		
 		RenderColor.setNonAlphaColors(gl, color);
 	}

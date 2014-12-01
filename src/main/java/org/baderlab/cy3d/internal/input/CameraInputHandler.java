@@ -2,7 +2,6 @@ package org.baderlab.cy3d.internal.input;
 
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +18,7 @@ import org.cytoscape.view.model.CyNetworkView;
 public class CameraInputHandler implements InputHandler {
 
 	@Override
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		Set<Integer> held = keys.getHeld();
 		Set<Integer> pressed = keys.getPressed();
@@ -52,10 +50,10 @@ public class CameraInputHandler implements InputHandler {
 			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 			
 			if (!selectedNodes.isEmpty()) {
-				Set<Integer> selectedNodeIndices = new HashSet<Integer>();
+				Set<Long> selectedNodeIndices = new HashSet<Long>();
 				
 				for (CyNode node : selectedNodes) {
-					selectedNodeIndices.add(node.getIndex());
+					selectedNodeIndices.add(node.getSUID());
 				}
 				
 				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, graphicsData.getDistanceScale());

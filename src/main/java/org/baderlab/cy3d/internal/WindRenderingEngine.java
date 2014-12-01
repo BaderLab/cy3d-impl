@@ -6,18 +6,12 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.util.Properties;
 
-import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.GLProfile.ShutdownType;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -25,7 +19,6 @@ import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.constants.GraphicsConstants;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.service.util.CyServiceRegistrar;
@@ -37,7 +30,6 @@ import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedEvent;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.work.swing.SubmenuTaskManager;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -99,7 +91,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	public void setUpCanvas(Object container) {
 		
 		// TODO: Addition of this line prevents an "ERROR: JarContent: Unable to read bytes." when Cytoscape shuts down, why?
-		ShutdownType shutdownType = ShutdownType.COMPLETE;
+//		ShutdownType shutdownType = ShutdownType.COMPLETE;
 		
 		// TODO: The current presentation API seems to require this cast, check
 		// if there's a way around it
@@ -160,9 +152,8 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	}
 	
 	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
-			DialogTaskManager taskManager, 
-			SubmenuTaskManager submenuTaskManager) {
-		graphics.setupTaskFactories(taskFactoryListener, taskManager,  submenuTaskManager);
+			DialogTaskManager taskManager) {
+		graphics.setupTaskFactories(taskFactoryListener, taskManager);
 	}
 	
 	// Adds a listener to the component containing the GLJPanel to stop the animator
@@ -301,7 +292,12 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	}
 	
 	@Override
-	public String getRenderingEngineID() {
+	public String getRendererId() {
 		return GraphicsConstants.RENDERING_ENGINE_ID;
+	}
+	
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
 	}
 }

@@ -1,13 +1,6 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
-import java.util.Properties;
-
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.SUIDFactory;
-import org.cytoscape.model.events.AboutToRemoveEdgesListener;
-import org.cytoscape.model.events.AboutToRemoveNodesListener;
-import org.cytoscape.model.events.AddedEdgesListener;
-import org.cytoscape.model.events.AddedNodesListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -30,8 +23,7 @@ public class WindNetworkViewFactory implements CyNetworkViewFactory {
 	}
 	
 	@Override
-	public CyNetworkView createNetworkView(CyNetwork network,
-			Boolean useThreshold) {
+	public CyNetworkView createNetworkView(CyNetwork network) {
 	
 		// TODO: Implement use of useThreshold parameter
 		WindNetworkView networkView = new WindNetworkView(network, 
@@ -51,11 +43,6 @@ public class WindNetworkViewFactory implements CyNetworkViewFactory {
 		// the NetworkView is removed from Cytoscape
 		
 		return networkView;
-	}
-	
-	@Override
-	public CyNetworkView createNetworkView(CyNetwork network) {
-		return createNetworkView(network, true);
 	}
 
 }

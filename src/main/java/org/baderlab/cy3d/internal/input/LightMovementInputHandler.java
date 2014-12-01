@@ -1,15 +1,11 @@
 package org.baderlab.cy3d.internal.input;
 
-import javax.swing.JPopupMenu;
-
 import org.baderlab.cy3d.internal.WindVisualLexicon;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.lighting.Light;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
-import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
@@ -31,8 +27,7 @@ public class LightMovementInputHandler implements InputHandler {
 	}
 	
 	@Override
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		processLightMovement(keys, mouse, graphicsData);
 	}

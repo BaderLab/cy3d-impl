@@ -1,6 +1,7 @@
 package org.baderlab.cy3d.internal.cytoscape.edges;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
+import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.view.model.View;
 
@@ -13,7 +14,7 @@ public class AugmentedEdgeContainer {
 	private View<CyEdge> edgeView;
 	
 	// Identifies the pair of nodes that the edge connects
-	private Long pairIdentifier = null;
+	private PairIdentifier pairIdentifier = null;
 	
 	// The index of this edge compared to all the other edges that connect the same pair
 	// of nodes. If this is the first of 7 edges that connect the same pair of nodes, its
@@ -45,11 +46,11 @@ public class AugmentedEdgeContainer {
 		this.edgeView = edgeView;
 	}
 
-	public Long getPairIdentifier() {
+	public PairIdentifier getPairIdentifier() {
 		return pairIdentifier;
 	}
 
-	public void setPairIdentifier(Long pairIdentifier) {
+	public void setPairIdentifier(PairIdentifier pairIdentifier) {
 		this.pairIdentifier = pairIdentifier;
 	}
 

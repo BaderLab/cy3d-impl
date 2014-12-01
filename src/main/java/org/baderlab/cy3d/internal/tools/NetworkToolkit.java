@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -26,13 +25,13 @@ public class NetworkToolkit {
 	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findCenter(Set<Integer> nodeIndices, CyNetworkView networkView, double distanceScale) {		
+	public static Vector3 findCenter(Set<Long> nodeSUIDS, CyNetworkView networkView, double distanceScale) {		
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		
 		View<CyNode> nodeView;
 		
-		for (Integer index : nodeIndices) {
+		for (Long index : nodeSUIDS) {
 			nodeView = networkView.getNodeView(networkView.getModel().getNode(index));
 
 			if (nodeView != null) {
@@ -268,14 +267,14 @@ public class NetworkToolkit {
 	}
 	
 	// Sets data in CyTable as well as View<CyNode>
-	public static void setNodeSelected(int index, CyNetworkView networkView, boolean selected) {
+	public static void setNodeSelected(long suid, CyNetworkView networkView, boolean selected) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultNodeTable();
-		CyRow row = table.getRow(network.getNode(index).getSUID());
+		CyRow row = table.getRow(network.getNode(suid).getSUID());
 		
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
-		networkView.getNodeView(network.getNode(index)).setVisualProperty(
+		networkView.getNodeView(network.getNode(suid)).setVisualProperty(
 				BasicVisualLexicon.NODE_SELECTED, selected);
 	}
 
@@ -310,14 +309,14 @@ public class NetworkToolkit {
 	}
 	
 	// Sets data in CyTable as well as View<CyNode>
-	public static void setEdgeSelected(int index, CyNetworkView networkView, boolean selected) {
+	public static void setEdgeSelected(long suid, CyNetworkView networkView, boolean selected) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultEdgeTable();
-		CyRow row = table.getRow(network.getEdge(index).getSUID());
+		CyRow row = table.getRow(network.getEdge(suid).getSUID());
 		
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
-		networkView.getEdgeView(network.getEdge(index)).setVisualProperty(
+		networkView.getEdgeView(network.getEdge(suid)).setVisualProperty(
 				BasicVisualLexicon.EDGE_SELECTED, selected);
 	}
 	
@@ -369,19 +368,11 @@ public class NetworkToolkit {
 	 * @param networkSize The number of nodes in the network. If the network grew, the identifiers are no
 	 * longer guaranteed to be unique.
 	 * @return An identifier that uniquely identifies the pair of nodes, ignoring the order of the nodes.
+	 * 
+	 * MKTODO remove networkSize argument
 	 */
-	public static long obtainPairIdentifier(CyNode source, CyNode target, int networkSize) {
-		long identifier;
-		
-		int sourceIndex = source.getIndex();
-		int targetIndex = target.getIndex();
-		
-		if (sourceIndex >= targetIndex) {
-			identifier = (long) networkSize * sourceIndex + targetIndex;
-		} else {
-			identifier = (long) networkSize * targetIndex + sourceIndex;
-		}
-		
-		return identifier;
+	public static PairIdentifier obtainPairIdentifier(CyNode source, CyNode target, int networkSize) {
+		return new PairIdentifier(source.getSUID(), target.getSUID());
 	}
+	
 }

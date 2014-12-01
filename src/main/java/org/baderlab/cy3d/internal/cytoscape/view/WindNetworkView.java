@@ -4,14 +4,10 @@ import java.awt.Component;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.media.opengl.GLAnimatorControl;
-
 import org.baderlab.cy3d.internal.AnimatorController;
-import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.model.CyEdge;
@@ -19,14 +15,6 @@ import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.SUIDFactory;
-import org.cytoscape.model.events.AboutToRemoveEdgesEvent;
-import org.cytoscape.model.events.AboutToRemoveEdgesListener;
-import org.cytoscape.model.events.AboutToRemoveNodesEvent;
-import org.cytoscape.model.events.AboutToRemoveNodesListener;
-import org.cytoscape.model.events.AddedEdgesEvent;
-import org.cytoscape.model.events.AddedEdgesListener;
-import org.cytoscape.model.events.AddedNodesEvent;
-import org.cytoscape.model.events.AddedNodesListener;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -61,8 +49,8 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private Component container = null;
 	
 	// Assumes indices of nodes are unique
-	private Map<Integer, View<CyNode>> nodeViews;
-	private Map<Integer, View<CyEdge>> edgeViews;
+	private Map<Long, View<CyNode>> nodeViews;
+	private Map<Long, View<CyEdge>> edgeViews;
 	
 	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
 	private boolean networkCentered;
@@ -77,21 +65,21 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		this.visualMappingManager = visualMappingManager;
 		
 		defaultValues = new DefaultValueVault(visualLexicon);
-		nodeViews = new HashMap<Integer, View<CyNode>>();
-		edgeViews = new HashMap<Integer, View<CyEdge>>();
+		nodeViews = new HashMap<>();
+		edgeViews = new HashMap<>();
 		
 		WindNodeView nodeView;
 		for (CyNode node : network.getNodeList()) {
 			nodeView = new WindNodeView(defaultValues, node);
 			
-			nodeViews.put(node.getIndex(), nodeView);
+			nodeViews.put(node.getSUID(), nodeView);
 		}
 		
 		WindEdgeView edgeView;
 		for (CyEdge edge : network.getEdgeList()) {
 			edgeView = new WindEdgeView(defaultValues, edge);
 			
-			edgeViews.put(edge.getIndex(), edgeView);
+			edgeViews.put(edge.getSUID(), edgeView);
 		}
 		
 		networkCentered = false;
@@ -109,7 +97,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public View<CyNode> getNodeView(CyNode node) {
-		return nodeViews.get(node.getIndex());
+		return nodeViews.get(node.getSUID());
 	}
 
 	@Override
@@ -119,7 +107,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public View<CyEdge> getEdgeView(CyEdge edge) {
-		return edgeViews.get(edge.getIndex());
+		return edgeViews.get(edge.getSUID());
 	}
 
 	@Override
@@ -219,11 +207,11 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			for (CyNode node : network.getNodeList()) {
 				
 				// Found a node without a view?
-				if (nodeViews.get(node.getIndex()) == null) {
+				if (nodeViews.get(node.getSUID()) == null) {
 					
 					WindNodeView nodeView = new WindNodeView(defaultValues, node);
 					
-					nodeViews.put(node.getIndex(), nodeView);
+					nodeViews.put(node.getSUID(), nodeView);
 					
 					nodeCountDifference--;
 				}
@@ -237,12 +225,12 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			}
 		// Check if nodes have been removed from the network
 		} else if (nodeCountDifference < 0) {
-			int nodeIndex;
-			HashSet<Integer> toBeRemovedIndices = new HashSet<Integer>();
+			long nodeIndex;
+			HashSet<Long> toBeRemovedIndices = new HashSet<>();
 			
 			for (View<CyNode> nodeView : nodeViews.values()) {
 				
-				nodeIndex = nodeView.getModel().getIndex();
+				nodeIndex = nodeView.getModel().getSUID();
 				
 				// TODO: Currently performs check by checking if the view's node index is still valid
 				if (network.getNode(nodeIndex) == null) {
@@ -250,7 +238,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				}
 			}
 			
-			for (int index : toBeRemovedIndices) {
+			for (Long index : toBeRemovedIndices) {
 				nodeViews.remove(index);
 			}
 		}
@@ -264,11 +252,11 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			for (CyEdge edge : network.getEdgeList()) {
 				
 				// Found a edge without a view?
-				if (edgeViews.get(edge.getIndex()) == null) {
+				if (edgeViews.get(edge.getSUID()) == null) {
 					
 					WindEdgeView edgeView = new WindEdgeView(defaultValues, edge);
 					
-					edgeViews.put(edge.getIndex(), edgeView);
+					edgeViews.put(edge.getSUID(), edgeView);
 					
 					edgeCountDifference--;
 				}
@@ -282,12 +270,12 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			}
 		// Check if edges have been removed from the network
 		} else if (edgeCountDifference < 0) {
-			int edgeIndex;
-			HashSet<Integer> toBeRemovedIndices = new HashSet<Integer>();
+			Long edgeIndex;
+			HashSet<Long> toBeRemovedIndices = new HashSet<>();
 			
 			for (View<CyEdge> edgeView : edgeViews.values()) {
 				
-				edgeIndex = edgeView.getModel().getIndex();
+				edgeIndex = edgeView.getModel().getSUID();
 				
 				// TODO: Currently performs check by checking if the view's edge index is still valid
 				if (network.getEdge(edgeIndex) == null) {
@@ -295,7 +283,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				}
 			}
 			
-			for (int index : toBeRemovedIndices) {
+			for (Long index : toBeRemovedIndices) {
 				edgeViews.remove(index);
 			}
 		}
@@ -389,6 +377,12 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		if (container != null) {
 			container.requestFocus();
 		}
+	}
+
+	@Override
+	public void dispose() {
+		// MKTODO Auto-generated method stub
+		
 	}
 
 	

@@ -21,14 +21,12 @@ import com.jogamp.newt.event.MouseEvent;
 public class DragMovementInputHandler implements InputHandler {
 
 	@Override
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		processDragMovement(keys, mouse, graphicsData);
 	}
 	
-	public void processDragMovement(KeyboardMonitor keys, 
-			MouseMonitor mouse, GraphicsData graphicsData) {
+	public void processDragMovement(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 			
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		SimpleCamera camera = graphicsData.getCamera();

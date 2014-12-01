@@ -3,7 +3,6 @@ package org.baderlab.cy3d.internal.input;
 import java.awt.event.MouseEvent;
 import java.util.Set;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
@@ -21,16 +20,14 @@ public class ContextMenuInputHandler implements InputHandler {
 	private PopupMenuCreator popupMenuCreator = null;
 	
 	@Override
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 
 		processNetworkRightClickMenu(mouse, graphicsData);
 	}
 
 	private void processNetworkRightClickMenu(MouseMonitor mouse, GraphicsData graphicsData){
 		if (popupMenuCreator == null) {
-			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager(),
-					graphicsData.getSubmenuTaskManager());
+			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager());
 		}
 		
 		Set<Integer> pressed = mouse.getPressed();

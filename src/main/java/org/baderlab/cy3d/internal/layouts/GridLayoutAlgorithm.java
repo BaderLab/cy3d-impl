@@ -1,25 +1,27 @@
 package org.baderlab.cy3d.internal.layouts;
 
+import java.util.Set;
+
+import org.cytoscape.model.CyNode;
 import org.cytoscape.view.layout.AbstractLayoutAlgorithm;
-import org.cytoscape.view.layout.CyLayoutContext;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.undo.UndoSupport;
 
-public class GridLayoutAlgorithm extends AbstractLayoutAlgorithm<GridLayoutContext> {
+public class GridLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
-	public GridLayoutAlgorithm() {
-		super("grid3D", "3D Grid Layout", false);
+	public GridLayoutAlgorithm(UndoSupport undo) {
+		super("grid3D", "3D Grid Layout", undo);
 	}
 
 	@Override
-	public TaskIterator createTaskIterator(GridLayoutContext context) {
-		return new TaskIterator(
-				new GridLayoutAlgorithmTask(getName(), context));
+	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
+		return new TaskIterator(new GridLayoutAlgorithmTask(getName(), (GridLayoutContext)context, networkView, nodesToLayOut, layoutAttribute, undoSupport));
 	}
 	
 	@Override
 	public GridLayoutContext createLayoutContext() {
-		return new GridLayoutContext(supportsSelectedOnly(), supportsNodeAttributes(), supportsEdgeAttributes());
+		return new GridLayoutContext();
 	}
 }

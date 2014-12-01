@@ -11,6 +11,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer.EdgeShapeType;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
+import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
@@ -20,8 +21,7 @@ import org.cytoscape.view.model.View;
 /**
  * This procedure renders edges in a simplified form for the bird's eye view.
  */
-public class RenderSimplifiedEdgesProcedure implements
-		ReadOnlyGraphicsProcedure {
+public class RenderSimplifiedEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
 	private EdgeShapeDrawer shapeDrawer;
 	
@@ -44,14 +44,14 @@ public class RenderSimplifiedEdgesProcedure implements
 		double distanceScale = graphicsData.getDistanceScale();
 		
 		// A set containing all pairs of nodes that have had an edge drawn between them
-		Set<Long> drawnPairs = new HashSet<Long>(networkView.getNodeViews().size());
+		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
 		CyNode source, target;
 		
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
 			source = edgeView.getModel().getSource();
 			target = edgeView.getModel().getTarget();
 			
-			long pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
+			PairIdentifier pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
 			
 			// Only draw an edge between this source-target pair if one has not been drawn already
 			if (!drawnPairs.contains(pairIdentifier)) {

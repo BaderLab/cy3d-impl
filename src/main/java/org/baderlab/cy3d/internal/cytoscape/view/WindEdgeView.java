@@ -1,10 +1,7 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.SUIDFactory;
-import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualProperty;
 
 public class WindEdgeView extends VisualPropertyKeeper<CyEdge> {
@@ -13,9 +10,7 @@ public class WindEdgeView extends VisualPropertyKeeper<CyEdge> {
 	private Long suid;
 	private DefaultValueVault defaultValueVault;
 	
-	public WindEdgeView(DefaultValueVault defaultValueVault, 
-			CyEdge edge) {
-		
+	public WindEdgeView(DefaultValueVault defaultValueVault, CyEdge edge) {
 		this.edge = edge;
 		this.suid = SUIDFactory.getNextSUID();	
 		this.defaultValueVault = defaultValueVault;
@@ -43,4 +38,6 @@ public class WindEdgeView extends VisualPropertyKeeper<CyEdge> {
 			return defaultValueVault.getDefaultValue(visualProperty);
 		}
 	}
+
+	
 }

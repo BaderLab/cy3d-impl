@@ -2,7 +2,6 @@ package org.baderlab.cy3d.internal.rendering;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.text.DecimalFormat;
 
 import javax.media.opengl.GL2;
 
@@ -12,7 +11,6 @@ import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -111,8 +109,10 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 			
 						// If we are set to not draw all node labels, only show labels for hovered and selected nodes
 						if (graphicsData.getShowAllNodeLabels()
-								|| graphicsData.getSelectionData().getHoverNodeIndex() == nodeView.getModel().getIndex()
-								|| nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+								// MKTODO
+//								|| graphicsData.getSelectionData().getHoverNodeIndex() == nodeView.getModel().getIndex()
+//								|| nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+								){
 							textRenderer.setColor(textColor);
 							textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
 						}

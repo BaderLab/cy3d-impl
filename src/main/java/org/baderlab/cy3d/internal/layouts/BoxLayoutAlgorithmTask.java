@@ -1,22 +1,14 @@
 package org.baderlab.cy3d.internal.layouts;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.baderlab.cy3d.internal.cytoscape.view.WindNetworkView;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.LayoutToolkit;
-import org.baderlab.cy3d.internal.tools.NetworkToolkit;
-import org.cytoscape.model.CyEdge.Type;
-import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.layout.AbstractBasicLayoutTask;
-import org.cytoscape.view.layout.AbstractLayoutAlgorithmContext;
+import org.cytoscape.view.layout.AbstractLayoutTask;
 import org.cytoscape.view.layout.LayoutNode;
 import org.cytoscape.view.layout.LayoutPartition;
 import org.cytoscape.view.layout.PartitionUtil;
@@ -24,14 +16,15 @@ import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.TaskMonitor;
+import org.cytoscape.work.undo.UndoSupport;
 
-public class BoxLayoutAlgorithmTask extends AbstractBasicLayoutTask {
+public class BoxLayoutAlgorithmTask extends AbstractLayoutTask {
 
 	private BoxLayoutContext context;
 	
-	public BoxLayoutAlgorithmTask(String name,
-			BoxLayoutContext context) {
-		super(name, context);
+	public BoxLayoutAlgorithmTask(String name, BoxLayoutContext context, CyNetworkView networkView,
+			                      Set<View<CyNode>> nodesToLayOut, String layoutAttribute, UndoSupport undo) {
+		super(name, networkView, nodesToLayOut, layoutAttribute, undo);
 		this.context = context;
 	}
 

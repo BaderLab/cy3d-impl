@@ -65,4 +65,24 @@ public abstract class VisualPropertyKeeper<S> implements View<S>{
 			valueHolders.get(visualProperty.getIdString()).setValueLocked(false);
 		}
 	}
+	
+	
+	// MKTODO the below methods were auto generated, how to fix?
+	@Override
+	public boolean isSet(VisualProperty<?> vp) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isDirectlyLocked(VisualProperty<?> vp) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clearVisualProperties() {
+		// TODO Auto-generated method stub
+		
+	}
 }

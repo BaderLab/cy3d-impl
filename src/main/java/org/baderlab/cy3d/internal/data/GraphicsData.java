@@ -1,20 +1,15 @@
 package org.baderlab.cy3d.internal.data;
 
 import java.awt.Component;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
-import javax.media.opengl.glu.GLU;
 
 import org.baderlab.cy3d.internal.AnimatorController;
 import org.baderlab.cy3d.internal.Graphics;
 import org.baderlab.cy3d.internal.constants.GraphicsConstants;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
-import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.FrameRateTracker;
@@ -22,9 +17,6 @@ import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.work.swing.SubmenuTaskManager;
-
-import com.jogamp.opengl.util.FPSAnimator;
 
 /**
  * This class represents a data object in which data relevant to the renderer,
@@ -98,8 +90,6 @@ public class GraphicsData {
 	
 	/** A task manager that can be used to execute tasks created by TaskFactory objects */
 	private DialogTaskManager taskManager;
-	
-	private SubmenuTaskManager submenuTaskManager;
 	
 	private EdgeAnalyser edgeAnalyser;
 	
@@ -328,14 +318,6 @@ public class GraphicsData {
 
 	public void setTaskManager(DialogTaskManager taskManager) {
 		this.taskManager = taskManager;
-	}
-
-	public void setSubmenuTaskManager(SubmenuTaskManager submenuTaskManager) {
-		this.submenuTaskManager = submenuTaskManager;
-	}
-
-	public SubmenuTaskManager getSubmenuTaskManager() {
-		return submenuTaskManager;
 	}
 
 	public void setUpdateScene(boolean updateScene) {

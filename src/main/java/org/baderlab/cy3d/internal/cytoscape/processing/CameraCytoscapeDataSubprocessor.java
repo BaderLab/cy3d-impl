@@ -4,8 +4,7 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-public class CameraCytoscapeDataSubprocessor implements
-		CytoscapeDataSubprocessor {
+public class CameraCytoscapeDataSubprocessor implements CytoscapeDataSubprocessor {
 
 	@Override
 	public void processCytoscapeData(GraphicsData graphicsData) {

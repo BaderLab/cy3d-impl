@@ -1,11 +1,7 @@
 package org.baderlab.cy3d.internal;
 
-import java.util.Properties;
-
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
@@ -15,7 +11,6 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.work.swing.SubmenuTaskManager;
 
 /** The RenderingEngineFactory for the WindRenderingEngine
  * 
@@ -39,7 +34,6 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	/** A task manager object that can be used to execute tasks created by TaskFactory objects */
 	private DialogTaskManager taskManager;
 	
-	private SubmenuTaskManager submenuTaskManager;
 	
 	/** The service registrar used to listen for events regarding when
 	 * the Graphics object is to be removed
@@ -51,7 +45,6 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
-			SubmenuTaskManager submenuTaskManager,
 			CyServiceRegistrar serviceRegistrar) {	
 		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
@@ -59,7 +52,6 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
-		this.submenuTaskManager = submenuTaskManager;
 		this.serviceRegistrar = serviceRegistrar;
 	}
 	
@@ -73,7 +65,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 //		engine.setUpNetworkView(networkViewManager);
 		engine.setUpCanvas(container);
 		engine.setUpListeners(serviceRegistrar);
-		engine.setupTaskFactories(taskFactoryListener, taskManager, submenuTaskManager);
+		engine.setupTaskFactories(taskFactoryListener, taskManager);
 		
 //		serviceRegistrar.registerService(engine.getSetCurrentRenderingEngineListener(), SetCurrentRenderingEngineListener.class, new Properties());
 		

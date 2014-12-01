@@ -7,10 +7,8 @@
 
 package org.baderlab.cy3d.internal;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.nio.FloatBuffer;
 
@@ -19,12 +17,7 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
-import javax.swing.JInternalFrame;
-
-import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.FPSAnimator;
 
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
@@ -43,7 +36,9 @@ import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.work.swing.SubmenuTaskManager;
+
+import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 
 /**
  * This class represents a Wind rendering object, directly called
@@ -180,10 +175,10 @@ public class Graphics implements GLEventListener {
 	 * @param listener
 	 */
 	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
-			DialogTaskManager taskManager, SubmenuTaskManager submenuTaskManager) {
+			DialogTaskManager taskManager) {
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
-		graphicsData.setSubmenuTaskManager(submenuTaskManager);
+//		graphicsData.setSubmenuTaskManager(submenuTaskManager);
 	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as

@@ -3,7 +3,6 @@ package org.baderlab.cy3d.internal.cytoscape.edges;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,8 +10,8 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.EdgeCoordinateCalculator;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
+import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -75,7 +74,7 @@ public class EdgeAnalyser {
 		
 		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
 			// Check if this edge container holds an edge that is no longer in the network
-			if (networkView.getModel().getEdge(edgeContainer.getEdgeView().getModel().getIndex()) == null) {
+			if (networkView.getModel().getEdge(edgeContainer.getEdgeView().getModel().getSUID()) == null) {
 				edgeContainersToBeRemoved.add(edgeContainer);
 			}
 		}
@@ -91,11 +90,11 @@ public class EdgeAnalyser {
 		
 		// This map maps each node-pair identifier to the number of edges between that pair of nodes
 		// The identifier is: max(sourceIndex, targetIndex) * nodeCount + min(sourceIndex, targetIndex)
-		Map<Long, Integer> pairCoincidenceCount = new HashMap<Long, Integer>(
-				networkView.getModel().getNodeCount());
+		Map<PairIdentifier, Integer> pairCoincidenceCount = new HashMap<>();
 		
-		long identifier;
-		int sourceIndex, targetIndex, edgeNumber;
+		PairIdentifier identifier;
+		long sourceIndex, targetIndex;
+		int edgeNumber;
 		int nodeCount = networkView.getModel().getNodeCount();
 		CyEdge edge;
 		
@@ -111,8 +110,8 @@ public class EdgeAnalyser {
 			
 			edge = edgeView.getModel();
 			
-			sourceIndex = edge.getSource().getIndex();
-			targetIndex = edge.getTarget().getIndex();
+			sourceIndex = edge.getSource().getSUID();
+			targetIndex = edge.getTarget().getSUID();
 			
 			// Assign an identifier to each pair of nodes
 			identifier = NetworkToolkit.obtainPairIdentifier(edge.getSource(), edge.getTarget(), networkView.getNodeViews().size());
@@ -153,7 +152,7 @@ public class EdgeAnalyser {
 		// Update the value for the total number of edges between this pair of nodes
 		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
 			
-			Long pairIdentifier = edgeContainer.getPairIdentifier();
+			PairIdentifier pairIdentifier = edgeContainer.getPairIdentifier();
 			Integer totalCoincidentEdgesCount = pairCoincidenceCount.get(pairIdentifier);
 		
 			if (totalCoincidentEdgesCount != null) {

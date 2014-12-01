@@ -10,8 +10,8 @@
 	<packaging>bundle</packaging>
 
 	<properties>
-		<bundle.symbolicName>org.cytoscape.cy3d-impl</bundle.symbolicName>
-		<bundle.namespace>org.cytoscape.cy3d</bundle.namespace>
+		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
+		<bundle.namespace>org.baderlab.cy3d</bundle.namespace>
 	</properties>
 
 	<repositories>
@@ -82,8 +82,6 @@
 					<instructions>
 						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Export-Package>!${bundle.namespace}.*,!org.cytoscape.graph.*,!org.cytoscape.util.intr.*,!org.cytoscape.spacial.*</Export-Package>
-						<Private-Package>${bundle.namespace}.*,org.cytoscape.graph.*,org.cytoscape.util.intr.*,org.cytoscape.spacial.*</Private-Package>
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
 					</instructions>
 				</configuration>

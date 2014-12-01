@@ -3,32 +3,21 @@ package org.baderlab.cy3d.internal.rendering;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 
 import org.baderlab.cy3d.internal.cytoscape.edges.AugmentedEdgeContainer;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer.EdgeShapeType;
-import org.baderlab.cy3d.internal.tools.EdgeCoordinateCalculator;
-import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 
@@ -99,7 +88,9 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				chooseColor(gl, edgeView, graphicsData);
 				
 				// Load name for edge picking
-				gl.glLoadName(edgeView.getModel().getIndex());
+				// MKTODO
+				gl.glLoadName(0);
+//				gl.glLoadName(edgeView.getModel().getIndex());
 				
 				// General points along the arc
 				Vector3[] points = container.getCoordinates();
@@ -144,14 +135,16 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 			color.multiplyRed(0.7, 0, 0.7);
 			color.multiplyGreen(1.5, 0.5, 1);
 			color.multiplyBlue(0.7, 0, 0.7);
-		} else if (edgeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverEdgeIndex()) {
-			
-			// Make hovered edges appear bluer
-			color.multiplyRed(0.7, 0, 0.7);
-			color.multiplyGreen(0.7, 0, 0.7);
-			color.multiplyBlue(1.5, 0.5, 1);
-		}
-		
+		} 
+		// MKTODO
+//		else if (edgeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverEdgeIndex()) {
+//			
+//			// Make hovered edges appear bluer
+//			color.multiplyRed(0.7, 0, 0.7);
+//			color.multiplyGreen(0.7, 0, 0.7);
+//			color.multiplyBlue(1.5, 0.5, 1);
+//		}
+//		
 		RenderColor.setNonAlphaColors(gl, color);
 	}
 	

@@ -3,9 +3,6 @@ package org.baderlab.cy3d.internal.picking;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -18,8 +15,6 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.KeyboardMonitor;
 import org.baderlab.cy3d.internal.input.MouseMonitor;
 import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
-import org.baderlab.cy3d.internal.rendering.RenderArcEdgesProcedure;
-import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
@@ -125,11 +120,9 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		glu.gluPickMatrix(x, screenHeight - y, width, height, viewport);
 		
 		if (screenHeight != 0) {
-			glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f,
-				50.0f);
+			glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f, 50.0f);
 		} else {
-			glu.gluPerspective(45.0f, 1, 0.2f,
-					50.0f);
+			glu.gluPerspective(45.0f, 1, 0.2f, 50.0f);
 		}
 
 		// don't think this ortho call is needed

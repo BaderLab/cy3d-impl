@@ -3,17 +3,12 @@ package org.baderlab.cy3d.internal.input;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Set;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
-import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithmTask;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyRow;
-import org.cytoscape.model.CyTable;
 import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 
@@ -44,8 +39,7 @@ public class SelectionInputHandler implements InputHandler {
 	}
 
 	// Performs single selection, and deselection of previously selected objects
-	private void processSingleSelection(KeyboardMonitor keys,
-			MouseMonitor mouse, GraphicsData graphicsData) {
+	private void processSingleSelection(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		int newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		int newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
@@ -98,13 +92,13 @@ public class SelectionInputHandler implements InputHandler {
 				// Deselect currently selected nodes
 				List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 				for (CyNode node : selectedNodes) {
-					NetworkToolkit.setNodeSelected(node.getIndex(), networkView, false);
+					NetworkToolkit.setNodeSelected(node.getSUID(), networkView, false);
 				}
 
 				// Deselect currently selected edges
 				List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(networkView.getModel(), "selected", true);
 				for (CyEdge edge : selectedEdges) {
-					NetworkToolkit.setEdgeSelected(edge.getIndex(), networkView, false);
+					NetworkToolkit.setEdgeSelected(edge.getSUID(), networkView, false);
 				}
 			}
 		}
