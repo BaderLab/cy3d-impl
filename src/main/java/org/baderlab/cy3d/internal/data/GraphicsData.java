@@ -7,7 +7,6 @@ import javax.media.opengl.GLAnimatorControl;
 
 import org.baderlab.cy3d.internal.AnimatorController;
 import org.baderlab.cy3d.internal.Graphics;
-import org.baderlab.cy3d.internal.constants.GraphicsConstants;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
@@ -38,7 +37,7 @@ public class GraphicsData {
 	 * This value controls distance scaling when converting from Cytoscape
 	 * coordinates (such as from Ding) to the renderer's 3D coordinates
 	 */
-	private float distanceScale = GraphicsConstants.DEFAULT_DISTANCE_SCALE; 
+	private float distanceScale = 180.0f; 
 
 	private float verticalFov = 45.0f;
 	
