@@ -17,7 +17,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.constants.GraphicsConstants;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -293,7 +292,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	@Override
 	public String getRendererId() {
-		return GraphicsConstants.RENDERING_ENGINE_ID;
+		return Cy3DNetworkViewRenderer.ID;
 	}
 	
 	@Override

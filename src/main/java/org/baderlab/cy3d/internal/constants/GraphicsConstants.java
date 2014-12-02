@@ -6,7 +6,7 @@ public class GraphicsConstants {
 	public static final int EMPTY_DISPLAY_LIST = -1;
 	
 	/** String id representing the renderer. */
-	public static final String RENDERING_ENGINE_ID = "org.baderlab.cy3d";
+//	public static final String RENDERING_ENGINE_ID = "org.baderlab.cy3d";
 	
 	/** 
 	 * The default scaling used to convert Cytoscape coordinates to renderer coordinates. Cytoscape coordinates

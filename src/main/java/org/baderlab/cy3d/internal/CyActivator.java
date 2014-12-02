@@ -7,6 +7,7 @@ import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
+import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
@@ -17,7 +18,6 @@ import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.swing.DialogTaskManager;
@@ -66,26 +66,30 @@ public class CyActivator extends AbstractCyActivator {
 		windNetworkViewFactoryProps.setProperty("serviceType", "factory");
 		registerService(bc, windNetworkViewFactory, CyNetworkViewFactory.class, windNetworkViewFactoryProps);
 
+		
 		// Main RenderingEngine factory
 		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 		
-		Properties windMainRenderingEngineFactoryProps = new Properties();
-		windMainRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
-		windMainRenderingEngineFactoryProps.setProperty("id", "wind");
-		registerService(bc, windMainRenderingEngineFactory, RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
-
+//		Properties windMainRenderingEngineFactoryProps = new Properties();
+//		windMainRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
+//		windMainRenderingEngineFactoryProps.setProperty("id", "wind");
+//		registerService(bc, windMainRenderingEngineFactory, RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
+//
 		// Bird's Eye RenderingEngine factory
 		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
 				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
-		
-		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
-		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
-		windBirdsEyeRenderingEngineFactoryProps.setProperty("id", "windMap");
-		registerService(bc, windBirdsEyeRenderingEngineFactory, RenderingEngineFactory.class, windBirdsEyeRenderingEngineFactoryProps);
+//		
+//		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
+//		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
+//		windBirdsEyeRenderingEngineFactoryProps.setProperty("id", "windMap");
+//		registerService(bc, windBirdsEyeRenderingEngineFactory, RenderingEngineFactory.class, windBirdsEyeRenderingEngineFactoryProps);
 
+		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(windNetworkViewFactory, windMainRenderingEngineFactory, windBirdsEyeRenderingEngineFactory);
+		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
+		
 		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);
 		Properties sphericalLayoutAlgorithmProps = new Properties();
 		sphericalLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");

@@ -11,7 +11,7 @@
 
 	<properties>
 		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
-		<bundle.namespace>org.baderlab.cy3d</bundle.namespace>
+		<bundle.namespace>org.baderlab.cy3d.internal</bundle.namespace>
 	</properties>
 
 	<repositories>
@@ -83,6 +83,10 @@
 						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
+						
+						<Import-Package>!com.jogamp.openal,!org.eclipse.swt.*,*</Import-Package>
+						<Embed-Dependency>jogl-all-main,jogl-all,gluegen-rt-main,gluegen-rt</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>
