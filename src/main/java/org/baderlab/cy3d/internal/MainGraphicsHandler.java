@@ -15,7 +15,7 @@ import org.baderlab.cy3d.internal.coordinator.MainCoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
-import org.baderlab.cy3d.internal.cytoscape.view.WindNetworkView;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;

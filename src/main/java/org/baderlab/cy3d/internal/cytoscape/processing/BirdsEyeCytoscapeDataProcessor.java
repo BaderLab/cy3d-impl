@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.baderlab.cy3d.internal.WindVisualLexicon;
+import org.baderlab.cy3d.internal.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.lighting.Light;

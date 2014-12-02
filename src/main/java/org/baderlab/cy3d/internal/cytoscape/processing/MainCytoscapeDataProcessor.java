@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.baderlab.cy3d.internal.WindVisualLexicon;
+import org.baderlab.cy3d.internal.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.LightingData;

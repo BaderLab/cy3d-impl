@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.input;
 
-import org.baderlab.cy3d.internal.WindVisualLexicon;
+import org.baderlab.cy3d.internal.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
@@ -89,8 +89,8 @@ public class LightMovementInputHandler implements InputHandler {
 	private void updateLightVisualProperties(Light light, CyNetworkView networkView) {
 		float[] lightPosition = light.getPosition();
 		
-		networkView.setVisualProperty(WindVisualLexicon.LIGHT_X_LOCATION, (double) lightPosition[0]);
-		networkView.setVisualProperty(WindVisualLexicon.LIGHT_Y_LOCATION, (double) lightPosition[1]);
-		networkView.setVisualProperty(WindVisualLexicon.LIGHT_Z_LOCATION, (double) lightPosition[2]);
+		networkView.setVisualProperty(Cy3DVisualLexicon.LIGHT_X_LOCATION, (double) lightPosition[0]);
+		networkView.setVisualProperty(Cy3DVisualLexicon.LIGHT_Y_LOCATION, (double) lightPosition[1]);
+		networkView.setVisualProperty(Cy3DVisualLexicon.LIGHT_Z_LOCATION, (double) lightPosition[2]);
 	}
 }

@@ -22,7 +22,7 @@ import javax.media.opengl.glu.GLU;
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
-import org.baderlab.cy3d.internal.cytoscape.view.WindNetworkView;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.InputProcessor;
@@ -41,7 +41,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
 /**
- * This class represents a Wind rendering object, directly called
+ * This class represents a Cy3D rendering object, directly called
  * by the display thread to update the rendered scene for every frame.
  * 
  * Its behavior is governed by its {@link GraphicsHandler} object, 
@@ -118,7 +118,7 @@ public class Graphics implements GLEventListener {
 		lightingProcessor = handler.getLightingProcessor();
 		
 		if (handler instanceof MainGraphicsHandler) {
-			((WindNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
+			((Cy3DNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
 		}
 	}
 	
@@ -139,7 +139,7 @@ public class Graphics implements GLEventListener {
 		graphicsData.setContainer(component);
 		
 		if (handler instanceof MainGraphicsHandler) {
-			((WindNetworkView) graphicsData.getNetworkView()).setContainer(component);
+			((Cy3DNetworkView) graphicsData.getNetworkView()).setContainer(component);
 		} else if (handler instanceof BirdsEyeGraphicsHandler) {
 			
 			// Add mouse listeners to render the updated scene when the Bird's eye view
@@ -293,7 +293,7 @@ public class Graphics implements GLEventListener {
 			component.addMouseWheelListener(controller);
 			
 			graphicsData.setAnimatorController(controller);
-			((WindNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
+			((Cy3DNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
 		}
 	}
 

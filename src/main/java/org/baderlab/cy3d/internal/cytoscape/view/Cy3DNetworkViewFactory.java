@@ -7,14 +7,14 @@ import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 
-public class WindNetworkViewFactory implements CyNetworkViewFactory {
+public class Cy3DNetworkViewFactory implements CyNetworkViewFactory {
 
 	private VisualLexicon visualLexicon;
 	
 	private CyServiceRegistrar serviceRegistrar;
 	private VisualMappingManager visualMappingManager;
 	
-	public WindNetworkViewFactory(CyServiceRegistrar serviceRegistrar,
+	public Cy3DNetworkViewFactory(CyServiceRegistrar serviceRegistrar,
 			VisualLexicon visualLexicon,
 			VisualMappingManager visualMappingManager) {
 		this.serviceRegistrar = serviceRegistrar;
@@ -26,7 +26,7 @@ public class WindNetworkViewFactory implements CyNetworkViewFactory {
 	public CyNetworkView createNetworkView(CyNetwork network) {
 	
 		// TODO: Implement use of useThreshold parameter
-		WindNetworkView networkView = new WindNetworkView(network, 
+		Cy3DNetworkView networkView = new Cy3DNetworkView(network, 
 				visualLexicon, visualMappingManager);
 		
 //		serviceRegistrar.registerService(networkView, AddedNodesListener.class, 

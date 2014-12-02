@@ -12,11 +12,11 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
 
-/** The RenderingEngineFactory for the WindRenderingEngine
+/** The RenderingEngineFactory for the Cy3DRenderingEngine
  * 
  * @author paperwing (Yue Dong)
  */
-public abstract class WindRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
+public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
 
 	/** The network view manager containing references to the network views */
 	private CyNetworkViewManager networkViewManager;
@@ -25,7 +25,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	 * rendering engines */
 	private RenderingEngineManager renderingEngineManager;
 	
-	/** The visual lexicon for the wind rendering engine */
+	/** The visual lexicon for the cy3d rendering engine */
 	private final VisualLexicon visualLexicon;
 	
 	/** A listener used to obtain the set of {@link TaskFactory} objects for use with creating context menus */
@@ -40,8 +40,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 	 */
 	private CyServiceRegistrar serviceRegistrar;
 	
-	/** Construct a new WindRenderingEngineFactory object */
-	public WindRenderingEngineFactory(CyNetworkViewManager networkViewManager,
+	public Cy3DRenderingEngineFactory(CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
@@ -60,7 +59,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 			Object container, View<CyNetwork> viewModel) {
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		WindRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
+		Cy3DRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
 		
 //		engine.setUpNetworkView(networkViewManager);
 		engine.setUpCanvas(container);
@@ -75,7 +74,7 @@ public abstract class WindRenderingEngineFactory implements RenderingEngineFacto
 		return engine;
 	}
 	
-	protected abstract WindRenderingEngine getNewRenderingEngine(Object container, 
+	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Object container, 
 			View<CyNetwork> viewModel, VisualLexicon visualLexicon);
 	
 	@Override

@@ -32,12 +32,12 @@ import org.cytoscape.work.swing.DialogTaskManager;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
-/** This class represents a WindRenderingEngine, responsible for
+/** This class represents a Cy3DRenderingEngine, responsible for
  * creating a rendering of a {@link CyNetwork}
  * 
  * @author Paperwing (Yue Dong)
  */
-public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> {
+public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 
 	/** The networkView to be rendered */
 	private CyNetworkView networkView;
@@ -64,7 +64,7 @@ public abstract class WindRenderingEngine implements RenderingEngine<CyNetwork> 
 	private SetCurrentRenderingEngineListener setCurrentRenderingEngineListener;
 	
 	/** Create a new WindRenderingEngine object */
-	public WindRenderingEngine(Object container, View<CyNetwork> viewModel, 
+	public Cy3DRenderingEngine(Object container, View<CyNetwork> viewModel, 
 			VisualLexicon visualLexicon) {
 	
 		this.viewModel = viewModel;

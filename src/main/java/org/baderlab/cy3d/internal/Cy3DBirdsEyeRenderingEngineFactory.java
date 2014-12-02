@@ -9,13 +9,13 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 
-/** This class is capable of creating instances of the WindMapRenderingEngine
+/** This class is capable of creating instances of the Cy3DRenderingEngine
  * 
  * @author Paperwing (Yue Dong)
  */
-public class WindBirdsEyeRenderingEngineFactory extends WindRenderingEngineFactory {
+public class Cy3DBirdsEyeRenderingEngineFactory extends Cy3DRenderingEngineFactory {
 
-	public WindBirdsEyeRenderingEngineFactory(
+	public Cy3DBirdsEyeRenderingEngineFactory(
 			CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager,
 			VisualLexicon lexicon,
@@ -27,10 +27,10 @@ public class WindBirdsEyeRenderingEngineFactory extends WindRenderingEngineFacto
 	}
 
 	@Override
-	protected WindRenderingEngine getNewRenderingEngine(Object container,
+	protected Cy3DRenderingEngine getNewRenderingEngine(Object container,
 			View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
 	
-		return new WindBirdsEyeRenderingEngine(container, viewModel, visualLexicon);
+		return new Cy3DBirdsEyeRenderingEngine(container, viewModel, visualLexicon);
 	}
 	
 	

@@ -2,7 +2,7 @@ package org.baderlab.cy3d.internal;
 
 import java.util.Properties;
 
-import org.baderlab.cy3d.internal.cytoscape.view.WindNetworkViewFactory;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
@@ -50,27 +50,27 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(bc, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
 		registerServiceListener(bc, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
 		
-		// Wind Visual Lexicon
-		WindVisualLexicon windVisualLexicon = new WindVisualLexicon();
+		// Cy3D Visual Lexicon
+		Cy3DVisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
 		
-		Properties windVisualLexiconProps = new Properties();
-		windVisualLexiconProps.setProperty("serviceType", "visualLexicon");
-		windVisualLexiconProps.setProperty("id", "wind");
-		registerService(bc, windVisualLexicon, VisualLexicon.class, windVisualLexiconProps);
+		Properties cy3dVisualLexiconProps = new Properties();
+		cy3dVisualLexiconProps.setProperty("serviceType", "visualLexicon");
+		cy3dVisualLexiconProps.setProperty("id", "cy3d");
+		registerService(bc, cy3dVisualLexicon, VisualLexicon.class, cy3dVisualLexiconProps);
 
-		// Wind NetworkView factory
-		WindNetworkViewFactory windNetworkViewFactory =
-			new WindNetworkViewFactory(cyServiceRegistrarRef, windVisualLexicon, visualMappingManagerServiceRef);
+		// Cy3D NetworkView factory
+		Cy3DNetworkViewFactory cy3dNetworkViewFactory =
+			new Cy3DNetworkViewFactory(cyServiceRegistrarRef, cy3dVisualLexicon, visualMappingManagerServiceRef);
 		
-		Properties windNetworkViewFactoryProps = new Properties();
-		windNetworkViewFactoryProps.setProperty("serviceType", "factory");
-		registerService(bc, windNetworkViewFactory, CyNetworkViewFactory.class, windNetworkViewFactoryProps);
+		Properties cy3dNetworkViewFactoryProps = new Properties();
+		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");
+		registerService(bc, cy3dNetworkViewFactory, CyNetworkViewFactory.class, cy3dNetworkViewFactoryProps);
 
 		
 		// Main RenderingEngine factory
-		WindMainRenderingEngineFactory windMainRenderingEngineFactory = new WindMainRenderingEngineFactory(
+		Cy3DMainRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DMainRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+				cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 		
 //		Properties windMainRenderingEngineFactoryProps = new Properties();
 //		windMainRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
@@ -78,16 +78,16 @@ public class CyActivator extends AbstractCyActivator {
 //		registerService(bc, windMainRenderingEngineFactory, RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
 //
 		// Bird's Eye RenderingEngine factory
-		WindBirdsEyeRenderingEngineFactory windBirdsEyeRenderingEngineFactory = new WindBirdsEyeRenderingEngineFactory(
+		Cy3DBirdsEyeRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DBirdsEyeRenderingEngineFactory(
 				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				windVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+				cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 //		
 //		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
 //		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
 //		windBirdsEyeRenderingEngineFactoryProps.setProperty("id", "windMap");
 //		registerService(bc, windBirdsEyeRenderingEngineFactory, RenderingEngineFactory.class, windBirdsEyeRenderingEngineFactoryProps);
 
-		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(windNetworkViewFactory, windMainRenderingEngineFactory, windBirdsEyeRenderingEngineFactory);
+		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
 		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);

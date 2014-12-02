@@ -9,26 +9,26 @@ import org.cytoscape.view.model.ContinuousRange;
 import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.Range;
 import org.cytoscape.view.model.VisualProperty;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.BooleanVisualProperty;
 import org.cytoscape.view.presentation.property.DoubleVisualProperty;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.PaintVisualProperty;
 
 /** The visual lexicon for the Wind rendering engines */
-public class WindVisualLexicon extends BasicVisualLexicon {
+public class Cy3DVisualLexicon extends BasicVisualLexicon {
 
 	/** A range from 0.0 to 1.0; useful for values such as color */
 	protected static final Range<Double> ZERO_TO_ONE_DOUBLE_RANGE = new ContinuousRange<Double>(
 			Double.class, 0.0, 1.0, true, true);
 	
 	/** The root visual property */
-	public static final VisualProperty<NullDataType> WIND_ROOT = new NullVisualProperty(
-			"WIND_ROOT_VISUAL_PROPERTY",
-			"Wind Rendering Engine Root Visual Property");
+	public static final VisualProperty<NullDataType> CY3D_ROOT = new NullVisualProperty(
+			"CY3D_ROOT_VISUAL_PROPERTY",
+			"cy3d Rendering Engine Root Visual Property");
 	
 	public static final VisualProperty<Double> TEST_PROPERTY = new DoubleVisualProperty(
-			1.0, ARBITRARY_DOUBLE_RANGE, "TEST_PROPERTY", "Wind Test Property", CyNode.class);
+			1.0, ARBITRARY_DOUBLE_RANGE, "TEST_PROPERTY", "cy3d Test Property", CyNode.class);
 	
 	public static final VisualProperty<Double> NODE_PITCH = new DoubleVisualProperty(
 			0.0, ARBITRARY_DOUBLE_RANGE, "NODE_PITCH", "Node Model Pitch", CyNode.class);
@@ -116,8 +116,8 @@ public class WindVisualLexicon extends BasicVisualLexicon {
 	
 	
 	/** Create a new WindVisualLexicon object */
-	public WindVisualLexicon() {
-		super(WIND_ROOT);
+	public Cy3DVisualLexicon() {
+		super(CY3D_ROOT);
 		
 		addVisualProperty(CAMERA_X_LOCATION, NETWORK);
 		addVisualProperty(CAMERA_Y_LOCATION, NETWORK);

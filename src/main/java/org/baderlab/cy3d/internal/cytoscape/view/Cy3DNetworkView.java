@@ -23,7 +23,7 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 
-public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
+public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
 	private Long suid;
 	
@@ -55,7 +55,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
 	private boolean networkCentered;
 	
-	public WindNetworkView(CyNetwork network,
+	public Cy3DNetworkView(CyNetwork network,
 			VisualLexicon visualLexicon,
 			VisualMappingManager visualMappingManager) {
 		suid = SUIDFactory.getNextSUID();
@@ -68,16 +68,16 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		nodeViews = new HashMap<>();
 		edgeViews = new HashMap<>();
 		
-		WindNodeView nodeView;
+		Cy3DNodeView nodeView;
 		for (CyNode node : network.getNodeList()) {
-			nodeView = new WindNodeView(defaultValues, node);
+			nodeView = new Cy3DNodeView(defaultValues, node);
 			
 			nodeViews.put(node.getSUID(), nodeView);
 		}
 		
-		WindEdgeView edgeView;
+		Cy3DEdgeView edgeView;
 		for (CyEdge edge : network.getEdgeList()) {
-			edgeView = new WindEdgeView(defaultValues, edge);
+			edgeView = new Cy3DEdgeView(defaultValues, edge);
 			
 			edgeViews.put(edge.getSUID(), edgeView);
 		}
@@ -209,7 +209,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				// Found a node without a view?
 				if (nodeViews.get(node.getSUID()) == null) {
 					
-					WindNodeView nodeView = new WindNodeView(defaultValues, node);
+					Cy3DNodeView nodeView = new Cy3DNodeView(defaultValues, node);
 					
 					nodeViews.put(node.getSUID(), nodeView);
 					
@@ -254,7 +254,7 @@ public class WindNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 				// Found a edge without a view?
 				if (edgeViews.get(edge.getSUID()) == null) {
 					
-					WindEdgeView edgeView = new WindEdgeView(defaultValues, edge);
+					Cy3DEdgeView edgeView = new Cy3DEdgeView(defaultValues, edge);
 					
 					edgeViews.put(edge.getSUID(), edgeView);
 					

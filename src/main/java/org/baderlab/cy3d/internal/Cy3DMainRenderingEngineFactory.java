@@ -9,13 +9,13 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 
-/** The RenderingEngineFactory for the WindRenderingEngine
+/** The RenderingEngineFactory for the Cy3DRenderingEngine
  * 
  * @author paperwing (Yue Dong)
  */
-public class WindMainRenderingEngineFactory extends WindRenderingEngineFactory {
+public class Cy3DMainRenderingEngineFactory extends Cy3DRenderingEngineFactory {
 
-	public WindMainRenderingEngineFactory(
+	public Cy3DMainRenderingEngineFactory(
 			CyNetworkViewManager networkViewManager,
 			RenderingEngineManager renderingEngineManager,
 			VisualLexicon lexicon,
@@ -28,10 +28,10 @@ public class WindMainRenderingEngineFactory extends WindRenderingEngineFactory {
 
 	
 	@Override
-	protected WindRenderingEngine getNewRenderingEngine(Object container,
+	protected Cy3DRenderingEngine getNewRenderingEngine(Object container,
 			View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
 		
-		return new WindMainRenderingEngine(container, viewModel, visualLexicon);
+		return new Cy3DMainRenderingEngine(container, viewModel, visualLexicon);
 	}
 	
 	
