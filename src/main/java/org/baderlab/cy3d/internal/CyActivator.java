@@ -1,5 +1,6 @@
 package org.baderlab.cy3d.internal;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
@@ -23,17 +24,19 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * CyActivator object used to import and export services from and to Cytoscape, such
  * as manager and factory objects.
  */
 public class CyActivator extends AbstractCyActivator {
-	public CyActivator() {
-		super();
-	}
+	
 
 	public void start(BundleContext bc) {
+		//final Logger logger = LoggerFactory.getLogger(this.getClass());
+		
 		CyNetworkViewManager cyNetworkViewManagerRef = getService(bc, CyNetworkViewManager.class);
 		RenderingEngineManager cyRenderingEngineManagerRef = getService(bc, RenderingEngineManager.class);
 		CyServiceRegistrar cyServiceRegistrarRef = getService(bc, CyServiceRegistrar.class);
@@ -115,5 +118,16 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
 		
 		
+		try {
+			JoglInitializer.unpackNativeLibrariesForJOGL(bc);
+		} catch (IOException e) {
+			//logger.error(e.getMessage(), e);
+			// This App will be useless if Jogl can't find its libraries, 
+			// so best throw an exception to OSGi to shut it down.
+			throw new RuntimeException(e);
+ 		}
 	}
+
+	
+	
 }

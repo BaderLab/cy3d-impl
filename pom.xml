@@ -12,6 +12,8 @@
 	<properties>
 		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
 		<bundle.namespace>org.baderlab.cy3d.internal</bundle.namespace>
+		<cytoscape.api>3.3.0-SNAPSHOT</cytoscape.api>
+		<jogl.version>2.2.4</jogl.version>
 	</properties>
 
 	<repositories>
@@ -84,7 +86,7 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
 						
-						<Import-Package>!com.jogamp.openal,!org.eclipse.swt.*,*</Import-Package>
+						<Import-Package>!com.jogamp.openal.*,!org.eclipse.swt.*,!com.jogamp.plugin.*,*</Import-Package>
 						<Embed-Dependency>jogl-all-main,jogl-all,gluegen-rt-main,gluegen-rt</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
@@ -102,57 +104,57 @@
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>event-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>model-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>presentation-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>core-task-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>swing-application-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>swing-util-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>vizmap-gui-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>work-swing-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>session-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>service-api</artifactId>
-			<version>3.2.0</version>
+			<version>${cytoscape.api}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.cytoscape</groupId>
 		    <artifactId>layout-api</artifactId>
-		    <version>3.2.0</version>
+		    <version>${cytoscape.api}</version>
 		</dependency>
 
 
@@ -160,14 +162,14 @@
 		<dependency>
 	     	<groupId>org.jogamp.gluegen</groupId>
 	     	<artifactId>gluegen-rt-main</artifactId>
-	     	<version>2.0.2</version>
+	     	<version>${jogl.version}</version>
 	   	</dependency>
 	   	<dependency>
 		     <groupId>org.jogamp.jogl</groupId>
 		     <artifactId>jogl-all-main</artifactId>
-	     	<version>2.0.2</version>
+	     	<version>${jogl.version}</version>
 	   	</dependency>
-	   
+		
 		<!-- Testing -->
 		
 	</dependencies>

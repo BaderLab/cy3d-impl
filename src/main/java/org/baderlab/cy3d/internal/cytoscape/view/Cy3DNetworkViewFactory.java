@@ -25,9 +25,7 @@ public class Cy3DNetworkViewFactory implements CyNetworkViewFactory {
 	@Override
 	public CyNetworkView createNetworkView(CyNetwork network) {
 	
-		// TODO: Implement use of useThreshold parameter
-		Cy3DNetworkView networkView = new Cy3DNetworkView(network, 
-				visualLexicon, visualMappingManager);
+		Cy3DNetworkView networkView = new Cy3DNetworkView(network, visualLexicon, visualMappingManager);
 		
 //		serviceRegistrar.registerService(networkView, AddedNodesListener.class, 
 //				new Properties());

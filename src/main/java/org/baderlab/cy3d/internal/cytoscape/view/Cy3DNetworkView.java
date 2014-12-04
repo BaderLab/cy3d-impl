@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.baderlab.cy3d.internal.AnimatorController;
+import org.baderlab.cy3d.internal.Cy3DNetworkViewRenderer;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.model.CyEdge;
@@ -55,9 +56,7 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
 	private boolean networkCentered;
 	
-	public Cy3DNetworkView(CyNetwork network,
-			VisualLexicon visualLexicon,
-			VisualMappingManager visualMappingManager) {
+	public Cy3DNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager) {
 		suid = SUIDFactory.getNextSUID();
 		
 		this.network = network;
@@ -317,8 +316,7 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	}
 	
 	@Override
-	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty,
-			V defaultValue) {
+	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty, V defaultValue) {
 		
 		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
 	}
@@ -385,6 +383,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 	}
 
-	
+	@Override
+	public String getRendererId() {
+		return Cy3DNetworkViewRenderer.ID;
+	}
+
 
 }

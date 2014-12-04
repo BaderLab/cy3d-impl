@@ -261,7 +261,7 @@ public class Graphics implements GLEventListener {
 		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_FASTEST);
 		// gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
 
-		gl.glViewport(0, 0, drawable.getWidth(), drawable.getHeight());
+		gl.glViewport(0, 0, drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
 
 		// Correct lightning for scaling certain models
 		gl.glEnable(GL2.GL_NORMALIZE);
