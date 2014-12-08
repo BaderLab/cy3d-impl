@@ -13,6 +13,7 @@ import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer.EdgeShapeType;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
+import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -88,29 +89,27 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 				chooseColor(gl, edgeView, graphicsData);
 				
 				// Load name for edge picking
-				// MKTODO
-				gl.glLoadName(0);
-//				gl.glLoadName(edgeView.getModel().getIndex());
+				long suid = edgeView.getModel().getSUID();
+				int upper = SUIDToolkit.upperInt(suid);
+				int lower = SUIDToolkit.lowerInt(suid);
+				
+				gl.glLoadName(upper);
+				gl.glPushName(lower);
 				
 				// General points along the arc
 				Vector3[] points = container.getCoordinates();
 				
 
 				// Draw the correct type of edge depending on the visual property
-				if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
-						== LineTypeVisualProperty.EQUAL_DASH) {
-
+				if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE) == LineTypeVisualProperty.EQUAL_DASH) {
 					drawDashedArc(gl, points);
-				} else if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE)
-						== LineTypeVisualProperty.DOT) {
-
+				} else if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE) == LineTypeVisualProperty.DOT) {
 					drawDottedArc(gl, points);
-					
-				// Draw regular edges for the catch-all case
-				} else {
-
+				} else { // Draw regular edges for the catch-all case
 					drawRegularArc(gl, points);
 				}
+				
+				gl.glPopName();
 				
 			}
 		}

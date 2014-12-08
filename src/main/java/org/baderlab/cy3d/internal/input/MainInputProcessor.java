@@ -26,8 +26,7 @@ public class MainInputProcessor implements InputProcessor {
 		inputHandlers.add(new DebugInputHandler());
 	}
 	
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		for (InputHandler inputHandler : inputHandlers) {
 			inputHandler.processInput(keys, mouse, graphicsData);

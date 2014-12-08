@@ -18,11 +18,7 @@ public class SelectionInputHandler implements InputHandler {
 	public static int NO_INDEX = -1; 
 	
 	@Override
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
-		
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		//TODO: Check whether to have this method here or in MainCytoscapeDataProcessor
 		// processClearToBeDeselected(selectionData);
 		
@@ -41,16 +37,15 @@ public class SelectionInputHandler implements InputHandler {
 	// Performs single selection, and deselection of previously selected objects
 	private void processSingleSelection(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
-		int newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
-		int newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
+		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
+		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 
 		selectionData.setHoverNodeIndex(newHoverNodeIndex);
 		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
 		
-		if (!selectionData.isDragSelectMode()
-				&& !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+		if (!selectionData.isDragSelectMode() && !keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 				
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 				
@@ -78,8 +73,7 @@ public class SelectionInputHandler implements InputHandler {
 		}
 	}
 	
-	private void processDeselectOther(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	private void processDeselectOther(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
@@ -106,8 +100,7 @@ public class SelectionInputHandler implements InputHandler {
 	}
 
 
-	private void processDragSelection(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	private void processDragSelection(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		CyNetworkView networkView = graphicsData.getNetworkView();
@@ -116,37 +109,32 @@ public class SelectionInputHandler implements InputHandler {
 		
 			// If the left button was clicked, prepare to select nodes/edges
 			if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
-				
 				selectionData.setSelectTopLeftX(mouse.x());
 				selectionData.setSelectTopLeftY(mouse.y());
-				
 				selectionData.setSelectTopLeftFound(true);
 			}
 		
 			// Dragging
-			if (mouse.getHeld().contains(MouseEvent.BUTTON1)
-					&& selectionData.isSelectTopLeftFound()) {
+			if (mouse.getHeld().contains(MouseEvent.BUTTON1) && selectionData.isSelectTopLeftFound()) {
 				selectionData.setSelectBottomRightX(mouse.x());
 				selectionData.setSelectBottomRightY(mouse.y());
 				
-				if (Math.abs(selectionData.getSelectTopLeftX() - mouse.x()) >= 1
-						&& Math.abs(selectionData.getSelectTopLeftY() - mouse.y()) >= 1) {
+				if (Math.abs(selectionData.getSelectTopLeftX() - mouse.x()) >= 1 && Math.abs(selectionData.getSelectTopLeftY() - mouse.y()) >= 1) {
 					selectionData.setDragSelectMode(true);
 				}
 			}
 			
 			// Disable drag selection upon mouse release
-			if (mouse.getReleased().contains(MouseEvent.BUTTON1)
-					&& selectionData.isDragSelectMode()) {
+			if (mouse.getReleased().contains(MouseEvent.BUTTON1) && selectionData.isDragSelectMode()) {
 				selectionData.setDragSelectMode(false);
 				selectionData.setSelectTopLeftFound(false);
 				
 				
-				for (Integer index : graphicsData.getPickingData().getPickedNodeIndices()) {
+				for (long index : graphicsData.getPickingData().getPickedNodeIndices()) {
 					NetworkToolkit.setNodeSelected(index, networkView, true);
 				}
 				
-				for (Integer index : graphicsData.getPickingData().getPickedEdgeIndices()) {
+				for (long index : graphicsData.getPickingData().getPickedEdgeIndices()) {
 					NetworkToolkit.setEdgeSelected(index, networkView, true);
 				}
 				
@@ -160,8 +148,7 @@ public class SelectionInputHandler implements InputHandler {
 	}
 	
 	// Stop hovering if mouse exited
-	private void processClearHover(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData) {
+	private void processClearHover(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		
 		if (mouse.hasExited()) {

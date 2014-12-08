@@ -4,46 +4,46 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PickingData {
-	private Set<Integer> pickedNodeIndices;
-	private Set<Integer> pickedEdgeIndices;
+	private Set<Long> pickedNodeIndices;
+	private Set<Long> pickedEdgeIndices;
 	
-	private int closestPickedNodeIndex;
-	private int closestPickedEdgeIndex;
+	private long closestPickedNodeIndex;
+	private long closestPickedEdgeIndex;
 	
 	public PickingData() {
-		pickedNodeIndices = new LinkedHashSet<Integer>();
-		pickedEdgeIndices = new LinkedHashSet<Integer>();
+		pickedNodeIndices = new LinkedHashSet<Long>();
+		pickedEdgeIndices = new LinkedHashSet<Long>();
 	}
 	
-	public Set<Integer> getPickedNodeIndices() {
+	public Set<Long> getPickedNodeIndices() {
 		return pickedNodeIndices;
 	}
 	
-	public void setPickedNodeIndices(Set<Integer> pickedNodeIndices) {
+	public void setPickedNodeIndices(Set<Long> pickedNodeIndices) {
 		this.pickedNodeIndices = pickedNodeIndices;
 	}
 	
-	public Set<Integer> getPickedEdgeIndices() {
+	public Set<Long> getPickedEdgeIndices() {
 		return pickedEdgeIndices;
 	}
 	
-	public void setPickedEdgeIndices(Set<Integer> pickedEdgeIndices) {
+	public void setPickedEdgeIndices(Set<Long> pickedEdgeIndices) {
 		this.pickedEdgeIndices = pickedEdgeIndices;
 	}
 	
-	public int getClosestPickedNodeIndex() {
+	public long getClosestPickedNodeIndex() {
 		return closestPickedNodeIndex;
 	}
 	
-	public void setClosestPickedNodeIndex(int closestPickedNodeIndex) {
+	public void setClosestPickedNodeIndex(long closestPickedNodeIndex) {
 		this.closestPickedNodeIndex = closestPickedNodeIndex;
 	}
 	
-	public int getClosestPickedEdgeIndex() {
+	public long getClosestPickedEdgeIndex() {
 		return closestPickedEdgeIndex;
 	}
 	
-	public void setClosestPickedEdgeIndex(int closestPickedEdgeIndex) {
+	public void setClosestPickedEdgeIndex(long closestPickedEdgeIndex) {
 		this.closestPickedEdgeIndex = closestPickedEdgeIndex;
 	}
 	

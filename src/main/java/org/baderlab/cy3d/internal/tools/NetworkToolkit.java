@@ -278,7 +278,7 @@ public class NetworkToolkit {
 				BasicVisualLexicon.NODE_SELECTED, selected);
 	}
 
-	public static boolean checkNodeSelected(int index, CyNetworkView networkView) {
+	public static boolean checkNodeSelected(long index, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultNodeTable();
 		CyRow row = table.getRow(network.getNode(index).getSUID());
@@ -320,7 +320,7 @@ public class NetworkToolkit {
 				BasicVisualLexicon.EDGE_SELECTED, selected);
 	}
 	
-	public static boolean checkEdgeSelected(int index, CyNetworkView networkView) {
+	public static boolean checkEdgeSelected(long index, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
 		CyTable table = network.getDefaultNodeTable();
 		CyEdge edge = network.getEdge(index);

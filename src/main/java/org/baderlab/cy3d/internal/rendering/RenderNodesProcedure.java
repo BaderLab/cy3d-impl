@@ -13,6 +13,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
 import org.baderlab.cy3d.internal.tools.RenderColor;
+import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -22,12 +23,9 @@ import org.cytoscape.view.presentation.property.values.NodeShape;
 
 public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.67, 0.67, 0.67);
-	private static final RenderColor DEFAULT_SELECTED_COLOR = 
-		new RenderColor(0.73, 0.73, 0.6);
-	private static final RenderColor DEFAULT_HOVER_COLOR = 
-		new RenderColor(0.5, 0.5, 0.7);
+	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.67, 0.67, 0.67);
+	private static final RenderColor DEFAULT_SELECTED_COLOR = new RenderColor(0.73, 0.73, 0.6);
+	private static final RenderColor DEFAULT_HOVER_COLOR = new RenderColor(0.5, 0.5, 0.7);
 	
 	/** The default radius of the spherical nodes */
 	private static final float NODE_SIZE_RADIUS = 0.322f; // 0.015f
@@ -56,54 +54,45 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 
 		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
-		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
-				FloatBuffer.wrap(specularReflection));
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
-		Set<Integer> selectedNodeIndices = graphicsData.getSelectionData()
-				.getSelectedNodeIndices();
-		int hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
+		Set<Long> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
+		long hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
-		float x, y, z;
 		Number width, height, depth;
-		int index;
 		ShapeType shapeType;
 		
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
-					.floatValue() / distanceScale;
-			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
-					.floatValue() / distanceScale;
-			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
-					.floatValue() / distanceScale;
+			float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
+			float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
+			float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
 
-			width = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
+			width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
 			height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
-			depth = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
+			depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
-			// MKTODO
-			index = 0;
-//			index = nodeView.getModel().getIndex();
 			
-			// gl.glLoadName(33);
-
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)
 					&& graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
+				long suid = nodeView.getModel().getSUID();
+				int upper = SUIDToolkit.upperInt(suid);
+				int lower = SUIDToolkit.lowerInt(suid);
+				
 				gl.glPushMatrix();
 				gl.glTranslatef(x, y, z);
-				gl.glLoadName(index);
+				gl.glLoadName(upper);
+				gl.glPushName(lower);
 				
 				chooseColor(gl, nodeView, graphicsData);
 				//gl.glCallList(nodeListIndex);
 				
-				gl.glScalef(NODE_SIZE_RADIUS, 
-						NODE_SIZE_RADIUS,
-						NODE_SIZE_RADIUS);
+				gl.glScalef(NODE_SIZE_RADIUS, NODE_SIZE_RADIUS, NODE_SIZE_RADIUS);
 				
 				if (width != null && height != null && depth != null) {
 					gl.glScalef(width.floatValue() / distanceScale, 
@@ -119,6 +108,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBE);
 				}
 				
+				gl.glPopName();
 				gl.glPopMatrix();
 			}
 		}
@@ -143,13 +133,12 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 			color.multiplyGreen(1.5, 0.5, 1);
 			color.multiplyBlue(0.7, 0, 0.3);
 		} 
-		// MKTODO fix selection
-//		else if (nodeView.getModel().getIndex() == graphicsData.getSelectionData().getHoverNodeIndex()) {
-//			// Make hovered nodes appear bluer
-//			color.multiplyRed(0.7, 0, 0.7);
-//			color.multiplyGreen(0.7, 0, 0.7);
-//			color.multiplyBlue(1.5, 0.5, 1);
-//		}
+		else if (nodeView.getModel().getSUID() == graphicsData.getSelectionData().getHoverNodeIndex()) {
+			// Make hovered nodes appear bluer
+			color.multiplyRed(0.7, 0, 0.7);
+			color.multiplyGreen(0.7, 0, 0.7);
+			color.multiplyBlue(1.5, 0.5, 1);
+		}
 		
 		RenderColor.setNonAlphaColors(gl, color);
 	}

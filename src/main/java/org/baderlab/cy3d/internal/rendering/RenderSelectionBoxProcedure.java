@@ -1,7 +1,5 @@
 package org.baderlab.cy3d.internal.rendering;
 
-import java.util.List;
-
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
@@ -13,13 +11,10 @@ import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	
-	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.58, 0.68, 0.85);
+	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.58, 0.68, 0.85);
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -38,33 +33,27 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 			return;
 		}
 
-		int selectTopLeftX = graphicsData.getSelectionData()
-				.getSelectTopLeftX();
-		int selectTopLeftY = graphicsData.getSelectionData()
-				.getSelectTopLeftY();
-		int selectBottomRightX = graphicsData.getSelectionData()
-				.getSelectBottomRightX();
-		int selectBottomRightY = graphicsData.getSelectionData()
-				.getSelectBottomRightY();
+		int selectTopLeftX = graphicsData.getSelectionData().getSelectTopLeftX();
+		int selectTopLeftY = graphicsData.getSelectionData().getSelectTopLeftY();
+		int selectBottomRightX = graphicsData.getSelectionData().getSelectBottomRightX();
+		int selectBottomRightY = graphicsData.getSelectionData().getSelectBottomRightY();
 
 		int screenWidth = graphicsData.getScreenWidth();
 		int screenHeight = graphicsData.getScreenHeight();
 		SimpleCamera camera = graphicsData.getCamera();
 		double drawDistance = graphicsData.getCamera().getDistance();
+		
+		System.out.printf("%d %d %d %d %d %d %f\n", selectTopLeftX, selectTopLeftY, selectBottomRightX, selectBottomRightY, screenWidth, screenHeight, drawDistance);
 
 		Vector3 topLeft = GeometryToolkit.convertScreenTo3d(
-				selectTopLeftX, selectTopLeftY, screenWidth, screenHeight,
-				drawDistance, camera);
+				selectTopLeftX, selectTopLeftY, screenWidth, screenHeight, drawDistance, camera);
 		Vector3 bottomLeft = GeometryToolkit.convertScreenTo3d(
-				selectTopLeftX, selectBottomRightY, screenWidth, screenHeight,
-				drawDistance, camera);
+				selectTopLeftX, selectBottomRightY, screenWidth, screenHeight, drawDistance, camera);
 
 		Vector3 topRight = GeometryToolkit.convertScreenTo3d(
-				selectBottomRightX, selectTopLeftY, screenWidth, screenHeight,
-				drawDistance, camera);
+				selectBottomRightX, selectTopLeftY, screenWidth, screenHeight, drawDistance, camera);
 		Vector3 bottomRight = GeometryToolkit.convertScreenTo3d(
-				selectBottomRightX, selectBottomRightY, screenWidth,
-				screenHeight, drawDistance, camera);
+				selectBottomRightX, selectBottomRightY, screenWidth, screenHeight, drawDistance, camera);
 
 		/**
 		 * // Below uses older cylinder approach drawSingleSelectEdge(gl,

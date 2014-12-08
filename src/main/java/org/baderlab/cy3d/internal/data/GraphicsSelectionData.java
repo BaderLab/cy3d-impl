@@ -8,14 +8,14 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 public class GraphicsSelectionData {
 	
 	/** The set of indices for nodes that are selected */
-	private Set<Integer> selectedNodeIndices;
+	private Set<Long> selectedNodeIndices;
 	
 	/** The set of indices for edges that are selected */
-	private Set<Integer> selectedEdgeIndices;
+	private Set<Long> selectedEdgeIndices;
 	
-	private Set<Integer> toBeDeselectedNodeIndices; 
+	private Set<Long> toBeDeselectedNodeIndices; 
 	
-	private Set<Integer> toBeDeselectedEdgeIndices; 	
+	private Set<Long> toBeDeselectedEdgeIndices; 	
 	
 	
 	/** The top left x position for the selection border */
@@ -31,10 +31,10 @@ public class GraphicsSelectionData {
 	private int selectBottomRightY;
 	
 	/** The index of the node currently being hovered over */
-	private int hoverNodeIndex = -1;
+	private long hoverNodeIndex = -1;
 	
 	/** The index of the edge currently being hovered over */
-	private int hoverEdgeIndex = -1;
+	private long hoverEdgeIndex = -1;
 	
 	/** A flag for whether drag selection mode is currently active */
 	private boolean dragSelectMode;
@@ -54,26 +54,26 @@ public class GraphicsSelectionData {
 	private double selectProjectionDistance;
 	
 	public GraphicsSelectionData() {
-		selectedNodeIndices = new LinkedHashSet<Integer>();
-		selectedEdgeIndices = new LinkedHashSet<Integer>();
+		selectedNodeIndices = new LinkedHashSet<Long>();
+		selectedEdgeIndices = new LinkedHashSet<Long>();
 		
-		toBeDeselectedNodeIndices = new LinkedHashSet<Integer>();
-		toBeDeselectedEdgeIndices = new LinkedHashSet<Integer>();
+		toBeDeselectedNodeIndices = new LinkedHashSet<Long>();
+		toBeDeselectedEdgeIndices = new LinkedHashSet<Long>();
 	}
 	
-	public Set<Integer> getSelectedNodeIndices() {
+	public Set<Long> getSelectedNodeIndices() {
 		return selectedNodeIndices;
 	}
 
-	public void setSelectedNodeIndices(Set<Integer> selectedNodeIndices) {
+	public void setSelectedNodeIndices(Set<Long> selectedNodeIndices) {
 		this.selectedNodeIndices = selectedNodeIndices;
 	}
 
-	public Set<Integer> getSelectedEdgeIndices() {
+	public Set<Long> getSelectedEdgeIndices() {
 		return selectedEdgeIndices;
 	}
 
-	public void setSelectedEdgeIndices(Set<Integer> selectedEdgeIndices) {
+	public void setSelectedEdgeIndices(Set<Long> selectedEdgeIndices) {
 		this.selectedEdgeIndices = selectedEdgeIndices;
 	}
 
@@ -141,19 +141,19 @@ public class GraphicsSelectionData {
 		this.selectProjectionDistance = selectProjectionDistance;
 	}
 
-	public void setHoverNodeIndex(int hoverNodeIndex) {
+	public void setHoverNodeIndex(long hoverNodeIndex) {
 		this.hoverNodeIndex = hoverNodeIndex;
 	}
 
-	public int getHoverNodeIndex() {
+	public long getHoverNodeIndex() {
 		return hoverNodeIndex;
 	}
 
-	public void setHoverEdgeIndex(int hoverEdgeIndex) {
+	public void setHoverEdgeIndex(long hoverEdgeIndex) {
 		this.hoverEdgeIndex = hoverEdgeIndex;
 	}
 
-	public int getHoverEdgeIndex() {
+	public long getHoverEdgeIndex() {
 		return hoverEdgeIndex;
 	}
 
@@ -165,21 +165,19 @@ public class GraphicsSelectionData {
 		return selectTopLeftFound;
 	}
 
-	public void setToBeDeselectedNodeIndices(
-			Set<Integer> toBeDeselectedNodeIndices) {
+	public void setToBeDeselectedNodeIndices(Set<Long> toBeDeselectedNodeIndices) {
 		this.toBeDeselectedNodeIndices = toBeDeselectedNodeIndices;
 	}
 
-	public Set<Integer> getToBeDeselectedNodeIndices() {
+	public Set<Long> getToBeDeselectedNodeIndices() {
 		return toBeDeselectedNodeIndices;
 	}
 
-	public void setToBeDeselectedEdgeIndices(
-			Set<Integer> toBeDeselectedEdgeIndices) {
+	public void setToBeDeselectedEdgeIndices(Set<Long> toBeDeselectedEdgeIndices) {
 		this.toBeDeselectedEdgeIndices = toBeDeselectedEdgeIndices;
 	}
 
-	public Set<Integer> getToBeDeselectedEdgeIndices() {
+	public Set<Long> getToBeDeselectedEdgeIndices() {
 		return toBeDeselectedEdgeIndices;
 	}
 }

@@ -15,6 +15,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.KeyboardMonitor;
 import org.baderlab.cy3d.internal.input.MouseMonitor;
 import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
@@ -44,8 +45,6 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
-		GL2 gl = graphicsData.getGlContext();
-		
 		drawNodesProcedure.initialize(graphicsData);
 		drawEdgesProcedure.initialize(graphicsData);
 	}
@@ -87,10 +86,8 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	 * @return The edges and nodes found in the region, as a {@link PickResults}
 	 *         object
 	 */
-	private void performPick(int x, int y, int width, int height,
-			boolean selectAll, GraphicsData graphicsData) {
+	private void performPick(int x, int y, int width, int height, boolean selectAll, GraphicsData graphicsData) {
 		int bufferSize = 1024;
-
 		if (selectAll) {
 			bufferSize = Math.max(4096, graphicsData.getNetworkView().getAllViews().size() * 64);
 		}
@@ -191,13 +188,10 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		pickingData.setClosestPickedNodeIndex(NO_INDEX);
 		pickingData.setClosestPickedEdgeIndex(NO_INDEX);
 		
-		int selectedIndex;
-		int selectedType;
-
 		// Current hit record is size 5 because we have
-		// (numNames, minZ, maxZ, name1, name2) for
-		// indices 0-4 respectively
-		int sizeOfHitRecord = 5;
+		// (numNames, minZ, maxZ, nameType, suidUpper, suidLower) for
+		// indices 0-5 respectively
+		final int sizeOfHitRecord = 6;
 
 		if (hits > 0) {
 			// The variable max helps keep track of the polygon that is closest
@@ -205,29 +199,34 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 			int max = buffer.get(2);
 			int maxType = buffer.get(3);
 
-			selectedType = buffer.get(3);
-			selectedIndex = buffer.get(4);
+			int selectedType = buffer.get(3);
+			int selectedSuidUpper = buffer.get(4);
+			int selectedSuidLower = buffer.get(5);
 
 			for (int i = 0; i < hits; i++) {
 
-				if (buffer.get(i * sizeOfHitRecord + 2) <= max
-						&& buffer.get(i * sizeOfHitRecord + 3) <= maxType) {
+				int offset = i * sizeOfHitRecord;
+				
+				if (buffer.get(offset + 2) <= max && buffer.get(offset + 3) <= maxType) {
 
-					max = buffer.get(i * sizeOfHitRecord + 2);
-					maxType = buffer.get(i * sizeOfHitRecord + 3);
+					max = buffer.get(offset + 2);
+					maxType = buffer.get(offset + 3);
 
 					// We have that name1 represents the object type
-					selectedType = buffer.get(i * sizeOfHitRecord + 3);
+					selectedType = buffer.get(offset + 3);
 
 					// name2 represents the object index
-					selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
+					selectedSuidUpper = buffer.get(offset + 4);
+					selectedSuidLower = buffer.get(offset + 5);
 				}
 			}
 			
+			long suid = SUIDToolkit.combineInts(selectedSuidUpper, selectedSuidLower);
+			
 			if (selectedType == NODE_TYPE) {
-				pickingData.setClosestPickedNodeIndex(selectedIndex);
+				pickingData.setClosestPickedNodeIndex(suid);
 			} else if (selectedType == EDGE_TYPE) {
-				pickingData.setClosestPickedEdgeIndex(selectedIndex);
+				pickingData.setClosestPickedEdgeIndex(suid);
 			}
 		}
 	}
@@ -236,34 +235,36 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	private void parseSelectionBufferMultipleSelection(IntBuffer buffer, int hits, PickingData pickingData) {
 		pickingData.getPickedNodeIndices().clear();
 		pickingData.getPickedEdgeIndices().clear();
-		
-		int selectedIndex;
-		int selectedType;
 
 		// Current hit record is size 5 because we have
-		// (numNames, minZ, maxZ, name1, name2) for
-		// indices 0-4 respectively
-		int sizeOfHitRecord = 5;
+		// (numNames, minZ, maxZ, nameType, suidUpper, suidLower) for
+		// indices 0-5 respectively
+		final int sizeOfHitRecord = 6;
 
 		if (hits > 0) {
 			// The variable max helps keep track of the polygon that is closest
 			// to the front of the screen
-			int max = buffer.get(2);
-			int maxType = buffer.get(3);
-
-			selectedType = buffer.get(3);
-			selectedIndex = buffer.get(4);
+//			int max = buffer.get(2);
+//			int maxType = buffer.get(3);
+//
+//			selectedType = buffer.get(3);
+//			selectedIndex = buffer.get(4);
 
 			// Drag-selection; select all
 			for (int i = 0; i < hits; i++) {
-
-				selectedType = buffer.get(i * sizeOfHitRecord + 3);
-				selectedIndex = buffer.get(i * sizeOfHitRecord + 4);
+				
+				int offset = i * sizeOfHitRecord;
+				
+				int selectedType  = buffer.get(offset + 3);
+				int selectedSuidUpper = buffer.get(offset + 4);
+				int selectedSuidLower = buffer.get(offset + 5);
+				
+				long suid = SUIDToolkit.combineInts(selectedSuidUpper, selectedSuidLower);
 
 				if (selectedType == NODE_TYPE) {
-					pickingData.getPickedNodeIndices().add(selectedIndex);
+					pickingData.getPickedNodeIndices().add(suid);
 				} else if (selectedType == EDGE_TYPE) {
-					pickingData.getPickedEdgeIndices().add(selectedIndex);
+					pickingData.getPickedEdgeIndices().add(suid);
 				}
 			}
 		}
