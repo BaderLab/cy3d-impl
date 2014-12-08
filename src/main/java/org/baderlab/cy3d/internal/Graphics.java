@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.nio.FloatBuffer;
 
+import javax.media.nativewindow.NativeSurface;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
@@ -24,6 +25,7 @@ import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.data.PixelConverter;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.input.KeyboardMonitor;
@@ -89,20 +91,18 @@ public class Graphics implements GLEventListener {
 	 * @param visualLexicon The visual lexicon being used
 	 */
 	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsHandler handler) {
-		
-		keys = new KeyboardMonitor();
-		mouse = new MouseMonitor();
-
-//		renderProcedures.put("nodes", new RenderNodesProcedure());
-//		renderProcedures.put("edges", new RenderEdgesProcedure());
-//		renderProcedures.put("selectionBox", new RenderSelectionBoxProcedure());
-		
 		this.handler = handler;
 		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
 		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 3), new Vector3(0, 0, 0),
 				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4));
+		
+		PixelConverter pixelConverter = new PixelConverter(null);
+		graphicsData.setPixelConverter(pixelConverter);
+		
+		keys = new KeyboardMonitor();
+		mouse = new MouseMonitor(pixelConverter);
 		
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
@@ -191,6 +191,7 @@ public class Graphics implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
+		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
 		
 		// Re-calculate the viewing volume
 		SimpleCamera camera = graphicsData.getCamera();
@@ -250,6 +251,8 @@ public class Graphics implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
+		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
+		
 		initLighting(drawable);
 
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -297,7 +300,14 @@ public class Graphics implements GLEventListener {
 		}
 	}
 
-
+	private static int computeSurfaceScale(NativeSurface surface) {
+		final int testVal = 100;
+		int[] test = new int[] {testVal,testVal};
+		surface.convertToPixelUnits(test);
+		int scale = test[0]/testVal;
+		return scale;
+	}
+	
 	private void initLighting(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 
@@ -337,8 +347,7 @@ public class Graphics implements GLEventListener {
 		// gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 40);
 		
 		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
-		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
-				FloatBuffer.wrap(specularReflection));
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
 		
 		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
@@ -347,8 +356,7 @@ public class Graphics implements GLEventListener {
 	}
 
 	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
-			int height) {
+	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 
 		if (height <= 0) {
 			height = 1;

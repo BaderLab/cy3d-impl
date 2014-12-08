@@ -97,6 +97,8 @@ public class GraphicsData {
 	
 	private AnimatorController animatorController;
 	
+	private PixelConverter pixelConverter;
+	
 	/** 
 	 * A {@link GraphicsSelectionData} object which is responsible for 
 	 * storing all data related to selection of objects in the network, such
@@ -370,4 +372,14 @@ public class GraphicsData {
 	public AnimatorController getAnimatorController() {
 		return animatorController;
 	}
+
+	public PixelConverter getPixelConverter() {
+		return pixelConverter;
+	}
+
+	public void setPixelConverter(PixelConverter pixelConverter) {
+		this.pixelConverter = pixelConverter;
+	}
+
+	
 }

@@ -43,7 +43,6 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		SimpleCamera camera = graphicsData.getCamera();
 		double drawDistance = graphicsData.getCamera().getDistance();
 		
-		System.out.printf("%d %d %d %d %d %d %f\n", selectTopLeftX, selectTopLeftY, selectBottomRightX, selectBottomRightY, screenWidth, screenHeight, drawDistance);
 
 		Vector3 topLeft = GeometryToolkit.convertScreenTo3d(
 				selectTopLeftX, selectTopLeftY, screenWidth, screenHeight, drawDistance, camera);

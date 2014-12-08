@@ -9,6 +9,8 @@ import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.baderlab.cy3d.internal.data.PixelConverter;
+
 /** This class represents a monitor that can keep track of mouse events.
  * 
  * Note that losing focus through the FocusListener will cause all mouse
@@ -17,8 +19,7 @@ import java.util.Set;
  * 
  * @author Paperwing (Yue Dong)
  */
-public class MouseMonitor implements MouseListener, MouseMotionListener,
-		MouseWheelListener, FocusListener {
+public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWheelListener, FocusListener {
 
 	/** The previous mouse x-coordinate, since the previous frame */
 	private int prevX;
@@ -54,9 +55,13 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 	
 	/** The set of all recently released mouse buttons */
 	private Set<Integer> justReleased;
+
+	private PixelConverter pixelConverter;
 	
-	/** Construct a new mouse monitor object */
-	public MouseMonitor() {
+	/** Construct a new mouse monitor object 
+	 * @param pixelConverter */
+	public MouseMonitor(PixelConverter pixelConverter) {
+		this.pixelConverter = pixelConverter;
 		justPressed = new HashSet<Integer>();
 		buttonsDown = new HashSet<Integer>();
 		justReleased = new HashSet<Integer>();
@@ -123,8 +128,12 @@ public class MouseMonitor implements MouseListener, MouseMotionListener,
 	@Override
 	public void mouseMoved(MouseEvent event) {
 		hasMoved = true;
-		currentX = event.getX();
-		currentY = event.getY();
+		
+		int[] pixels = { event.getX(), event.getY() };
+		pixelConverter.convertToPixelUnits(pixels);
+		
+		currentX = pixels[0];
+		currentY = pixels[1];
 		
 		if (ignoreNext) {
 			prevX = currentX;
