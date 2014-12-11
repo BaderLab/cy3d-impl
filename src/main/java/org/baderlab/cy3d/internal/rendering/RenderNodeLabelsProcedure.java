@@ -76,12 +76,9 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 		// textRenderer.createString(gl, null, 0, "test").
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)
-					.floatValue() / distanceScale;
-			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)
-					.floatValue() / distanceScale;
-			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION)
-					.floatValue() / distanceScale;
+			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
+			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
+			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
@@ -123,8 +120,10 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		
 		if (graphicsData.getShowFPS()) {
 			double frameRate = graphicsData.getFrameRateTracker().getFrameRate();
-
-			textRenderer.draw("FPS: " + (int) frameRate, 1, 1);
+			int width = graphicsData.getScreenWidth();
+			int height = graphicsData.getScreenHeight();
+			String message = String.format("%dx%d FPS:%d", width, height, (int)frameRate);
+			textRenderer.draw(message, 1, 1);
 		}
 		
 		// textRenderer.flush();

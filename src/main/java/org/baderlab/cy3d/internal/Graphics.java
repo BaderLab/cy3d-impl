@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.nio.FloatBuffer;
 
-import javax.media.nativewindow.NativeSurface;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
@@ -147,8 +146,7 @@ public class Graphics implements GLEventListener {
 			component.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
-					if (coordinator != null 
-							&& coordinator.getMainAnimatorController() != null) {
+					if (coordinator != null && coordinator.getMainAnimatorController() != null) {
 						coordinator.getMainAnimatorController().startAnimator();
 					}
 				}
@@ -157,8 +155,7 @@ public class Graphics implements GLEventListener {
 			component.addMouseMotionListener(new MouseMotionAdapter() {
 				@Override
 				public void mouseDragged(MouseEvent e) {
-					if (coordinator != null 
-							&& coordinator.getMainAnimatorController() != null) {
+					if (coordinator != null && coordinator.getMainAnimatorController() != null) {
 						coordinator.getMainAnimatorController().startAnimator();
 					}
 				}
@@ -223,6 +220,11 @@ public class Graphics implements GLEventListener {
 		// Draw the scene
 		handler.drawScene(graphicsData);
 		
+		int errorCode = gl.glGetError();
+		if(errorCode != GL2.GL_NO_ERROR) {
+			System.out.println("Error Code: " + errorCode);
+		}
+		
 		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
 		graphicsData.getFrameRateTracker().advanceFrame();
 		
@@ -251,6 +253,11 @@ public class Graphics implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
+		
+		System.out.println("GL_VENDOR: "   + gl.glGetString(GL2.GL_VENDOR));
+		System.out.println("GL_RENDERER: " + gl.glGetString(GL2.GL_RENDERER));
+		System.out.println("GL_VERSION: "  + gl.glGetString(GL2.GL_VERSION));
+		
 		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
 		
 		initLighting(drawable);
@@ -300,17 +307,9 @@ public class Graphics implements GLEventListener {
 		}
 	}
 
-	private static int computeSurfaceScale(NativeSurface surface) {
-		final int testVal = 100;
-		int[] test = new int[] {testVal,testVal};
-		surface.convertToPixelUnits(test);
-		int scale = test[0]/testVal;
-		return scale;
-	}
 	
 	private void initLighting(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
-
 		float[] global = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 		gl.glEnable(GL2.GL_LIGHTING);

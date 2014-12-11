@@ -33,9 +33,10 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 	private Map<NodeShape, ShapeType> cytoscapeShapeMap;
 	private ScalableShapeDrawer shapeDrawer;
 	
+	
 	public RenderNodesProcedure() {
 		shapeDrawer = new ScalableShapeDrawer();
-	}
+	}	
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
@@ -62,23 +63,19 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		Set<Long> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
 		long hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
-		Number width, height, depth;
-		ShapeType shapeType;
-		
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
 
-			width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
-			height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
-			depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
+//			Double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
+//			Double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
+//			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
 			
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)
-					&& graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
 				long suid = nodeView.getModel().getSUID();
 				int upper = SUIDToolkit.upperInt(suid);
@@ -94,13 +91,13 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				
 				gl.glScalef(NODE_SIZE_RADIUS, NODE_SIZE_RADIUS, NODE_SIZE_RADIUS);
 				
-				if (width != null && height != null && depth != null) {
-					gl.glScalef(width.floatValue() / distanceScale, 
-							height.floatValue() / distanceScale, 
-							depth.floatValue() / distanceScale);
-				}
+//				if (width != null && height != null && depth != null) {
+//					gl.glScalef(width.floatValue() / distanceScale, 
+//							height.floatValue() / distanceScale, 
+//							depth.floatValue() / distanceScale);
+//				}
 				
-				shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
+				ShapeType shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
 				
 				if (shapeType != null) {
 					shapeDrawer.drawShape(gl, shapeType);

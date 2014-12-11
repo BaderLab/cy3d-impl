@@ -116,12 +116,9 @@ public class JoglInitializer {
 			public URL resolve(URL url) {
 				String path = url.getPath();
 				String jarToUse = isGluegen(path) ? GLUEGEN_JAR : JOGL_JAR;
-				
 				String urlString = "jar:file:" + pathMap.get(jarToUse) + "!" + path;
 				try {
 					URL newUrl = new URL(urlString);
-					System.out.println("URL: " + url);
-					System.out.println("NEW: " + newUrl);
 					return newUrl;
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
@@ -131,5 +128,4 @@ public class JoglInitializer {
 			
 		});
 	}
-	
 }
