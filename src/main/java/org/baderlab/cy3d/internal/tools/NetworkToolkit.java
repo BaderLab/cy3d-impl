@@ -118,7 +118,7 @@ public class NetworkToolkit {
 	 * are divided by this scale to obtain renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {		
+	public static Vector3 findNetworkCenter(CyNetworkView networkView, double distanceScale) {	
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		

@@ -7,10 +7,10 @@ import java.util.jar.Manifest;
 import javax.media.opengl.GLAnimatorControl;
 import javax.swing.SwingUtilities;
 
-import org.baderlab.cy3d.internal.AnimatorController;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
+import org.baderlab.cy3d.internal.graphics.AnimatorController;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;

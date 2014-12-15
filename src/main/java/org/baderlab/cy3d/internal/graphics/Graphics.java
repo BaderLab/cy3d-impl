@@ -5,7 +5,7 @@
 // src/main/resources/overview-todo.txt -- contains information about what 
 // is to be done
 
-package org.baderlab.cy3d.internal;
+package org.baderlab.cy3d.internal.graphics;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -171,8 +171,7 @@ public class Graphics implements GLEventListener {
 	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
 	 * @param listener
 	 */
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
-			DialogTaskManager taskManager) {
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
 //		graphicsData.setSubmenuTaskManager(submenuTaskManager);

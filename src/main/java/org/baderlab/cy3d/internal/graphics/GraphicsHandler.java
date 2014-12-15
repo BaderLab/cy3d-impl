@@ -1,6 +1,4 @@
-package org.baderlab.cy3d.internal;
-
-import java.util.Map;
+package org.baderlab.cy3d.internal.graphics;
 
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
@@ -9,7 +7,6 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
-import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.view.model.CyNetworkView;
 

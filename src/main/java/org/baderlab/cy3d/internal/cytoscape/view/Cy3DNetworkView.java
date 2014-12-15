@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.baderlab.cy3d.internal.AnimatorController;
 import org.baderlab.cy3d.internal.Cy3DNetworkViewRenderer;
+import org.baderlab.cy3d.internal.graphics.AnimatorController;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.model.CyEdge;

@@ -1,4 +1,4 @@
-package org.baderlab.cy3d.internal;
+package org.baderlab.cy3d.internal.graphics;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

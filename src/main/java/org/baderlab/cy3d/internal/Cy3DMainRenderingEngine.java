@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal;
 
+import org.baderlab.cy3d.internal.graphics.Graphics;
+import org.baderlab.cy3d.internal.graphics.MainGraphicsHandler;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;

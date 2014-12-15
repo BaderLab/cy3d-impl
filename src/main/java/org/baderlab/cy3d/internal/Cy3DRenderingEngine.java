@@ -17,6 +17,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
+import org.baderlab.cy3d.internal.graphics.Graphics;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -150,8 +151,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 		}
 	}
 	
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, 
-			DialogTaskManager taskManager) {
+	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
 		graphics.setupTaskFactories(taskFactoryListener, taskManager);
 	}
 	

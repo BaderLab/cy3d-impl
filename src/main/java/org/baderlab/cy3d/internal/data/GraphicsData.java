@@ -5,11 +5,11 @@ import java.awt.Component;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAnimatorControl;
 
-import org.baderlab.cy3d.internal.AnimatorController;
-import org.baderlab.cy3d.internal.Graphics;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
+import org.baderlab.cy3d.internal.graphics.AnimatorController;
+import org.baderlab.cy3d.internal.graphics.Graphics;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.FrameRateTracker;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;

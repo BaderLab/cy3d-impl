@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
-import org.baderlab.cy3d.internal.Graphics;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.graphics.Graphics;
 
 /**
  * This class represents a rendering procedure. Rendering procedures
