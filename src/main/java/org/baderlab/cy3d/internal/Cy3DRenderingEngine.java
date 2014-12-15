@@ -3,7 +3,9 @@ package org.baderlab.cy3d.internal;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.image.BufferedImage;
@@ -13,11 +15,16 @@ import java.util.Properties;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 import org.baderlab.cy3d.internal.graphics.Graphics;
+import org.baderlab.cy3d.internal.icon.IconManager;
+import org.baderlab.cy3d.internal.icon.IconManagerImpl;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -65,14 +72,10 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	private SetCurrentRenderingEngineListener setCurrentRenderingEngineListener;
 	
 	/** Create a new WindRenderingEngine object */
-	public Cy3DRenderingEngine(Object container, View<CyNetwork> viewModel, 
-			VisualLexicon visualLexicon) {
-	
+	public Cy3DRenderingEngine(Object container, View<CyNetwork> viewModel,  VisualLexicon visualLexicon) {
 		this.viewModel = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.active = false;
-
-//		setUpCanvas(container);
 	}
 	
 	// Needs to be called before setUpCanvas
@@ -93,8 +96,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 		// TODO: Addition of this line prevents an "ERROR: JarContent: Unable to read bytes." when Cytoscape shuts down, why?
 //		ShutdownType shutdownType = ShutdownType.COMPLETE;
 		
-		// TODO: The current presentation API seems to require this cast, check
-		// if there's a way around it
+		// TODO: The current presentation API seems to require this cast, check if there's a way around it
 		this.networkView = (CyNetworkView) viewModel;
 		
 		if (networkView != null) {
@@ -102,7 +104,6 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 			if (container instanceof JComponent) {
 				
 				JComponent component = (JComponent) container;
-				Container focus = component;
 				
 				// Use the system's default version of OpenGL
 				GLProfile profile = GLProfile.getDefault();
@@ -124,15 +125,14 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 
 				if (container instanceof JInternalFrame) {
 					JInternalFrame frame = (JInternalFrame) container;
+					setUpGlassPane(frame);
 					Container pane = frame.getContentPane();
 					
-					focus = pane;
 					graphics.trackInput(pane);
 					
 					pane.setLayout(new BorderLayout());
 					pane.add(panel, BorderLayout.CENTER);
 				} else {
-					focus = component;
 					graphics.trackInput(component);
 					
 					component.setLayout(new BorderLayout());
@@ -150,6 +150,36 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 			}
 		}
 	}
+	
+	private void setUpGlassPane(JInternalFrame frame) {
+		JPanel glass = (JPanel) frame.getGlassPane();
+		glass.setLayout(new BorderLayout());
+		glass.setVisible(true);
+		
+		JPanel toolbar = new JPanel();
+		toolbar.setLayout(new FlowLayout(FlowLayout.LEFT));
+		toolbar.setOpaque(false);
+		
+		JToggleButton button = new JToggleButton() ;
+		setIcon(button, IconManager.ICON_CAMERA);
+		toolbar.add(button);
+		
+		
+		
+		glass.add(toolbar, BorderLayout.NORTH);
+	}
+	
+	
+	IconManager iconManager = new IconManagerImpl();
+	
+	private void setIcon(AbstractButton button, String icon) {
+		button.setFont(iconManager.getIconFont(11));
+		button.setText(icon);
+		button.setMargin(new Insets(0, 0, 0, 0));
+		button.setPreferredSize(new Dimension(24, 24));
+	}
+	
+	
 	
 	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
 		graphics.setupTaskFactories(taskFactoryListener, taskManager);

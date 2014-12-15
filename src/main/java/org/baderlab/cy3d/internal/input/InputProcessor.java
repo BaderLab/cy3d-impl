@@ -9,7 +9,6 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
  */
 public interface InputProcessor {
 	
-	public void processInput(KeyboardMonitor keys, MouseMonitor mouse,
-			GraphicsData graphicsData);
+	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData);
 
 }
