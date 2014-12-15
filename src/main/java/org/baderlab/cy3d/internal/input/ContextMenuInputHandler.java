@@ -42,7 +42,7 @@ public class ContextMenuInputHandler implements InputHandler {
 			JPopupMenu popupMenu = null;
 			
 			if (node != null) {
-				View<CyNode> nodeView = networkView.getNodeView(node);;
+				View<CyNode> nodeView = networkView.getNodeView(node);
 				
 				popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
 						networkView, graphicsData.getVisualLexicon(), 
@@ -59,10 +59,10 @@ public class ContextMenuInputHandler implements InputHandler {
 						graphicsData.getTaskFactoryListener().getNetworkViewTaskFactories());
 			}
 			
-			// menu.add(new JMenuItem("Sample Action"));
-			
 			if (popupMenu != null) {
-				popupMenu.show(graphicsData.getContainer(), mouse.x(), mouse.y());
+				int[] coords = new int[] {mouse.x(), mouse.y()};
+				graphicsData.getPixelConverter().convertToWindowUnits(coords);
+				popupMenu.show(graphicsData.getContainer(), coords[0], coords[1]);
 			}
 		}
 		
