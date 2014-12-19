@@ -1,7 +1,5 @@
 package org.baderlab.cy3d.internal.tools;
 
-import java.util.Collection;
-
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
@@ -15,8 +13,6 @@ public class GeometryToolkit {
 	 * the camera and the plane which intersects a line passing through the eye and 
 	 * the specified location on the plane
 	 * 
-	 * This method can be used for mouse coordinates, as mouse coordinates are
-	 * screen coordinates.
 	 * 
 	 * @param x The x window coordinate of the mouse (0 for top left)
 	 * @param y The y window coordinate of the mouse (0 for top left)
@@ -24,8 +20,7 @@ public class GeometryToolkit {
 	 * intersecting plane
 	 * @return The 3D position of the mouse
 	 */
-	public static Vector3 convertScreenTo3d(int x, int y, int screenWidth, int screenHeight, 
-			double planeDistance, SimpleCamera camera) {
+	public static Vector3 convertScreenTo3d(int x, int y, int screenWidth, int screenHeight, double planeDistance, SimpleCamera camera) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
@@ -80,8 +75,7 @@ public class GeometryToolkit {
 	
 	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
 	// which is perpendicular to the camera.
-	public static Vector3 convertMouseTo3d(MouseMonitor mouse, GraphicsData graphicsData, 
-			double planeDistance) {
+	public static Vector3 convertMouseTo3d(MouseMonitor mouse, GraphicsData graphicsData, double planeDistance) {
 		return convertScreenTo3d(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
 		
 	}

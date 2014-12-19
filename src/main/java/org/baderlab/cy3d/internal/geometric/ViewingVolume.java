@@ -2,6 +2,8 @@ package org.baderlab.cy3d.internal.geometric;
 
 /**
  * This class represents the 6-sided viewing volume of the camera.
+ * 
+ * // MKTODO why is this class needed? can't opengl do this automatically?
  */
 public class ViewingVolume {
 	

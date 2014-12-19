@@ -55,8 +55,7 @@ public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFacto
 	}
 	
 	@Override
-	public RenderingEngine<CyNetwork> createRenderingEngine(
-			Object container, View<CyNetwork> viewModel) {
+	public RenderingEngine<CyNetwork> createRenderingEngine(Object container, View<CyNetwork> viewModel) {
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
 		Cy3DRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
@@ -68,14 +67,12 @@ public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFacto
 		
 //		serviceRegistrar.registerService(engine.getSetCurrentRenderingEngineListener(), SetCurrentRenderingEngineListener.class, new Properties());
 		
-		// System.out.println("returning engine: " + engine);
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		return engine;
 	}
 	
-	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Object container, 
-			View<CyNetwork> viewModel, VisualLexicon visualLexicon);
+	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon);
 	
 	@Override
 	public VisualLexicon getVisualLexicon() {

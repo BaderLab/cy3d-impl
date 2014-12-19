@@ -25,6 +25,7 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
+import org.baderlab.cy3d.internal.data.SettingsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.input.KeyboardMonitor;
@@ -79,7 +80,8 @@ public class Graphics implements GLEventListener {
 	/**
 	 * The {@link LightingProcessor} object responsible for setting up and maintaining lighting
 	 */
-	private LightingProcessor lightingProcessor;
+	// MKTODO do I still want this?
+	//private LightingProcessor lightingProcessor;
 	
 	private GraphicsHandler handler;
 	
@@ -114,7 +116,7 @@ public class Graphics implements GLEventListener {
 		inputProcessor = handler.getInputProcessor();
 		
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
-		lightingProcessor = handler.getLightingProcessor();
+		//lightingProcessor = handler.getLightingProcessor();
 		
 		if (handler instanceof MainGraphicsHandler) {
 			((Cy3DNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
@@ -125,6 +127,7 @@ public class Graphics implements GLEventListener {
 	 * to the specified component for capturing keyboard and mouse events
 	 * 
 	 * @param component The component to listen to events for
+	 * @param settingsData 
 	 */
 	public void trackInput(Component component) {
 		component.addMouseListener(mouse);
@@ -161,6 +164,10 @@ public class Graphics implements GLEventListener {
 				}
 			});
 		}
+	}
+	
+	public void trackSettings(SettingsData settingsData) {
+		graphicsData.setSettingsData(settingsData);
 	}
 	
 	public void setAnimatorControl(GLAnimatorControl animatorControl) {
@@ -214,7 +221,7 @@ public class Graphics implements GLEventListener {
 		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
 		
 		// Update lighting
-		lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
+		//lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
 		
 		// Draw the scene
 		handler.drawScene(graphicsData);
@@ -261,8 +268,12 @@ public class Graphics implements GLEventListener {
 		
 		initLighting(drawable);
 
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glEnable(GL2.GL_DEPTH_TEST);
+		
+		gl.glEnable(GL2.GL_CULL_FACE);
+		gl.glCullFace(GL2.GL_BACK);
+//		gl.glFrontFace(GL2.GL_CW);
 
 		gl.glDepthFunc(GL.GL_LEQUAL);
 		// gl.glDepthFunc(GL2.GL_LESS);
@@ -285,7 +296,7 @@ public class Graphics implements GLEventListener {
 		graphicsData.setGlContext(gl);
 		
 		handler.initializeGraphicsProcedures(graphicsData);
-		handler.setupLighting(graphicsData);
+		//handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
 		
@@ -309,7 +320,7 @@ public class Graphics implements GLEventListener {
 	
 	private void initLighting(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
-		float[] global = { 0.2f, 0.2f, 0.2f, 1.0f };
+		float[] global = { 0.4f, 0.4f, 0.4f, 1.0f };
 
 		gl.glEnable(GL2.GL_LIGHTING);
 		gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global));
@@ -335,6 +346,13 @@ public class Graphics implements GLEventListener {
 
 		*/
 
+		float[] diffuse = { 0.7f, 0.7f, 0.7f, 0.7f };
+		float[] position = { -4.0f, 4.0f, 6.0f, 0.0f };
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, FloatBuffer.wrap(diffuse));
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, FloatBuffer.wrap(position));
+		gl.glEnable(GL2.GL_LIGHT0);
+		
+		
 		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 		gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
 		
@@ -344,13 +362,13 @@ public class Graphics implements GLEventListener {
 		// FloatBuffer.wrap(specularReflection));
 		// gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 40);
 		
-		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
-		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
-		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
-		
-		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
-		
-		lightingProcessor.setupLighting(gl, graphicsData.getLightingData());
+//		float[] specularReflection = { 0.46f, 0.46f, 0.46f, 1.0f };
+//		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
+//		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
+//		
+//		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
+//		
+//		lightingProcessor.setupLighting(gl, graphicsData.getLightingData());
 	}
 
 	@Override

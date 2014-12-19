@@ -15,17 +15,18 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 
-public class CameraInputHandler implements InputHandler {
+public class CameraKeyboardInputHandler implements InputHandler {
 
 	@Override
 	public void processInput(KeyboardMonitor keys, MouseMonitor mouse, GraphicsData graphicsData) {
 		
 		Set<Integer> held = keys.getHeld();
 		Set<Integer> pressed = keys.getPressed();
+		System.out.println(held);
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		processCameraTranslation(held, camera);
-		processCameraRoll(held, camera);
+		//processCameraRoll(held, camera);
 		processCameraRotation(held, camera);
 		
 		processCameraFirstPersonLook(keys, mouse, camera);
@@ -62,8 +63,7 @@ public class CameraInputHandler implements InputHandler {
 		}
 	}
 
-	private void processCameraFirstPersonLook(KeyboardMonitor keys,
-			MouseMonitor mouse, SimpleCamera camera) {
+	private void processCameraFirstPersonLook(KeyboardMonitor keys, MouseMonitor mouse, SimpleCamera camera) {
 		
 		if (mouse.hasMoved()) {
 

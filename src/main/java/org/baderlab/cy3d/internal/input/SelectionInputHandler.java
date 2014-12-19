@@ -105,6 +105,9 @@ public class SelectionInputHandler implements InputHandler {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
+		if(!graphicsData.getSettingsData().isSelectMode())
+			return;
+		
 		if (!keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 		
 			// If the left button was clicked, prepare to select nodes/edges

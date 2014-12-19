@@ -46,27 +46,25 @@ public class DragMovementInputHandler implements InputHandler {
 		if (mouse.getPressed().contains(MouseEvent.BUTTON1)) {
 			Vector3 selectedCenter = NetworkToolkit.findCenter(selectedNodeViews, graphicsData.getDistanceScale());
 			
-			selectionData.setSelectProjectionDistance(GeometryToolkit.findOrthogonalDistance(
-					camera.getPosition(), selectedCenter, camera.getDirection()));
+			selectionData.setSelectProjectionDistance(
+					GeometryToolkit.findOrthogonalDistance(camera.getPosition(), selectedCenter, camera.getDirection()));
 			
-			selectionData.setPreviousSelectedProjection(GeometryToolkit.convertMouseTo3d(mouse, 
-					graphicsData, selectionData.getSelectProjectionDistance()));
+			selectionData.setPreviousSelectedProjection(
+					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, selectionData.getSelectProjectionDistance()));
 		}
 		
 		if (mouse.hasMoved() 
 				&& mouse.getHeld().contains(MouseEvent.BUTTON1)
 				&& keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
 			
-			selectionData.setCurrentSelectedProjection(GeometryToolkit.convertMouseTo3d(mouse, 
-					graphicsData, selectionData.getSelectProjectionDistance()));
+			selectionData.setCurrentSelectedProjection(
+					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, selectionData.getSelectProjectionDistance()));
 			
-			Vector3 nodeDisplacement = selectionData.getCurrentSelectedProjection().subtract(
-					selectionData.getPreviousSelectedProjection());
+			Vector3 nodeDisplacement = selectionData.getCurrentSelectedProjection().subtract(selectionData.getPreviousSelectedProjection());
 			
 			NetworkToolkit.displaceNodes(selectedNodeViews, graphicsData.getDistanceScale(), nodeDisplacement);
 			
-			selectionData.setPreviousSelectedProjection(
-					selectionData.getCurrentSelectedProjection().copy());
+			selectionData.setPreviousSelectedProjection(selectionData.getCurrentSelectedProjection().copy());
 		}
 	}
 }

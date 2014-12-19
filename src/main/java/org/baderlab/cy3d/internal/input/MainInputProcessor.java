@@ -15,7 +15,8 @@ public class MainInputProcessor implements InputProcessor {
 	
 		// Populate the list of InputHandler objects to be used by this InputProcessor.
 		// The InputHandler objects are called in the order that they are added.
-		inputHandlers.add(new CameraInputHandler());
+		inputHandlers.add(new CameraKeyboardInputHandler());
+		inputHandlers.add(new CameraMouseInputHandler());
 		inputHandlers.add(new DragMovementInputHandler());
 		inputHandlers.add(new SelectionInputHandler());
 		inputHandlers.add(new NetworkChangeInputHandler());

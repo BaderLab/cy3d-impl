@@ -3,9 +3,7 @@ package org.baderlab.cy3d.internal;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.image.BufferedImage;
@@ -15,16 +13,11 @@ import java.util.Properties;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
-import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 import org.baderlab.cy3d.internal.graphics.Graphics;
-import org.baderlab.cy3d.internal.icon.IconManager;
-import org.baderlab.cy3d.internal.icon.IconManagerImpl;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -120,21 +113,17 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 				// panel.setDoubleBuffered(true);
 				
 				graphics = getGraphicsInstance(networkView, visualLexicon);
+				graphics.trackInput(panel);
 
 				panel.addGLEventListener(graphics);
 
 				if (container instanceof JInternalFrame) {
 					JInternalFrame frame = (JInternalFrame) container;
-					setUpGlassPane(frame);
 					Container pane = frame.getContentPane();
-					
-					graphics.trackInput(pane);
 					
 					pane.setLayout(new BorderLayout());
 					pane.add(panel, BorderLayout.CENTER);
 				} else {
-					graphics.trackInput(component);
-					
 					component.setLayout(new BorderLayout());
 					component.add(panel, BorderLayout.CENTER);
 				}
@@ -151,33 +140,6 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 		}
 	}
 	
-	private void setUpGlassPane(JInternalFrame frame) {
-		JPanel glass = (JPanel) frame.getGlassPane();
-		glass.setLayout(new BorderLayout());
-		glass.setVisible(true);
-		
-		JPanel toolbar = new JPanel();
-		toolbar.setLayout(new FlowLayout(FlowLayout.LEFT));
-		toolbar.setOpaque(false);
-		
-		JToggleButton button = new JToggleButton() ;
-		setIcon(button, IconManager.ICON_CAMERA);
-		toolbar.add(button);
-		
-		
-		
-		glass.add(toolbar, BorderLayout.NORTH);
-	}
-	
-	
-	IconManager iconManager = new IconManagerImpl();
-	
-	private void setIcon(AbstractButton button, String icon) {
-		button.setFont(iconManager.getIconFont(11));
-		button.setText(icon);
-		button.setMargin(new Insets(0, 0, 0, 0));
-		button.setPreferredSize(new Dimension(24, 24));
-	}
 	
 	
 	

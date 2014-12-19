@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal;
 
+import javax.swing.JInternalFrame;
+
 import org.baderlab.cy3d.internal.graphics.Graphics;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsHandler;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
@@ -19,14 +21,15 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
+	private Graphics graphics;
+	
 	public Cy3DMainRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
 		super(container, viewModel, visualLexicon);
 	}
 
 	@Override
 	protected Graphics getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		
-		return new Graphics(networkView, visualLexicon, new MainGraphicsHandler());
+		return graphics = new Graphics(networkView, visualLexicon, new MainGraphicsHandler());
 	}
 
 	@Override
@@ -45,4 +48,16 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 			}
 		};
 	}
+	
+	@Override
+	public void setUpCanvas(Object container) {
+		super.setUpCanvas(container);
+		
+		if(container instanceof JInternalFrame) {
+			JInternalFrame frame = (JInternalFrame) container;
+			ToolPanel toolPanel = ToolPanel.createFor(frame);
+			graphics.trackSettings(toolPanel.getSettingsData());
+		}
+	}
+	
 }

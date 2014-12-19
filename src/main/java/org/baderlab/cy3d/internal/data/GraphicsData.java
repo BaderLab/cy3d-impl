@@ -129,6 +129,10 @@ public class GraphicsData {
 	 */
 	private LightingData lightingData;
 	
+	
+	
+	private SettingsData settingsData;
+	
 	private GL2 glContext;
 	
 	private VisualLexicon visualLexicon;
@@ -381,5 +385,11 @@ public class GraphicsData {
 		this.pixelConverter = pixelConverter;
 	}
 
+	public SettingsData getSettingsData() {
+		return settingsData;
+	}
 	
+	public void setSettingsData(SettingsData settingsData) {
+		this.settingsData = settingsData;
+	}
 }
