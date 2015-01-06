@@ -12,7 +12,7 @@ import org.cytoscape.view.model.CyNetworkView;
 
 /**
  * A handler object that is responsible for specifying how input, calculation, and drawing are
- * handled in a {@link Graphics} object. A {@link Graphics} object relies on its GraphicsHandler
+ * handled in a {@link GraphicsEventHandler} object. A {@link GraphicsEventHandler} object relies on its GraphicsHandler
  * to provide implementations for how certain responses are handled.
  */
 public interface GraphicsHandler {
@@ -58,8 +58,8 @@ public interface GraphicsHandler {
 	/**
 	 * Return an instance of a {@link CoordinatorProcessor} object, which is responsible for
 	 * interacting with the current {@link ViewingCoordinator} in order to extract relevant data
-	 * from another {@link Graphics} object. This could be information about the position of
-	 * the camera in the other {@link Graphics} object, for example.
+	 * from another {@link GraphicsEventHandler} object. This could be information about the position of
+	 * the camera in the other {@link GraphicsEventHandler} object, for example.
 	 * 
 	 * @return An instance of a {@link CoordinatorProcessor} object used to interact with
 	 * the {@link ViewingCoordinator}, which is also provided by this class.

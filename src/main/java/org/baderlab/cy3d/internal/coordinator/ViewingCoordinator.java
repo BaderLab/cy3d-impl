@@ -2,10 +2,8 @@ package org.baderlab.cy3d.internal.coordinator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.jar.Manifest;
 
 import javax.media.opengl.GLAnimatorControl;
-import javax.swing.SwingUtilities;
 
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
@@ -15,8 +13,6 @@ import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
-import com.jogamp.opengl.util.FPSAnimator;
-
 /**
  * This class is responsible for allowing communication between the main
  * and bird's eye rendering objects without introducing circular reference schemes,
@@ -24,6 +20,9 @@ import com.jogamp.opengl.util.FPSAnimator;
  * runtime.
  *
  * @author yuedong
+ * 
+ * MKTODO Move the coordinators map into a separate object.
+ * MKTODO Remove as many getter/setters as possible.
  */
 public class ViewingCoordinator {
 

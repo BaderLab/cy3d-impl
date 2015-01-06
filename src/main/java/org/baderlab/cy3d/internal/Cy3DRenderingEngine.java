@@ -18,7 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
-import org.baderlab.cy3d.internal.graphics.Graphics;
+import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -49,7 +49,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	/** The animator responsible for making calls to the rendering window */
 	private FPSAnimator animator;
 	
-	private Graphics graphics;
+	private GraphicsEventHandler graphics;
 	private GLJPanel panel;
 	
 	private CyServiceRegistrar serviceRegistrar;
@@ -64,7 +64,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	protected abstract SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(FPSAnimator animator);
 	
-	protected abstract Graphics getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon);
+	protected abstract GraphicsEventHandler getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon);
 	
 	
 	/** Set up the canvas by creating and placing it, along with a Graphics

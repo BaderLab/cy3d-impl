@@ -44,4 +44,9 @@ public class BirdsEyeGraphicsHandler extends AbstractGraphicsHandler {
 	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
 		return new BirdsEyeCytoscapeDataProcessor();
 	}
+	
+	@Override
+	public String toString() {
+		return "BirdsEyeGraphicsHandler";
+	}
 }

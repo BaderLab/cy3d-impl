@@ -2,7 +2,7 @@ package org.baderlab.cy3d.internal;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.graphics.BirdsEyeGraphicsHandler;
-import org.baderlab.cy3d.internal.graphics.Graphics;
+import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -23,8 +23,8 @@ public class Cy3DBirdsEyeRenderingEngine extends Cy3DRenderingEngine {
 	}
 
 	@Override
-	protected Graphics getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		return new Graphics(networkView, visualLexicon, new BirdsEyeGraphicsHandler());
+	protected GraphicsEventHandler getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
+		return new GraphicsEventHandler(networkView, visualLexicon, new BirdsEyeGraphicsHandler());
 	}
 
 	@Override

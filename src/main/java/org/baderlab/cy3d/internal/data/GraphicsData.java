@@ -9,7 +9,7 @@ import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.graphics.AnimatorController;
-import org.baderlab.cy3d.internal.graphics.Graphics;
+import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.FrameRateTracker;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
@@ -110,7 +110,7 @@ public class GraphicsData {
 	/**
 	 * A {@link CoordinatorData} object responsible for storing data related to
 	 * the relevant {@link ViewingCoordinator}, ie. it stores the data related
-	 * to coordination with another {@link Graphics} object, such as in the
+	 * to coordination with another {@link GraphicsEventHandler} object, such as in the
 	 * relationship between bird's eye and main window rendering objects.
 	 */
 	private CoordinatorData coordinatorData;

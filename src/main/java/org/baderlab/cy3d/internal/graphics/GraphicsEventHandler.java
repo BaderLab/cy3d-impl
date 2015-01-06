@@ -51,13 +51,13 @@ import com.jogamp.opengl.util.FPSAnimator;
  * - keyboard and mouse input
  * - calculation related to rendering
  * - rendering of the network
- * - communication with other {@link Graphics} objects, such as in the case
+ * - communication with other {@link GraphicsEventHandler} objects, such as in the case
  * of a bird's eye rendering object and a main window rendering object communication
  * with each other.
  * 
  * @author Paperwing (Yue Dong)
  */
-public class Graphics implements GLEventListener {
+public class GraphicsEventHandler implements GLEventListener {
 	
 	/** A monitor to keep track of keyboard events */
 	private KeyboardMonitor keys;
@@ -91,13 +91,13 @@ public class Graphics implements GLEventListener {
 	 * View<CyNetwork> object that we are rendering
 	 * @param visualLexicon The visual lexicon being used
 	 */
-	public Graphics(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsHandler handler) {
+	public GraphicsEventHandler(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsHandler handler) {
 		this.handler = handler;
 		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
-		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 3), new Vector3(0, 0, 0),
-				new Vector3(0, 1, 0), 0.04, 0.0033, 0.01, 0.01, 0.4));
+		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 3), new Vector3(0, 0, 0), new Vector3(0, 1, 0), 
+				                                0.04, 0.0033, 0.01, 0.01, 0.4));
 		
 		PixelConverter pixelConverter = new PixelConverter(null);
 		graphicsData.setPixelConverter(pixelConverter);
@@ -391,5 +391,10 @@ public class Graphics implements GLEventListener {
 		
 		graphicsData.setScreenHeight(height);
 		graphicsData.setScreenWidth(width);
+	}
+	
+	@Override
+	public String toString() {
+		return "Graphics(" + handler + ")";
 	}
 }

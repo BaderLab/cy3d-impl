@@ -89,4 +89,9 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 		return new MainCytoscapeDataProcessor();
 	}
 	
+	@Override
+	public String toString() {
+		return "MainGraphicsHandler";
+	}
+	
 }
