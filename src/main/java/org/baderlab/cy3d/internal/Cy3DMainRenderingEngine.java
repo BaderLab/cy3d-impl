@@ -1,16 +1,17 @@
 package org.baderlab.cy3d.internal;
 
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
+import org.baderlab.cy3d.internal.command.ToolPanel;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.graphics.Graphics;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsHandler;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.RenderingEngine;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -23,8 +24,8 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
 	private Graphics graphics;
 	
-	public Cy3DMainRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon) {
-		super(container, viewModel, visualLexicon);
+	public Cy3DMainRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon) {
+		super(viewModel, visualLexicon);
 	}
 
 	@Override
@@ -34,13 +35,11 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
 	@Override
 	protected SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(final FPSAnimator animator) {
-		final RenderingEngine<CyNetwork> renderingEngine = this;
-
 		return new SetCurrentRenderingEngineListener() {
 			
 			@Override
 			public void handleEvent(SetCurrentRenderingEngineEvent e) {
-				if (e.getRenderingEngine() == renderingEngine) {
+				if (e.getRenderingEngine() == Cy3DMainRenderingEngine.this) {
 					animator.start();
 				} else {
 					animator.stop();
@@ -50,13 +49,13 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 	}
 	
 	@Override
-	public void setUpCanvas(Object container) {
+	public void setUpCanvas(JComponent container) {
 		super.setUpCanvas(container);
 		
 		if(container instanceof JInternalFrame) {
 			JInternalFrame frame = (JInternalFrame) container;
 			ToolPanel toolPanel = ToolPanel.createFor(frame);
-			graphics.trackSettings(toolPanel.getSettingsData());
+			graphics.trackSettings(toolPanel.getSettingsData()); // MKTODO this has to change, use observer instead
 		}
 	}
 	

@@ -1,15 +1,16 @@
 package org.baderlab.cy3d.internal;
 
+import javax.swing.JComponent;
+
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.service.util.CyServiceRegistrar;
-import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
-import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 /** The RenderingEngineFactory for the Cy3DRenderingEngine
@@ -17,62 +18,53 @@ import org.cytoscape.work.swing.DialogTaskManager;
  * @author paperwing (Yue Dong)
  */
 public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
-
-	/** The network view manager containing references to the network views */
-	private CyNetworkViewManager networkViewManager;
 	
-	/** The RenderingEngineManager containing references to the current 
-	 * rendering engines */
-	private RenderingEngineManager renderingEngineManager;
-	
-	/** The visual lexicon for the cy3d rendering engine */
+	private final RenderingEngineManager renderingEngineManager;
 	private final VisualLexicon visualLexicon;
+	private final TaskFactoryListener taskFactoryListener;
+	private final DialogTaskManager taskManager;
 	
-	/** A listener used to obtain the set of {@link TaskFactory} objects for use with creating context menus */
-	private TaskFactoryListener taskFactoryListener;
-	
-	/** A task manager object that can be used to execute tasks created by TaskFactory objects */
-	private DialogTaskManager taskManager;
+	/** The service registrar used to listen for events regarding when the Graphics object is to be removed */
+	private final CyServiceRegistrar serviceRegistrar;
 	
 	
-	/** The service registrar used to listen for events regarding when
-	 * the Graphics object is to be removed
-	 */
-	private CyServiceRegistrar serviceRegistrar;
-	
-	public Cy3DRenderingEngineFactory(CyNetworkViewManager networkViewManager,
-			RenderingEngineManager renderingEngineManager, VisualLexicon lexicon,
+	public Cy3DRenderingEngineFactory(RenderingEngineManager renderingEngineManager, 
+			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
 			CyServiceRegistrar serviceRegistrar) {	
-		this.networkViewManager = networkViewManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
-		
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
 		this.serviceRegistrar = serviceRegistrar;
 	}
 	
+	
+	/**
+	 * Catch these errors up front.
+	 * 
+	 * @throws ClassCastException if the viewModel is not an instance of Cy3DNetworkView
+	 * @throws ClassCastException if the container is not an instance of JComponent
+	 */
 	@Override
 	public RenderingEngine<CyNetwork> createRenderingEngine(Object container, View<CyNetwork> viewModel) {
+		// Verify the type of the view up front.
+		Cy3DNetworkView cy3dViewModel = (Cy3DNetworkView) viewModel;
+		JComponent component = (JComponent) container;
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		Cy3DRenderingEngine engine = getNewRenderingEngine(container, viewModel, visualLexicon);
-		
-//		engine.setUpNetworkView(networkViewManager);
-		engine.setUpCanvas(container);
+		Cy3DRenderingEngine engine = getNewRenderingEngine(cy3dViewModel, visualLexicon);
+		engine.setUpCanvas(component);
 		engine.setUpListeners(serviceRegistrar);
 		engine.setupTaskFactories(taskFactoryListener, taskManager);
-		
-//		serviceRegistrar.registerService(engine.getSetCurrentRenderingEngineListener(), SetCurrentRenderingEngineListener.class, new Properties());
 		
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		return engine;
 	}
 	
-	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Object container, View<CyNetwork> viewModel, VisualLexicon visualLexicon);
+	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon);
 	
 	@Override
 	public VisualLexicon getVisualLexicon() {

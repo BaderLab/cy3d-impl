@@ -1,4 +1,4 @@
-package org.baderlab.cy3d.internal;
+package org.baderlab.cy3d.internal.command;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

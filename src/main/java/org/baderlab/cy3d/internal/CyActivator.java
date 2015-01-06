@@ -24,19 +24,14 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /**
  * CyActivator object used to import and export services from and to Cytoscape, such
  * as manager and factory objects.
  */
 public class CyActivator extends AbstractCyActivator {
-	
 
 	public void start(BundleContext bc) {
-		//final Logger logger = LoggerFactory.getLogger(this.getClass());
-		
 		CyNetworkViewManager cyNetworkViewManagerRef = getService(bc, CyNetworkViewManager.class);
 		RenderingEngineManager cyRenderingEngineManagerRef = getService(bc, RenderingEngineManager.class);
 		CyServiceRegistrar cyServiceRegistrarRef = getService(bc, CyServiceRegistrar.class);
@@ -72,23 +67,11 @@ public class CyActivator extends AbstractCyActivator {
 		
 		// Main RenderingEngine factory
 		Cy3DMainRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DMainRenderingEngineFactory(
-				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 		
-//		Properties windMainRenderingEngineFactoryProps = new Properties();
-//		windMainRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
-//		windMainRenderingEngineFactoryProps.setProperty("id", "wind");
-//		registerService(bc, windMainRenderingEngineFactory, RenderingEngineFactory.class, windMainRenderingEngineFactoryProps);
-//
 		// Bird's Eye RenderingEngine factory
 		Cy3DBirdsEyeRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DBirdsEyeRenderingEngineFactory(
-				cyNetworkViewManagerRef, cyRenderingEngineManagerRef,
-				cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
-//		
-//		Properties windBirdsEyeRenderingEngineFactoryProps = new Properties();
-//		windBirdsEyeRenderingEngineFactoryProps.setProperty("serviceType", "presentationFactory");
-//		windBirdsEyeRenderingEngineFactoryProps.setProperty("id", "windMap");
-//		registerService(bc, windBirdsEyeRenderingEngineFactory, RenderingEngineFactory.class, windBirdsEyeRenderingEngineFactoryProps);
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
 
 		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
@@ -121,9 +104,7 @@ public class CyActivator extends AbstractCyActivator {
 		try {
 			JoglInitializer.unpackNativeLibrariesForJOGL(bc);
 		} catch (IOException e) {
-			//logger.error(e.getMessage(), e);
-			// This App will be useless if Jogl can't find its libraries, 
-			// so best throw an exception to OSGi to shut it down.
+			// This App will be useless if Jogl can't find its libraries, so best throw an exception to OSGi to shut it down.
 			throw new RuntimeException(e);
  		}
 	}

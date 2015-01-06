@@ -5,6 +5,12 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 
+/**
+ * This is the main service that is registered with Cytoscape so that it
+ * picks up the 3D renderer.
+ * 
+ * @author mkucera
+ */
 public class Cy3DNetworkViewRenderer implements NetworkViewRenderer {
 
 	public static final String ID = "org.baderlab.cy3d";

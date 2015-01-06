@@ -35,12 +35,17 @@ public class JoglInitializer {
 	
 	
 	public static void unpackNativeLibrariesForJOGL(BundleContext bc) throws IOException {
+		
 		// Get the URLs for the JOGL jar files that are contained in the bundle.
 		List<URL> jarFileURLs = getJarFileURLs(bc);
+		
 		// Copy the jar files to the persistent storage area, return a map of file paths.
 		Map<String,String> pathMap = copyJarFiles(jarFileURLs, bc);
+		
 		// Create a URL resolver object and register it with JOGL.
-		createJarResolver(pathMap);
+		JarUtil.Resolver resolver = createJarResolver(pathMap);
+		JarUtil.setResolver(resolver);
+		
 	}
 	
 	
@@ -93,8 +98,8 @@ public class JoglInitializer {
 	}
 	
 	
-	private static void createJarResolver(final Map<String,String> pathMap) {
-		JarUtil.setResolver(new JarUtil.Resolver() {
+	private static JarUtil.Resolver createJarResolver(final Map<String,String> pathMap) {
+		return new JarUtil.Resolver() {
 			
 			private final Set<String> gluegenPrefixes = new HashSet<>(); 
 			{
@@ -126,6 +131,6 @@ public class JoglInitializer {
 				}
 			}
 			
-		});
+		};
 	}
 }

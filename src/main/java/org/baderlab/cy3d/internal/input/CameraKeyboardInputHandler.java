@@ -22,7 +22,6 @@ public class CameraKeyboardInputHandler implements InputHandler {
 		
 		Set<Integer> held = keys.getHeld();
 		Set<Integer> pressed = keys.getPressed();
-		System.out.println(held);
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		processCameraTranslation(held, camera);
