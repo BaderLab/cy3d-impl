@@ -3,10 +3,10 @@ package org.baderlab.cy3d.internal;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.command.ToolPanel;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsHandler;
+import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -22,7 +22,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
-	private GraphicsEventHandler graphics;
+	private MainGraphicsHandler mainGraphicsHandler = new MainGraphicsHandler();
 	
 	public Cy3DMainRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon) {
 		super(viewModel, visualLexicon);
@@ -30,7 +30,7 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
 	@Override
 	protected GraphicsEventHandler getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		return graphics = new GraphicsEventHandler(networkView, visualLexicon, new MainGraphicsHandler());
+		return new GraphicsEventHandler(networkView, visualLexicon, mainGraphicsHandler);
 	}
 
 	@Override
@@ -55,8 +55,9 @@ public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 		if(container instanceof JInternalFrame) {
 			JInternalFrame frame = (JInternalFrame) container;
 			ToolPanel toolPanel = ToolPanel.createFor(frame);
-			graphics.trackSettings(toolPanel.getSettingsData()); // MKTODO this has to change, use observer instead
+			toolPanel.addMouseModeChangeListener(mainGraphicsHandler.getMouseModeChangeListener());
 		}
+		
 	}
 	
 }

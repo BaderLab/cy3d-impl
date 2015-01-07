@@ -1,5 +1,6 @@
 package org.baderlab.cy3d.internal.graphics;
 
+import java.awt.Component;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL2;
@@ -12,6 +13,9 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.input.MainInputProcessor;
+import org.baderlab.cy3d.internal.input.handler.MainInputEventHandler;
+import org.baderlab.cy3d.internal.input.handler.MouseMode;
+import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.baderlab.cy3d.internal.lighting.Light;
 import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
@@ -30,6 +34,9 @@ import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
  * 
  */
 public class MainGraphicsHandler extends AbstractGraphicsHandler {
+	
+	private MainInputEventHandler inputHandler;
+	
 	
 	public MainGraphicsHandler() {
 		add(new ResetSceneProcedure());
@@ -94,4 +101,21 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 		return "MainGraphicsHandler";
 	}
 	
+	@Override
+	public void trackInput(GraphicsData graphicsData, Component component) {
+		inputHandler = new MainInputEventHandler(graphicsData);
+		component.addMouseWheelListener(inputHandler);
+		component.addMouseMotionListener(inputHandler);
+		component.addMouseListener(inputHandler);
+	}
+	
+	public ToolPanel.MouseModeChangeListener getMouseModeChangeListener() {
+		return new ToolPanel.MouseModeChangeListener() {
+			@Override
+			public void mouseModeChanged(MouseMode mouseMode) {
+				if(inputHandler != null)
+					inputHandler.setMouseMode(mouseMode);
+			}
+		};
+	}
 }

@@ -1,4 +1,4 @@
-package org.baderlab.cy3d.internal.command;
+package org.baderlab.cy3d.internal.input.handler;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -8,14 +8,13 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-
-import org.baderlab.cy3d.internal.data.SettingsData;
-import org.baderlab.cy3d.internal.data.SettingsData.CameraDragMode;
 
 /**
  * Tool panel that overlays the renderer window.
@@ -26,10 +25,30 @@ import org.baderlab.cy3d.internal.data.SettingsData.CameraDragMode;
 public class ToolPanel {
 	
 	
-	private CameraDragMode currentCameraMode;
+	private Set<MouseModeChangeListener> listeners = new LinkedHashSet<>();
+	
+	public interface MouseModeChangeListener {
+		void mouseModeChanged(MouseMode mouseMode);
+	}
 	
 	
 	private ToolPanel() {}
+	
+	
+	public boolean addMouseModeChangeListener(MouseModeChangeListener listner) {
+		return listeners.add(listner);
+	}
+	
+	public boolean removeMouseModeChangeListener(MouseModeChangeListener listener) {
+		return listeners.remove(listener);
+	}
+	
+	private void fireMouseModeChangeEvent(MouseMode mouseMode) {
+		for(MouseModeChangeListener listener : listeners) {
+			listener.mouseModeChanged(mouseMode);
+		}
+	}
+	
 	
 	public static ToolPanel createFor(JInternalFrame frame) {
 		ToolPanel toolPanel = new ToolPanel();
@@ -47,17 +66,15 @@ public class ToolPanel {
 		cameraToolBar.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		cameraToolBar.setOpaque(false);
 		
-		createButton("Select", CameraDragMode.OFF,    cameraToolBar, cameraGroup).setSelected(true);
-		createButton("Pan",    CameraDragMode.PAN,    cameraToolBar, cameraGroup);
-		createButton("Strafe", CameraDragMode.STRAFE, cameraToolBar, cameraGroup);
-		createButton("Orbit",  CameraDragMode.ORBIT,  cameraToolBar, cameraGroup);
-		
-		currentCameraMode = CameraDragMode.OFF;
+		createButton("Select", MouseMode.SELECT, cameraToolBar, cameraGroup);
+		createButton("Pan",    MouseMode.PAN,    cameraToolBar, cameraGroup);
+		createButton("Strafe", MouseMode.STRAFE, cameraToolBar, cameraGroup);
+		createButton("Orbit",  MouseMode.ORBIT,  cameraToolBar, cameraGroup);
 		
 		glass.add(cameraToolBar, BorderLayout.WEST);
 	}
 	
-	private JToggleButton createButton(String text, final CameraDragMode mode, Container parent, ButtonGroup group) {
+	private JToggleButton createButton(String text, final MouseMode mode, Container parent, ButtonGroup group) {
 		JToggleButton button = new JToggleButton(text);
 		button.setMargin(new Insets(0, 0, 0, 0));
 		button.setPreferredSize(new Dimension(40, 20));
@@ -68,36 +85,15 @@ public class ToolPanel {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentCameraMode = mode;
+				fireMouseModeChangeEvent(mode);
 			}
 		});
-		return button;
-	}
-	
-	
-	public SettingsData getSettingsData() {
-		return new ExposedSettingsData();
-	}
-	
-	
-	private class ExposedSettingsData implements SettingsData {
-
-		@Override
-		public CameraDragMode getCameraDragMode() {
-			return currentCameraMode;
-		}
-
-		@Override
-		public boolean isSelectMode() {
-			return currentCameraMode == CameraDragMode.OFF;
-		}
-
-		@Override
-		public boolean resetCamera() {
-			// TODO Auto-generated method stub
-			return false;
+		
+		if(mode == MouseMode.getDefault()) {
+			button.setSelected(true);
 		}
 		
+		return button;
 	}
 	
 	

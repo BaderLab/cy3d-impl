@@ -122,6 +122,7 @@ public class MouseMonitor implements MouseListener, MouseMotionListener, MouseWh
 	
 	@Override
 	public void mouseDragged(MouseEvent event) {
+		System.out.println("mouseDragged: " + event.getX() + " " + event.getY());
 		mouseMoved(event);
 	}
 

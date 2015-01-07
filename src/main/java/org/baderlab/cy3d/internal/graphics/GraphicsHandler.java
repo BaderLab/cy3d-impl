@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal.graphics;
 
+import java.awt.Component;
+
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
@@ -122,6 +124,9 @@ public interface GraphicsHandler {
 	 * about the current state of rendering as well as the current state of the network.
 	 */
 	public void dispose(GraphicsData graphicsData);
+	
+	
+	public void trackInput(GraphicsData graphicsData, Component component);
 }
 
 

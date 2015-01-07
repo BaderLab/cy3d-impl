@@ -56,6 +56,7 @@ public class DragMovementInputHandler implements InputHandler {
 		if (mouse.hasMoved() 
 				&& mouse.getHeld().contains(MouseEvent.BUTTON1)
 				&& keys.getHeld().contains(KeyEvent.VK_CONTROL)) {
+			System.out.println("Select drag");
 			
 			selectionData.setCurrentSelectedProjection(
 					GeometryToolkit.convertMouseTo3d(mouse, graphicsData, selectionData.getSelectProjectionDistance()));

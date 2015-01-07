@@ -25,11 +25,7 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
-import org.baderlab.cy3d.internal.data.SettingsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.input.InputProcessor;
-import org.baderlab.cy3d.internal.input.KeyboardMonitor;
-import org.baderlab.cy3d.internal.input.MouseMonitor;
 import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
@@ -60,17 +56,17 @@ import com.jogamp.opengl.util.FPSAnimator;
 public class GraphicsEventHandler implements GLEventListener {
 	
 	/** A monitor to keep track of keyboard events */
-	private KeyboardMonitor keys;
+	//private KeyboardMonitor keys;
 	
 	/** A monitor to keep track of mouse events */
-	private MouseMonitor mouse;
+	//private MouseMonitor mouse;
 	
 	/** A boolean to use lower quality 3D shapes to improve framerate */
 	private boolean lowerQuality = false;
 	
 	private GraphicsData graphicsData;
 	
-	private InputProcessor inputProcessor;
+	//private InputProcessor inputProcessor;
 	// private ShapePicker shapePicker;
 	private ShapePickingProcessor shapePickingProcessor;
 	private ViewingCoordinator coordinator;
@@ -102,8 +98,8 @@ public class GraphicsEventHandler implements GLEventListener {
 		PixelConverter pixelConverter = new PixelConverter(null);
 		graphicsData.setPixelConverter(pixelConverter);
 		
-		keys = new KeyboardMonitor();
-		mouse = new MouseMonitor(pixelConverter);
+//		keys = new KeyboardMonitor();
+//		mouse = new MouseMonitor(pixelConverter);
 		
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
@@ -113,7 +109,7 @@ public class GraphicsEventHandler implements GLEventListener {
 		coordinatorProcessor.initializeCoordinator(coordinator, graphicsData);
 		
 		shapePickingProcessor = handler.getShapePickingProcessor();
-		inputProcessor = handler.getInputProcessor();
+//		inputProcessor = handler.getInputProcessor();
 		
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
 		//lightingProcessor = handler.getLightingProcessor();
@@ -130,13 +126,16 @@ public class GraphicsEventHandler implements GLEventListener {
 	 * @param settingsData 
 	 */
 	public void trackInput(Component component) {
-		component.addMouseListener(mouse);
-		component.addMouseMotionListener(mouse);
-		component.addMouseWheelListener(mouse);
-		component.addFocusListener(mouse);
 		
-		component.addKeyListener(keys);
-		component.addFocusListener(keys);
+		handler.trackInput(graphicsData, component);
+		
+//		component.addMouseListener(mouse);
+//		component.addMouseMotionListener(mouse);
+//		component.addMouseWheelListener(mouse);
+//		component.addFocusListener(mouse);
+//		
+//		component.addKeyListener(keys);
+//		component.addFocusListener(keys);
 		
 		graphicsData.setContainer(component);
 		
@@ -164,10 +163,6 @@ public class GraphicsEventHandler implements GLEventListener {
 				}
 			});
 		}
-	}
-	
-	public void trackSettings(SettingsData settingsData) {
-		graphicsData.setSettingsData(settingsData);
 	}
 	
 	public void setAnimatorControl(GLAnimatorControl animatorControl) {
@@ -209,10 +204,10 @@ public class GraphicsEventHandler implements GLEventListener {
 						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
 		
 		// Perform picking
-		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
+//		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
 		
 		// Check input
-		inputProcessor.processInput(keys, mouse, graphicsData);
+//		inputProcessor.processInput(keys, mouse, graphicsData);
 		
 		// Update data for bird's eye view camera movement
 		coordinatorProcessor.extractData(coordinator, graphicsData);

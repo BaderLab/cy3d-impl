@@ -1,9 +1,12 @@
 package org.baderlab.cy3d.internal.graphics;
 
+import java.awt.Component;
+
 import org.baderlab.cy3d.internal.coordinator.BirdsEyeCoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.BirdsEyeCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
+import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.input.BirdsEyeInputProcessor;
 import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
@@ -48,5 +51,11 @@ public class BirdsEyeGraphicsHandler extends AbstractGraphicsHandler {
 	@Override
 	public String toString() {
 		return "BirdsEyeGraphicsHandler";
+	}
+	
+	@Override
+	public void trackInput(GraphicsData graphicsData, Component component) {
+		// TODO Auto-generated method stub
+		
 	}
 }
