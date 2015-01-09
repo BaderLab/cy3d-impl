@@ -7,8 +7,6 @@ import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.BirdsEyeCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.input.BirdsEyeInputProcessor;
-import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderArcEdgesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
@@ -33,11 +31,6 @@ public class BirdsEyeGraphicsHandler extends AbstractGraphicsHandler {
 		add(new RenderBoundingBoxProcedure());	
 	}
 	
-	@Override
-	public InputProcessor getInputProcessor() {
-		return new BirdsEyeInputProcessor();
-	}
-
 	@Override
 	public CoordinatorProcessor getCoordinatorProcessor() {
 		return new BirdsEyeCoordinatorProcessor();

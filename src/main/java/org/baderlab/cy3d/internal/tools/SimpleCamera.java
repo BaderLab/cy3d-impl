@@ -233,10 +233,18 @@ public class SimpleCamera {
 		move(left, moveSpeed);
 	}
 	
+	public void moveLeft(double multiplier) {
+		move(left, multiplier * moveSpeed);
+	}
+	
 	/** Translate the camera rightwards by its movement speed and direction vectors
 	 */
 	public void moveRight() {
 		move(left, -moveSpeed);
+	}
+	
+	public void moveRight(double multiplier) {
+		move(left, multiplier * -moveSpeed);
 	}
 	
 	/** Translate the camera forwards by its movement speed
@@ -257,10 +265,19 @@ public class SimpleCamera {
 		move(up, moveSpeed);
 	}
 	
+	public void moveUp(double multiplier) {
+		move(up, multiplier * moveSpeed);
+	}
+	
+	
 	/** Translate the camera downwards by its movement speed
 	 */
 	public void moveDown() {
 		move(up, -moveSpeed);
+	}
+	
+	public void moveDown(double multiplier) {
+		move(up, multiplier * -moveSpeed);
 	}
 	
 	/** Translate the camera forwards quickly, using its zooming speed as the movement rate

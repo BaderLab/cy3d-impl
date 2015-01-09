@@ -73,6 +73,11 @@
 						<Xmaxwarns>10000</Xmaxwarns>
 						<Xmaxerrs>10000</Xmaxerrs>
 					</compilerArguments>
+					
+					<excludes>
+						<exclude>org/baderlab/cy3d/internal/input/*.java</exclude>
+					</excludes>
+					
 				</configuration>
 			</plugin>
 			<plugin>

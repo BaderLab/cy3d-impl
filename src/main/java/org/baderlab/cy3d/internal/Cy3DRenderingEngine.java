@@ -41,6 +41,8 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 
+	public static int FPS_TARGET = 60;  // try to render this fast
+	
 	/** The networkView to be rendered */
 	private CyNetworkView networkView;
 	
@@ -107,7 +109,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 				container.add(panel, BorderLayout.CENTER);
 			}
 			
-			animator = new FPSAnimator(60);
+			animator = new FPSAnimator(FPS_TARGET);
 			animator.add(panel);
 			animator.start();
 			

@@ -12,8 +12,6 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.PickingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.input.KeyboardMonitor;
-import org.baderlab.cy3d.internal.input.MouseMonitor;
 import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
@@ -50,7 +48,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	}
 	
 	@Override
-	public void processPicking(MouseMonitor mouse, KeyboardMonitor keys, GraphicsData graphicsData) {
+	public void processPicking(int x, int y, GraphicsData graphicsData) {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 	
 		if (selectionData.isDragSelectMode()) {
@@ -61,7 +59,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 			
 			performPick(selectionBoxCenterX, selectionBoxCenterY, selectionBoxWidth, selectionBoxHeight, true, graphicsData);
 		} else {
-			performPick(mouse.x(), mouse.y(), 2, 2, false, graphicsData);
+			performPick(x, y, 2, 2, false, graphicsData);
 		}
 	}
 	

@@ -11,8 +11,6 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
-import org.baderlab.cy3d.internal.input.InputProcessor;
-import org.baderlab.cy3d.internal.input.MainInputProcessor;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventHandler;
 import org.baderlab.cy3d.internal.input.handler.MouseMode;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
@@ -50,11 +48,6 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 		add(new RenderLightsProcedure());
 	}
 	
-	@Override
-	public InputProcessor getInputProcessor() {
-		return new MainInputProcessor();
-	}
-
 	@Override
 	public void setupLighting(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
@@ -107,6 +100,7 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 		component.addMouseWheelListener(inputHandler);
 		component.addMouseMotionListener(inputHandler);
 		component.addMouseListener(inputHandler);
+		component.addKeyListener(inputHandler);
 	}
 	
 	public ToolPanel.MouseModeChangeListener getMouseModeChangeListener() {
@@ -117,5 +111,10 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 					inputHandler.setMouseMode(mouseMode);
 			}
 		};
+	}
+	
+	@Override
+	public void dispose(GraphicsData gd) {
+		inputHandler.dispose();
 	}
 }

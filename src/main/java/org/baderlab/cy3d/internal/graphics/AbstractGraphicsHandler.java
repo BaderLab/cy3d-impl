@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.input.KeyboardMonitor;
-import org.baderlab.cy3d.internal.input.MouseMonitor;
 import org.baderlab.cy3d.internal.lighting.DefaultLightingProcessor;
 import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
@@ -47,7 +45,7 @@ public abstract class AbstractGraphicsHandler implements GraphicsHandler {
 	public ShapePickingProcessor getShapePickingProcessor() {
 		return new ShapePickingProcessor() {
 			@Override public void initialize(GraphicsData graphicsData) { }
-			@Override public void processPicking(MouseMonitor mouse, KeyboardMonitor keys, GraphicsData graphicsData) { }
+			@Override public void processPicking(int x, int y, GraphicsData graphicsData) { }
 		};
 	}
 

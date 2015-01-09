@@ -6,7 +6,6 @@ import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.input.InputProcessor;
 import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.cytoscape.model.CyTable;
@@ -32,18 +31,6 @@ public interface GraphicsHandler {
 	 */
 	public ShapePickingProcessor getShapePickingProcessor();
 	
-	/**
-	 * Return an {@link InputProcessor} that is responsible for responding
-	 * to keyboard and mouse button input given the states of the keyboard and
-	 * mouse, as well as a {@link GraphicsData} object to store the interpreted
-	 * input data.
-	 * 
-	 * The {@link InputProcessor} is called after the {@link ShapePickingProcessor}.
-	 * 
-	 * @return An {@link InputProcessor} that directs how input is handled.
-	 */
-	public InputProcessor getInputProcessor();
-
 	/**
 	 * Return an instance of a {@link ViewingCoordinator} that will be used to allow
 	 * communication between the bird's eye and the main rendering windows. This communication
@@ -125,7 +112,12 @@ public interface GraphicsHandler {
 	 */
 	public void dispose(GraphicsData graphicsData);
 	
-	
+	/**
+	 * Adds input handling linseners to the AWT component which are responsible for responding
+	 * to keyboard and mouse button input given the states of the keyboard and
+	 * mouse, as well as a {@link GraphicsData} object to store the interpreted
+	 * input data.
+	 */
 	public void trackInput(GraphicsData graphicsData, Component component);
 }
 

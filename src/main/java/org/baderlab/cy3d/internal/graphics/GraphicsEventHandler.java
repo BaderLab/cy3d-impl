@@ -246,6 +246,7 @@ public class GraphicsEventHandler implements GLEventListener {
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
 		coordinatorProcessor.unlinkCoordinator(coordinator);
+		handler.dispose(graphicsData);
 	}
 
 	/** Initialize the Graphics object, performing certain

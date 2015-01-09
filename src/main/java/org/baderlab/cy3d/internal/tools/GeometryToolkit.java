@@ -3,7 +3,6 @@ package org.baderlab.cy3d.internal.tools;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.input.MouseMonitor;
 
 public class GeometryToolkit {
 	
@@ -75,8 +74,8 @@ public class GeometryToolkit {
 	
 	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
 	// which is perpendicular to the camera.
-	public static Vector3 convertMouseTo3d(MouseMonitor mouse, GraphicsData graphicsData, double planeDistance) {
-		return convertScreenTo3d(mouse.x(), mouse.y(), graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
+	public static Vector3 convertMouseTo3d(int x, int y, GraphicsData graphicsData, double planeDistance) {
+		return convertScreenTo3d(x, y, graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
 		
 	}
 	
