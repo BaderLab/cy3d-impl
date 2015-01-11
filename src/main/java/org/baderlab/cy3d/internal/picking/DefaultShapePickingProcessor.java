@@ -48,8 +48,10 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	}
 	
 	@Override
-	public void processPicking(int x, int y, GraphicsData graphicsData) {
+	public void processPicking(GraphicsData graphicsData) {
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+		int x = graphicsData.getMouseCurrentX();
+		int y = graphicsData.getMouseCurrentY();
 	
 		if (selectionData.isDragSelectMode()) {
 			int selectionBoxCenterX = (selectionData.getSelectTopLeftX() + selectionData.getSelectBottomRightX()) / 2;

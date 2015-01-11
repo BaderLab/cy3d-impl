@@ -21,37 +21,24 @@ import org.baderlab.cy3d.internal.input.handler.commands.CameraPanMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
-import org.baderlab.cy3d.internal.input.handler.commands.SelectionMenuMouseCommand;
+import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
 
 
 /**
- * ALT - forces camera mode
- * SHIFT - forces selection mode
- * 
  * This class has two responsibilities.
  * 1) Handle input events from Swing.
  * 2) On each input event decides which command should be executed
  * 
  * Mouse Modes:
  * 
- * Modes
- * - Shift: force select mode
- * - Alt: force camera mode
- * 
- * Select mode
- * - Left drag (Ctrl modifier) = selection rectangle
- * - Right drag (Ctrl modifier) = selection rectange
- * - Left click (Ctrl modifyier) = select single node
- * - Right click = context menu
- * 
- * Camera mode
- * - Left drag - pan
- * - Right drag - strafe
- * - Left/Right click = do nothing?
+ * The current mouse mode is the one selected in the toolbar.
+ * Alt and Shift "override" the current mode, they force camera mode and selection mode respectively.
+ * Ctrl is a "modifier", it takes the current command and "modifies" it.
  * 
  * Keyboard:
- * - always controlls the camera
+ * 
+ * The keyboard always controls the camera.
  * 
  * @author mkucera
  *
@@ -61,7 +48,6 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	private final GraphicsData graphicsData;
 	private final PixelConverter pixelConverter;
 	private final int[] coords = new int[2];
-	
 	private Timer heartBeat;
 	
 	private boolean keyUp;
@@ -82,20 +68,17 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		startHeartbeat();
 	}
 	
+	private void createInitialCommands() {
+		mouseWheelCommand = new CameraZoomCommand(graphicsData);
+		keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
+		setToolbarMouseMode(MouseMode.getDefault()); // assume toolbar also starts off using the default
+	}
 	
 	
 	// *** Mode selection ***
 	
-	private void createInitialCommands() {
-		mouseWheelCommand = new CameraZoomCommand(graphicsData);
-		keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
-		// assume toolbar also starts off using the default
-		setMouseMode(MouseMode.getDefault());
-	}
-	
-	
-	// Setting the mouse mode can be independent from the toolbar, eg) Alt forces camera mode
-	public void setMouseMode(MouseMode mouseMode) {
+	/** Called when a button on the toolbar is pressed. */
+	public void setToolbarMouseMode(MouseMode mouseMode) { 
 		switch(mouseMode) {
 			case CAMERA: 
 				leftMouseCommand  = new CameraPanMouseCommand(graphicsData.getCamera()); 
@@ -103,7 +86,7 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 				break;
 			case SELECT: 
 				leftMouseCommand  = new SelectionMouseCommand(graphicsData); 
-				rightMouseCommand = new SelectionMenuMouseCommand(graphicsData);
+				rightMouseCommand = new PopupMenuMouseCommand(graphicsData);
 				break;
 		}
 	}
@@ -123,29 +106,45 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		mouseWheelCommand.execute(e.getWheelRotation());
 	}
 	
-
-	private MouseCommand currentDragCommand;
 	
+	/**
+	 * The current mouse command is set by the toolbar, however it can
+	 * be overridden by holding the Shift or Alt key.
+	 * (Shift takes precedence over Alt.)
+	 */
+	private MouseCommand getMouseCommand(MouseEvent e) {
+		if(SwingUtilities.isLeftMouseButton(e)) { 
+			if(e.isShiftDown())
+				return new SelectionMouseCommand(graphicsData); // force selection mode
+			if(e.isAltDown())
+				return new CameraPanMouseCommand(graphicsData.getCamera()); // force camera mode
+			else
+				return leftMouseCommand; // use current mode
+		}
+		else if(SwingUtilities.isRightMouseButton(e)) {
+			if(e.isShiftDown())
+				return new PopupMenuMouseCommand(graphicsData);
+			if(e.isAltDown())
+				return new CameraStrafeMouseCommand(graphicsData.getCamera());
+			else
+				return rightMouseCommand;
+		}
+		return MouseCommand.EMPTY;
+	}
+	
+	/**
+	 * The current mouse command is modified by holding Ctrl.
+	 */
+	private MouseCommand getModifiedMouseCommand(MouseEvent e) {
+		MouseCommand command = getMouseCommand(e);
+		return e.isControlDown() ? command.modify() : command;
+	}
+	
+	private MouseCommand currentDragCommand;
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		currentDragCommand = MouseCommand.EMPTY;
-		
-		if(SwingUtilities.isLeftMouseButton(e)) { 
-			currentDragCommand = leftMouseCommand;
-			if(e.isAltDown())
-				currentDragCommand = new CameraPanMouseCommand(graphicsData.getCamera()); 
-			if(e.isShiftDown())
-				currentDragCommand = new SelectionMouseCommand(graphicsData); 
-		}
-		else if(SwingUtilities.isRightMouseButton(e)) {
-			currentDragCommand = rightMouseCommand;
-			if(e.isAltDown())
-				currentDragCommand = new CameraStrafeMouseCommand(graphicsData.getCamera()); 
-			if(e.isShiftDown())
-				currentDragCommand = new SelectionMenuMouseCommand(graphicsData);
-		}
-		
+		currentDragCommand = getModifiedMouseCommand(e);
 		convertCoords(e);
 		currentDragCommand.pressed(coords[0], coords[1]);
 	}
@@ -165,20 +164,17 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-		if(SwingUtilities.isLeftMouseButton(e)) {
-			convertCoords(e);
-			leftMouseCommand.pressed(coords[0], coords[1]);
-		}
-		else if(SwingUtilities.isRightMouseButton(e)) {
-			convertCoords(e);
-			rightMouseCommand.pressed(coords[0], coords[1]);
-		}
+		MouseCommand clickCommand = getModifiedMouseCommand(e);
+		convertCoords(e);
+		clickCommand.clicked(e.getX(), e.getY());
 	}
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// probably need to do something for hover
+		convertCoords(e);
+		// needed for hover higlight
+		graphicsData.setMouseCurrentX(coords[0]);
+		graphicsData.setMouseCurrentY(coords[1]);
 	}
 
 	@Override
@@ -199,7 +195,7 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	 * We will do that at a constant rate in order to avoid direct interaction with the main render loop.
 	 */
 	public void startHeartbeat() {
-		// need to tick at the at least as fast as the renderer to get smooth movement
+		// need to tick at least as fast as the renderer loop to get smooth movement
 		heartBeat = new Timer(Cy3DRenderingEngine.FPS_TARGET, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -227,7 +223,6 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
 		switch(e.getKeyCode()) {
 			case KeyEvent.VK_UP:    keyUp    = true;  break;
 			case KeyEvent.VK_LEFT:  keyLeft  = true;  break;
@@ -253,11 +248,6 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
-	
-	
-	
-	
-
 	
 	
 }

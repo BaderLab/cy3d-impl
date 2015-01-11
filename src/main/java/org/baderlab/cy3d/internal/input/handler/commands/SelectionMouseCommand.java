@@ -1,92 +1,73 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
+
+import java.util.List;
+
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.input.handler.MouseCommand;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 
+/**
+ * Deselects currently selected nodes and edges before selecting new ones.
+ * 
+ * @author mkucera
+ */
 public class SelectionMouseCommand implements MouseCommand {
 
 	private final GraphicsData graphicsData;
+	private final SelectionAddMouseCommand addCommand;
 	
 	public SelectionMouseCommand(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
+		this.addCommand = new SelectionAddMouseCommand(graphicsData);
 	}
-	
-	
+
 	@Override
 	public void clicked(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
-		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
-		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
-		
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-
-		selectionData.setHoverNodeIndex(newHoverNodeIndex);
-		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
-		
-		if (!selectionData.isDragSelectMode()) {
-			if (newHoverNodeIndex != -1) {
-				if (NetworkToolkit.checkNodeSelected(newHoverNodeIndex, networkView)) {
-					// Deselect the node if it was already selected
-					NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, false);
-				} else {
-					// Select the node if it was not selected
-					NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, true);
-				}
-				
-			} else if (newHoverEdgeIndex != -1) {
-				if (NetworkToolkit.checkEdgeSelected(newHoverEdgeIndex, networkView)) {
-					// Deselect the edge if it was already selected
-					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, false);
-				} else {
-					// Select the edge if it was not selected
-					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, true);
-				}
-			}
-		}
+		deselectOther();
+		addCommand.clicked(x, y);
 	}
 	
 	@Override
 	public void pressed(int x, int y) {
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		selectionData.setSelectTopLeftX(x);
-		selectionData.setSelectTopLeftY(y);
-		selectionData.setSelectTopLeftFound(true);
+		deselectOther();
+		addCommand.pressed(x, y);
 	}
-
+	
 	@Override
 	public void dragged(int x, int y) {
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		
-		selectionData.setSelectBottomRightX(x);
-		selectionData.setSelectBottomRightY(y);
-		
-		if (Math.abs(selectionData.getSelectTopLeftX() - x) >= 1 && Math.abs(selectionData.getSelectTopLeftY() - y) >= 1) {
-			selectionData.setDragSelectMode(true);
-		}
+		addCommand.dragged(x, y);
 	}
 
 	@Override
 	public void released(int x, int y) {
-		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+		addCommand.released(x, y);
+	}
+	
+	private void deselectOther() {
 		CyNetworkView networkView = graphicsData.getNetworkView();
-		selectionData.setDragSelectMode(false);
-		selectionData.setSelectTopLeftFound(false);
 		
-		for (long index : graphicsData.getPickingData().getPickedNodeIndices()) {
-			NetworkToolkit.setNodeSelected(index, networkView, true);
+		// Deselect currently selected nodes
+		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
+		for (CyNode node : selectedNodes) {
+			NetworkToolkit.setNodeSelected(node.getSUID(), networkView, false);
 		}
-		
-		for (long index : graphicsData.getPickingData().getPickedEdgeIndices()) {
-			NetworkToolkit.setEdgeSelected(index, networkView, true);
+
+		// Deselect currently selected edges
+		List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(networkView.getModel(), "selected", true);
+		for (CyEdge edge : selectedEdges) {
+			NetworkToolkit.setEdgeSelected(edge.getSUID(), networkView, false);
 		}
-		
-		/*
-		selectionData.getSelectedNodeIndices().addAll(graphicsData.getPickingData().getPickedNodeIndices());
-		selectionData.getSelectedEdgeIndices().addAll(graphicsData.getPickingData().getPickedEdgeIndices());
-		*/
+	}
+	
+	@Override
+	public MouseCommand modify() {
+		return addCommand;
 	}
 
+	
 }

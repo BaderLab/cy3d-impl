@@ -45,7 +45,7 @@ public abstract class AbstractGraphicsHandler implements GraphicsHandler {
 	public ShapePickingProcessor getShapePickingProcessor() {
 		return new ShapePickingProcessor() {
 			@Override public void initialize(GraphicsData graphicsData) { }
-			@Override public void processPicking(int x, int y, GraphicsData graphicsData) { }
+			@Override public void processPicking(GraphicsData graphicsData) { }
 		};
 	}
 

@@ -98,9 +98,6 @@ public class GraphicsEventHandler implements GLEventListener {
 		PixelConverter pixelConverter = new PixelConverter(null);
 		graphicsData.setPixelConverter(pixelConverter);
 		
-//		keys = new KeyboardMonitor();
-//		mouse = new MouseMonitor(pixelConverter);
-		
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
 		
@@ -109,7 +106,6 @@ public class GraphicsEventHandler implements GLEventListener {
 		coordinatorProcessor.initializeCoordinator(coordinator, graphicsData);
 		
 		shapePickingProcessor = handler.getShapePickingProcessor();
-//		inputProcessor = handler.getInputProcessor();
 		
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
 		//lightingProcessor = handler.getLightingProcessor();
@@ -128,14 +124,6 @@ public class GraphicsEventHandler implements GLEventListener {
 	public void trackInput(Component component) {
 		
 		handler.trackInput(graphicsData, component);
-		
-//		component.addMouseListener(mouse);
-//		component.addMouseMotionListener(mouse);
-//		component.addMouseWheelListener(mouse);
-//		component.addFocusListener(mouse);
-//		
-//		component.addKeyListener(keys);
-//		component.addFocusListener(keys);
 		
 		graphicsData.setContainer(component);
 		
@@ -204,7 +192,7 @@ public class GraphicsEventHandler implements GLEventListener {
 						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
 		
 		// Perform picking
-//		shapePickingProcessor.processPicking(mouse, keys, graphicsData);
+		shapePickingProcessor.processPicking(graphicsData);
 		
 		// Check input
 //		inputProcessor.processInput(keys, mouse, graphicsData);

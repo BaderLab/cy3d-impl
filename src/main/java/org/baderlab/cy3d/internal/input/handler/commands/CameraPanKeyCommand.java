@@ -13,22 +13,22 @@ public class CameraPanKeyCommand implements KeyCommand {
 
 	@Override
 	public void up() {
-		camera.turnUp(2.0);
+		camera.turnUp(4.0);
 	}
 
 	@Override
 	public void down() {
-		camera.turnDown(2.0);
+		camera.turnDown(4.0);
 	}
 
 	@Override
 	public void left() {
-		camera.turnLeft(2.0);
+		camera.turnLeft(4.0);
 	}
 
 	@Override
 	public void right() {
-		camera.turnRight(2.0);
+		camera.turnRight(4.0);
 	}
 	
 }

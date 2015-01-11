@@ -7,6 +7,6 @@ public interface ShapePickingProcessor {
 	
 	public void initialize(GraphicsData graphicsData);
 	
-	public void processPicking(int x, int y, GraphicsData graphicsData);
+	public void processPicking(GraphicsData graphicsData);
 
 }

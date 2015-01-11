@@ -108,7 +108,7 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 			@Override
 			public void mouseModeChanged(MouseMode mouseMode) {
 				if(inputHandler != null)
-					inputHandler.setMouseMode(mouseMode);
+					inputHandler.setToolbarMouseMode(mouseMode);
 			}
 		};
 	}

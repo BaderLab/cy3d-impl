@@ -42,4 +42,8 @@ public class CameraPanMouseCommand implements MouseCommand {
 	public void released(int x, int y) {
 	}
 
+	@Override
+	public MouseCommand modify() {
+		return this;
+	}
 }

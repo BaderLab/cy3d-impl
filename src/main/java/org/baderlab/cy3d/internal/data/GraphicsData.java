@@ -52,6 +52,10 @@ public class GraphicsData {
 	/** The camera to use for transformation of 3D scene */
 	private SimpleCamera camera;
 	
+	private int mouseCurrentX;
+	
+	private int mouseCurrentY;
+	
 	/** The height of the screen */
 	private int screenHeight;
 	
@@ -382,4 +386,19 @@ public class GraphicsData {
 		this.pixelConverter = pixelConverter;
 	}
 
+	public void setMouseCurrentX(int x) {
+		this.mouseCurrentX = x;
+	}
+	
+	public int getMouseCurrentX() {
+		return mouseCurrentX;
+	}
+	
+	public void setMouseCurrentY(int y) {
+		this.mouseCurrentY = y;
+	}
+	
+	public int getMouseCurrentY() {
+		return mouseCurrentY;
+	}
 }
