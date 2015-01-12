@@ -29,6 +29,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
+import org.baderlab.cy3d.internal.tools.FrameRateTracker;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
@@ -214,8 +215,8 @@ public class GraphicsEventHandler implements GLEventListener {
 			System.out.println("Error Code: " + errorCode);
 		}
 		
-		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
-		graphicsData.getFrameRateTracker().advanceFrame();
+//		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
+//		graphicsData.getFrameRateTracker().advanceFrame();
 		
 		// Pause rendering unless a keyboard or mouse button is held down to conserve CPU/GPU/power resources
 		if (handler instanceof MainGraphicsHandler) {
@@ -276,8 +277,9 @@ public class GraphicsEventHandler implements GLEventListener {
 		// gl.glEnable(GL2.GL_BLEND);
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
-		graphicsData.setStartTime(System.nanoTime());
+//		graphicsData.setStartTime(System.nanoTime());
 		graphicsData.setGlContext(gl);
+		graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
 		
 		handler.initializeGraphicsProcedures(graphicsData);
 		//handler.setupLighting(graphicsData);

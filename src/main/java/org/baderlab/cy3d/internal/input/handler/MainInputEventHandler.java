@@ -247,6 +247,11 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
+		switch(e.getKeyChar()) {
+			case 'k': case 'K':
+				graphicsData.setShowFPS(!graphicsData.getShowFPS()); 
+				break;
+		}
 	}
 	
 	

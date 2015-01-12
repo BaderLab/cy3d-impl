@@ -62,11 +62,11 @@ public class GraphicsData {
 	/** The width of the screen */
 	private int screenWidth;
 	
-	/** Start time used for FPS timing */
-	private long startTime;
-	
+//	/** Start time used for FPS timing */
+//	private long startTime;
+//	
 	/** Number of frames elapsed */
-	private long framesElapsed = 0;
+//	private long framesElapsed = 0;
 	
 	/** End time used for FPS timing */
 	private long endTime;
@@ -146,12 +146,15 @@ public class GraphicsData {
 		
 		camera = new SimpleCamera();
 		viewingVolume = new ViewingVolume();
-		frameRateTracker = new FrameRateTracker();
 		edgeAnalyser = new EdgeAnalyser();
 	}
 	
 	public void setNetworkView(CyNetworkView networkView) {
 		this.networkView = networkView;
+	}
+	
+	public void setFrameRateTracker(FrameRateTracker frameRateTracker) {
+		this.frameRateTracker = frameRateTracker;
 	}
 
 	public CyNetworkView getNetworkView() {
@@ -198,13 +201,13 @@ public class GraphicsData {
 		return endTime;
 	}
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
-	public long getStartTime() {
-		return startTime;
-	}
+//	public void setStartTime(long startTime) {
+//		this.startTime = startTime;
+//	}
+//
+//	public long getStartTime() {
+//		return startTime;
+//	}
 
 	public void setDisableHovering(boolean disableHovering) {
 		this.disableHovering = disableHovering;
@@ -238,13 +241,13 @@ public class GraphicsData {
 		return visualLexicon;
 	}
 
-	public void setFramesElapsed(long framesElapsed) {
-		this.framesElapsed = framesElapsed;
-	}
-
-	public long getFramesElapsed() {
-		return framesElapsed;
-	}
+//	public void setFramesElapsed(long framesElapsed) {
+//		this.framesElapsed = framesElapsed;
+//	}
+//
+//	public long getFramesElapsed() {
+//		return framesElapsed;
+//	}
 
 	public void setCoordinatorData(CoordinatorData coordinatorData) {
 		this.coordinatorData = coordinatorData;
@@ -335,6 +338,10 @@ public class GraphicsData {
 	}
 
 	public void setShowFPS(boolean showFPS) {
+		if(showFPS)
+			this.frameRateTracker.startTrackingFPS();
+		else
+			this.frameRateTracker.stopTrackingFPS();
 		this.showFPS = showFPS;
 	}
 

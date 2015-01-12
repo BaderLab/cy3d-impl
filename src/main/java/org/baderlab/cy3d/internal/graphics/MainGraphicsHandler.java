@@ -101,6 +101,7 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 		component.addMouseMotionListener(inputHandler);
 		component.addMouseListener(inputHandler);
 		component.addKeyListener(inputHandler);
+//		AltShiftEventHandler forceHandler = new AltShiftEventHandler(toolPanel)
 	}
 	
 	public ToolPanel.MouseModeChangeListener getMouseModeChangeListener() {
