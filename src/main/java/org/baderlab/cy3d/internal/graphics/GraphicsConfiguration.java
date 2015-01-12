@@ -13,10 +13,10 @@ import org.cytoscape.view.model.CyNetworkView;
 
 /**
  * A handler object that is responsible for specifying how input, calculation, and drawing are
- * handled in a {@link GraphicsEventHandler} object. A {@link GraphicsEventHandler} object relies on its GraphicsHandler
+ * handled in a {@link RenderEventListener} object. A {@link RenderEventListener} object relies on its GraphicsHandler
  * to provide implementations for how certain responses are handled.
  */
-public interface GraphicsHandler {
+public interface GraphicsConfiguration {
 		
 	/**
 	 * Return a {@link ShapePickingProcessor} object that is responsible for
@@ -47,8 +47,8 @@ public interface GraphicsHandler {
 	/**
 	 * Return an instance of a {@link CoordinatorProcessor} object, which is responsible for
 	 * interacting with the current {@link ViewingCoordinator} in order to extract relevant data
-	 * from another {@link GraphicsEventHandler} object. This could be information about the position of
-	 * the camera in the other {@link GraphicsEventHandler} object, for example.
+	 * from another {@link RenderEventListener} object. This could be information about the position of
+	 * the camera in the other {@link RenderEventListener} object, for example.
 	 * 
 	 * @return An instance of a {@link CoordinatorProcessor} object used to interact with
 	 * the {@link ViewingCoordinator}, which is also provided by this class.
@@ -117,8 +117,11 @@ public interface GraphicsHandler {
 	 * to keyboard and mouse button input given the states of the keyboard and
 	 * mouse, as well as a {@link GraphicsData} object to store the interpreted
 	 * input data.
+	 * 
+	 * @returns A {@link RenderUpdateFlag} that is used by the {@link RenderEventListener} to
+	 * avoid re-rendering the same image.
 	 */
-	public void trackInput(GraphicsData graphicsData, Component component);
+	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component);
 }
 
 

@@ -14,16 +14,16 @@ import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
 
 /**
- * An implementation of the {@link GraphicsHandler} interface used
- * for bird's eye view rendering objects. This {@link GraphicsHandler}
+ * An implementation of the {@link GraphicsConfiguration} interface used
+ * for bird's eye view rendering objects. This {@link GraphicsConfiguration}
  * implementation thusly will not provide support for picking and
  * advanced input handling, such as node and edge creation via the
  * keyboard.
  * 
  */
-public class BirdsEyeGraphicsHandler extends AbstractGraphicsHandler {
+public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
-	public BirdsEyeGraphicsHandler() {
+	public BirdsEyeGraphicsConfiguration() {
 		add(new ResetSceneProcedure());
 		add(new PositionCameraProcedure());
 		add(new RenderNodesProcedure());
@@ -47,8 +47,9 @@ public class BirdsEyeGraphicsHandler extends AbstractGraphicsHandler {
 	}
 	
 	@Override
-	public void trackInput(GraphicsData graphicsData, Component component) {
-		// TODO Auto-generated method stub
-		
+	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component) {
+		// MKTODO this is temporary
+		// I plan to re-architect the coordinator stuff in order to make this work better.
+		return null;
 	}
 }

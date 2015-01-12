@@ -3,15 +3,10 @@ package org.baderlab.cy3d.internal.data;
 import java.awt.Component;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.GLAnimatorControl;
 
-import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
-import org.baderlab.cy3d.internal.graphics.AnimatorController;
-import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.baderlab.cy3d.internal.tools.FrameRateTracker;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -62,15 +57,6 @@ public class GraphicsData {
 	/** The width of the screen */
 	private int screenWidth;
 	
-//	/** Start time used for FPS timing */
-//	private long startTime;
-//	
-	/** Number of frames elapsed */
-//	private long framesElapsed = 0;
-	
-	/** End time used for FPS timing */
-	private long endTime;
-	
 	/** A boolean to disable real-time shape picking to improve framerate */
 	private boolean disableHovering;
 	
@@ -96,41 +82,14 @@ public class GraphicsData {
 	
 	private EdgeAnalyser edgeAnalyser;
 	
-	/** The {@link GLAnimatorControl} object used to control the animator which automatically makes calls to redraw the scene */
-	private GLAnimatorControl animatorControl;
-	
-	private AnimatorController animatorController;
-	
 	private PixelConverter pixelConverter;
-	
-	/** 
-	 * A {@link GraphicsSelectionData} object which is responsible for 
-	 * storing all data related to selection of objects in the network, such
-	 * as indices of currently selected nodes, or the coordinates of the current
-	 * selection box.
-	 * */
+
 	private GraphicsSelectionData selectionData;
 	
-	/**
-	 * A {@link CoordinatorData} object responsible for storing data related to
-	 * the relevant {@link ViewingCoordinator}, ie. it stores the data related
-	 * to coordination with another {@link GraphicsEventHandler} object, such as in the
-	 * relationship between bird's eye and main window rendering objects.
-	 */
 	private CoordinatorData coordinatorData;
 	
-	/**
-	 * A {@link PickingData} object responsible for storing data related to the 
-	 * current picking state of the renderer, such as the index and type
-	 * of the object that was found under the current mouse cursor.
-	 */
 	private PickingData pickingData;
 	
-	/**
-	 * A {@link LightingData} object responsible for storing data related to
-	 * lighting and lights, such as the states of lights and their color
-	 * values.
-	 */
 	private LightingData lightingData;
 	
 	
@@ -193,22 +152,6 @@ public class GraphicsData {
 		return screenWidth;
 	}
 
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
-	}
-
-	public long getEndTime() {
-		return endTime;
-	}
-
-//	public void setStartTime(long startTime) {
-//		this.startTime = startTime;
-//	}
-//
-//	public long getStartTime() {
-//		return startTime;
-//	}
-
 	public void setDisableHovering(boolean disableHovering) {
 		this.disableHovering = disableHovering;
 	}
@@ -240,14 +183,6 @@ public class GraphicsData {
 	public VisualLexicon getVisualLexicon() {
 		return visualLexicon;
 	}
-
-//	public void setFramesElapsed(long framesElapsed) {
-//		this.framesElapsed = framesElapsed;
-//	}
-//
-//	public long getFramesElapsed() {
-//		return framesElapsed;
-//	}
 
 	public void setCoordinatorData(CoordinatorData coordinatorData) {
 		this.coordinatorData = coordinatorData;
@@ -329,14 +264,6 @@ public class GraphicsData {
 		this.taskManager = taskManager;
 	}
 
-	public void setUpdateScene(boolean updateScene) {
-		this.updateScene = updateScene;
-	}
-
-	public boolean getUpdateScene() {
-		return updateScene;
-	}
-
 	public void setShowFPS(boolean showFPS) {
 		if(showFPS)
 			this.frameRateTracker.startTrackingFPS();
@@ -367,22 +294,6 @@ public class GraphicsData {
 
 	public EdgeAnalyser getEdgeAnalyser() {
 		return edgeAnalyser;
-	}
-
-	public void setAnimatorControl(GLAnimatorControl animatorControl) {
-		this.animatorControl = animatorControl;
-	}
-
-	public GLAnimatorControl getAnimatorControl() {
-		return animatorControl;
-	}
-
-	public void setAnimatorController(AnimatorController animatorController) {
-		this.animatorController = animatorController;
-	}
-
-	public AnimatorController getAnimatorController() {
-		return animatorController;
 	}
 
 	public PixelConverter getPixelConverter() {

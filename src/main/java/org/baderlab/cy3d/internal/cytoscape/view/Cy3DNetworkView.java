@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.baderlab.cy3d.internal.Cy3DNetworkViewRenderer;
-import org.baderlab.cy3d.internal.graphics.AnimatorController;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.model.CyEdge;
@@ -33,8 +32,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private VisualLexicon visualLexicon;
 	private DefaultValueVault defaultValues;
 	private VisualMappingManager visualMappingManager;
-	
-	private AnimatorController animatorController;
 	
 	/**
 	 * The camera associated with the main network viewing window used to
@@ -133,10 +130,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	public void fitContent() {
 		fitNodesInView();
 		
-		if (animatorController != null) {
-			animatorController.startAnimator();
-		}
-		
 		// Request focus for the network view to be ready for keyboard input
 		requestNetworkFocus();
 	}
@@ -160,10 +153,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
 		}
 		
-		if (animatorController != null) {
-			animatorController.startAnimator();
-		}
-		
 		// Request focus for the network view to be ready for keyboard input
 		requestNetworkFocus();
 	}
@@ -179,10 +168,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		// Match the current network view to the currently applied visual style
 //		updateToMatchVisualStyle();
 		
-		// Render at least 1 more frame to reflect changes in network
-		if (animatorController != null) {
-			animatorController.startAnimator();
-		}
+//		// Render at least 1 more frame to reflect changes in network
+//		if (animatorController != null) {
+//			animatorController.startAnimator();
+//		}
 		
 		// Center the network if it hasn't been centered yet
 		if (!networkCentered) {
@@ -334,13 +323,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		}
 	}
 
-	public void setAnimatorController(AnimatorController animatorController) {
-		this.animatorController = animatorController;
-	}
-
-	public AnimatorController getAnimatorController() {
-		return animatorController;
-	}
 
 	public void setNetworkCamera(SimpleCamera networkCamera) {
 		this.networkCamera = networkCamera;

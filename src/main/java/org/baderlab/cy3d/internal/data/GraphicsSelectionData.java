@@ -5,6 +5,12 @@ import java.util.Set;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
+/** 
+ * A {@link GraphicsSelectionData} object which is responsible for 
+ * storing all data related to selection of objects in the network, such
+ * as indices of currently selected nodes, or the coordinates of the current
+ * selection box.
+ * */
 public class GraphicsSelectionData {
 	
 	/** The set of indices for nodes that are selected */

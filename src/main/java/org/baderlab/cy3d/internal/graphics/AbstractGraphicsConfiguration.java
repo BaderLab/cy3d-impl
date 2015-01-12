@@ -11,7 +11,7 @@ import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.cytoscape.view.model.CyNetworkView;
 
-public abstract class AbstractGraphicsHandler implements GraphicsHandler {
+public abstract class AbstractGraphicsConfiguration implements GraphicsConfiguration {
 
 	private List<ReadOnlyGraphicsProcedure> renderProcedures = new LinkedList<ReadOnlyGraphicsProcedure>();
 	

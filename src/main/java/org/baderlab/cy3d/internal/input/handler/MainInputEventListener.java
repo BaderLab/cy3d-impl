@@ -16,6 +16,7 @@ import javax.swing.Timer;
 import org.baderlab.cy3d.internal.Cy3DRenderingEngine;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
+import org.baderlab.cy3d.internal.graphics.RenderUpdateFlag;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
@@ -43,7 +44,7 @@ import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
  * @author mkucera
  *
  */
-public class MainInputEventHandler implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class MainInputEventListener implements RenderUpdateFlag, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
 	private final GraphicsData graphicsData;
 	private final PixelConverter pixelConverter;
@@ -60,8 +61,11 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	private MouseCommand leftMouseCommand;
 	private KeyCommand keyCommand;
 	
+	private boolean needToRender = true; // need to render the first frame
 	
-	public MainInputEventHandler(GraphicsData graphicsData) {
+	
+	
+	public MainInputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
 		this.pixelConverter = graphicsData.getPixelConverter();
 		createInitialCommands();
@@ -104,6 +108,7 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelCommand.execute(e.getWheelRotation());
+		needToRender = true;
 	}
 	
 	
@@ -147,18 +152,21 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		currentDragCommand = getModifiedMouseCommand(e);
 		convertCoords(e);
 		currentDragCommand.pressed(coords[0], coords[1]);
+		needToRender = true;
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		convertCoords(e);
 		currentDragCommand.dragged(coords[0], coords[1]);
+		needToRender = true;
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		convertCoords(e);
 		currentDragCommand.released(coords[0], coords[1]);
+		needToRender = true;
 	}
 	
 
@@ -167,6 +175,7 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
 		convertCoords(e);
 		clickCommand.clicked(e.getX(), e.getY());
+		needToRender = true;
 	}
 	
 	@Override
@@ -175,6 +184,7 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		// needed for hover higlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);
+		needToRender = true;
 	}
 
 	@Override
@@ -218,6 +228,9 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 			keyCommand.left();
 		if(keyRight)
 			keyCommand.right();
+		
+		if(keyUp || keyDown || keyLeft || keyRight)
+			needToRender = true;
 	}
 	
 
@@ -250,8 +263,19 @@ public class MainInputEventHandler implements MouseListener, MouseMotionListener
 		switch(e.getKeyChar()) {
 			case 'k': case 'K':
 				graphicsData.setShowFPS(!graphicsData.getShowFPS()); 
+				needToRender = true;
 				break;
 		}
+	}
+
+	@Override
+	public boolean needToRender() {
+		return needToRender;
+	}
+
+	@Override
+	public void reset() {
+		needToRender = false;
 	}
 	
 	

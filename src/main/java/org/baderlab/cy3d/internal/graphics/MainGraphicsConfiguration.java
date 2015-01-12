@@ -11,7 +11,7 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
-import org.baderlab.cy3d.internal.input.handler.MainInputEventHandler;
+import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
 import org.baderlab.cy3d.internal.input.handler.MouseMode;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.baderlab.cy3d.internal.lighting.Light;
@@ -26,17 +26,17 @@ import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
 
 /**
- * An implementation for the {@link GraphicsHandler} interface to be used
+ * An implementation for the {@link GraphicsConfiguration} interface to be used
  * for main rendering windows. That is, this handler fully supports keyboard
  * and mouse input, as well as selection and picking.
  * 
  */
-public class MainGraphicsHandler extends AbstractGraphicsHandler {
+public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
-	private MainInputEventHandler inputHandler;
+	private MainInputEventListener inputHandler;
 	
 	
-	public MainGraphicsHandler() {
+	public MainGraphicsConfiguration() {
 		add(new ResetSceneProcedure());
 		add(new PositionCameraProcedure());
 		
@@ -95,13 +95,13 @@ public class MainGraphicsHandler extends AbstractGraphicsHandler {
 	}
 	
 	@Override
-	public void trackInput(GraphicsData graphicsData, Component component) {
-		inputHandler = new MainInputEventHandler(graphicsData);
+	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component) {
+		inputHandler = new MainInputEventListener(graphicsData);
 		component.addMouseWheelListener(inputHandler);
 		component.addMouseMotionListener(inputHandler);
 		component.addMouseListener(inputHandler);
 		component.addKeyListener(inputHandler);
-//		AltShiftEventHandler forceHandler = new AltShiftEventHandler(toolPanel)
+		return inputHandler;
 	}
 	
 	public ToolPanel.MouseModeChangeListener getMouseModeChangeListener() {

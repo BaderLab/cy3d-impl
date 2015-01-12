@@ -4,8 +4,8 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
-import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
-import org.baderlab.cy3d.internal.graphics.MainGraphicsHandler;
+import org.baderlab.cy3d.internal.graphics.RenderEventListener;
+import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.cytoscape.application.events.SetCurrentRenderingEngineEvent;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
@@ -22,15 +22,15 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class Cy3DMainRenderingEngine extends Cy3DRenderingEngine {
 
-	private MainGraphicsHandler mainGraphicsHandler = new MainGraphicsHandler();
+	private MainGraphicsConfiguration mainGraphicsHandler = new MainGraphicsConfiguration();
 	
 	public Cy3DMainRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon) {
 		super(viewModel, visualLexicon);
 	}
 
 	@Override
-	protected GraphicsEventHandler getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon) {
-		return new GraphicsEventHandler(networkView, visualLexicon, mainGraphicsHandler);
+	protected RenderEventListener getRenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon) {
+		return new RenderEventListener(networkView, visualLexicon, mainGraphicsHandler);
 	}
 
 	@Override

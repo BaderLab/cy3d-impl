@@ -1,7 +1,15 @@
 package org.baderlab.cy3d.internal.data;
 
+import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
-import org.baderlab.cy3d.internal.geometric.Vector3;
+import org.baderlab.cy3d.internal.graphics.RenderEventListener;
+
+/**
+ * A {@link CoordinatorData} object responsible for storing data related to
+ * the relevant {@link ViewingCoordinator}, ie. it stores the data related
+ * to coordination with another {@link RenderEventListener} object, such as in the
+ * relationship between bird's eye and main window rendering objects.
+ */
 
 public class CoordinatorData {
 	private Quadrilateral nearBounds;

@@ -8,7 +8,6 @@ import javax.media.opengl.GLAnimatorControl;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.graphics.AnimatorController;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
@@ -51,7 +50,6 @@ public class ViewingCoordinator {
 	private EdgeAnalyser mainEdgeAnalyser = null;
 	
 	private GLAnimatorControl birdsEyeAnimatorControl;
-	private AnimatorController mainAnimatorController;
 	
 	// Claiming: Means whether a Graphics object has claimed ownership of this coordinator by obtaining a reference to it.
 	// Linking: Whether or not that Graphics object wishes to retain the reference to the coordinator, useful for garbage collection
@@ -310,11 +308,4 @@ public class ViewingCoordinator {
 		return birdsEyeAnimatorControl;
 	}
 
-	public void setMainAnimatorController(AnimatorController mainAnimatorController) {
-		this.mainAnimatorController = mainAnimatorController;
-	}
-
-	public AnimatorController getMainAnimatorController() {
-		return mainAnimatorController;
-	}
 }

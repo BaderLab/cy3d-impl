@@ -7,14 +7,10 @@
 
 package org.baderlab.cy3d.internal.graphics;
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.GLAnimatorControl;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
@@ -23,13 +19,12 @@ import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.baderlab.cy3d.internal.data.FrameRateTracker;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.lighting.LightingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.baderlab.cy3d.internal.tools.FrameRateTracker;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
@@ -43,44 +38,29 @@ import com.jogamp.opengl.util.FPSAnimator;
  * This class represents a Cy3D rendering object, directly called
  * by the display thread to update the rendered scene for every frame.
  * 
- * Its behavior is governed by its {@link GraphicsHandler} object, 
+ * Its behavior is governed by its {@link GraphicsConfiguration} object, 
  * which will determine if and how it handles the following:
  * - keyboard and mouse input
  * - calculation related to rendering
  * - rendering of the network
- * - communication with other {@link GraphicsEventHandler} objects, such as in the case
+ * - communication with other {@link RenderEventListener} objects, such as in the case
  * of a bird's eye rendering object and a main window rendering object communication
  * with each other.
  * 
  * @author Paperwing (Yue Dong)
  */
-public class GraphicsEventHandler implements GLEventListener {
+public class RenderEventListener implements GLEventListener {
 	
-	/** A monitor to keep track of keyboard events */
-	//private KeyboardMonitor keys;
-	
-	/** A monitor to keep track of mouse events */
-	//private MouseMonitor mouse;
-	
-	/** A boolean to use lower quality 3D shapes to improve framerate */
-	private boolean lowerQuality = false;
-	
+	// Contains the "global" state used by one renderer.
 	private GraphicsData graphicsData;
-	
-	//private InputProcessor inputProcessor;
-	// private ShapePicker shapePicker;
 	private ShapePickingProcessor shapePickingProcessor;
 	private ViewingCoordinator coordinator;
 	private CoordinatorProcessor coordinatorProcessor;
 	private CytoscapeDataProcessor cytoscapeDataProcessor;
 	
-	/**
-	 * The {@link LightingProcessor} object responsible for setting up and maintaining lighting
-	 */
-	// MKTODO do I still want this?
-	//private LightingProcessor lightingProcessor;
+	private GraphicsConfiguration handler;
+	private RenderUpdateFlag renderUpdateFlag;
 	
-	private GraphicsHandler handler;
 	
 	/** Create a new Graphics object
 	 * 
@@ -88,7 +68,7 @@ public class GraphicsEventHandler implements GLEventListener {
 	 * View<CyNetwork> object that we are rendering
 	 * @param visualLexicon The visual lexicon being used
 	 */
-	public GraphicsEventHandler(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsHandler handler) {
+	public RenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsConfiguration handler) {
 		this.handler = handler;
 		
 		// TODO: add default constant speeds for camera movement
@@ -111,7 +91,7 @@ public class GraphicsEventHandler implements GLEventListener {
 		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
 		//lightingProcessor = handler.getLightingProcessor();
 		
-		if (handler instanceof MainGraphicsHandler) {
+		if (handler instanceof MainGraphicsConfiguration) {
 			((Cy3DNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
 		}
 	}
@@ -123,40 +103,17 @@ public class GraphicsEventHandler implements GLEventListener {
 	 * @param settingsData 
 	 */
 	public void trackInput(Component component) {
-		
-		handler.trackInput(graphicsData, component);
+		renderUpdateFlag = handler.trackInput(graphicsData, component);
+		if(renderUpdateFlag == null)
+			renderUpdateFlag = RenderUpdateFlag.ALWAYS_RENDER;
 		
 		graphicsData.setContainer(component);
 		
-		if (handler instanceof MainGraphicsHandler) {
+		if (handler instanceof MainGraphicsConfiguration) {
 			((Cy3DNetworkView) graphicsData.getNetworkView()).setContainer(component);
-		} else if (handler instanceof BirdsEyeGraphicsHandler) {
-			
-			// Add mouse listeners to render the updated scene when the Bird's eye view
-			// is clicked or encounters mouse drag movement
-			component.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mousePressed(MouseEvent e) {
-					if (coordinator != null && coordinator.getMainAnimatorController() != null) {
-						coordinator.getMainAnimatorController().startAnimator();
-					}
-				}
-			});
-			
-			component.addMouseMotionListener(new MouseMotionAdapter() {
-				@Override
-				public void mouseDragged(MouseEvent e) {
-					if (coordinator != null && coordinator.getMainAnimatorController() != null) {
-						coordinator.getMainAnimatorController().startAnimator();
-					}
-				}
-			});
-		}
+		} 
 	}
 	
-	public void setAnimatorControl(GLAnimatorControl animatorControl) {
-		graphicsData.setAnimatorControl(animatorControl);
-	}
 	
 	/**
 	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
@@ -176,6 +133,11 @@ public class GraphicsEventHandler implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		if(!renderUpdateFlag.needToRender())
+			return;
+		
+		System.out.println("display: " + handler);
+		
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
 		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
@@ -195,9 +157,6 @@ public class GraphicsEventHandler implements GLEventListener {
 		// Perform picking
 		shapePickingProcessor.processPicking(graphicsData);
 		
-		// Check input
-//		inputProcessor.processInput(keys, mouse, graphicsData);
-		
 		// Update data for bird's eye view camera movement
 		coordinatorProcessor.extractData(coordinator, graphicsData);
 		
@@ -215,21 +174,7 @@ public class GraphicsEventHandler implements GLEventListener {
 			System.out.println("Error Code: " + errorCode);
 		}
 		
-//		graphicsData.setFramesElapsed(graphicsData.getFramesElapsed() + 1);
-//		graphicsData.getFrameRateTracker().advanceFrame();
-		
-		// Pause rendering unless a keyboard or mouse button is held down to conserve CPU/GPU/power resources
-		if (handler instanceof MainGraphicsHandler) {
-			if (!graphicsData.getAnimatorController().hasKeysDown()) {
-				graphicsData.getAnimatorControl().stop();
-			}
-		} else if (handler instanceof BirdsEyeGraphicsHandler) {
-			if (coordinator.getMainAnimatorController() != null 
-					&& !coordinator.getMainAnimatorController().hasKeysDown()) {
-				graphicsData.getAnimatorControl().stop();
-			}
-		}
-		
+		renderUpdateFlag.reset();
 	}
 
 	@Override
@@ -277,7 +222,6 @@ public class GraphicsEventHandler implements GLEventListener {
 		// gl.glEnable(GL2.GL_BLEND);
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
-//		graphicsData.setStartTime(System.nanoTime());
 		graphicsData.setGlContext(gl);
 		graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
 		
@@ -286,21 +230,6 @@ public class GraphicsEventHandler implements GLEventListener {
 		
 		shapePickingProcessor.initialize(graphicsData);
 		
-		if (handler instanceof MainGraphicsHandler) {
-
-			// Add an AnimatorController as a listener that keeps the animator running only when at least 1 button is pressed
-			AnimatorController controller = new AnimatorController(graphicsData.getAnimatorControl());
-			controller.setCoordinator(coordinator);
-			
-			Component component = graphicsData.getContainer();
-			component.addKeyListener(controller);
-			component.addMouseListener(controller);
-			component.addMouseMotionListener(controller);
-			component.addMouseWheelListener(controller);
-			
-			graphicsData.setAnimatorController(controller);
-			((Cy3DNetworkView) graphicsData.getNetworkView()).setAnimatorController(controller);
-		}
 	}
 
 	

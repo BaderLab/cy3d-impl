@@ -1,9 +1,7 @@
 package org.baderlab.cy3d.internal.coordinator;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class MainCoordinatorProcessor implements CoordinatorProcessor {
@@ -19,7 +17,7 @@ public class MainCoordinatorProcessor implements CoordinatorProcessor {
 	public void extractData(ViewingCoordinator coordinator,
 			GraphicsData graphicsData) {
 		
-		coordinator.setMainAnimatorController(graphicsData.getAnimatorController());
+//		coordinator.setMainAnimatorController(graphicsData.getAnimatorController());
 		
 		if (coordinator.isBirdsEyeClaimed()) {
 			SimpleCamera camera = graphicsData.getCamera();

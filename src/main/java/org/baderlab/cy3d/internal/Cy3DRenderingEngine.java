@@ -18,7 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
-import org.baderlab.cy3d.internal.graphics.GraphicsEventHandler;
+import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
@@ -51,7 +51,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	/** The animator responsible for making calls to the rendering window */
 	private FPSAnimator animator;
 	
-	private GraphicsEventHandler graphics;
+	private RenderEventListener graphics;
 	private GLJPanel panel;
 	
 	private CyServiceRegistrar serviceRegistrar;
@@ -66,7 +66,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	
 	protected abstract SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(FPSAnimator animator);
 	
-	protected abstract GraphicsEventHandler getGraphicsInstance(CyNetworkView networkView, VisualLexicon visualLexicon);
+	protected abstract RenderEventListener getRenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon);
 	
 	
 	/** Set up the canvas by creating and placing it, along with a Graphics
@@ -93,7 +93,7 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 			panel.setIgnoreRepaint(true);
 			// panel.setDoubleBuffered(true);
 			
-			graphics = getGraphicsInstance(networkView, visualLexicon);
+			graphics = getRenderEventListener(networkView, visualLexicon);
 			graphics.trackInput(panel);
 
 			panel.addGLEventListener(graphics);
@@ -114,7 +114,6 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 			animator.start();
 			
 			addStopAnimatorListener(container);
-			graphics.setAnimatorControl(animator);
 		}
 	}
 	
