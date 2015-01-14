@@ -3,9 +3,9 @@ package org.baderlab.cy3d.internal;
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
@@ -17,27 +17,27 @@ import org.cytoscape.work.swing.DialogTaskManager;
  * 
  * @author paperwing (Yue Dong)
  */
-public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
+public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
 	
 	private final RenderingEngineManager renderingEngineManager;
 	private final VisualLexicon visualLexicon;
 	private final TaskFactoryListener taskFactoryListener;
 	private final DialogTaskManager taskManager;
 	
-	/** The service registrar used to listen for events regarding when the Graphics object is to be removed */
-	private final CyServiceRegistrar serviceRegistrar;
+	private final GraphicsConfiguration configuration;
 	
 	
 	public Cy3DRenderingEngineFactory(RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
-			CyServiceRegistrar serviceRegistrar) {	
+			GraphicsConfiguration configuration) {	
+		
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
-		this.serviceRegistrar = serviceRegistrar;
+		this.configuration = configuration;
 	}
 	
 	
@@ -54,17 +54,14 @@ public abstract class Cy3DRenderingEngineFactory implements RenderingEngineFacto
 		JComponent component = (JComponent) container;
 		
 		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		Cy3DRenderingEngine engine = getNewRenderingEngine(cy3dViewModel, visualLexicon);
+		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(cy3dViewModel, visualLexicon, configuration);
 		engine.setUpCanvas(component);
-		engine.setUpListeners(serviceRegistrar);
-		engine.setupTaskFactories(taskFactoryListener, taskManager);
+		engine.setUpTaskFactories(taskFactoryListener, taskManager);
 		
 		renderingEngineManager.addRenderingEngine(engine);
 		
 		return engine;
 	}
-	
-	protected abstract Cy3DRenderingEngine getNewRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon);
 	
 	@Override
 	public VisualLexicon getVisualLexicon() {

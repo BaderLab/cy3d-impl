@@ -118,13 +118,13 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 			}
 		}
 		
-		if (graphicsData.getShowFPS()) {
-			float frameRate = graphicsData.getFrameRateTracker().getFPS();
-			int width = graphicsData.getScreenWidth();
-			int height = graphicsData.getScreenHeight();
-			String message = String.format("%dx%d FPS:%d", width, height, (int)frameRate);
-			textRenderer.draw(message, 1, 1);
-		}
+//		if (graphicsData.getShowFPS()) {
+//			float frameRate = graphicsData.getFrameRateTracker().getFPS();
+//			int width = graphicsData.getScreenWidth();
+//			int height = graphicsData.getScreenHeight();
+//			String message = String.format("%dx%d FPS:%d", width, height, (int)frameRate);
+//			textRenderer.draw(message, 1, 1);
+//		}
 		
 		// textRenderer.flush();
 		textRenderer.endRendering();

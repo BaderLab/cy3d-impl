@@ -67,7 +67,7 @@ public class ToolPanel {
 		cameraToolBar.setOpaque(false);
 		
 		createButton("Select", MouseMode.SELECT, cameraToolBar, cameraGroup);
-		createButton("Pan",    MouseMode.CAMERA, cameraToolBar, cameraGroup);
+		createButton("Camera", MouseMode.CAMERA, cameraToolBar, cameraGroup);
 		
 		glass.add(cameraToolBar, BorderLayout.WEST);
 	}

@@ -45,11 +45,11 @@ public class EdgeAnalyser {
 	private Map<View<CyEdge>, AugmentedEdgeContainer> edgeContainers;
 	
 	/** The frame number that the generated edge data is current for */
-	private long currentFrame;
+//	private long currentFrame;
 	
 	public EdgeAnalyser() {
 		edgeContainers = new HashMap<View<CyEdge>, AugmentedEdgeContainer>();
-		currentFrame = 0L;
+//		currentFrame = 0L;
 	}
 
 	/**
@@ -61,13 +61,13 @@ public class EdgeAnalyser {
 	 * @param currentFrame The current frame of rendering.
 	 * @return An up-to-date set of analyzed edge data to be used for rendering.
 	 */
-	public Collection<AugmentedEdgeContainer> getAnalyzedEdges(CyNetworkView networkView, double distanceScale, long currentFrame) {
+	public Collection<AugmentedEdgeContainer> getAnalyzedEdges(CyNetworkView networkView, double distanceScale/*, long currentFrame*/) {
 
-		if (currentFrame - this.currentFrame > 0) {
+//		if (currentFrame - this.currentFrame > 0) {
 			calculateEdgeProperties(networkView, distanceScale);
 			calculateEdgeCoordinates();
-			this.currentFrame = currentFrame;
-		}
+//			this.currentFrame = currentFrame;
+//		}
 		
 		// Prepare to remove edgeContainers for edges that are no longer in the network
 		Set<AugmentedEdgeContainer> edgeContainersToBeRemoved = new HashSet<AugmentedEdgeContainer>();

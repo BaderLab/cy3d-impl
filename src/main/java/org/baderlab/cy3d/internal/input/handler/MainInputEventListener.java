@@ -1,5 +1,6 @@
 package org.baderlab.cy3d.internal.input.handler;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,10 +14,8 @@ import java.awt.event.MouseWheelListener;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.baderlab.cy3d.internal.Cy3DRenderingEngine;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
-import org.baderlab.cy3d.internal.graphics.RenderUpdateFlag;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
@@ -24,6 +23,7 @@ import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeMouseComman
 import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
+import org.cytoscape.view.model.CyNetworkView;
 
 
 /**
@@ -44,9 +44,11 @@ import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
  * @author mkucera
  *
  */
-public class MainInputEventListener implements RenderUpdateFlag, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
 	private final GraphicsData graphicsData;
+	private final CyNetworkView networkView;
+	
 	private final PixelConverter pixelConverter;
 	private final int[] coords = new int[2];
 	private Timer heartBeat;
@@ -61,15 +63,22 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	private MouseCommand leftMouseCommand;
 	private KeyCommand keyCommand;
 	
-	private boolean needToRender = true; // need to render the first frame
-	
-	
 	
 	public MainInputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
 		this.pixelConverter = graphicsData.getPixelConverter();
+		this.networkView = graphicsData.getNetworkView();
 		createInitialCommands();
 		startHeartbeat();
+	}
+	
+	public static MainInputEventListener attach(Component component, GraphicsData graphicsData) {
+		MainInputEventListener inputHandler = new MainInputEventListener(graphicsData);
+		component.addMouseWheelListener(inputHandler);
+		component.addMouseMotionListener(inputHandler);
+		component.addMouseListener(inputHandler);
+		component.addKeyListener(inputHandler);
+		return inputHandler;
 	}
 	
 	private void createInitialCommands() {
@@ -102,7 +111,7 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelCommand.execute(e.getWheelRotation());
-		needToRender = true;
+		networkView.updateView();
 	}
 	
 	
@@ -146,21 +155,21 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 		currentDragCommand = getModifiedMouseCommand(e);
 		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.pressed(coords[0], coords[1]);
-		needToRender = true;
+		networkView.updateView();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.dragged(coords[0], coords[1]);
-		needToRender = true;
+		networkView.updateView();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.released(coords[0], coords[1]);
-		needToRender = true;
+		networkView.updateView();
 	}
 	
 
@@ -169,7 +178,7 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
 		pixelConverter.convertMouse(e, coords);
 		clickCommand.clicked(e.getX(), e.getY());
-		needToRender = true;
+		networkView.updateView();
 	}
 	
 	@Override
@@ -178,7 +187,7 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 		// needed for hover higlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);
-		needToRender = true;
+		networkView.updateView();
 	}
 
 	@Override
@@ -200,7 +209,7 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	 */
 	public void startHeartbeat() {
 		// need to tick at least as fast as the renderer loop to get smooth movement
-		heartBeat = new Timer(Cy3DRenderingEngine.FPS_TARGET, new ActionListener() {
+		heartBeat = new Timer(30, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				tickKey();
@@ -224,7 +233,7 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 			keyCommand.right();
 		
 		if(keyUp || keyDown || keyLeft || keyRight)
-			needToRender = true;
+			networkView.updateView();
 	}
 	
 
@@ -254,23 +263,11 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
-		switch(e.getKeyChar()) {
-			case 'k': case 'K':
-				graphicsData.setShowFPS(!graphicsData.getShowFPS()); 
-				needToRender = true;
-				break;
-		}
+//		switch(e.getKeyChar()) {
+//			case 'k': case 'K':
+//				graphicsData.setShowFPS(!graphicsData.getShowFPS()); 
+//				break;
+//		}
 	}
-
-	@Override
-	public boolean needToRender() {
-		return needToRender;
-	}
-
-	@Override
-	public void reset() {
-		needToRender = false;
-	}
-	
 	
 }

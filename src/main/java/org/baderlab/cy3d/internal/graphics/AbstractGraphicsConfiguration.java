@@ -3,6 +3,8 @@ package org.baderlab.cy3d.internal.graphics;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JComponent;
+
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.lighting.DefaultLightingProcessor;
@@ -68,7 +70,10 @@ public abstract class AbstractGraphicsConfiguration implements GraphicsConfigura
 
 	@Override
 	public void setupLighting(GraphicsData graphicsData) {
-		// default implementation does nothing
+	}
+	
+	@Override
+	public void setUpContainer(JComponent container) {
 	}
 
 

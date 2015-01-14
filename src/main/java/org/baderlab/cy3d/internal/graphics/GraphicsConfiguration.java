@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import java.awt.Component;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
@@ -13,8 +13,8 @@ import org.cytoscape.view.model.CyNetworkView;
 
 /**
  * A handler object that is responsible for specifying how input, calculation, and drawing are
- * handled in a {@link RenderEventListener} object. A {@link RenderEventListener} object relies on its GraphicsHandler
- * to provide implementations for how certain responses are handled.
+ * handled in a {@link RenderEventListener} object. A {@link RenderEventListener} object relies 
+ * on its GraphicsConfiguration to provide implementations for how certain responses are handled.
  */
 public interface GraphicsConfiguration {
 		
@@ -86,7 +86,6 @@ public interface GraphicsConfiguration {
 	 */
 	public void initializeGraphicsProcedures(GraphicsData graphicsData);
 	
-	
 	/**
 	 * This method is called to graphically render the current scene. It should be
 	 * called every frame if the state of the network during each frame is desired
@@ -106,22 +105,28 @@ public interface GraphicsConfiguration {
 	public void setupLighting(GraphicsData graphicsData);
 	
 	/**
+	 * Allows the configuration to add listeners directly to the drawing canvas.
+	 * @param component Usually an instance of GLJPanel.
+	 */
+	public void trackInput(JComponent component, GraphicsData graphicsData);
+	
+	
+	/**
+	 * Allows the configuration to add anything it needs to the outermost swing container
+	 * @param container Usually an instance of JInternalFrame.
+	 */
+	public void setUpContainer(JComponent container);
+	
+	
+	/**
 	 * Called when the GraphicsHandler is about to be disposed, to perform any necessary cleanup
 	 * @param graphicsData The current {@link GraphicsData} object containing information
 	 * about the current state of rendering as well as the current state of the network.
 	 */
 	public void dispose(GraphicsData graphicsData);
+
 	
-	/**
-	 * Adds input handling linseners to the AWT component which are responsible for responding
-	 * to keyboard and mouse button input given the states of the keyboard and
-	 * mouse, as well as a {@link GraphicsData} object to store the interpreted
-	 * input data.
-	 * 
-	 * @returns A {@link RenderUpdateFlag} that is used by the {@link RenderEventListener} to
-	 * avoid re-rendering the same image.
-	 */
-	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component);
+	
 }
 
 

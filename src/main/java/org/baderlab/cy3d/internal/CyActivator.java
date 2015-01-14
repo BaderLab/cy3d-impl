@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
+import org.baderlab.cy3d.internal.graphics.BirdsEyeGraphicsConfiguration;
+import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
@@ -66,12 +68,14 @@ public class CyActivator extends AbstractCyActivator {
 
 		
 		// Main RenderingEngine factory
-		Cy3DMainRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DMainRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+		MainGraphicsConfiguration mainGraphicsConfiguration = new MainGraphicsConfiguration();
+		Cy3DRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DRenderingEngineFactory(
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, mainGraphicsConfiguration);
 		
 		// Bird's Eye RenderingEngine factory
-		Cy3DBirdsEyeRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DBirdsEyeRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, cyServiceRegistrarRef);
+		BirdsEyeGraphicsConfiguration birdsEyeGraphicsConfiguration = new BirdsEyeGraphicsConfiguration();
+		Cy3DRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DRenderingEngineFactory(
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, birdsEyeGraphicsConfiguration);
 
 		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());

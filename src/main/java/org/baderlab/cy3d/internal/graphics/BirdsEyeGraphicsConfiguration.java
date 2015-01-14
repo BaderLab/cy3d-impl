@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import java.awt.Component;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.coordinator.BirdsEyeCoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
@@ -43,15 +43,12 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 	}
 	
 	@Override
-	public String toString() {
-		return "BirdsEyeGraphicsHandler";
+	public void trackInput(JComponent component, GraphicsData graphicsData) {
+		BirdsEyeInputEventListener.attach(component, graphicsData);
 	}
 	
 	@Override
-	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component) {
-		BirdsEyeInputEventListener inputListener = new BirdsEyeInputEventListener(graphicsData);
-		component.addMouseMotionListener(inputListener);
-		component.addMouseListener(inputListener);
-		return RenderUpdateFlag.ALWAYS_RENDER; // MKTODO temporary, needs to be linked to the main event listener
+	public String toString() {
+		return "BirdsEyeGraphicsHandler";
 	}
 }

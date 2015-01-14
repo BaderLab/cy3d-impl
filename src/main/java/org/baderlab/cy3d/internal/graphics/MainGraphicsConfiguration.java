@@ -1,9 +1,10 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import java.awt.Component;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL2;
+import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.MainCoordinatorProcessor;
@@ -95,27 +96,28 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	}
 	
 	@Override
-	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component) {
-		inputHandler = new MainInputEventListener(graphicsData);
-		component.addMouseWheelListener(inputHandler);
-		component.addMouseMotionListener(inputHandler);
-		component.addMouseListener(inputHandler);
-		component.addKeyListener(inputHandler);
-		return inputHandler;
+	public void trackInput(JComponent component, GraphicsData graphicsData) {
+		inputHandler = MainInputEventListener.attach(component, graphicsData);
 	}
 	
-	public ToolPanel.MouseModeChangeListener getMouseModeChangeListener() {
-		return new ToolPanel.MouseModeChangeListener() {
-			@Override
-			public void mouseModeChanged(MouseMode mouseMode) {
-				if(inputHandler != null)
+	@Override
+	public void setUpContainer(JComponent container) {
+		if(container instanceof JInternalFrame) {
+			JInternalFrame frame = (JInternalFrame) container;
+			ToolPanel toolPanel = ToolPanel.createFor(frame);
+			
+			toolPanel.addMouseModeChangeListener(new ToolPanel.MouseModeChangeListener() {
+				@Override
+				public void mouseModeChanged(MouseMode mouseMode) {
 					inputHandler.setToolbarMouseMode(mouseMode);
-			}
-		};
+				}
+			});
+		}
 	}
 	
 	@Override
 	public void dispose(GraphicsData gd) {
 		inputHandler.dispose();
 	}
+
 }

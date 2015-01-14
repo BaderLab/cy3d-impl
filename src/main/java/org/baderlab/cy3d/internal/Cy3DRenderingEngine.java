@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.util.Properties;
@@ -18,55 +16,35 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.service.util.CyServiceRegistrar;
-import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
-import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedEvent;
-import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
 
-import com.jogamp.opengl.util.FPSAnimator;
-
-/** This class represents a Cy3DRenderingEngine, responsible for
- * creating a rendering of a {@link CyNetwork}
- * 
- * @author Paperwing (Yue Dong)
+/** 
+ * This class represents a Cy3DRenderingEngine, responsible for
+ * creating a rendering of a {@link CyNetwork}.
  */
-public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
-
-	public static int FPS_TARGET = 60;  // try to render this fast
+class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
-	/** The networkView to be rendered */
-	private CyNetworkView networkView;
+	private final Cy3DNetworkView networkView;
+	private final VisualLexicon visualLexicon;
+	private final GraphicsConfiguration configuration;
 	
-	private VisualLexicon visualLexicon;
-	
-	/** The animator responsible for making calls to the rendering window */
-	private FPSAnimator animator;
-	
-	private RenderEventListener graphics;
+	private RenderEventListener renderEventListener;
 	private GLJPanel panel;
 	
-	private CyServiceRegistrar serviceRegistrar;
-	private NetworkViewAboutToBeDestroyedListener networkViewDestroyedListener;
-	private SetCurrentRenderingEngineListener setCurrentRenderingEngineListener;
 	
-	public Cy3DRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon) {
+	public Cy3DRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon, GraphicsConfiguration configuration) {
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
+		this.configuration = configuration;
 	}
-	
-	
-	protected abstract SetCurrentRenderingEngineListener getSetCurrentRenderingEngineListener(FPSAnimator animator);
-	
-	protected abstract RenderEventListener getRenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon);
 	
 	
 	/** Set up the canvas by creating and placing it, along with a Graphics
@@ -76,112 +54,39 @@ public abstract class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> 
 	 * the rendered results
 	 */
 	public void setUpCanvas(JComponent container) {
+		GLProfile profile = GLProfile.getDefault(); // Use the system's default version of OpenGL
+		GLCapabilities capabilities = new GLCapabilities(profile);
+		capabilities.setHardwareAccelerated(true);
+		capabilities.setDoubleBuffered(true);
 		
-		if (networkView != null) { // MKTODO this check should be somewhere else
-				
-			// Use the system's default version of OpenGL
-			GLProfile profile = GLProfile.getDefault();
-			GLCapabilities capabilities = new GLCapabilities(profile);
-			capabilities.setHardwareAccelerated(true);
-			// TODO: check if this line should be moved to graphics object
-			capabilities.setDoubleBuffered(true);
-			
-			// TODO: check whether to use GLCanvas or GLJPanel
-			panel = new GLJPanel(capabilities);
+		panel = new GLJPanel(capabilities); // GLJPanel is meant to be used with JInternalFrame
+		panel.setIgnoreRepaint(true); // TODO: check if negative effects produced by this
+		//panel.setDoubleBuffered(true);
+		
+		renderEventListener = new RenderEventListener(networkView, visualLexicon, configuration);
+		renderEventListener.trackInput(panel);
+		
+		configuration.setUpContainer(container);
 
-			// TODO: check if negative effects produced by this
-			panel.setIgnoreRepaint(true);
-			// panel.setDoubleBuffered(true);
-			
-			graphics = getRenderEventListener(networkView, visualLexicon);
-			graphics.trackInput(panel);
+		panel.addGLEventListener(renderEventListener);
+		
+		networkView.addContainer(panel); // When networkView.updateView() is called it will repaint all containers it owns
 
-			panel.addGLEventListener(graphics);
-
-			if (container instanceof JInternalFrame) {
-				JInternalFrame frame = (JInternalFrame) container;
-				Container pane = frame.getContentPane();
-				
-				pane.setLayout(new BorderLayout());
-				pane.add(panel, BorderLayout.CENTER);
-			} else {
-				container.setLayout(new BorderLayout());
-				container.add(panel, BorderLayout.CENTER);
-			}
-			
-			animator = new FPSAnimator(FPS_TARGET);
-			animator.add(panel);
-			animator.start();
-			
-			addStopAnimatorListener(container);
+		if (container instanceof JInternalFrame) {
+			JInternalFrame frame = (JInternalFrame) container;
+			Container pane = frame.getContentPane();
+			pane.setLayout(new BorderLayout());
+			pane.add(panel, BorderLayout.CENTER);
+		} 
+		else {
+			container.setLayout(new BorderLayout());
+			container.add(panel, BorderLayout.CENTER);
 		}
 	}
 	
 	
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
-		graphics.setupTaskFactories(taskFactoryListener, taskManager);
-	}
-	
-	// Adds a listener to the component containing the GLJPanel to stop the animator
-	// if the GLJPanel is about to be removed
-	private void addStopAnimatorListener(JComponent container) {
-		container.addContainerListener(new ContainerListener() {
-
-			@Override
-			public void componentAdded(ContainerEvent event) {
-			}
-
-			@Override
-			public void componentRemoved(ContainerEvent event) {
-				if (event.getChild() == panel && animator != null) {
-					animator.stop();
-				}
-			}
-		});
-	}
-	
-	
-	public void setUpListeners(CyServiceRegistrar serviceRegistrar) {
-		this.serviceRegistrar = serviceRegistrar;
-		
-		if (networkViewDestroyedListener == null) {
-			networkViewDestroyedListener = getAboutToBeRemovedListener();
-			serviceRegistrar.registerService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class, new Properties());
-		}
-		
-		if (setCurrentRenderingEngineListener == null) {
-			setCurrentRenderingEngineListener = getSetCurrentRenderingEngineListener(animator);
-			if (setCurrentRenderingEngineListener != null) {
-				serviceRegistrar.registerService(setCurrentRenderingEngineListener, SetCurrentRenderingEngineListener.class, new Properties());
-			}
-		}
-	}
-	
-	
-	/** Return a listener to listen to events regarding when the graphics
-	 * object is to be destroyed, and the animator stopped
-	 * 
-	 * @return A listener object handling certain cleanup
-	 */
-	private NetworkViewAboutToBeDestroyedListener getAboutToBeRemovedListener() {
-		
-		return new NetworkViewAboutToBeDestroyedListener(){
-			@Override
-			public void handleEvent(NetworkViewAboutToBeDestroyedEvent evt) {
-				// System.out.println("Rendering engine about to be removed event: " + evt.getRenderingEngine());
-				// System.out.println("Current engine: " + selfPointer);
-				
-				if (evt.getNetworkView() == networkView) {
-					animator.stop();
-					
-					serviceRegistrar.unregisterService(networkViewDestroyedListener, NetworkViewAboutToBeDestroyedListener.class);
-					
-					if (setCurrentRenderingEngineListener != null) {
-						serviceRegistrar.unregisterService(setCurrentRenderingEngineListener, SetCurrentRenderingEngineListener.class);
-					}
-				}
-			}
-		};
+	public void setUpTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+		renderEventListener.setupTaskFactories(taskFactoryListener, taskManager);
 	}
 	
 	

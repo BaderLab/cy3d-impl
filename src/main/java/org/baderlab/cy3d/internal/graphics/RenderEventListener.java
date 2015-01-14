@@ -6,7 +6,6 @@
 // is to be done
 
 package org.baderlab.cy3d.internal.graphics;
-import java.awt.Component;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
@@ -14,12 +13,12 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
-import org.baderlab.cy3d.internal.data.FrameRateTracker;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
 import org.baderlab.cy3d.internal.geometric.Vector3;
@@ -59,7 +58,6 @@ public class RenderEventListener implements GLEventListener {
 	private CytoscapeDataProcessor cytoscapeDataProcessor;
 	
 	private GraphicsConfiguration configuration;
-	private RenderUpdateFlag renderUpdateFlag;
 	
 	
 	/** Create a new Graphics object
@@ -102,16 +100,9 @@ public class RenderEventListener implements GLEventListener {
 	 * @param component The component to listen to events for
 	 * @param settingsData 
 	 */
-	public void trackInput(Component component) {
-		renderUpdateFlag = configuration.trackInput(graphicsData, component);
-		if(renderUpdateFlag == null)
-			renderUpdateFlag = RenderUpdateFlag.ALWAYS_RENDER;
-		
+	public void trackInput(JComponent component) {
 		graphicsData.setContainer(component);
-		
-		if (configuration instanceof MainGraphicsConfiguration) {
-			((Cy3DNetworkView) graphicsData.getNetworkView()).setContainer(component);
-		} 
+		configuration.trackInput(component, graphicsData);
 	}
 	
 	
@@ -122,7 +113,6 @@ public class RenderEventListener implements GLEventListener {
 	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
-//		graphicsData.setSubmenuTaskManager(submenuTaskManager);
 	}
 
 	/** Main drawing method; can be called by an {@link Animator} such as
@@ -133,11 +123,6 @@ public class RenderEventListener implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		if(!renderUpdateFlag.needToRender())
-			return;
-		
-		System.out.println("display " + configuration);
-		
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
 		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
@@ -173,8 +158,6 @@ public class RenderEventListener implements GLEventListener {
 		if(errorCode != GL2.GL_NO_ERROR) {
 			System.out.println("Error Code: " + errorCode);
 		}
-		
-		renderUpdateFlag.reset();
 	}
 
 	@Override
@@ -223,13 +206,15 @@ public class RenderEventListener implements GLEventListener {
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
 		graphicsData.setGlContext(gl);
-		graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
+		//graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
 		
 		configuration.initializeGraphicsProcedures(graphicsData);
 		//handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
 		
+		// force render of first frame
+		graphicsData.getNetworkView().updateView();
 	}
 
 	

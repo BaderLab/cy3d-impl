@@ -71,9 +71,6 @@ public class GraphicsData {
 	
 	private Component container;
 	
-	/** A framerate tracker used to calculate the current number of frames per second. */
-	private FrameRateTracker frameRateTracker;
-	
 	/** A {@link TaskFactoryListener} object that can be used to obtain the current set of task factories */
 	private TaskFactoryListener taskFactoryListener;
 	
@@ -112,10 +109,6 @@ public class GraphicsData {
 		this.networkView = networkView;
 	}
 	
-	public void setFrameRateTracker(FrameRateTracker frameRateTracker) {
-		this.frameRateTracker = frameRateTracker;
-	}
-
 	public CyNetworkView getNetworkView() {
 		return networkView;
 	}
@@ -264,17 +257,17 @@ public class GraphicsData {
 		this.taskManager = taskManager;
 	}
 
-	public void setShowFPS(boolean showFPS) {
-		if(showFPS)
-			this.frameRateTracker.startTrackingFPS();
-		else
-			this.frameRateTracker.stopTrackingFPS();
-		this.showFPS = showFPS;
-	}
-
-	public boolean getShowFPS() {
-		return showFPS;
-	}
+//	public void setShowFPS(boolean showFPS) {
+//		if(showFPS)
+//			this.frameRateTracker.startTrackingFPS();
+//		else
+//			this.frameRateTracker.stopTrackingFPS();
+//		this.showFPS = showFPS;
+//	}
+//
+//	public boolean getShowFPS() {
+//		return showFPS;
+//	}
 	
 	public void setShowAllNodeLabels(boolean showAllNodeLabels) {
 		this.showAllNodeLabels = showAllNodeLabels;
@@ -282,10 +275,6 @@ public class GraphicsData {
 
 	public boolean getShowAllNodeLabels() {
 		return showAllNodeLabels;
-	}
-
-	public FrameRateTracker getFrameRateTracker() {
-		return frameRateTracker;
 	}
 
 	public void setEdgeAnalyser(EdgeAnalyser edgeAnalyser) {

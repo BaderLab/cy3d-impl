@@ -1,9 +1,11 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,12 +41,7 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 */
 	private SimpleCamera networkCamera = null;
 	
-	/**
-	 * The container associated with the network view, used to request
-	 * input focus after actions such as the user clicking a button on the 
-	 * toolbar
-	 */
-	private Component container = null;
+	private List<Component> canvases = new ArrayList<>(2);
 	
 	// Assumes indices of nodes are unique
 	private Map<Long, View<CyNode>> nodeViews;
@@ -131,7 +128,7 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		fitNodesInView();
 		
 		// Request focus for the network view to be ready for keyboard input
-		requestNetworkFocus();
+//		requestNetworkFocus();
 	}
 
 	@Override
@@ -154,7 +151,7 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		}
 		
 		// Request focus for the network view to be ready for keyboard input
-		requestNetworkFocus();
+//		requestNetworkFocus();
 	}
 
 	@Override
@@ -180,7 +177,12 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		// Request focus after the network has been updated, such as via clicking a toolbar button,
 		// in order to be ready to receive keyboard and mouse input
-		requestNetworkFocus();
+//		requestNetworkFocus();
+		
+		for(int i = 0; i < canvases.size(); i++) {
+			canvases.get(i).repaint();
+		}
+		
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -328,16 +330,8 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		this.networkCamera = networkCamera;
 	}
 
-	public SimpleCamera getNetworkCamera() {
-		return networkCamera;
-	}
-
-	public void setContainer(Component container) {
-		this.container = container;
-	}
-
-	public Component getContainer() {
-		return container;
+	public void addContainer(Component container) {
+		canvases.add(container);
 	}
 	
 	/**
@@ -350,14 +344,14 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		}
 	}
 	
-	/**
-	 * Requests focus for this network view so that it is ready to accept mouse and keyboard input.
-	 */
-	private void requestNetworkFocus() {
-		if (container != null) {
-			container.requestFocus();
-		}
-	}
+//	/**
+//	 * Requests focus for this network view so that it is ready to accept mouse and keyboard input.
+//	 */
+//	private void requestNetworkFocus() {
+//		if (container != null) {
+//			container.requestFocus();
+//		}
+//	}
 
 	@Override
 	public void dispose() {

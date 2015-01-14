@@ -67,7 +67,7 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		double distanceScale = graphicsData.getDistanceScale();
 		
-		Collection<AugmentedEdgeContainer> edgeContainers = graphicsData.getEdgeAnalyser().getAnalyzedEdges(networkView, distanceScale, graphicsData.getFrameRateTracker().getTotalFrames());
+		Collection<AugmentedEdgeContainer> edgeContainers = graphicsData.getEdgeAnalyser().getAnalyzedEdges(networkView, distanceScale);
 		View<CyEdge> edgeView;
 
 		Number edgeWidth;
