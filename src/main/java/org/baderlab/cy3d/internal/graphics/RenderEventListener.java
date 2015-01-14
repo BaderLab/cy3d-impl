@@ -58,7 +58,7 @@ public class RenderEventListener implements GLEventListener {
 	private CoordinatorProcessor coordinatorProcessor;
 	private CytoscapeDataProcessor cytoscapeDataProcessor;
 	
-	private GraphicsConfiguration handler;
+	private GraphicsConfiguration configuration;
 	private RenderUpdateFlag renderUpdateFlag;
 	
 	
@@ -69,7 +69,7 @@ public class RenderEventListener implements GLEventListener {
 	 * @param visualLexicon The visual lexicon being used
 	 */
 	public RenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsConfiguration handler) {
-		this.handler = handler;
+		this.configuration = handler;
 		
 		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
@@ -103,13 +103,13 @@ public class RenderEventListener implements GLEventListener {
 	 * @param settingsData 
 	 */
 	public void trackInput(Component component) {
-		renderUpdateFlag = handler.trackInput(graphicsData, component);
+		renderUpdateFlag = configuration.trackInput(graphicsData, component);
 		if(renderUpdateFlag == null)
 			renderUpdateFlag = RenderUpdateFlag.ALWAYS_RENDER;
 		
 		graphicsData.setContainer(component);
 		
-		if (handler instanceof MainGraphicsConfiguration) {
+		if (configuration instanceof MainGraphicsConfiguration) {
 			((Cy3DNetworkView) graphicsData.getNetworkView()).setContainer(component);
 		} 
 	}
@@ -136,7 +136,7 @@ public class RenderEventListener implements GLEventListener {
 		if(!renderUpdateFlag.needToRender())
 			return;
 		
-		System.out.println("display: " + handler);
+		System.out.println("display " + configuration);
 		
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
@@ -167,7 +167,7 @@ public class RenderEventListener implements GLEventListener {
 		//lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
 		
 		// Draw the scene
-		handler.drawScene(graphicsData);
+		configuration.drawScene(graphicsData);
 		
 		int errorCode = gl.glGetError();
 		if(errorCode != GL2.GL_NO_ERROR) {
@@ -180,7 +180,7 @@ public class RenderEventListener implements GLEventListener {
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
 		coordinatorProcessor.unlinkCoordinator(coordinator);
-		handler.dispose(graphicsData);
+		configuration.dispose(graphicsData);
 	}
 
 	/** Initialize the Graphics object, performing certain
@@ -225,7 +225,7 @@ public class RenderEventListener implements GLEventListener {
 		graphicsData.setGlContext(gl);
 		graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
 		
-		handler.initializeGraphicsProcedures(graphicsData);
+		configuration.initializeGraphicsProcedures(graphicsData);
 		//handler.setupLighting(graphicsData);
 		
 		shapePickingProcessor.initialize(graphicsData);
@@ -310,6 +310,6 @@ public class RenderEventListener implements GLEventListener {
 	
 	@Override
 	public String toString() {
-		return "Graphics(" + handler + ")";
+		return "Graphics(" + configuration + ")";
 	}
 }

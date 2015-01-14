@@ -7,6 +7,7 @@ import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.BirdsEyeCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.input.handler.BirdsEyeInputEventListener;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderArcEdgesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
@@ -48,8 +49,9 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 	
 	@Override
 	public RenderUpdateFlag trackInput(GraphicsData graphicsData, Component component) {
-		// MKTODO this is temporary
-		// I plan to re-architect the coordinator stuff in order to make this work better.
-		return null;
+		BirdsEyeInputEventListener inputListener = new BirdsEyeInputEventListener(graphicsData);
+		component.addMouseMotionListener(inputListener);
+		component.addMouseListener(inputListener);
+		return RenderUpdateFlag.ALWAYS_RENDER; // MKTODO temporary, needs to be linked to the main event listener
 	}
 }

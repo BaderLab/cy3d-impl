@@ -98,12 +98,6 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	
 	// *** Mouse event handling ***
 	
-	private void convertCoords(MouseEvent e) {
-		// put the result in coords to use
-		coords[0] = e.getX();
-		coords[1] = e.getY();
-		pixelConverter.convertToPixelUnits(coords);
-	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
@@ -150,21 +144,21 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		currentDragCommand = getModifiedMouseCommand(e);
-		convertCoords(e);
+		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.pressed(coords[0], coords[1]);
 		needToRender = true;
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		convertCoords(e);
+		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.dragged(coords[0], coords[1]);
 		needToRender = true;
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		convertCoords(e);
+		pixelConverter.convertMouse(e, coords);
 		currentDragCommand.released(coords[0], coords[1]);
 		needToRender = true;
 	}
@@ -173,14 +167,14 @@ public class MainInputEventListener implements RenderUpdateFlag, MouseListener, 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
-		convertCoords(e);
+		pixelConverter.convertMouse(e, coords);
 		clickCommand.clicked(e.getX(), e.getY());
 		needToRender = true;
 	}
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		convertCoords(e);
+		pixelConverter.convertMouse(e, coords);
 		// needed for hover higlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);

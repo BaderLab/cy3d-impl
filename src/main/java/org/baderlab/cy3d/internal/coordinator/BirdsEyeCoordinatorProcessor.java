@@ -8,19 +8,13 @@ import org.baderlab.cy3d.internal.tools.SimpleCamera;
 public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 
 	@Override
-	public void initializeCoordinator(ViewingCoordinator coordinator,
-			GraphicsData graphicsData) {
-		
+	public void initializeCoordinator(ViewingCoordinator coordinator, GraphicsData graphicsData) {
 		coordinator.claimBirdsEye();
 		coordinator.setInitialBoundsMatched(false);
 	}
 
 	@Override
-	public void extractData(ViewingCoordinator coordinator,
-			GraphicsData graphicsData) {
-		
-//		coordinator.setBirdsEyeAnimatorControl(graphicsData.getAnimatorControl());
-		
+	public void extractData(ViewingCoordinator coordinator, GraphicsData graphicsData) {
 		if (coordinator.isMainClaimed()) {
 			CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
 			

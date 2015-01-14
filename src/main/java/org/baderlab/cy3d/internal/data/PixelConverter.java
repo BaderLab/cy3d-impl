@@ -1,6 +1,7 @@
 package org.baderlab.cy3d.internal.data;
 
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 
 import javax.media.nativewindow.NativeSurface;
 
@@ -56,5 +57,15 @@ public class PixelConverter {
 		nativeSurface.convertToPixelUnits(coords);
 		windowUnitsAndResult.x = coords[0];
 		windowUnitsAndResult.y = coords[1];
+	}
+	
+	
+	// Just a convenience method
+	
+	public void convertMouse(MouseEvent e, int[] coords) {
+		// put the result in coords to use
+		coords[0] = e.getX();
+		coords[1] = e.getY();
+		convertToPixelUnits(coords);
 	}
 }
