@@ -13,7 +13,6 @@ import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcesso
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
-import org.baderlab.cy3d.internal.input.handler.MouseMode;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.baderlab.cy3d.internal.lighting.Light;
 import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
@@ -104,14 +103,8 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	public void setUpContainer(JComponent container) {
 		if(container instanceof JInternalFrame) {
 			JInternalFrame frame = (JInternalFrame) container;
-			ToolPanel toolPanel = ToolPanel.createFor(frame);
-			
-			toolPanel.addMouseModeChangeListener(new ToolPanel.MouseModeChangeListener() {
-				@Override
-				public void mouseModeChanged(MouseMode mouseMode) {
-					inputHandler.setToolbarMouseMode(mouseMode);
-				}
-			});
+			ToolPanel toolPanel = new ToolPanel(frame);
+			toolPanel.addMouseModeChangeListener(inputHandler);
 		}
 	}
 	

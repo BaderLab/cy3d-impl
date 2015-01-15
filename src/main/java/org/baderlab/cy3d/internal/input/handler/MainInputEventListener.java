@@ -34,7 +34,8 @@ import org.cytoscape.view.model.CyNetworkView;
  * Mouse Modes:
  * 
  * The current mouse mode is the one selected in the toolbar.
- * Alt and Shift "override" the current mode, they force camera mode and selection mode respectively.
+ * Alt and Shift "override" the current mode, they force camera 
+ * mode and selection mode respectively (this is done in {@link ToolPanel}).
  * Ctrl is a "modifier", it takes the current command and "modifies" it.
  * 
  * Keyboard:
@@ -44,7 +45,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * @author mkucera
  *
  */
-public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, ToolPanel.MouseModeChangeListener {
 
 	private final GraphicsData graphicsData;
 	private final CyNetworkView networkView;
@@ -84,14 +85,15 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	private void createInitialCommands() {
 		mouseWheelCommand = new CameraZoomCommand(graphicsData);
 		keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
-		setToolbarMouseMode(MouseMode.getDefault()); // assume toolbar also starts off using the default
+		mouseModeChanged(MouseMode.getDefault()); // assume toolbar also starts off using the default
 	}
 	
 	
 	// *** Mode selection ***
 	
 	/** Called when a button on the toolbar is pressed. */
-	public void setToolbarMouseMode(MouseMode mouseMode) { 
+	@Override
+	public void mouseModeChanged(MouseMode mouseMode) { 
 		switch(mouseMode) {
 			case CAMERA: 
 				leftMouseCommand  = new CameraPanMouseCommand(graphicsData.getCamera()); 
@@ -116,37 +118,22 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	
 	/**
-	 * The current mouse command is set by the toolbar, however it can
-	 * be overridden by holding the Shift or Alt key.
-	 * (Shift takes precedence over Alt.)
-	 */
-	private MouseCommand getMouseCommand(MouseEvent e) {
-		if(SwingUtilities.isLeftMouseButton(e)) { 
-			if(e.isShiftDown())
-				return new SelectionMouseCommand(graphicsData); // force selection mode
-			if(e.isAltDown())
-				return new CameraPanMouseCommand(graphicsData.getCamera()); // force camera mode
-			else
-				return leftMouseCommand; // use current mode
-		}
-		else if(SwingUtilities.isRightMouseButton(e)) {
-			if(e.isShiftDown())
-				return new PopupMenuMouseCommand(graphicsData);
-			if(e.isAltDown())
-				return new CameraStrafeMouseCommand(graphicsData.getCamera());
-			else
-				return rightMouseCommand;
-		}
-		return MouseCommand.EMPTY;
-	}
-	
-	/**
 	 * The current mouse command is modified by holding Ctrl.
 	 */
 	private MouseCommand getModifiedMouseCommand(MouseEvent e) {
-		MouseCommand command = getMouseCommand(e);
-		return e.isControlDown() ? command.modify() : command;
+		MouseCommand command = MouseCommand.EMPTY;
+		if(SwingUtilities.isLeftMouseButton(e))
+			command = leftMouseCommand;
+		else if(SwingUtilities.isRightMouseButton(e))
+			command = rightMouseCommand;
+		
+		if(e.isControlDown())
+			command = command.modify();
+		
+		return command;
 	}
+	
+	
 	
 	private MouseCommand currentDragCommand;
 	
@@ -263,11 +250,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
-//		switch(e.getKeyChar()) {
-//			case 'k': case 'K':
-//				graphicsData.setShowFPS(!graphicsData.getShowFPS()); 
-//				break;
-//		}
 	}
 	
 }
