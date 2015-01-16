@@ -39,21 +39,6 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 		addCommand.pressed(x, y);
 	}
 	
-	@Override
-	public void dragged(int x, int y) {
-		addCommand.dragged(x, y);
-	}
-
-	@Override
-	public void released(int x, int y) {
-		addCommand.released(x, y);
-	}
-	
-	@Override
-	public void moved(int x, int y) {
-		addCommand.moved(x, y);
-	}
-	
 	private void deselectOther() {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
@@ -70,10 +55,30 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 		}
 	}
 	
+
+	@Override
+	public void dragged(int x, int y) {
+		addCommand.dragged(x, y);
+	}
+
+	@Override
+	public void released(int x, int y) {
+		addCommand.released(x, y);
+	}
+	
+	@Override
+	public void moved(int x, int y) {
+		addCommand.moved(x, y);
+	}
+	
+	@Override
+	public void exited() {
+		addCommand.exited();
+	}
+	
 	@Override
 	public MouseCommand modify() {
 		return addCommand;
 	}
 
-	
 }

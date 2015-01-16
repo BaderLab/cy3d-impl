@@ -95,7 +95,6 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		GL2 gl = graphicsData.getGlContext();
 		int screenHeight = graphicsData.getScreenHeight();
 		int screenWidth = graphicsData.getScreenWidth();
-		SimpleCamera camera = graphicsData.getCamera();
 		
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);

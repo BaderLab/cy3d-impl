@@ -1,5 +1,10 @@
 package org.baderlab.cy3d.internal.input.handler;
 
+/**
+ * A convenience class with empty implementations of the methods declared in {@link MouseCommand}.
+ * 
+ * @author mkucera
+ */
 public class MouseCommandAdapter implements MouseCommand {
 
 	@Override
@@ -22,6 +27,14 @@ public class MouseCommandAdapter implements MouseCommand {
 	public void moved(int x, int y) {
 	}
 
+	@Override
+	public void exited() {
+	}
+	
+	@Override
+	public void entered() {
+	}
+	
 	/**
 	 * Default implementation returns the current object.
 	 */
@@ -29,5 +42,7 @@ public class MouseCommandAdapter implements MouseCommand {
 	public MouseCommand modify() {
 		return this;
 	}
+
+	
 
 }

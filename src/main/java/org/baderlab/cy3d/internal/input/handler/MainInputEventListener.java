@@ -60,8 +60,8 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	private boolean keyDown;
 	
 	private MouseWheelCommand mouseWheelCommand;
-	private MouseCommand rightMouseCommand;
-	private MouseCommand leftMouseCommand;
+	private MouseCommand primaryMouseCommand;
+	private MouseCommand secondaryMouseCommand;
 	private KeyCommand keyCommand;
 	
 	
@@ -96,12 +96,12 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	public void mouseModeChanged(MouseMode mouseMode) { 
 		switch(mouseMode) {
 			case CAMERA: 
-				leftMouseCommand  = new CameraPanMouseCommand(graphicsData.getCamera()); 
-				rightMouseCommand = new CameraStrafeMouseCommand(graphicsData.getCamera()); 
+				primaryMouseCommand   = new CameraPanMouseCommand(graphicsData.getCamera()); 
+				secondaryMouseCommand = new CameraStrafeMouseCommand(graphicsData.getCamera()); 
 				break;
 			case SELECT: 
-				leftMouseCommand  = new SelectionMouseCommand(graphicsData); 
-				rightMouseCommand = new PopupMenuMouseCommand(graphicsData);
+				primaryMouseCommand   = new SelectionMouseCommand(graphicsData); 
+				secondaryMouseCommand = new PopupMenuMouseCommand(graphicsData);
 				break;
 		}
 	}
@@ -123,9 +123,9 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	private MouseCommand getModifiedMouseCommand(MouseEvent e) {
 		MouseCommand command = MouseCommand.EMPTY;
 		if(SwingUtilities.isLeftMouseButton(e))
-			command = leftMouseCommand;
+			command = primaryMouseCommand;
 		else if(SwingUtilities.isRightMouseButton(e))
-			command = rightMouseCommand;
+			command = secondaryMouseCommand;
 		
 		if(e.isControlDown())
 			command = command.modify();
@@ -174,16 +174,20 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		// needed for hover highlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);
-		leftMouseCommand.moved(coords[0], coords[1]);
+		primaryMouseCommand.moved(coords[0], coords[1]);
 		networkView.updateView();
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
+		primaryMouseCommand.entered();
+		networkView.updateView();
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+		primaryMouseCommand.exited();
+		networkView.updateView();
 	}
 	
 	
