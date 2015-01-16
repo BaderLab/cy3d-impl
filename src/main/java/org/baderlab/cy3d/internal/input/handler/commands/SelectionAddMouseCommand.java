@@ -2,11 +2,11 @@ package org.baderlab.cy3d.internal.input.handler.commands;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
-import org.baderlab.cy3d.internal.input.handler.MouseCommand;
+import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
 
-public class SelectionAddMouseCommand implements MouseCommand {
+public class SelectionAddMouseCommand extends MouseCommandAdapter {
 
 	private final GraphicsData graphicsData;
 	
@@ -92,9 +92,16 @@ public class SelectionAddMouseCommand implements MouseCommand {
 		*/
 	}
 	
+	
 	@Override
-	public MouseCommand modify() {
-		return this;
+	public void moved(int x, int y) {
+		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
+		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
+		
+		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
+
+		selectionData.setHoverNodeIndex(newHoverNodeIndex);
+		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
 	}
 
 }

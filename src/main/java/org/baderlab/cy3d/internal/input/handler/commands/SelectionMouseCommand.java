@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.input.handler.MouseCommand;
+import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
@@ -16,7 +17,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * 
  * @author mkucera
  */
-public class SelectionMouseCommand implements MouseCommand {
+public class SelectionMouseCommand extends MouseCommandAdapter {
 
 	private final GraphicsData graphicsData;
 	private final SelectionAddMouseCommand addCommand;
@@ -46,6 +47,11 @@ public class SelectionMouseCommand implements MouseCommand {
 	@Override
 	public void released(int x, int y) {
 		addCommand.released(x, y);
+	}
+	
+	@Override
+	public void moved(int x, int y) {
+		addCommand.moved(x, y);
 	}
 	
 	private void deselectOther() {

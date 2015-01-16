@@ -171,9 +171,10 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		pixelConverter.convertMouse(e, coords);
-		// needed for hover higlight
+		// needed for hover highlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);
+		leftMouseCommand.moved(coords[0], coords[1]);
 		networkView.updateView();
 	}
 

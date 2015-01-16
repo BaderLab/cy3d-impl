@@ -5,14 +5,14 @@ import java.awt.Point;
 import javax.swing.JPopupMenu;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.input.handler.MouseCommand;
+import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.task.PopupMenuCreator;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 
-public class PopupMenuMouseCommand implements MouseCommand {
+public class PopupMenuMouseCommand extends MouseCommandAdapter {
 
 	private PopupMenuCreator popupMenuCreator = null;
 	private final GraphicsData graphicsData;
@@ -62,21 +62,4 @@ public class PopupMenuMouseCommand implements MouseCommand {
 		}
 	}
 
-	
-	@Override
-	public void pressed(int x, int y) {
-	}
-
-	@Override
-	public void dragged(int x, int y) {
-	}
-
-	@Override
-	public void released(int x, int y) {
-	}
-	
-	@Override
-	public MouseCommand modify() {
-		return this;
-	}
 }

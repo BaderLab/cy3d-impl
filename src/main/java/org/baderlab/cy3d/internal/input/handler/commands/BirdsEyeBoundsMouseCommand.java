@@ -5,11 +5,11 @@ import org.baderlab.cy3d.internal.data.CoordinatorData;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.input.handler.MouseCommand;
+import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
-public class BirdsEyeBoundsMouseCommand implements MouseCommand {
+public class BirdsEyeBoundsMouseCommand extends MouseCommandAdapter {
 
 	private final GraphicsData graphicsData;
 	
@@ -26,7 +26,7 @@ public class BirdsEyeBoundsMouseCommand implements MouseCommand {
 		
 		if(coordinatorData.isInitialBoundsMatched()) {
 			Vector3 nearMousePosition = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.NEAR_BOUNDS_DISTANCE);
-			Vector3 farMousePosition = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.FAR_BOUNDS_DISTANCE);
+//			Vector3 farMousePosition  = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.FAR_BOUNDS_DISTANCE);
 			
 			// The y-coordinate needs to be inverted
 			// mousePosition.set(mousePosition.x(), -mousePosition.y(), mousePosition.z());
@@ -78,23 +78,5 @@ public class BirdsEyeBoundsMouseCommand implements MouseCommand {
 		return newPosition;
 	}
 	
-	
-	
-	@Override
-	public void pressed(int x, int y) {
-	}
-
-	@Override
-	public void clicked(int x, int y) {
-	}
-
-	@Override
-	public void released(int x, int y) {
-	}
-
-	@Override
-	public MouseCommand modify() {
-		return this;
-	}
 
 }

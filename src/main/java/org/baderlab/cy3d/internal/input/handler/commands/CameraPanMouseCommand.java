@@ -1,9 +1,9 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
-import org.baderlab.cy3d.internal.input.handler.MouseCommand;
+import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
-public class CameraPanMouseCommand implements MouseCommand {
+public class CameraPanMouseCommand extends MouseCommandAdapter {
 
 	private final SimpleCamera camera;
 	
@@ -34,16 +34,4 @@ public class CameraPanMouseCommand implements MouseCommand {
 		prevY = y;
 	}
 
-	@Override
-	public void clicked(int x, int y) {
-	}
-
-	@Override
-	public void released(int x, int y) {
-	}
-
-	@Override
-	public MouseCommand modify() {
-		return this;
-	}
 }
