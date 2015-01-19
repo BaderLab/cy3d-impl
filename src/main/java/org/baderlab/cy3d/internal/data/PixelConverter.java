@@ -38,6 +38,17 @@ public class PixelConverter {
 		nativeSurface.convertToPixelUnits(windowUnitsAndResult);
 	}
 	
+	/**
+	 * Returns the number of OpenGL pixels per Window unit.
+	 * Note: Calculates the value on every call.
+	 */
+	public float getPixelsPerWindowUnitRatio() {
+		int[] windowUnits = new int[] {100, 100};
+		nativeSurface.convertToPixelUnits(windowUnits);
+		float ratio = (float) windowUnits[0] / 100.0f;
+		return ratio;
+	}
+	
 	
 	// Nicer java.awt.Point based access.
 	

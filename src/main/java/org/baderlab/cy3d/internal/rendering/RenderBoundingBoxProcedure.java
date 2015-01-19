@@ -2,33 +2,31 @@ package org.baderlab.cy3d.internal.rendering;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
-	private static final RenderColor DEFAULT_COLOR = 
-		new RenderColor(0.27, 0.27, 0.27);
+	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.3, 0.3, 0.3);
+	
+	private float lineWidth;
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
+		float ratio = graphicsData.getPixelConverter().getPixelsPerWindowUnitRatio();
+		lineWidth = 1.5f * (float) Math.max(1.0, ratio);
 	}
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		
 		if (graphicsData.getCoordinatorData().isInitialBoundsMatched()) {
-			// drawFullBox(graphicsData);
-			
-			drawViewingVolumePortion(graphicsData);
-			// drawHalfBox(graphicsData);
+			drawFullBox(graphicsData);
+			//drawViewingVolumePortion(graphicsData);
+			//drawHalfBox(graphicsData);
 		}
 	}
 	
@@ -65,6 +63,10 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		
 		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
 		
+		float[] prev = new float[1];
+		gl.glGetFloatv(GL.GL_LINE_WIDTH, prev, 0);
+		gl.glLineWidth(lineWidth);
+		
 		// Below uses converted 3D coordinates
 		gl.glBegin(GL2.GL_LINE_STRIP);
 		gl.glVertex3d(topLeftDown.x(), topLeftDown.y(), topLeftDown.z());
@@ -90,6 +92,8 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glVertex3d(topRightLeft.x(), topRightLeft.y(), topRightLeft.z());
 		gl.glEnd();
 		
+		gl.glLineWidth(prev[0]);
+		
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		if (disabledLighting) {
 			gl.glEnable(GL2.GL_LIGHTING);
@@ -114,7 +118,11 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		
-		gl.glColor3f(0.7f, 0.7f, 0.7f);
+		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
+		
+		float[] prev = new float[1];
+		gl.glGetFloatv(GL.GL_LINE_WIDTH, prev, 0);
+		gl.glLineWidth(lineWidth);
 		
 		// Below uses converted 3D coordinates
 		gl.glBegin(GL2.GL_LINE_LOOP);
@@ -123,6 +131,8 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
 		gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
 		gl.glEnd();
+		
+		gl.glLineWidth(prev[0]);
 		
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		if (disabledLighting) {

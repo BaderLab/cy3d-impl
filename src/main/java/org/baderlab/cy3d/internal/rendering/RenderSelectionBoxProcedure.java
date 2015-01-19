@@ -13,8 +13,12 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	
 	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.58, 0.68, 0.85);
 	
+	private float lineWidth;
+	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
+		float ratio = graphicsData.getPixelConverter().getPixelsPerWindowUnitRatio();
+		lineWidth = (float) Math.max(1.0, ratio);
 	}
 
 	/**
@@ -65,14 +69,20 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 		}
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		RenderColor.setNonAlphaColors(gl, DEFAULT_COLOR);
-		
+
 		// Below uses converted 3D coordinates
+		float[] prev = new float[1];
+		gl.glGetFloatv(GL.GL_LINE_WIDTH, prev, 0);
+		gl.glLineWidth(lineWidth);
+		
 		gl.glBegin(GL2.GL_LINE_LOOP);
 		gl.glVertex3d(topLeft.x(), topLeft.y(), topLeft.z());
 		gl.glVertex3d(bottomLeft.x(), bottomLeft.y(), bottomLeft.z());
 		gl.glVertex3d(bottomRight.x(), bottomRight.y(), bottomRight.z());
 		gl.glVertex3d(topRight.x(), topRight.y(), topRight.z());
 		gl.glEnd();
+		
+		gl.glLineWidth(prev[0]);
 
 		// Below uses raw 2d coordinates
 		// gl.glBegin(GL2.GL_LINE_LOOP);
