@@ -23,7 +23,6 @@ public class PixelConverter {
 	}
 	
 	public void setNativeSurface(NativeSurface nativeSurface) { 
-		// MKTODO this method should not exist, nativeSurface should be final
 		this.nativeSurface = nativeSurface;
 	}
 	

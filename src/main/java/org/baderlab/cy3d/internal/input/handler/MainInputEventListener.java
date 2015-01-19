@@ -15,7 +15,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.data.PixelConverter;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
@@ -50,7 +49,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	private final GraphicsData graphicsData;
 	private final CyNetworkView networkView;
 	
-	private final PixelConverter pixelConverter;
 	private final int[] coords = new int[2];
 	private Timer heartBeat;
 	
@@ -67,7 +65,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	public MainInputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
-		this.pixelConverter = graphicsData.getPixelConverter();
 		this.networkView = graphicsData.getNetworkView();
 		createInitialCommands();
 		startHeartbeat();
@@ -140,21 +137,21 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	@Override
 	public void mousePressed(MouseEvent e) {
 		currentDragCommand = getModifiedMouseCommand(e);
-		pixelConverter.convertMouse(e, coords);
+		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.pressed(coords[0], coords[1]);
 		networkView.updateView();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		pixelConverter.convertMouse(e, coords);
+		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.dragged(coords[0], coords[1]);
 		networkView.updateView();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		pixelConverter.convertMouse(e, coords);
+		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.released(coords[0], coords[1]);
 		networkView.updateView();
 	}
@@ -163,14 +160,14 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
-		pixelConverter.convertMouse(e, coords);
+		graphicsData.getPixelConverter().convertMouse(e, coords);
 		clickCommand.clicked(coords[0], coords[1]);
 		networkView.updateView();
 	}
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		pixelConverter.convertMouse(e, coords);
+		graphicsData.getPixelConverter().convertMouse(e, coords);
 		// needed for hover highlight
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);

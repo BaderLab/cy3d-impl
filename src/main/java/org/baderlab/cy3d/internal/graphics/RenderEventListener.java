@@ -21,7 +21,6 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
-import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
@@ -69,14 +68,7 @@ public class RenderEventListener implements GLEventListener {
 	public RenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsConfiguration handler) {
 		this.configuration = handler;
 		
-		// TODO: add default constant speeds for camera movement
 		graphicsData = new GraphicsData();
-		graphicsData.setCamera(new SimpleCamera(new Vector3(0, 0, 3), new Vector3(0, 0, 0), new Vector3(0, 1, 0), 
-				                                0.04, 0.0033, 0.01, 0.01, 0.4));
-		
-		PixelConverter pixelConverter = new PixelConverter(null);
-		graphicsData.setPixelConverter(pixelConverter);
-		
 		graphicsData.setNetworkView(networkView);
 		graphicsData.setVisualLexicon(visualLexicon);
 		
@@ -115,57 +107,7 @@ public class RenderEventListener implements GLEventListener {
 		graphicsData.setTaskManager(taskManager);
 	}
 
-	/** Main drawing method; can be called by an {@link Animator} such as
-	 * {@link FPSAnimator}, responsible for drawing the scene and advancing
-	 * the frame
-	 * 
-	 * @param drawable The GLAutoDrawable object used for rendering
-	 */
-	@Override
-	public void display(GLAutoDrawable drawable) {
-		GL2 gl = drawable.getGL().getGL2();
-		graphicsData.setGlContext(gl);
-		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
-		
-		// Re-calculate the viewing volume
-		SimpleCamera camera = graphicsData.getCamera();
-		graphicsData.getViewingVolume().calculateViewingVolume(
-				camera.getPosition(), 
-				camera.getDirection(), 
-				camera.getUp(), 
-				graphicsData.getNearZ(), 
-				graphicsData.getFarZ(), 
-				graphicsData.getVerticalFov(), 
-				GeometryToolkit.findHorizontalFieldOfView(graphicsData.getDistanceScale(), 
-						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
-		
-		// Perform picking
-		shapePickingProcessor.processPicking(graphicsData);
-		
-		// Update data for bird's eye view camera movement
-		coordinatorProcessor.extractData(coordinator, graphicsData);
-		
-		// Process Cytoscape data
-		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
-		
-		// Update lighting
-		//lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
-		
-		// Draw the scene
-		configuration.drawScene(graphicsData);
-		
-		int errorCode = gl.glGetError();
-		if(errorCode != GL2.GL_NO_ERROR) {
-			System.out.println("Error Code: " + errorCode);
-		}
-	}
-
-	@Override
-	public void dispose(GLAutoDrawable autoDrawable) {
-		coordinatorProcessor.unlinkCoordinator(coordinator);
-		configuration.dispose(graphicsData);
-	}
-
+	
 	/** Initialize the Graphics object, performing certain
 	 * OpenGL initializations
 	 */
@@ -177,7 +119,8 @@ public class RenderEventListener implements GLEventListener {
 		System.out.println("GL_RENDERER: " + gl.glGetString(GL2.GL_RENDERER));
 		System.out.println("GL_VERSION: "  + gl.glGetString(GL2.GL_VERSION));
 		
-		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
+		graphicsData.setPixelConverter(new PixelConverter(drawable.getNativeSurface()));
+
 		
 		initLighting(drawable);
 
@@ -270,6 +213,52 @@ public class RenderEventListener implements GLEventListener {
 //		
 //		lightingProcessor.setupLighting(gl, graphicsData.getLightingData());
 	}
+	
+	
+	/** Main drawing method; can be called by an {@link Animator} such as
+	 * {@link FPSAnimator}, responsible for drawing the scene and advancing
+	 * the frame
+	 * 
+	 * @param drawable The GLAutoDrawable object used for rendering
+	 */
+	@Override
+	public void display(GLAutoDrawable drawable) {
+		GL2 gl = drawable.getGL().getGL2();
+		graphicsData.setGlContext(gl);
+		
+		// Re-calculate the viewing volume
+		SimpleCamera camera = graphicsData.getCamera();
+		graphicsData.getViewingVolume().calculateViewingVolume(
+				camera.getPosition(), 
+				camera.getDirection(), 
+				camera.getUp(), 
+				graphicsData.getNearZ(), 
+				graphicsData.getFarZ(), 
+				graphicsData.getVerticalFov(), 
+				GeometryToolkit.findHorizontalFieldOfView(graphicsData.getDistanceScale(), 
+						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
+		
+		// Perform picking
+		shapePickingProcessor.processPicking(graphicsData);
+		
+		// Update data for bird's eye view camera movement
+		coordinatorProcessor.extractData(coordinator, graphicsData);
+		
+		// Process Cytoscape data
+		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
+		
+		// Update lighting
+		//lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
+		
+		// Draw the scene
+		configuration.drawScene(graphicsData);
+		
+		int errorCode = gl.glGetError();
+		if(errorCode != GL2.GL_NO_ERROR) {
+			System.out.println("Error Code: " + errorCode);
+		}
+	}
+
 
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -291,7 +280,18 @@ public class RenderEventListener implements GLEventListener {
 		
 		graphicsData.setScreenHeight(height);
 		graphicsData.setScreenWidth(width);
+		
+		// MKTODO I think this is required to move between monitors, confirm this assumption
+		graphicsData.getPixelConverter().setNativeSurface(drawable.getNativeSurface());
 	}
+	
+	
+	@Override
+	public void dispose(GLAutoDrawable autoDrawable) {
+		coordinatorProcessor.unlinkCoordinator(coordinator);
+		configuration.dispose(graphicsData);
+	}
+
 	
 	@Override
 	public String toString() {

@@ -19,10 +19,10 @@ public class SimpleCamera {
 	// useful for certain rotations and transformations.
 	
 	/** The default camera translational movement speed */
-	public static final double DEFAULT_MOVE_SPEED = 0.04;
+	public static final double DEFAULT_MOVE_SPEED = 0.007;
 	
 	/**  The default angular speed for camera turning */
-	public static final double DEFAULT_TURN_SPEED = 0.0033;
+	public static final double DEFAULT_TURN_SPEED = 0.001;
 	
 	/** The default camera orbit angular speed */
 	public static final double DEFAULT_ORBIT_SPEED = 0.01;
@@ -539,8 +539,13 @@ public class SimpleCamera {
 	 * @param angle The angle to turn, positive for leftwards
 	 */
 	private void turnHorizontal(double angle) {
-		direction = direction.rotate(up, angle);
+		Vector3 worldUp = new Vector3(0, 1, 0);
+		
+		direction = direction.rotate(worldUp, angle);
 		direction.normalizeLocal();
+		
+		up = up.rotate(worldUp, angle);
+		up.normalizeLocal();
 		
 		Vector3 newTarget = direction.multiply(distance);
 		newTarget.addLocal(position);

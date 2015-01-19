@@ -27,8 +27,8 @@ public class CameraPanMouseCommand extends MouseCommandAdapter {
 		int dx = x - prevX;
 		int dy = y - prevY;
 		
-		camera.turnRight(dx);
-		camera.turnDown(dy);
+		camera.turnRight(-dx);
+		camera.turnDown(-dy);
 		
 		prevX = x;
 		prevY = y;

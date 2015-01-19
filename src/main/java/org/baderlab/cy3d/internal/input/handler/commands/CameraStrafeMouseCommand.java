@@ -27,8 +27,8 @@ public class CameraStrafeMouseCommand extends MouseCommandAdapter {
 		int dx = x - prevX;
 		int dy = y - prevY;
 		
-		camera.moveRight(dx);
-		camera.moveDown(dy);
+		camera.moveRight(-dx);
+		camera.moveDown(-dy);
 		
 		prevX = x;
 		prevY = y;
