@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.media.opengl.GL2;
 
@@ -60,8 +59,6 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
-		Set<Long> selectedNodeIndices = graphicsData.getSelectionData().getSelectedNodeIndices();
-		long hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
 
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
@@ -123,14 +120,15 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 					(double) visualPropertyColor.getBlue() / 255);
 		}
 		
+		Long suid = nodeView.getModel().getSUID();
+		
 		if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-			
 			// Make selected nodes appear greener
 			color.multiplyRed(0.7, 0, 0.3);
 			color.multiplyGreen(1.5, 0.5, 1);
 			color.multiplyBlue(0.7, 0, 0.3);
 		} 
-		else if (nodeView.getModel().getSUID() == graphicsData.getSelectionData().getHoverNodeIndex()) {
+		else if (suid.equals(graphicsData.getSelectionData().getHoverNodeIndex()) || graphicsData.getPickingData().getPickedNodeIndices().contains(suid)) {
 			// Make hovered nodes appear bluer
 			color.multiplyRed(0.7, 0, 0.7);
 			color.multiplyGreen(0.7, 0, 0.7);

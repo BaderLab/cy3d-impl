@@ -2,6 +2,7 @@ package org.baderlab.cy3d.internal.input.handler.commands;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
+import org.baderlab.cy3d.internal.data.PickingData;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.view.model.CyNetworkView;
@@ -75,26 +76,26 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	@Override
 	public void released(int x, int y) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
+		PickingData pickingData = graphicsData.getPickingData();
+		
 		selectionData.setDragSelectMode(false);
 		selectionData.setSelectTopLeftFound(false);
 		
-		for (long index : graphicsData.getPickingData().getPickedNodeIndices()) {
+		for (long index : pickingData.getPickedNodeIndices()) {
 			NetworkToolkit.setNodeSelected(index, networkView, true);
 		}
-		
-		for (long index : graphicsData.getPickingData().getPickedEdgeIndices()) {
+		for (long index : pickingData.getPickedEdgeIndices()) {
 			NetworkToolkit.setEdgeSelected(index, networkView, true);
 		}
 		
-		/*
-		selectionData.getSelectedNodeIndices().addAll(graphicsData.getPickingData().getPickedNodeIndices());
-		selectionData.getSelectedEdgeIndices().addAll(graphicsData.getPickingData().getPickedEdgeIndices());
-		*/
+		pickingData.getPickedNodeIndices().clear();
+		pickingData.getPickedEdgeIndices().clear();
 	}
 	
 	
 	@Override
 	public void moved(int x, int y) {
+		// MKTODO I think this returns the picked node index computed from the last frame.
 		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 		

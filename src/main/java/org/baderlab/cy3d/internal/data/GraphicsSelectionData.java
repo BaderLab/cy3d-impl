@@ -1,8 +1,5 @@
 package org.baderlab.cy3d.internal.data;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
 /** 
@@ -12,16 +9,6 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
  * selection box.
  * */
 public class GraphicsSelectionData {
-	
-	/** The set of indices for nodes that are selected */
-	private Set<Long> selectedNodeIndices;
-	
-	/** The set of indices for edges that are selected */
-	private Set<Long> selectedEdgeIndices;
-	
-	private Set<Long> toBeDeselectedNodeIndices; 
-	
-	private Set<Long> toBeDeselectedEdgeIndices; 	
 	
 	
 	/** The top left x position for the selection border */
@@ -60,28 +47,8 @@ public class GraphicsSelectionData {
 	private double selectProjectionDistance;
 	
 	public GraphicsSelectionData() {
-		selectedNodeIndices = new LinkedHashSet<Long>();
-		selectedEdgeIndices = new LinkedHashSet<Long>();
-		
-		toBeDeselectedNodeIndices = new LinkedHashSet<Long>();
-		toBeDeselectedEdgeIndices = new LinkedHashSet<Long>();
 	}
 	
-	public Set<Long> getSelectedNodeIndices() {
-		return selectedNodeIndices;
-	}
-
-	public void setSelectedNodeIndices(Set<Long> selectedNodeIndices) {
-		this.selectedNodeIndices = selectedNodeIndices;
-	}
-
-	public Set<Long> getSelectedEdgeIndices() {
-		return selectedEdgeIndices;
-	}
-
-	public void setSelectedEdgeIndices(Set<Long> selectedEdgeIndices) {
-		this.selectedEdgeIndices = selectedEdgeIndices;
-	}
 
 	public int getSelectTopLeftX() {
 		return selectTopLeftX;
@@ -171,19 +138,4 @@ public class GraphicsSelectionData {
 		return selectTopLeftFound;
 	}
 
-	public void setToBeDeselectedNodeIndices(Set<Long> toBeDeselectedNodeIndices) {
-		this.toBeDeselectedNodeIndices = toBeDeselectedNodeIndices;
-	}
-
-	public Set<Long> getToBeDeselectedNodeIndices() {
-		return toBeDeselectedNodeIndices;
-	}
-
-	public void setToBeDeselectedEdgeIndices(Set<Long> toBeDeselectedEdgeIndices) {
-		this.toBeDeselectedEdgeIndices = toBeDeselectedEdgeIndices;
-	}
-
-	public Set<Long> getToBeDeselectedEdgeIndices() {
-		return toBeDeselectedEdgeIndices;
-	}
 }
