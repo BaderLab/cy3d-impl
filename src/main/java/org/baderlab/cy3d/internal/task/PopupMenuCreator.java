@@ -13,7 +13,6 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.task.EdgeViewTaskFactory;
-import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.GravityTracker;
@@ -30,27 +29,65 @@ import org.cytoscape.work.swing.DialogTaskManager;
  * This class is responsible for creating and populating pop-up menus created when right-clicking the network.
  */
 public class PopupMenuCreator {
-		
+	
 	/** For creating popup menu items for the network, only use task factories that match the preferred action*/
 	private static final String NETWORK_PREFFERED_ACTION = "NEW";
 	
 	private DialogTaskManager taskManager;
-	
 	private TaskFactoryProvider taskFactoryProvider;
 	
 	// Large value to be used for the gravity value of org.cytoscape.util.swing.GravityTracker
 	private double largeValue = Double.MAX_VALUE / 2.0;
 
+	
+	
+	private static final String[][] networkFilter = {
+		{"select", "all nodes and edges"},
+	};
+	
+	private static final String[][] nodeFilter = {
+		{"add", "edges connecting selected nodes"},
+		{"edit", "cut"},
+		{"edit", "copy"},
+		{"edit", "paste"},
+		{"select", "select first neighbors"},
+	};
+	
+	private static final String[][] edgeFilter = {
+		{"edit", "cut"},
+		{"edit", "copy"},
+	};
+	
+	
+	private static boolean filter(String[][] filter, Map<String,Object> properties) {
+		String preferredMenu = (String) properties.get("preferredMenu");
+		String title = (String) properties.get("title");
+		
+		if(preferredMenu == null || title == null) 
+			return false;
+		
+		for(String[] allowed : filter) {
+			String allowedMenu = allowed[0];
+			String allowedTitle = allowed[1];
+			
+			if(preferredMenu.toLowerCase().startsWith(allowedMenu) && title.toLowerCase().startsWith(allowedTitle)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	
+	
 	public PopupMenuCreator(DialogTaskManager taskManager) {
 		this.taskManager = taskManager;
-		
 		this.taskFactoryProvider = new TaskFactoryProvider();
 	}
 	
-	public JPopupMenu createEdgeMenu(View<CyEdge> edgeView, 
-			CyNetworkView networkView, 
-			VisualLexicon visualLexicon,
-			Map<EdgeViewTaskFactory, Map<String, Object>> taskFactories) {
+	public JPopupMenu createEdgeMenu(View<CyEdge> edgeView, CyNetworkView networkView, VisualLexicon visualLexicon, 
+			                         Map<EdgeViewTaskFactory, Map<String, Object>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
@@ -60,26 +97,19 @@ public class PopupMenuCreator {
 				EdgeViewTaskFactory edgeViewTaskFactory = entry.getKey();
 				Map<String, Object> properties = entry.getValue();
 				
-				Object context = null; // TunableContext
-				// MKTODO what?
-//				if (edgeViewTaskFactory instanceof TunableEdgeViewTaskFactory<?>) {
-//					context = ((TunableEdgeViewTaskFactory<?>) edgeViewTaskFactory).createTunableContext(
-//							edgeView, networkView);
-//				}
+				if(!filter(edgeFilter, properties)) continue;
 				
-//				edgeViewTaskFactory.setEdgeView(edgeView, networkView);
 				TaskFactory taskFactory = taskFactoryProvider.createFor(edgeViewTaskFactory, edgeView, networkView);
-				createMenuItem(edgeView, visualLexicon, popupMenu, taskFactory, context, tracker, properties);
+				createMenuItem(edgeView, visualLexicon, popupMenu, taskFactory, tracker, properties);
 			}
 		}
 		
 		return popupMenu;
 	}
 	
-	public JPopupMenu createNodeMenu(View<CyNode> nodeView, 
-			CyNetworkView networkView, 
-			VisualLexicon visualLexicon,
-			Map<NodeViewTaskFactory, Map<String, Object>> taskFactories) {
+	
+	public JPopupMenu createNodeMenu(View<CyNode> nodeView, CyNetworkView networkView, VisualLexicon visualLexicon,
+			                         Map<NodeViewTaskFactory, Map<String, Object>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
@@ -89,70 +119,46 @@ public class PopupMenuCreator {
 				NodeViewTaskFactory nodeViewTaskFactory = entry.getKey();
 				Map<String, Object> properties = entry.getValue();
 				
-				Object context = null;
-				// MKTODO what?
-//				if (nodeViewTaskFactory instanceof TunableNodeViewTaskFactory<?>) {
-//					context = ((TunableNodeViewTaskFactory<?>) nodeViewTaskFactory).createTunableContext(
-//							nodeView, networkView);
-//				}
+				if(!filter(nodeFilter, properties)) continue;
 				
 				TaskFactory taskFactory = taskFactoryProvider.createFor(nodeViewTaskFactory, nodeView, networkView);
-				createMenuItem(nodeView, visualLexicon, popupMenu, taskFactory, context, tracker, properties);
+				createMenuItem(nodeView, visualLexicon, popupMenu, taskFactory, tracker, properties);
 			}
 		}
 		
 		return popupMenu;
 	}
 	
+	
 	public JPopupMenu createNetworkMenu(CyNetworkView networkView, VisualLexicon visualLexicon,
-			Map<NetworkViewTaskFactory, Map<String, Object>> taskFactories) {
+			                            Map<NetworkViewTaskFactory, Map<String, Object>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
 		
 		if (taskFactories.size() >= 1) {
 			for (Entry<NetworkViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
-
 				NetworkViewTaskFactory networkViewTaskFactory = entry.getKey();
 				Map<String, Object> properties = entry.getValue();
+				
+				if(!filter(networkFilter, properties)) continue;
 				
 				Object preferredAction = properties.get("preferredAction");
 				
 				if (preferredAction != null && preferredAction.toString().equals(NETWORK_PREFFERED_ACTION)) {
 					
 					TaskFactory taskFactory = taskFactoryProvider.createFor(networkViewTaskFactory, networkView);
-					createMenuItem(null, visualLexicon, popupMenu, taskFactory, null, tracker, properties);
+					createMenuItem(null, visualLexicon, popupMenu, taskFactory, tracker, properties);
 				}
 			}
 		}
 		
 		return popupMenu;
 	}
-	
-	public JPopupMenu createNetworkLocationMenu(CyNetworkView networkView, VisualLexicon visualLexicon,
-			Map<NetworkViewLocationTaskFactory, Map<String, Object>> taskFactories) {
-		JPopupMenu popupMenu = new JPopupMenu();
-		JMenuTracker tracker = new JMenuTracker(popupMenu);
-		
-		for (Entry<NetworkViewLocationTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
 
-			NetworkViewLocationTaskFactory networkViewLocationTaskFactory = entry.getKey();
-			Map<String, Object> properties = entry.getValue();
-			
-			// TODO: Ding implementation for the NetworkViewLocation Task objects also takes 2D coordinates for 
-			// the source of the event. Determine if appropriate to support NetworkViewLocation Tasks.
-			
-			/*
-			TaskFactory taskFactory = taskFactoryProvider.createFor(networkViewLocationTaskFactory, networkView);
-				createMenuItem(null, visualLexicon, popupMenu, taskFactory, null, tracker, properties);
-			*/
-		}
-		
-		return popupMenu;
-	}
 	
 	private void createMenuItem(View<?> view, VisualLexicon visualLexicon, JPopupMenu popupMenu, TaskFactory taskFactory,
-	                            Object context, JMenuTracker tracker, Map<String, Object> properties) {
+	                            JMenuTracker tracker, Map<String, Object> properties) {
 		
 		String title = null;
 		if (properties.get("title") != null) {
@@ -168,24 +174,7 @@ public class PopupMenuCreator {
 		if (properties.get("preferredMenu") != null) {
 			preferredMenu = properties.get("preferredMenu").toString();
 		}
-		
-		// TODO: Ding implementation refers to a DynamicSubmenuListener related to the SubMenuTaskManager,
-		// check if this is necessary for this implementation
-		
-		// Below based on implementation from Ding
 
-		// check if the menus are created dynamically, and if so add the listener
-		
-		// MKTODO what the heck did I just comment out?
-//		Object preferredTaskManager = properties.get("preferredTaskManager");
-//		if (preferredTaskManager != null && preferredTaskManager.toString().equals("menu")) {
-//			if (title == null)
-//				title = "Dynamic";
-//			DynamicSubmenuListener submenu = submenuTaskManager.getConfiguration(taskFactory, context);
-//	        submenu.setMenuTitle(title);
-//			popupMenu.addPopupMenuListener(submenu);
-//			return;
-//		}
 
 		
 		Boolean useCheckBoxMenuItem = Boolean.parseBoolean(String.valueOf(properties.get("useCheckBoxMenuItem")));

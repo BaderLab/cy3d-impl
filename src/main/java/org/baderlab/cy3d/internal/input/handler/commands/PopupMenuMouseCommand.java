@@ -23,10 +23,6 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void clicked(int x, int y) {
-		// This is kind of a hack, but we have to convert BACK to window coordinates, this at least keeps a consistent interface.
-		Point p = new Point(x, y);
-		graphicsData.getPixelConverter().convertToWindowUnits(p);
-		
 		if (popupMenuCreator == null) {
 			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager());
 		}
@@ -36,7 +32,6 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
 		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
 		
-			
 		JPopupMenu popupMenu = null;
 		
 		if (node != null) {
@@ -58,6 +53,9 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 		}
 		
 		if (popupMenu != null) {
+			// This is kind of a hack, but we have to convert BACK to window coordinates, this at least keeps a consistent interface.
+			Point p = new Point(x, y);
+			graphicsData.getPixelConverter().convertToWindowUnits(p);
 			popupMenu.show(graphicsData.getContainer(), p.x, p.y);
 		}
 	}
