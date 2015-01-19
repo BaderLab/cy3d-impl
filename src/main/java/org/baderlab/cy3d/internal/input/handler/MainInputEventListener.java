@@ -164,7 +164,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	public void mouseClicked(MouseEvent e) {
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
 		pixelConverter.convertMouse(e, coords);
-		clickCommand.clicked(e.getX(), e.getY());
+		clickCommand.clicked(coords[0], coords[1]);
 		networkView.updateView();
 	}
 	
