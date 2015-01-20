@@ -12,7 +12,7 @@ import org.cytoscape.work.undo.UndoSupport;
 public class BoxLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 	public BoxLayoutAlgorithm(UndoSupport undo) {
-		super("box", "Box Layout", undo);
+		super("box", "3D Box Layout", undo);
 	}
 
 	@Override

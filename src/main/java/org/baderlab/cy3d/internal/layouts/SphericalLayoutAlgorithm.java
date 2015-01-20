@@ -12,7 +12,7 @@ import org.cytoscape.work.undo.UndoSupport;
 public class SphericalLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 	public SphericalLayoutAlgorithm(UndoSupport undo) {
-		super("spherical", "Spherical Layout", undo);
+		super("spherical", "3D Spherical Layout", undo);
 	}
 
 	@Override

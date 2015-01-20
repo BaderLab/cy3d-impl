@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal;
 
+import static org.cytoscape.work.ServiceProperties.*;
+
 import java.io.IOException;
 import java.util.Properties;
 
@@ -82,26 +84,25 @@ public class CyActivator extends AbstractCyActivator {
 		
 		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);
 		Properties sphericalLayoutAlgorithmProps = new Properties();
-		sphericalLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
-		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		sphericalLayoutAlgorithmProps.setProperty("title",sphericalLayoutAlgorithm.toString());
-		sphericalLayoutAlgorithmProps.setProperty("menuGravity","10.5");
+		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager", "menu");
+		sphericalLayoutAlgorithmProps.setProperty(TITLE, sphericalLayoutAlgorithm.toString());
+		sphericalLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.1");
+		sphericalLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
 		registerService(bc, sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
 		
 		GridLayoutAlgorithm gridLayoutAlgorithm = new GridLayoutAlgorithm(undoSupport);
 		Properties gridLayoutAlgorithmProps = new Properties();
-		gridLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
 		gridLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		gridLayoutAlgorithmProps.setProperty("title", gridLayoutAlgorithm.toString());
-		gridLayoutAlgorithmProps.setProperty("menuGravity","10.49");
+		gridLayoutAlgorithmProps.setProperty(TITLE, gridLayoutAlgorithm.toString());
+		gridLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.2");
 		registerService(bc, gridLayoutAlgorithm, CyLayoutAlgorithm.class, gridLayoutAlgorithmProps);
 		
 		BoxLayoutAlgorithm boxLayoutAlgorithm = new BoxLayoutAlgorithm(undoSupport);
 		Properties boxLayoutAlgorithmProps = new Properties();
-		boxLayoutAlgorithmProps.setProperty("preferredMenu","Layout.3D Layouts");
 		boxLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		boxLayoutAlgorithmProps.setProperty("title", boxLayoutAlgorithm.toString());
-		boxLayoutAlgorithmProps.setProperty("menuGravity","10.51");
+		boxLayoutAlgorithmProps.setProperty(TITLE, boxLayoutAlgorithm.toString());
+		boxLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.3");
+		boxLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_AFTER, "true");
 		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
 		
 		
