@@ -129,6 +129,8 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		// Request focus for the network view to be ready for keyboard input
 //		requestNetworkFocus();
+		
+		updateView();
 	}
 
 	@Override
