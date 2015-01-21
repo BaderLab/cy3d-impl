@@ -22,6 +22,7 @@ import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeMouseComman
 import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
+import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 
@@ -252,6 +253,14 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
+		switch(e.getKeyChar()) {
+			case 'R':
+			case 'r': 
+				graphicsData.getCamera().set(new SimpleCamera());
+				graphicsData.getNetworkView().fitContent();
+				networkView.updateView();
+				break;
+		}
 	}
 	
 }
