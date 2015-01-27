@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
@@ -49,15 +50,18 @@ public class ToolPanel {
 	private JToggleButton selectButton;
 	private JToggleButton cameraButton;
 	
-	private Set<MouseModeChangeListener> listeners = new LinkedHashSet<>();
+	private JToggleButton labelsButton;
+	
+	private Set<ToolPanelListener> listeners = new LinkedHashSet<>();
 	
 	
 	/**
 	 * The input event listeners should use this to register
 	 * for events that indicate changes to the toolbar mode.
 	 */
-	public interface MouseModeChangeListener {
+	public interface ToolPanelListener {
 		void mouseModeChanged(MouseMode mouseMode);
+		void showLabelsChanged(boolean showLabels);
 	}
 	
 	
@@ -67,18 +71,25 @@ public class ToolPanel {
 	}
 	
 	
-	public boolean addMouseModeChangeListener(MouseModeChangeListener listner) {
+	public boolean addToolbarListener(ToolPanelListener listner) {
 		return listeners.add(listner);
 	}
 	
-	public boolean removeMouseModeChangeListener(MouseModeChangeListener listener) {
+	public boolean removeToolbarListener(ToolPanelListener listener) {
 		return listeners.remove(listener);
 	}
 	
 	private void fireMouseModeChangeEvent() {
 		MouseMode mouseMode = getCurrentMouseMode();
-		for(MouseModeChangeListener listener : listeners) {
+		for(ToolPanelListener listener : listeners) {
 			listener.mouseModeChanged(mouseMode);
+		}
+	}
+	
+	private void fireLabelChangeEvent() {
+		boolean showLabels = labelsButton.isSelected();
+		for(ToolPanelListener listener : listeners) {
+			listener.showLabelsChanged(showLabels);
 		}
 	}
 	
@@ -102,6 +113,16 @@ public class ToolPanel {
 		cameraButton = createModeButton("Camera", MouseMode.CAMERA, cameraGroup);
 		cameraToolBar.add(selectButton);
 		cameraToolBar.add(cameraButton);
+		cameraToolBar.add(Box.createHorizontalStrut(4));
+		
+		labelsButton = createToolbarButton("Labels");
+		labelsButton.setSelected(true);
+		labelsButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				fireLabelChangeEvent();
+			}
+		});
+		cameraToolBar.add(labelsButton);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -123,16 +144,19 @@ public class ToolPanel {
 		glass.add(toolPanel, BorderLayout.NORTH);
 	}
 	
-	
-	private JToggleButton createModeButton(String text, final MouseMode mode, ButtonGroup group) {
+	private JToggleButton createToolbarButton(String text) {
 		JToggleButton button = new JToggleButton(text);
 		button.setMargin(new Insets(0, 0, 0, 0));
 		button.setPreferredSize(new Dimension(40, 20));
 		button.setFont(new Font("Arial", Font.PLAIN, 8));
 		button.setFocusable(false);
+		return button;
+	}
+	
+	private JToggleButton createModeButton(String text, final MouseMode mode, ButtonGroup group) {
+		JToggleButton button = createToolbarButton(text);
 		group.add(button);
 		button.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				defaultToolbarMode = mode;
 				fireMouseModeChangeEvent();

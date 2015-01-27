@@ -13,6 +13,7 @@ import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcesso
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
+import org.baderlab.cy3d.internal.input.handler.MouseMode;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.baderlab.cy3d.internal.lighting.Light;
 import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
@@ -31,10 +32,10 @@ import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
  * and mouse input, as well as selection and picking.
  * 
  */
-public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
+public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration implements ToolPanel.ToolPanelListener {
 	
 	private MainInputEventListener inputHandler;
-	
+	private RenderNodeLabelsProcedure renderNodeLabelsProcedure;
 	
 	public MainGraphicsConfiguration() {
 		add(new ResetSceneProcedure());
@@ -43,9 +44,13 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		add(new RenderNodesProcedure());
 		add(new RenderArcEdgesProcedure());
 		add(new RenderSelectionBoxProcedure());
-		
-		add(new RenderNodeLabelsProcedure());
 		add(new RenderLightsProcedure());
+		
+		// Make label rendering the last element in the list so that adding and removing it doesn't change the order
+		// of the other elements in the list. 
+		// (Note, if more complex enabling/disabling of render procedures is needed in the future then AbstractGraphicsConfiguration
+		// should be changed to have a more sophisticated ordering mechanism.)
+		add(renderNodeLabelsProcedure = new RenderNodeLabelsProcedure());
 	}
 	
 	@Override
@@ -104,7 +109,8 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		if(container instanceof JInternalFrame) {
 			JInternalFrame frame = (JInternalFrame) container;
 			ToolPanel toolPanel = new ToolPanel(frame);
-			toolPanel.addMouseModeChangeListener(inputHandler);
+			toolPanel.addToolbarListener(inputHandler);
+			toolPanel.addToolbarListener(this);
 		}
 	}
 	
@@ -112,5 +118,19 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	public void dispose(GraphicsData gd) {
 		inputHandler.dispose();
 	}
-
+	
+	@Override
+	public void showLabelsChanged(boolean showLabels) {
+		if(showLabels) {
+			add(renderNodeLabelsProcedure);
+		} else {
+			remove(renderNodeLabelsProcedure);
+		}
+		inputHandler.touch();
+	}
+	
+	@Override
+	public void mouseModeChanged(MouseMode mouseMode) {
+	}
+	
 }

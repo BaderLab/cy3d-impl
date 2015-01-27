@@ -19,8 +19,18 @@ public abstract class AbstractGraphicsConfiguration implements GraphicsConfigura
 	
 	
 	protected void add(ReadOnlyGraphicsProcedure procedure) {
-		renderProcedures.add(procedure);
+		if(!renderProcedures.contains(procedure))
+			renderProcedures.add(procedure);
 	}
+	
+	// MKTODO This is kind of a hack. Just having add() and remove() methods makes it hard
+	// to maintain an ordering to the render procedures. For now its ok, but if this method
+	// gets called more often it would be better to move to a sorted data structure with
+	// explicit prioritization for each procedure.
+	protected void remove(ReadOnlyGraphicsProcedure procedure) {
+		renderProcedures.remove(procedure);
+	}
+	
 	
 	@Override
 	public void initializeGraphicsProcedures(GraphicsData graphicsData) {

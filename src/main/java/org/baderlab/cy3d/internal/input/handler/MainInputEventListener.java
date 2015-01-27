@@ -45,7 +45,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * @author mkucera
  *
  */
-public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, ToolPanel.MouseModeChangeListener {
+public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, ToolPanel.ToolPanelListener {
 
 	private final GraphicsData graphicsData;
 	private final CyNetworkView networkView;
@@ -104,6 +104,13 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		}
 	}
 	
+	@Override
+	public void showLabelsChanged(boolean showLabels) {
+	}
+	
+	public void touch() {
+		networkView.updateView();
+	}
 	
 	// *** Mouse event handling ***
 	
