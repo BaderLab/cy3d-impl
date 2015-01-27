@@ -11,8 +11,10 @@ import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
+import org.baderlab.cy3d.internal.layouts.WrappedLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.NetworkViewRenderer;
+import org.cytoscape.command.CommandExecutorTaskFactory;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
@@ -20,11 +22,13 @@ import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
+import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.work.TunableSetter;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
@@ -41,6 +45,8 @@ public class CyActivator extends AbstractCyActivator {
 		CyServiceRegistrar cyServiceRegistrarRef = getService(bc, CyServiceRegistrar.class);
 		VisualMappingManager visualMappingManagerServiceRef = getService(bc, VisualMappingManager.class);
 		UndoSupport undoSupport = getService(bc, UndoSupport.class);
+		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(bc, CyLayoutAlgorithmManager.class);
+		TunableSetter tunableSetter = getService(bc, TunableSetter.class);
 		
 		// TaskManager object used to execute tasks
 		DialogTaskManager cyDialogTaskManager = getService(bc, DialogTaskManager.class);
@@ -86,25 +92,32 @@ public class CyActivator extends AbstractCyActivator {
 		Properties sphericalLayoutAlgorithmProps = new Properties();
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager", "menu");
 		sphericalLayoutAlgorithmProps.setProperty(TITLE, sphericalLayoutAlgorithm.toString());
-		sphericalLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.1");
-		sphericalLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
+		sphericalLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.2");
+		sphericalLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_BEFORE, "false");
 		registerService(bc, sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
 		
 		GridLayoutAlgorithm gridLayoutAlgorithm = new GridLayoutAlgorithm(undoSupport);
 		Properties gridLayoutAlgorithmProps = new Properties();
 		gridLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
 		gridLayoutAlgorithmProps.setProperty(TITLE, gridLayoutAlgorithm.toString());
-		gridLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.2");
+		gridLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.3");
 		registerService(bc, gridLayoutAlgorithm, CyLayoutAlgorithm.class, gridLayoutAlgorithmProps);
 		
 		BoxLayoutAlgorithm boxLayoutAlgorithm = new BoxLayoutAlgorithm(undoSupport);
 		Properties boxLayoutAlgorithmProps = new Properties();
 		boxLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
 		boxLayoutAlgorithmProps.setProperty(TITLE, boxLayoutAlgorithm.toString());
-		boxLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.3");
+		boxLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.4");
 		boxLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_AFTER, "true");
 		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
 		
+		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
+		WrappedLayoutAlgorithm fr3DAlgorithm = new WrappedLayoutAlgorithm(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
+		Properties fr3DProps = new Properties();
+		fr3DProps.setProperty("preferredTaskManager","menu");
+		fr3DProps.setProperty(MENU_GRAVITY, "30.1");
+		fr3DProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
+		registerService(bc, fr3DAlgorithm, CyLayoutAlgorithm.class, fr3DProps);
 		
 		try {
 			JoglInitializer.unpackNativeLibrariesForJOGL(bc);
