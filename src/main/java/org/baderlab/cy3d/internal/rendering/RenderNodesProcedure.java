@@ -59,22 +59,36 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		float distanceScale = graphicsData.getDistanceScale();
+		float nodeSizeScale = 60;
 
 		// networkView.updateView();
 		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+			if(nodeView == null) {
+				// MKTODO why does this happen?
+				System.err.println("nodeView is null: networkView.getNodeViews() returns: " + networkView.getNodeViews());
+				continue;
+			}
+			
 			float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
 
-//			Double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
-//			Double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
-//			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
+			Double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
+			Double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
+			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
+			//System.out.printf("(%f,%f,%f)\n", width, height, depth);
 			
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) 
+					&& 
+					graphicsData
+					.getViewingVolume()
+					.inside(new Vector3(x, y, z), 1)) {
 				
 				long suid = nodeView.getModel().getSUID();
+				
+				// glLoadName() and glPushName() only support int, so we need to break the long SUID into two parts
 				int upper = SUIDToolkit.upperInt(suid);
 				int lower = SUIDToolkit.lowerInt(suid);
 				
@@ -88,11 +102,13 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 				
 				gl.glScalef(NODE_SIZE_RADIUS, NODE_SIZE_RADIUS, NODE_SIZE_RADIUS);
 				
-//				if (width != null && height != null && depth != null) {
-//					gl.glScalef(width.floatValue() / distanceScale, 
-//							height.floatValue() / distanceScale, 
-//							depth.floatValue() / distanceScale);
-//				}
+				
+				
+				if (width != null && height != null && depth != null) {
+					gl.glScalef(width.floatValue() / nodeSizeScale, 
+							height.floatValue() / nodeSizeScale, 
+							depth.floatValue() / nodeSizeScale);
+				}
 				
 				ShapeType shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
 				
