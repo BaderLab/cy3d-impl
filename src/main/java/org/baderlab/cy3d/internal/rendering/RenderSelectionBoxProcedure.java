@@ -3,11 +3,11 @@ package org.baderlab.cy3d.internal.rendering;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 	

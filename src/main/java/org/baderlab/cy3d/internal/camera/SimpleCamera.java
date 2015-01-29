@@ -1,4 +1,4 @@
-package org.baderlab.cy3d.internal.tools;
+package org.baderlab.cy3d.internal.camera;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
@@ -8,7 +8,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
  * 
  * @author paperwing (Yue Dong)
  */
-public class SimpleCamera {
+public class SimpleCamera extends CameraPositionHolder {
 	
 	// A brief note about the camera:
 	// -----------------------------
@@ -44,28 +44,28 @@ public class SimpleCamera {
 	public static final double MAX_DISTANCE = 40;
 	
 	/** The direction vector for this camera object */
-	private Vector3 direction;
+//	private Vector3 direction;
 	
 	/** The up vector for this camera */
-	private Vector3 up;
+//	private Vector3 up;
 	
 	/** The left vector for this camera */
-	private Vector3 left;
+//	private Vector3 left;
 	
 	/** The position vector for this camera */
-	private Vector3 position;
+//	private Vector3 position;
 	
 	/** The target position vector, which represents a point such that the
 	 * camera points exactly through it
 	 */
-	private Vector3 target;
+//	private Vector3 target;
 	
 	// /** The minimum distance */
 	// private double minDistance = 2;
 	// private double maxDistance = 40;
 	
 	/** The current distance between the camera and its target point */
-	private double distance;
+//	private double distance;
 	
 	/** The speed at which the camera is able to move or translate */
 	private double moveSpeed;
@@ -103,7 +103,7 @@ public class SimpleCamera {
 	 * @param target The position vector of the target point
 	 * @param up The up vector of the camera
 	 */
-	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up) {
+	private SimpleCamera(Vector3 position, Vector3 target, Vector3 up) {
 		// TODO: provide constants for default values
 		
 		this(position, target, up, DEFAULT_MOVE_SPEED, DEFAULT_TURN_SPEED, 
@@ -122,20 +122,13 @@ public class SimpleCamera {
 	 * @param rollSpeed The camera's fixed-position roll speed, related to the rolling methods
 	 * @param zoomSpeed The camera's fixed-direction zoom speed, related to the zoom methods
 	 */
-	public SimpleCamera(Vector3 position, Vector3 target, Vector3 up,
+	private SimpleCamera(Vector3 position, Vector3 target, Vector3 up,
 			double moveSpeed, double turnSpeed, double orbitSpeed,
 			double rollSpeed, double zoomSpeed) {
 		this.position = new Vector3(position);
 		this.target = new Vector3(target);
 		this.up = new Vector3(up);
 		this.up.normalizeLocal();
-		
-		direction = target.subtract(position);
-		direction.normalizeLocal();
-		left = up.cross(direction);
-		left.normalizeLocal();
-		
-		distance = position.distance(target);
 		
 		this.moveSpeed = moveSpeed;
 		this.turnSpeed = turnSpeed;
@@ -144,15 +137,15 @@ public class SimpleCamera {
 		this.zoomSpeed = zoomSpeed;
 	}
 
-	public void set(SimpleCamera other) {
-		
-		this.direction.set(other.direction);
-		this.up.set(other.up);
-		this.left.set(other.left);
-		this.position.set(other.position);
-		this.target.set(other.target);
-		this.distance = other.distance;
-		
+	@Override
+	public void set(CameraPosition other) {
+		super.set(other);
+		if(other instanceof SimpleCamera) {
+			setSpeed((SimpleCamera)other);
+		} 
+	}
+	
+	private void setSpeed(SimpleCamera other) {
 		this.moveSpeed = other.moveSpeed;
 		this.turnSpeed = other.turnSpeed;
 		this.orbitSpeed = other.orbitSpeed;
@@ -177,86 +170,38 @@ public class SimpleCamera {
 		this.zoomSpeed = zoomSpeed;
 	}
 	
-	/** Return the camera's position vector
-	 * 
-	 * @return The camera's position vector
-	 */
-	public Vector3 getPosition() {
-		return position;
-	}
 	
-	/** Return the camera's target-point position vector
-	 * 
-	 * @return The target point's position vector
-	 */
-	public Vector3 getTarget() {
-		return target;
-	}
-	
-	/** Return the camera's up vector, as a unit vector
-	 * 
-	 * @return The camera's up vector, as a unit vector
-	 */
-	public Vector3 getUp() {
-		return up;
-	}
-	
-	/** Return the camera's left vector, as a unit vector
-	 * 
-	 * @return The camera's left vector, as a unit vector
-	 */
-	public Vector3 getLeft() {
-		return left;
-	}
-	
-	/** Return the camera's direction vector, as a unit vector
-	 * 
-	 * @return The camera's direction vector, as a unit vector
-	 */
-	public Vector3 getDirection() {
-		return direction;
-	}
-	
-	/** Return the distance between the target point and the camera's
-	 * position vector
-	 * 
-	 * @return The distance between the target point and the camera's
-	 * position vector
-	 */
-	public double getDistance() {
-		return distance;
-	}
 	
 	/** Translate the camera leftwards by its movement speed and direction vectors
 	 */
 	public void moveLeft() {
-		move(left, moveSpeed);
+		move(getLeft(), moveSpeed);
 	}
 	
 	public void moveLeft(double multiplier) {
-		move(left, multiplier * moveSpeed);
+		move(getLeft(), multiplier * moveSpeed);
 	}
 	
 	/** Translate the camera rightwards by its movement speed and direction vectors
 	 */
 	public void moveRight() {
-		move(left, -moveSpeed);
+		move(getLeft(), -moveSpeed);
 	}
 	
 	public void moveRight(double multiplier) {
-		move(left, multiplier * -moveSpeed);
+		move(getLeft(), multiplier * -moveSpeed);
 	}
 	
 	/** Translate the camera forwards by its movement speed
 	 */
 	public void moveForward() {
-		move(direction, moveSpeed);
+		move(getDirection(), moveSpeed);
 	}
 	
 	/** Translate the camera backwards by its movement speed
 	 */
 	public void moveBackward() {
-		move(direction, -moveSpeed);
+		move(getDirection(), -moveSpeed);
 	}
 	
 	/** Translate the camera upwards by its movement speed
@@ -286,7 +231,7 @@ public class SimpleCamera {
 	 * multiplier results in moving backwards.
 	 */
 	public void moveForwardQuickly(double multiplier) {
-		move(direction, zoomSpeed * multiplier);
+		move(getDirection(), zoomSpeed * multiplier);
 	}
 	
 	/** Translates the camera to a given position. The target position vector is
@@ -295,6 +240,9 @@ public class SimpleCamera {
 	 * @param position The position vector representing the new position
 	 */
 	public void moveTo(Vector3 position) {
+		Vector3 direction = getDirection();
+		double distance = getDistance();
+		
 		this.position.set(position);
 		
 		// Recalculate the target position
@@ -312,6 +260,9 @@ public class SimpleCamera {
 	 * @param z The new position's z-coordinate
 	 */
 	public void moveTo(double x, double y, double z) {
+		Vector3 direction = getDirection();
+		double distance = getDistance();
+		
 		this.position.set(x, y, z);
 		
 		Vector3 newTarget = direction.multiply(distance);
@@ -516,19 +467,22 @@ public class SimpleCamera {
 	
 	/** Move the camera by a given amount, towards a given direction
 	 * 
-	 * @param direction A unit vector representing the direction to
+	 * @param directionToMove A unit vector representing the direction to
 	 * move towards
 	 * @param multiplier The multiplier times the direction vector's
 	 * magnitude results in the distance travelled (which is equal
 	 * to the multiplier if the given direct vector has magnitude
 	 * 1)
 	 */
-	private void move(Vector3 direction, double multiplier) {
-		Vector3 offset = new Vector3(direction.multiply(multiplier));
+	private void move(Vector3 directionToMove, double multiplier) {
+		double distance = getDistance();
+		Vector3 direction = getDirection();
+		
+		Vector3 offset = new Vector3(directionToMove.multiply(multiplier));
 		
 		target.addLocal(offset);
 		
-		Vector3 newPosition = this.direction.multiply(-distance);
+		Vector3 newPosition = direction.multiply(-distance);
 		newPosition.addLocal(target);
 		
 		position.set(newPosition);
@@ -540,6 +494,8 @@ public class SimpleCamera {
 	 */
 	private void turnHorizontal(double angle) {
 		Vector3 worldUp = new Vector3(0, 1, 0);
+		Vector3 direction = getDirection();
+		double distance = getDistance();
 		
 		direction = direction.rotate(worldUp, angle);
 		direction.normalizeLocal();
@@ -550,9 +506,6 @@ public class SimpleCamera {
 		Vector3 newTarget = direction.multiply(distance);
 		newTarget.addLocal(position);
 		target.set(newTarget);
-		
-		left.set(up.cross(direction));
-		left.normalizeLocal();
 	}
 	
 	/** Turn the camera vertically by a certain angle, negative for upwards
@@ -560,6 +513,10 @@ public class SimpleCamera {
 	 * @param angle The angle to turn, negative for upwards
 	 */
 	private void turnVertical(double angle) {
+		Vector3 direction = getDirection();
+		double distance = getDistance();
+		Vector3 left = getLeft();
+		
 		direction = direction.rotate(left, angle);
 		direction.normalizeLocal();
 		
@@ -576,6 +533,9 @@ public class SimpleCamera {
 	 * @param angle The angle to orbit, positive for rightwards
 	 */
 	private void orbitHorizontal(double angle) {
+		Vector3 direction = getDirection();
+		double distance = getDistance();
+		
 		Vector3 newPosition = direction.multiply(-distance);
 		newPosition = newPosition.rotate(up, angle);
 		newPosition.addLocal(target);
@@ -584,9 +544,6 @@ public class SimpleCamera {
 		
 		direction.set(target.subtract(position));
 		direction.normalizeLocal();
-		
-		left = left.projectNormal(direction);
-		left.normalizeLocal();
 	}
 	
 	/** Orbit the camera around the target point vertically, positive angle for upwards
@@ -594,6 +551,10 @@ public class SimpleCamera {
 	 * @param angle The angle to orbit, positive for upwards
 	 */
 	private void orbitVertical(double angle) {
+		Vector3 direction = getDirection();
+		double distance = getDistance();
+		Vector3 left = getLeft();
+		
 		Vector3 newPosition = direction.multiply(-distance);
 		newPosition = newPosition.rotate(left, angle);
 		newPosition.addLocal(target);
@@ -612,11 +573,9 @@ public class SimpleCamera {
 	 * @param angle The angle to roll, positive for clockwise
 	 */
 	private void roll(double angle) {
+		Vector3 direction = getDirection();
 		up = up.rotate(direction, angle);
 		up.normalizeLocal();
-		
-		left = up.cross(direction);
-		left.normalizeLocal();
 	}
 	
 	// TODO: This method does not snap distance values to certain nearest values
@@ -625,6 +584,7 @@ public class SimpleCamera {
 	 * @param amount The distance to shift by
 	 */
 	private void zoom(double amount) {
+		double distance = getDistance();
 		distance -= amount;
 		if (distance > MAX_DISTANCE) {
 			distance = MAX_DISTANCE;
@@ -632,17 +592,14 @@ public class SimpleCamera {
 			distance = MIN_DISTANCE;
 		}
 		
-		Vector3 newPosition = direction.multiply(-distance);
+		Vector3 newPosition = getDirection().multiply(-distance);
 		newPosition.addLocal(target);
 		position.set(newPosition);
 	}
 	
 	public void setDistance(double distance) {
-		this.distance = distance;
-		
-		Vector3 newTarget = direction.multiply(distance);
+		Vector3 newTarget = getDirection().multiply(distance);
 		newTarget.addLocal(position);
-		
 		target.set(newTarget);
 	}
 }

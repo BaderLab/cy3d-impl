@@ -3,6 +3,7 @@ package org.baderlab.cy3d.internal.tools;
 import java.util.Collection;
 import java.util.Set;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;

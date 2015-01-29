@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.input.handler.commands;
 import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 
-public class CameraStrafeMouseCommand extends MouseCommandAdapter {
+public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 
 	private final SimpleCamera camera;
 	
@@ -11,7 +11,7 @@ public class CameraStrafeMouseCommand extends MouseCommandAdapter {
 	private int prevY;
 	
 	
-	public CameraStrafeMouseCommand(SimpleCamera camera) {
+	public CameraOrbitMouseCommand(SimpleCamera camera) {
 		this.camera = camera;
 	}
 	
@@ -27,11 +27,10 @@ public class CameraStrafeMouseCommand extends MouseCommandAdapter {
 		int dx = x - prevX;
 		int dy = y - prevY;
 		
-		camera.moveRight(-dx);
-		camera.moveDown(-dy);
+		camera.orbitLeft(dx);
+		camera.orbitUp(dy);
 		
 		prevX = x;
 		prevY = y;
 	}
-
 }

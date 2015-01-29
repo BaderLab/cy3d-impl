@@ -14,15 +14,15 @@ import java.awt.event.MouseWheelListener;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
-import org.baderlab.cy3d.internal.input.handler.commands.CameraPanMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 
@@ -94,7 +94,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	public void mouseModeChanged(MouseMode mouseMode) { 
 		switch(mouseMode) {
 			case CAMERA: 
-				primaryMouseCommand   = new CameraPanMouseCommand(graphicsData.getCamera()); 
+				primaryMouseCommand   = new CameraOrbitMouseCommand(graphicsData.getCamera()); 
 				secondaryMouseCommand = new CameraStrafeMouseCommand(graphicsData.getCamera()); 
 				break;
 			case SELECT: 

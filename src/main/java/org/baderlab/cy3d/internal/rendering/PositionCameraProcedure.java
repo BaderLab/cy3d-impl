@@ -3,9 +3,9 @@ package org.baderlab.cy3d.internal.rendering;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class PositionCameraProcedure implements ReadOnlyGraphicsProcedure {
 

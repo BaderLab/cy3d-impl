@@ -5,11 +5,12 @@ import java.util.Map;
 
 import javax.media.opengl.GLAnimatorControl;
 
+import org.baderlab.cy3d.internal.camera.CameraPosition;
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.view.model.CyNetworkView;
 
 /**
@@ -35,7 +36,7 @@ public class ViewingCoordinator {
 	public static final double BOUNDS_CHANGE_THRESHOLD = 5e-16;
 	public static final double CAMERA_CHANGE_THRESHOLD = 5e-25;
 	
-	private SimpleCamera mainCameraCopy;
+	private CameraPosition mainCameraCopy;
 	private Quadrilateral birdsEyeBoundsCopy;
 	
 	private double verticalFov;
@@ -108,7 +109,7 @@ public class ViewingCoordinator {
 		return coordinator;
 	}
 	
-	public boolean checkCameraChanged(SimpleCamera mainCamera) {
+	public boolean checkCameraChanged(CameraPosition mainCamera) {
 		double threshold = CAMERA_CHANGE_THRESHOLD;
 		
 		// Positional movement
@@ -155,10 +156,6 @@ public class ViewingCoordinator {
 		} else {
 			return GeometryToolkit.generateCameraPosition(birdsEyeBoundsCopy, cameraDirection, NEAR_BOUNDS_DISTANCE);
 		}
-	}
-	
-	public Vector3 getUpdatedMainCameraPosition() {
-		return mainCameraCopy.getPosition().copy();
 	}
 	
 	// Claim by a main window rendering object
@@ -276,11 +273,11 @@ public class ViewingCoordinator {
 		this.birdsEyeBoundsCopy.set(birdsEyeBounds);
 	}
 
-	public SimpleCamera getMainCameraCopy() {
+	public CameraPosition getMainCameraCopy() {
 		return mainCameraCopy;
 	}	
 	
-	public void setMainCameraCopy(SimpleCamera camera) {
+	public void setMainCameraCopy(CameraPosition camera) {
 		mainCameraCopy.set(camera);
 	}
 

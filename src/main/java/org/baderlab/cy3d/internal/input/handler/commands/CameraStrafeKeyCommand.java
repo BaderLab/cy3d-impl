@@ -1,7 +1,7 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.input.handler.KeyCommand;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class CameraStrafeKeyCommand implements KeyCommand {
 

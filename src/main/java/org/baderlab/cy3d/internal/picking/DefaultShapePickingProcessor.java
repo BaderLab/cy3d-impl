@@ -8,13 +8,13 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.PickingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 

@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.baderlab.cy3d.internal.Cy3DNetworkViewRenderer;
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
