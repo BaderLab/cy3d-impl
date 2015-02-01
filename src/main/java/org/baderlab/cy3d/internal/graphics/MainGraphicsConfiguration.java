@@ -1,21 +1,17 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import java.nio.FloatBuffer;
+import java.util.Collection;
 
-import javax.media.opengl.GL2;
-import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
-import org.baderlab.cy3d.internal.coordinator.MainCoordinatorProcessor;
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.data.LightingData;
+import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
+import org.baderlab.cy3d.internal.eventbus.ShowLabelsEvent;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
-import org.baderlab.cy3d.internal.input.handler.MouseMode;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
-import org.baderlab.cy3d.internal.lighting.Light;
 import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
@@ -25,6 +21,11 @@ import org.baderlab.cy3d.internal.rendering.RenderNodeLabelsProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
+import org.baderlab.cy3d.internal.tools.NetworkToolkit;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.View;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * An implementation for the {@link GraphicsConfiguration} interface to be used
@@ -32,12 +33,20 @@ import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
  * and mouse input, as well as selection and picking.
  * 
  */
-public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration implements ToolPanel.ToolPanelListener {
+public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
+	
+	private final RenderNodeLabelsProcedure renderNodeLabelsProcedure;
+	private final ShapePickingProcessor shapePickingProcessor;
+	private final CytoscapeDataProcessor dataProcessor;
 	
 	private MainInputEventListener inputHandler;
-	private RenderNodeLabelsProcedure renderNodeLabelsProcedure;
+	private ToolPanel toolPanel;
+			
 	
 	public MainGraphicsConfiguration() {
+		dataProcessor = new MainCytoscapeDataProcessor();
+		shapePickingProcessor = new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderArcEdgesProcedure());
+		
 		add(new ResetSceneProcedure());
 		add(new PositionCameraProcedure());
 		
@@ -53,75 +62,38 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration imp
 		add(renderNodeLabelsProcedure = new RenderNodeLabelsProcedure());
 	}
 	
+	
 	@Override
-	public void setupLighting(GraphicsData graphicsData) {
-		GL2 gl = graphicsData.getGlContext();
-		LightingData lightingData = graphicsData.getLightingData();
+	public void initializeFrame(JInternalFrame frame) {
+		toolPanel = new ToolPanel(frame);
+	}
 	
-		Light light0 = lightingData.getLight(0);
-		light0.setAmbient(0.4f, 0.4f, 0.4f, 1.0f);
-		light0.setDiffuse(0.57f, 0.57f, 0.57f, 1.0f);
-		light0.setSpecular(0.79f, 0.79f, 0.79f, 1.0f);
-		light0.setPosition(-4.0f, 4.0f, 6.0f, 1.0f);
-		light0.setTurnedOn(true);
-		
-		for (int i = 0; i < LightingData.NUM_LIGHTS; i++) {
-			Light light = lightingData.getLight(i);
-		
-			if (light.isTurnedOn()) {
-				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, FloatBuffer.wrap(light.getAmbient()));
-				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, FloatBuffer.wrap(light.getDiffuse()));
-				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, FloatBuffer.wrap(light.getSpecular()));
-				gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, FloatBuffer.wrap(light.getPosition()));
 	
-				gl.glEnable(GL2.GL_LIGHT0 + i);
-			}
-		}
+	@Override
+	public void initialize(GraphicsData graphicsData) {
+		super.initialize(graphicsData);
+		shapePickingProcessor.initialize(graphicsData);
+		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData);
+		toolPanel.setEventBus(graphicsData.getEventBus());
+		graphicsData.getEventBus().register(this);
+	}
+	
+	
+	@Override
+	public void update() {
+		shapePickingProcessor.processPicking(graphicsData);
+		dataProcessor.processCytoscapeData(graphicsData);
 	}
 
-	@Override
-	public ShapePickingProcessor getShapePickingProcessor() {
-		return new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderArcEdgesProcedure());
-	}
-
-	@Override
-	public CoordinatorProcessor getCoordinatorProcessor() {
-		return new MainCoordinatorProcessor();
-	}
-
-	@Override
-	public CytoscapeDataProcessor getCytoscapeDataProcessor() {
-		return new MainCytoscapeDataProcessor();
-	}
 	
 	@Override
-	public String toString() {
-		return "MainGraphicsHandler";
-	}
-	
-	@Override
-	public void trackInput(JComponent component, GraphicsData graphicsData) {
-		inputHandler = MainInputEventListener.attach(component, graphicsData);
-	}
-	
-	@Override
-	public void setUpContainer(JComponent container) {
-		if(container instanceof JInternalFrame) {
-			JInternalFrame frame = (JInternalFrame) container;
-			ToolPanel toolPanel = new ToolPanel(frame);
-			toolPanel.addToolbarListener(inputHandler);
-			toolPanel.addToolbarListener(this);
-		}
-	}
-	
-	@Override
-	public void dispose(GraphicsData gd) {
+	public void dispose() {
 		inputHandler.dispose();
 	}
 	
-	@Override
-	public void showLabelsChanged(boolean showLabels) {
-		if(showLabels) {
+	@Subscribe
+	public void handleShowLabelsChangedEvent(ShowLabelsEvent showLabelsEvent) {
+		if(showLabelsEvent.showLabels()) {
 			add(renderNodeLabelsProcedure);
 		} else {
 			remove(renderNodeLabelsProcedure);
@@ -129,8 +101,17 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration imp
 		inputHandler.touch();
 	}
 	
-	@Override
-	public void mouseModeChanged(MouseMode mouseMode) {
+	@Subscribe
+	public void handleFitInViewEvent(FitInViewEvent e) {
+		SimpleCamera camera = graphicsData.getCamera();
+		Collection<View<CyNode>> selectedNodeViews = e.getSelectedNodeViews();
+		NetworkToolkit.fitInView(camera, selectedNodeViews, 180.0, 2.3, 1.8);
 	}
 	
+
+	@Override
+	public String toString() {
+		return "MainGraphicsConfiguration";
+	}
+
 }

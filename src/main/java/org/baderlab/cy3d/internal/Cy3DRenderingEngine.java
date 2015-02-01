@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
@@ -34,16 +35,23 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	private final Cy3DNetworkView networkView;
 	private final VisualLexicon visualLexicon;
-	private final GraphicsConfiguration configuration;
 	
-	private RenderEventListener renderEventListener;
 	private GLJPanel panel;
 	
 	
-	public Cy3DRenderingEngine(Cy3DNetworkView viewModel, VisualLexicon visualLexicon, GraphicsConfiguration configuration) {
+	public Cy3DRenderingEngine(
+			JComponent component,
+			Cy3DNetworkView viewModel, 
+			VisualLexicon visualLexicon, 
+			EventBusProvider eventBusProvider, 
+			GraphicsConfiguration configuration,
+			TaskFactoryListener taskFactoryListener, 
+			DialogTaskManager taskManager) {
+		
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
-		this.configuration = configuration;
+		
+		setUpCanvas(component, configuration, eventBusProvider, taskFactoryListener, taskManager);
 	}
 	
 	
@@ -53,7 +61,9 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	 * @param container A container in the GUI window used to contain
 	 * the rendered results
 	 */
-	public void setUpCanvas(JComponent container) {
+	private void setUpCanvas(JComponent container, GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
+			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+		
 		GLProfile profile = GLProfile.getDefault(); // Use the system's default version of OpenGL
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		capabilities.setHardwareAccelerated(true);
@@ -63,10 +73,8 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		panel.setIgnoreRepaint(true); // TODO: check if negative effects produced by this
 		//panel.setDoubleBuffered(true);
 		
-		renderEventListener = new RenderEventListener(networkView, visualLexicon, configuration);
-		renderEventListener.trackInput(panel);
-		
-		configuration.setUpContainer(container);
+		RenderEventListener renderEventListener = new RenderEventListener(networkView, visualLexicon, eventBusProvider, 
+				                                                          configuration, taskFactoryListener, taskManager, panel);
 
 		panel.addGLEventListener(renderEventListener);
 		
@@ -77,18 +85,13 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 			Container pane = frame.getContentPane();
 			pane.setLayout(new BorderLayout());
 			pane.add(panel, BorderLayout.CENTER);
+			renderEventListener.initializeFrame(frame);
 		} 
 		else {
 			container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
 		}
 	}
-	
-	
-	public void setUpTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
-		renderEventListener.setupTaskFactories(taskFactoryListener, taskManager);
-	}
-	
 	
 	
 	@Override

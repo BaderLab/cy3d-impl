@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.baderlab.cy3d.internal.Cy3DNetworkViewRenderer;
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
-import org.baderlab.cy3d.internal.tools.NetworkToolkit;
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
+import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
@@ -25,21 +25,23 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 
+import com.google.common.eventbus.EventBus;
+
 public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
 
-	private Long suid;
+	private final Long suid;
+	private final CyNetwork network;
 	
-	private CyNetwork network;
-	
-	private VisualLexicon visualLexicon;
-	private DefaultValueVault defaultValues;
-	private VisualMappingManager visualMappingManager;
+	private final VisualLexicon visualLexicon;
+	private final DefaultValueVault defaultValues;
+	private final VisualMappingManager visualMappingManager;
+	private final EventBus eventBus;
 	
 	/**
 	 * The camera associated with the main network viewing window used to
 	 * perform operations such as fitting all nodes onto the screen
 	 */
-	private SimpleCamera networkCamera = null;
+//	private SimpleCamera networkCamera = null;
 	
 	private List<Component> canvases = new ArrayList<>(2);
 	
@@ -49,8 +51,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	
 	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
 	private boolean networkCentered;
+
 	
-	public Cy3DNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager) {
+	
+	public Cy3DNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
 		suid = SUIDFactory.getNextSUID();
 		
 		this.network = network;
@@ -76,6 +80,8 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		}
 		
 		networkCentered = false;
+		
+		this.eventBus = eventBusProvider.getEventBus(this);
 	}
 	
 	@Override
@@ -148,9 +154,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			return;
 		}
 		
-		if (networkCamera != null) {
-			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
-		}
+		// MKTODO 
+//		if (networkCamera != null) {
+//			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
+//		}
 		
 		// Request focus for the network view to be ready for keyboard input
 //		requestNetworkFocus();
@@ -328,10 +335,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	}
 
 
-	public void setNetworkCamera(SimpleCamera networkCamera) {
-		this.networkCamera = networkCamera;
-	}
-
 	public void addContainer(Component container) {
 		canvases.add(container);
 	}
@@ -340,10 +343,8 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 * Attempts to adjust the view to show all nodes by using the network camera.
 	 */
 	private void fitNodesInView() {
-		if (networkCamera != null) {
-			NetworkToolkit.fitInView(networkCamera, nodeViews.values(), 180.0, 1.9, 2.0);
-			networkCentered = true;
-		}
+		eventBus.post(new FitInViewEvent(nodeViews.values()));
+		networkCentered = true;
 	}
 	
 //	/**

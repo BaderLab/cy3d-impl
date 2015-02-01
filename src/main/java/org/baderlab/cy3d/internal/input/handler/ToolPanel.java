@@ -14,8 +14,6 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -30,8 +28,12 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
+import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
+import org.baderlab.cy3d.internal.eventbus.ShowLabelsEvent;
 import org.baderlab.cy3d.internal.icons.IconManager;
 import org.baderlab.cy3d.internal.icons.IconManagerImpl;
+
+import com.google.common.eventbus.EventBus;
 
 /**
  * Toolbar panel that overlays the renderer window.
@@ -49,50 +51,18 @@ public class ToolPanel {
 	
 	private JToggleButton selectButton;
 	private JToggleButton cameraButton;
-	
 	private JToggleButton labelsButton;
 	
-	private Set<ToolPanelListener> listeners = new LinkedHashSet<>();
-	
-	
-	/**
-	 * The input event listeners should use this to register
-	 * for events that indicate changes to the toolbar mode.
-	 */
-	public interface ToolPanelListener {
-		void mouseModeChanged(MouseMode mouseMode);
-		void showLabelsChanged(boolean showLabels);
-	}
-	
+	private EventBus eventBus = null;
 	
 	public ToolPanel(JInternalFrame frame) {
 		setUpGlassPane(frame);
 		setUpKeyboardInput(frame);
 	}
 	
-	
-	public boolean addToolbarListener(ToolPanelListener listner) {
-		return listeners.add(listner);
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
-	
-	public boolean removeToolbarListener(ToolPanelListener listener) {
-		return listeners.remove(listener);
-	}
-	
-	private void fireMouseModeChangeEvent() {
-		MouseMode mouseMode = getCurrentMouseMode();
-		for(ToolPanelListener listener : listeners) {
-			listener.mouseModeChanged(mouseMode);
-		}
-	}
-	
-	private void fireLabelChangeEvent() {
-		boolean showLabels = labelsButton.isSelected();
-		for(ToolPanelListener listener : listeners) {
-			listener.showLabelsChanged(showLabels);
-		}
-	}
-	
 	
 	private void setUpGlassPane(JInternalFrame frame) {
 		JPanel glass = (JPanel) frame.getGlassPane();
@@ -119,7 +89,9 @@ public class ToolPanel {
 		labelsButton.setSelected(true);
 		labelsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fireLabelChangeEvent();
+				if(eventBus != null) {
+					eventBus.post(new ShowLabelsEvent(labelsButton.isSelected()));
+				}
 			}
 		});
 		cameraToolBar.add(labelsButton);
@@ -159,7 +131,9 @@ public class ToolPanel {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				defaultToolbarMode = mode;
-				fireMouseModeChangeEvent();
+				if(eventBus != null) {
+					eventBus.post(new MouseModeChangeEvent(getCurrentMouseMode()));
+				}
 			}
 		});
 		
@@ -247,36 +221,39 @@ public class ToolPanel {
 		inputMap.put(KeyStroke.getKeyStroke("alt released SHIFT"), UNFORCE_SELECT);
 		
 		frame.getActionMap().put(FORCE_CAMERA, new AbstractAction() {
-			@Override public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				forceCamera = true;
-				showCurrentMode();
-				fireMouseModeChangeEvent();
+				fireForce();
 			}
 		});
 		
 		frame.getActionMap().put(UNFORCE_CAMERA, new AbstractAction() {
-			@Override public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				forceCamera = false;
-				showCurrentMode();
-				fireMouseModeChangeEvent();
+				fireForce();
 			}
 		});
 		
 		frame.getActionMap().put(FORCE_SELECT, new AbstractAction() {
-			@Override public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				forceSelect = true;
-				showCurrentMode();
-				fireMouseModeChangeEvent();
+				fireForce();
 			}
 		});
 		
 		frame.getActionMap().put(UNFORCE_SELECT, new AbstractAction() {
-			@Override public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				forceSelect = false;
-				showCurrentMode();
-				fireMouseModeChangeEvent();
+				fireForce();
 			}
 		});
+	}
+	
+	private void fireForce() {
+		showCurrentMode();
+		if(eventBus != null) {
+			eventBus.post(new MouseModeChangeEvent(getCurrentMouseMode()));
+		}
 	}
 	
 	

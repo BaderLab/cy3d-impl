@@ -1,9 +1,10 @@
 package org.baderlab.cy3d.internal.coordinator;
 
+import org.baderlab.cy3d.internal.camera.CameraPosition;
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.CoordinatorData;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 
@@ -84,7 +85,7 @@ public class BirdsEyeCoordinatorProcessor implements CoordinatorProcessor {
 		}
 	}
 
-	private void updateBirdsEyeCamera(SimpleCamera mainCameraCopy, GraphicsData graphicsData) {
+	private void updateBirdsEyeCamera(CameraPosition mainCameraCopy, GraphicsData graphicsData) {
 		SimpleCamera camera = graphicsData.getCamera();
 		
 		// Update the birds eye view camera

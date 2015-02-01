@@ -1,10 +1,6 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
-import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
-import org.baderlab.cy3d.internal.data.CoordinatorData;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
@@ -21,23 +17,23 @@ public class BirdsEyeBoundsMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void dragged(int x, int y) {
-		CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
-		SimpleCamera camera = graphicsData.getCamera();
-		
-		if(coordinatorData.isInitialBoundsMatched()) {
-			Vector3 nearMousePosition = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.NEAR_BOUNDS_DISTANCE);
-//			Vector3 farMousePosition  = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.FAR_BOUNDS_DISTANCE);
-			
-			// The y-coordinate needs to be inverted
-			// mousePosition.set(mousePosition.x(), -mousePosition.y(), mousePosition.z());
-			
-			Quadrilateral oldNearBounds = coordinatorData.getNearBounds();
-			
-			Vector3 newCenter = findClickedNewCenter(camera.getPosition(), camera.getDirection(), oldNearBounds.getCenterPoint(), nearMousePosition);
-			oldNearBounds.moveTo(newCenter);
-
-			coordinatorData.setBoundsManuallyChanged(true);
-		}
+//		CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
+//		SimpleCamera camera = graphicsData.getCamera();
+//		
+//		if(coordinatorData.isInitialBoundsMatched()) {
+//			Vector3 nearMousePosition = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.NEAR_BOUNDS_DISTANCE);
+////			Vector3 farMousePosition  = GeometryToolkit.convertMouseTo3d(x, y, graphicsData, ViewingCoordinator.FAR_BOUNDS_DISTANCE);
+//			
+//			// The y-coordinate needs to be inverted
+//			// mousePosition.set(mousePosition.x(), -mousePosition.y(), mousePosition.z());
+//			
+//			Quadrilateral oldNearBounds = coordinatorData.getNearBounds();
+//			
+//			Vector3 newCenter = findClickedNewCenter(camera.getPosition(), camera.getDirection(), oldNearBounds.getCenterPoint(), nearMousePosition);
+//			oldNearBounds.moveTo(newCenter);
+//
+//			coordinatorData.setBoundsManuallyChanged(true);
+//		}
 	}
 	
 	/** 

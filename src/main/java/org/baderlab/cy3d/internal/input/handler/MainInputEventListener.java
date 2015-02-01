@@ -16,6 +16,7 @@ import javax.swing.Timer;
 
 import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
@@ -24,6 +25,9 @@ import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
 import org.cytoscape.view.model.CyNetworkView;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 
 /**
@@ -45,7 +49,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * @author mkucera
  *
  */
-public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, ToolPanel.ToolPanelListener {
+public class MainInputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
 	private final GraphicsData graphicsData;
 	private final CyNetworkView networkView;
@@ -64,7 +68,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	private KeyCommand keyCommand;
 	
 	
-	public MainInputEventListener(GraphicsData graphicsData) {
+	private MainInputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
 		this.networkView = graphicsData.getNetworkView();
 		createInitialCommands();
@@ -73,25 +77,36 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	public static MainInputEventListener attach(Component component, GraphicsData graphicsData) {
 		MainInputEventListener inputHandler = new MainInputEventListener(graphicsData);
+		
 		component.addMouseWheelListener(inputHandler);
 		component.addMouseMotionListener(inputHandler);
 		component.addMouseListener(inputHandler);
 		component.addKeyListener(inputHandler);
+		
+		EventBus eventBus = graphicsData.getEventBus();
+		eventBus.register(inputHandler);
+		
 		return inputHandler;
 	}
 	
 	private void createInitialCommands() {
 		mouseWheelCommand = new CameraZoomCommand(graphicsData);
 		keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
-		mouseModeChanged(MouseMode.getDefault()); // assume toolbar also starts off using the default
+		setMouseMode(MouseMode.getDefault()); // assume toolbar also starts off using the default
 	}
 	
 	
 	// *** Mode selection ***
 	
+	
+	
 	/** Called when a button on the toolbar is pressed. */
-	@Override
-	public void mouseModeChanged(MouseMode mouseMode) { 
+	@Subscribe
+	public void mouseModeChanged(MouseModeChangeEvent mouseModeChangeEvent) { 
+		setMouseMode(mouseModeChangeEvent.getMouseMode());
+	}
+	
+	private void setMouseMode(MouseMode mouseMode) {
 		switch(mouseMode) {
 			case CAMERA: 
 				primaryMouseCommand   = new CameraOrbitMouseCommand(graphicsData.getCamera()); 
@@ -104,9 +119,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		}
 	}
 	
-	@Override
-	public void showLabelsChanged(boolean showLabels) {
-	}
 	
 	public void touch() {
 		networkView.updateView();

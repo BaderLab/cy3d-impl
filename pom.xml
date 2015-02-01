@@ -76,6 +76,9 @@
 					
 					<excludes>
 						<exclude>org/baderlab/cy3d/internal/input/*.java</exclude>
+						<exclude>org/baderlab/cy3d/internal/coordinator/*.java</exclude>
+						<exclude>org/baderlab/cy3d/internal/data/CoordinatorData.java</exclude>
+						<exclude>org/baderlab/cy3d/internal/rendering/RenderBoundingBoxProcedure.java</exclude>
 					</excludes>
 					
 				</configuration>
@@ -91,8 +94,8 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
 						
-						<Import-Package>!com.jogamp.openal.*,!org.eclipse.swt.*,!com.jogamp.plugin.*,*</Import-Package>
-						<Embed-Dependency>jogl-all-main,jogl-all,gluegen-rt-main,gluegen-rt</Embed-Dependency>
+						<Import-Package>!com.jogamp.openal.*,!org.eclipse.swt.*,!com.jogamp.plugin.*,!sun.misc,*</Import-Package>
+						<Embed-Dependency>jogl-all-main,jogl-all,gluegen-rt-main,gluegen-rt,guava</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
@@ -179,6 +182,12 @@
 		     <groupId>org.jogamp.jogl</groupId>
 		     <artifactId>jogl-all-main</artifactId>
 	     	<version>${jogl.version}</version>
+	   	</dependency>
+	   	
+	   	<dependency>
+		     <groupId>com.google.guava</groupId>
+		     <artifactId>guava</artifactId>
+	     	<version>18.0</version>
 	   	</dependency>
 		
 		<!-- Testing -->

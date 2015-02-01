@@ -1,5 +1,6 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
@@ -13,19 +14,24 @@ public class Cy3DNetworkViewFactory implements CyNetworkViewFactory {
 	
 	private CyServiceRegistrar serviceRegistrar;
 	private VisualMappingManager visualMappingManager;
+	private final EventBusProvider eventBusProvider;
 	
 	public Cy3DNetworkViewFactory(CyServiceRegistrar serviceRegistrar,
 			VisualLexicon visualLexicon,
-			VisualMappingManager visualMappingManager) {
+			VisualMappingManager visualMappingManager,
+			EventBusProvider eventBusProvider) {
+		
 		this.serviceRegistrar = serviceRegistrar;
 		this.visualLexicon = visualLexicon;
 		this.visualMappingManager = visualMappingManager;
+		this.eventBusProvider = eventBusProvider;
 	}
 	
 	@Override
 	public CyNetworkView createNetworkView(CyNetwork network) {
 	
-		Cy3DNetworkView networkView = new Cy3DNetworkView(network, visualLexicon, visualMappingManager);
+		
+		Cy3DNetworkView networkView = new Cy3DNetworkView(network, visualLexicon, visualMappingManager, eventBusProvider);
 		
 //		serviceRegistrar.registerService(networkView, AddedNodesListener.class, 
 //				new Properties());

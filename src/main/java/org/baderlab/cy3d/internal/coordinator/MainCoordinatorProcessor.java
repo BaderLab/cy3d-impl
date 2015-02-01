@@ -1,8 +1,8 @@
 package org.baderlab.cy3d.internal.coordinator;
 
+import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.tools.SimpleCamera;
 
 public class MainCoordinatorProcessor implements CoordinatorProcessor {
 	

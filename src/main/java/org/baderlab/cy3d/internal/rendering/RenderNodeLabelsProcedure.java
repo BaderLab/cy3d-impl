@@ -54,7 +54,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
-		float distanceScale = graphicsData.getDistanceScale();
+		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float x, y, z;
 
 		// Store the current modelview, projection, and viewport matrices
@@ -94,7 +94,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 					
 					// Only draw the text if the front side of the camera faces it
 					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL 
-							&& graphicsData.getViewingVolume().inside(text3dPosition, graphicsData.getNearZ() / 2)) {
+							&& graphicsData.getViewingVolume().inside(text3dPosition, GraphicsData.NEAR_Z / 2)) {
 						
 						// TODO: Check if there is a way around this cast
 						textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
@@ -104,15 +104,9 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 							textColor = TEXT_DEFAULT_COLOR;
 						}
 			
-						// If we are set to not draw all node labels, only show labels for hovered and selected nodes
-						if (graphicsData.getShowAllNodeLabels()
-								// MKTODO
-//								|| graphicsData.getSelectionData().getHoverNodeIndex() == nodeView.getModel().getIndex()
-//								|| nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-								){
-							textRenderer.setColor(textColor);
-							textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
-						}
+
+						textRenderer.setColor(textColor);
+						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
 					}
 				}
 			}

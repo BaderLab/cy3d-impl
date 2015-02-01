@@ -41,8 +41,6 @@ public class RenderSimplifiedEdgesProcedure implements ReadOnlyGraphicsProcedure
 				FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 1);
 		
-		double distanceScale = graphicsData.getDistanceScale();
-		
 		// A set containing all pairs of nodes that have had an edge drawn between them
 		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
 		CyNode source, target;
@@ -56,8 +54,8 @@ public class RenderSimplifiedEdgesProcedure implements ReadOnlyGraphicsProcedure
 			// Only draw an edge between this source-target pair if one has not been drawn already
 			if (!drawnPairs.contains(pairIdentifier)) {
 			
-				Vector3 start = NetworkToolkit.obtainNodeCoordinates(source, networkView, distanceScale);
-				Vector3 end = NetworkToolkit.obtainNodeCoordinates(target, networkView, distanceScale);
+				Vector3 start = NetworkToolkit.obtainNodeCoordinates(source, networkView, (double) GraphicsData.DISTANCE_SCALE);
+				Vector3 end = NetworkToolkit.obtainNodeCoordinates(target, networkView, (double) GraphicsData.DISTANCE_SCALE);
 				Vector3 displacement = end.subtract(start);
 				
 				gl.glPushMatrix();

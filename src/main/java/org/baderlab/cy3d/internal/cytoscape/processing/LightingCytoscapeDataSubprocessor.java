@@ -56,9 +56,9 @@ public class LightingCytoscapeDataSubprocessor implements CytoscapeDataSubproces
 				(float) specularAlpha);
 		
 		// Transfer position properties
-		light.setPosition(networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_X_LOCATION).floatValue() / graphicsData.getDistanceScale(),
-				networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_Y_LOCATION).floatValue() / graphicsData.getDistanceScale(), 
-				networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_Z_LOCATION).floatValue() / graphicsData.getDistanceScale(), 
+		light.setPosition(networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_X_LOCATION).floatValue() / GraphicsData.DISTANCE_SCALE,
+				networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_Y_LOCATION).floatValue() / GraphicsData.DISTANCE_SCALE, 
+				networkView.getVisualProperty(Cy3DVisualLexicon.LIGHT_Z_LOCATION).floatValue() / GraphicsData.DISTANCE_SCALE, 
 				1.0f);
 		
 		// Transfer remaining properties

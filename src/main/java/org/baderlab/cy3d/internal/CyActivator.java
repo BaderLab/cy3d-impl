@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.BirdsEyeGraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
@@ -14,7 +15,6 @@ import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.WrappedLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.NetworkViewRenderer;
-import org.cytoscape.command.CommandExecutorTaskFactory;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
@@ -67,8 +67,9 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(bc, cy3dVisualLexicon, VisualLexicon.class, cy3dVisualLexiconProps);
 
 		// Cy3D NetworkView factory
+		EventBusProvider eventBusProvider = new EventBusProvider();
 		Cy3DNetworkViewFactory cy3dNetworkViewFactory =
-			new Cy3DNetworkViewFactory(cyServiceRegistrarRef, cy3dVisualLexicon, visualMappingManagerServiceRef);
+			new Cy3DNetworkViewFactory(cyServiceRegistrarRef, cy3dVisualLexicon, visualMappingManagerServiceRef, eventBusProvider);
 		
 		Properties cy3dNetworkViewFactoryProps = new Properties();
 		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");
@@ -78,12 +79,12 @@ public class CyActivator extends AbstractCyActivator {
 		// Main RenderingEngine factory
 		MainGraphicsConfiguration mainGraphicsConfiguration = new MainGraphicsConfiguration();
 		Cy3DRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, mainGraphicsConfiguration);
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, eventBusProvider, mainGraphicsConfiguration);
 		
 		// Bird's Eye RenderingEngine factory
 		BirdsEyeGraphicsConfiguration birdsEyeGraphicsConfiguration = new BirdsEyeGraphicsConfiguration();
 		Cy3DRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, birdsEyeGraphicsConfiguration);
+				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, eventBusProvider, birdsEyeGraphicsConfiguration);
 
 		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());

@@ -3,6 +3,7 @@ package org.baderlab.cy3d.internal;
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
@@ -23,20 +24,24 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final VisualLexicon visualLexicon;
 	private final TaskFactoryListener taskFactoryListener;
 	private final DialogTaskManager taskManager;
+	private final EventBusProvider eventBusProvider;
 	
 	private final GraphicsConfiguration configuration;
 	
 	
-	public Cy3DRenderingEngineFactory(RenderingEngineManager renderingEngineManager, 
+	public Cy3DRenderingEngineFactory(
+			RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
+			EventBusProvider eventBusFactory,
 			GraphicsConfiguration configuration) {	
 		
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
+		this.eventBusProvider = eventBusFactory;
 		this.configuration = configuration;
 	}
 	
@@ -53,13 +58,10 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		Cy3DNetworkView cy3dViewModel = (Cy3DNetworkView) viewModel;
 		JComponent component = (JComponent) container;
 		
-		//TODO: NetworkViewManager does not contain all instances of CyNetworkView, so wait 
-		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(cy3dViewModel, visualLexicon, configuration);
-		engine.setUpCanvas(component);
-		engine.setUpTaskFactories(taskFactoryListener, taskManager);
+		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(component, cy3dViewModel, visualLexicon, eventBusProvider,
+				                                             configuration, taskFactoryListener, taskManager);
 		
 		renderingEngineManager.addRenderingEngine(engine);
-		
 		return engine;
 	}
 	

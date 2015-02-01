@@ -24,6 +24,7 @@ public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void dragged(int x, int y) {
+		System.out.println("orbit");
 		int dx = x - prevX;
 		int dy = y - prevY;
 		

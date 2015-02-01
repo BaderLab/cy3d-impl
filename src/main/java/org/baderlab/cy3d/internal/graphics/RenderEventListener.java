@@ -6,6 +6,8 @@
 // is to be done
 
 package org.baderlab.cy3d.internal.graphics;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
@@ -14,21 +16,19 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.camera.SimpleCamera;
-import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
-import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
-import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
-import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
+import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
-import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
+import com.google.common.eventbus.EventBus;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -45,82 +45,47 @@ import com.jogamp.opengl.util.FPSAnimator;
  * of a bird's eye rendering object and a main window rendering object communication
  * with each other.
  * 
- * @author Paperwing (Yue Dong)
  */
 public class RenderEventListener implements GLEventListener {
 	
 	// Contains the "global" state used by one renderer.
-	private GraphicsData graphicsData;
-	private ShapePickingProcessor shapePickingProcessor;
-	private ViewingCoordinator coordinator;
-	private CoordinatorProcessor coordinatorProcessor;
-	private CytoscapeDataProcessor cytoscapeDataProcessor;
-	
-	private GraphicsConfiguration configuration;
+	private final GraphicsData graphicsData;
+	private final GraphicsConfiguration configuration;
 	
 	
-	/** Create a new Graphics object
-	 * 
-	 * @param networkView The CyNetworkView object, representing the 
-	 * View<CyNetwork> object that we are rendering
-	 * @param visualLexicon The visual lexicon being used
-	 */
-	public RenderEventListener(CyNetworkView networkView, VisualLexicon visualLexicon, GraphicsConfiguration handler) {
-		this.configuration = handler;
+	public RenderEventListener(
+			Cy3DNetworkView networkView, 
+			VisualLexicon visualLexicon, 
+			EventBusProvider eventBusProvider, 
+			GraphicsConfiguration configuration,
+			TaskFactoryListener taskFactoryListener, 
+			DialogTaskManager taskManager,
+			JComponent component) {
 		
-		graphicsData = new GraphicsData();
-		graphicsData.setNetworkView(networkView);
-		graphicsData.setVisualLexicon(visualLexicon);
+		this.configuration = checkNotNull(configuration);
+		EventBus eventBus = eventBusProvider.getEventBus(networkView);
 		
-		coordinator = handler.getCoordinator(graphicsData);
-		coordinatorProcessor = handler.getCoordinatorProcessor();
-		coordinatorProcessor.initializeCoordinator(coordinator, graphicsData);
-		
-		shapePickingProcessor = handler.getShapePickingProcessor();
-		
-		cytoscapeDataProcessor = handler.getCytoscapeDataProcessor();
-		//lightingProcessor = handler.getLightingProcessor();
-		
-		if (handler instanceof MainGraphicsConfiguration) {
-			((Cy3DNetworkView) graphicsData.getNetworkView()).setNetworkCamera(graphicsData.getCamera());
-		}
-	}
-	
-	/** Attach the KeyboardMonitor and MouseMonitors, which are listeners,
-	 * to the specified component for capturing keyboard and mouse events
-	 * 
-	 * @param component The component to listen to events for
-	 * @param settingsData 
-	 */
-	public void trackInput(JComponent component) {
-		graphicsData.setContainer(component);
-		configuration.trackInput(component, graphicsData);
-	}
-	
-	
-	/**
-	 * Set the {@link TaskFactoryListener} object used to obtain the list of current task factories.
-	 * @param listener
-	 */
-	public void setupTaskFactories(TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
+		graphicsData = new GraphicsData(networkView, visualLexicon, eventBus);
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
+		graphicsData.setContainer(component);
+	}
+	
+	public void initializeFrame(JInternalFrame frame) {
+		configuration.initializeFrame(frame);
 	}
 
 	
-	/** Initialize the Graphics object, performing certain
-	 * OpenGL initializations
+	/** 
+	 * Initialize the Graphics object, performing certain OpenGL initializations.
 	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
-		
-		System.out.println("GL_VENDOR: "   + gl.glGetString(GL2.GL_VENDOR));
-		System.out.println("GL_RENDERER: " + gl.glGetString(GL2.GL_RENDERER));
-		System.out.println("GL_VERSION: "  + gl.glGetString(GL2.GL_VERSION));
-		
+		graphicsData.setGlContext(gl);
 		graphicsData.setPixelConverter(new PixelConverter(drawable.getNativeSurface()));
-
+		
+		configuration.initialize(graphicsData);
 		
 		initLighting(drawable);
 
@@ -148,19 +113,12 @@ public class RenderEventListener implements GLEventListener {
 		// gl.glEnable(GL2.GL_BLEND);
 		// gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
-		graphicsData.setGlContext(gl);
-		//graphicsData.setFrameRateTracker(new FrameRateTracker(drawable.getAnimator()));
-		
-		configuration.initializeGraphicsProcedures(graphicsData);
-		//handler.setupLighting(graphicsData);
-		
-		shapePickingProcessor.initialize(graphicsData);
 		
 		// force render of first frame
 		graphicsData.getNetworkView().updateView();
 	}
 
-	
+	// MKTODO this should be moved into the GraphicsConfiguration
 	private void initLighting(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		float[] global = { 0.4f, 0.4f, 0.4f, 1.0f };
@@ -210,8 +168,6 @@ public class RenderEventListener implements GLEventListener {
 //		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 16); // Default shininess 31
 //		
 //		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 0);
-//		
-//		lightingProcessor.setupLighting(gl, graphicsData.getLightingData());
 	}
 	
 	
@@ -232,37 +188,28 @@ public class RenderEventListener implements GLEventListener {
 				camera.getPosition(), 
 				camera.getDirection(), 
 				camera.getUp(), 
-				graphicsData.getNearZ(), 
-				graphicsData.getFarZ(), 
-				graphicsData.getVerticalFov(), 
-				GeometryToolkit.findHorizontalFieldOfView(graphicsData.getDistanceScale(), 
+				GraphicsData.NEAR_Z, 
+				GraphicsData.FAR_Z, 
+				GraphicsData.VERTICAL_VOF, 
+				GeometryToolkit.findHorizontalFieldOfView(GraphicsData.DISTANCE_SCALE, 
 						graphicsData.getScreenWidth(), graphicsData.getScreenHeight()));
 		
-		// Perform picking
-		shapePickingProcessor.processPicking(graphicsData);
 		
-		// Update data for bird's eye view camera movement
-		coordinatorProcessor.extractData(coordinator, graphicsData);
+		// Doesn't really need to be split into two methods, but it allows GrapicsConfigurations to 
+		// only override update() and leave the drawing to AbstractGraphicsConfiguration.
 		
-		// Process Cytoscape data
-		cytoscapeDataProcessor.processCytoscapeData(graphicsData);
-		
-		// Update lighting
-		//lightingProcessor.updateLighting(gl, graphicsData.getLightingData());
-		
-		// Draw the scene
-		configuration.drawScene(graphicsData);
+		configuration.update();
+		configuration.drawScene();
 		
 		int errorCode = gl.glGetError();
 		if(errorCode != GL2.GL_NO_ERROR) {
-			System.out.println("Error Code: " + errorCode);
+			System.err.println("Error Code: " + errorCode);
 		}
 	}
 
 
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-
 		if (height <= 0) {
 			height = 1;
 		}
@@ -273,7 +220,7 @@ public class RenderEventListener implements GLEventListener {
 		gl.glLoadIdentity();
 
 		GLU glu = new GLU();
-		glu.gluPerspective(graphicsData.getVerticalFov(), (float) width / height, graphicsData.getNearZ(), graphicsData.getFarZ());
+		glu.gluPerspective(GraphicsData.VERTICAL_VOF, (float) width / height, GraphicsData.NEAR_Z, GraphicsData.FAR_Z);
 
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
@@ -288,13 +235,13 @@ public class RenderEventListener implements GLEventListener {
 	
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
-		coordinatorProcessor.unlinkCoordinator(coordinator);
-		configuration.dispose(graphicsData);
+		configuration.dispose();
 	}
-
+	
+	
 	
 	@Override
 	public String toString() {
-		return "Graphics(" + configuration + ")";
+		return "RenderEventListener(" + configuration + ")";
 	}
 }

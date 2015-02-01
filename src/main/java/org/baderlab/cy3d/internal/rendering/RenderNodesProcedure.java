@@ -58,7 +58,7 @@ public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
-		float distanceScale = graphicsData.getDistanceScale();
+		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float nodeSizeScale = 60;
 
 		// networkView.updateView();

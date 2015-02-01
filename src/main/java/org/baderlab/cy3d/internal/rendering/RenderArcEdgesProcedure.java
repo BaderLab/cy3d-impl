@@ -61,13 +61,10 @@ public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
 		GL2 gl = graphicsData.getGlContext();
 		
 		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };
-		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
-				FloatBuffer.wrap(specularReflection));
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 1);
 		
-		double distanceScale = graphicsData.getDistanceScale();
-		
-		Collection<AugmentedEdgeContainer> edgeContainers = graphicsData.getEdgeAnalyser().getAnalyzedEdges(networkView, distanceScale);
+		Collection<AugmentedEdgeContainer> edgeContainers = graphicsData.getEdgeAnalyser().getAnalyzedEdges(networkView, GraphicsData.DISTANCE_SCALE);
 		View<CyEdge> edgeView;
 
 		Number edgeWidth;

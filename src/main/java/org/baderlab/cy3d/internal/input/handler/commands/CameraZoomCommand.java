@@ -44,7 +44,7 @@ public class CameraZoomCommand implements MouseWheelCommand {
 					selectedNodeIndices.add(node.getSUID());
 				}
 				
-				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, graphicsData.getDistanceScale());
+				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, GraphicsData.DISTANCE_SCALE);
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 			}
 		}

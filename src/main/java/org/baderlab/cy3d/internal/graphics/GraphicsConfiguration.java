@@ -1,131 +1,48 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.coordinator.CoordinatorProcessor;
-import org.baderlab.cy3d.internal.coordinator.ViewingCoordinator;
-import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.lighting.LightingProcessor;
-import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
-import org.cytoscape.model.CyTable;
-import org.cytoscape.view.model.CyNetworkView;
 
 /**
- * A handler object that is responsible for specifying how input, calculation, and drawing are
- * handled in a {@link RenderEventListener} object. A {@link RenderEventListener} object relies 
- * on its GraphicsConfiguration to provide implementations for how certain responses are handled.
+ * A GraphicsConfiguration object that is responsible for specifying how input, calculation, and drawing are
+ * handled in a {@link RenderEventListener} object. 
  */
 public interface GraphicsConfiguration {
 		
-	/**
-	 * Return a {@link ShapePickingProcessor} object that is responsible for
-	 * performing shape picking and selection given the state of the 
-	 * network as well as the mouse. It will be given a {@link GraphicsData} object
-	 * to store its results.
-	 * 
-	 * The {@link ShapePickingProcessor} is called first in the display loop.
-	 * 
-	 * @return A {@link ShapePickingProcessor} object that will perform shape picking
-	 * and store the results appropriately for later use.
-	 */
-	public ShapePickingProcessor getShapePickingProcessor();
 	
 	/**
-	 * Return an instance of a {@link ViewingCoordinator} that will be used to allow
-	 * communication between the bird's eye and the main rendering windows. This communication
-	 * is used to facilitate features such as being able to move the main camera by clicking
-	 * on the bird's eye view.
-	 * 
-	 * @param graphicsData The {@link GraphicsData} object containing relevant information about
-	 * the current rendering object, such as the current {@link CyNetworkView} being rendered
-	 * @return An instance of a {@link ViewingCoordinator} used for coordination between
-	 * the main and bird's eye cameras.
+	 * Allows the configuration to add anything it needs to the outermost swing container.
+	 * Called once when the JInternalFrame is created.
+	 * Called first, before initialize(GraphicsData) is called.
 	 */
-	public ViewingCoordinator getCoordinator(GraphicsData graphicsData);
+	public void initializeFrame(JInternalFrame container);
+	
 	
 	/**
-	 * Return an instance of a {@link CoordinatorProcessor} object, which is responsible for
-	 * interacting with the current {@link ViewingCoordinator} in order to extract relevant data
-	 * from another {@link RenderEventListener} object. This could be information about the position of
-	 * the camera in the other {@link RenderEventListener} object, for example.
-	 * 
-	 * @return An instance of a {@link CoordinatorProcessor} object used to interact with
-	 * the {@link ViewingCoordinator}, which is also provided by this class.
+	 * Gives the GraphicsConfiguration access to the GraphicsData for the current renderer.
+	 * Called once before rendering.
 	 */
-	public CoordinatorProcessor getCoordinatorProcessor();
+	public void initialize(GraphicsData graphicsData);
+	
 	
 	/**
-	 * Return an instance of a {@link CytoscapeDataProcessor}, which is responsible for
-	 * transferring data to and from Cytoscape's data objects, such as {@link CyTable}.
-	 * This could be used to update a value from a {@link CyTable}, or retrieve a value
-	 * from a {@link CyTable}.
-	 * 
-	 * @return A {@link CytoscapeDataProcessor} object that is responsible for modifying
-	 * or retrieving data belonging to the rest of Cytoscape, such as data belonging to 
-	 * a {@link CyTable} object.
+	 * This method is called to do any processing based on changes to the grapicsData
+	 * as needed. It will be called every frame before drawScene() is called.
 	 */
-	public CytoscapeDataProcessor getCytoscapeDataProcessor();
+	public void update();
 	
 	/**
-	 * Return an instance of a {@link LightingProcessor} that is responsible for setting
-	 * up and maintaining scene lighting.
-	 * 
-	 * @return A {@link LightingProcessor} object responsible for setting up and updating
-	 * the scene lighting as necessary.
-	 */
-	public LightingProcessor getLightingProcessor();
-	
-	/**
-	 * This method should be called before the first frame of rendering. It will initialize
-	 * the rendering procedures (eg. setting up display lists) and allow them to be 
-	 * executed for per-frame drawing, such as via the drawScene method.
-	 * 
-	 * @param graphicsData The current {@link GraphicsData} object containing information
-	 * about the current state of rendering as well as the current state of the network.
-	 */
-	public void initializeGraphicsProcedures(GraphicsData graphicsData);
-	
-	/**
-	 * This method is called to graphically render the current scene. It should be
+	 * This method is called to graphically render the current scene. It will be
 	 * called every frame if the state of the network during each frame is desired
 	 * to for visualization.
-	 * 
-	 * @param graphicsData The current {@link GraphicsData} object containing information
-	 * about the current state of rendering as well as the current state of the network.
 	 */
-	public void drawScene(GraphicsData graphicsData);
-
-	/**
-	 * Sets up the lighting. Should be called before the first frame of rendering.
-	 * 
-	 * @param graphicsData The current {@link GraphicsData} object containing information
-	 * about the current state of rendering as well as the current state of the network.
-	 */
-	public void setupLighting(GraphicsData graphicsData);
-	
-	/**
-	 * Allows the configuration to add listeners directly to the drawing canvas.
-	 * @param component Usually an instance of GLJPanel.
-	 */
-	public void trackInput(JComponent component, GraphicsData graphicsData);
-	
-	
-	/**
-	 * Allows the configuration to add anything it needs to the outermost swing container
-	 * @param container Usually an instance of JInternalFrame.
-	 */
-	public void setUpContainer(JComponent container);
-	
+	public void drawScene();
 	
 	/**
 	 * Called when the GraphicsHandler is about to be disposed, to perform any necessary cleanup
-	 * @param graphicsData The current {@link GraphicsData} object containing information
-	 * about the current state of rendering as well as the current state of the network.
 	 */
-	public void dispose(GraphicsData graphicsData);
-
-	
+	public void dispose();
 	
 }
 
