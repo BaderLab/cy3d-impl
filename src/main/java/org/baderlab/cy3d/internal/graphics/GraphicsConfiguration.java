@@ -4,9 +4,34 @@ import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 
+import com.google.common.eventbus.EventBus;
+
 /**
- * A GraphicsConfiguration object that is responsible for specifying how input, calculation, and drawing are
- * handled in a {@link RenderEventListener} object. 
+ * The {@link RenderEventListener} uses an instance of GraphicsConfiguration to perform
+ * the actual drawing of the scene. <br><br>
+ * 
+ * Contains life-cycle methods for initializing, updating, drawing the scene, and for 
+ * cleaning up when the renderer shuts down. <br><br>
+ * 
+ * The GraphicsConfiguration may also register with the {@link EventBus} in order to respond
+ * to events that may change how the scene is rendered.
+ * 
+ * For example:
+ * 
+ * <code>
+ * <pre>
+ * &#64;Override 
+ * public void initialize(GraphicsData graphicsData) {
+ *     // register with event bus
+ *     graphicsData.getEventBus().register(this);
+ * }
+ * 
+ * &#64;Subscribe 
+ * public void handleShowLabelsEvent(ShowLabelsEvent e) {
+ *     // handle event
+ * }
+ * </pre>
+ * </code>
  */
 public interface GraphicsConfiguration {
 		
@@ -21,7 +46,7 @@ public interface GraphicsConfiguration {
 	
 	/**
 	 * Gives the GraphicsConfiguration access to the GraphicsData for the current renderer.
-	 * Called once before rendering.
+	 * Called once before rendering begins.
 	 */
 	public void initialize(GraphicsData graphicsData);
 	
@@ -34,13 +59,12 @@ public interface GraphicsConfiguration {
 	
 	/**
 	 * This method is called to graphically render the current scene. It will be
-	 * called every frame if the state of the network during each frame is desired
-	 * to for visualization.
+	 * called every frame after update() is called.
 	 */
 	public void drawScene();
 	
 	/**
-	 * Called when the GraphicsHandler is about to be disposed, to perform any necessary cleanup
+	 * Called when the GraphicsHandler is about to be disposed, to perform any necessary cleanup.
 	 */
 	public void dispose();
 	

@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.BirdsEyeCameraChangeEvent;
 import org.baderlab.cy3d.internal.input.handler.commands.BirdsEyeBoundsMouseCommand;
 import org.cytoscape.view.model.CyNetworkView;
 
@@ -32,32 +33,37 @@ public class BirdsEyeInputEventListener implements MouseListener, MouseMotionLis
 		return inputListener;
 	}
 	
+	private void updateBothRenderers() {
+		graphicsData.getEventBus().post(new BirdsEyeCameraChangeEvent(graphicsData.getCamera()));
+		networkView.updateView();
+	}
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		mouseCommand.pressed(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		mouseCommand.dragged(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		mouseCommand.released(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		mouseCommand.clicked(e.getX(), e.getY());
-		networkView.updateView();
+		updateBothRenderers();
 	}
 
 	@Override

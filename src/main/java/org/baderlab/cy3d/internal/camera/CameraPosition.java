@@ -2,6 +2,7 @@ package org.baderlab.cy3d.internal.camera;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
+
 public interface CameraPosition {
 
 	Vector3 getPosition();
@@ -16,6 +17,8 @@ public interface CameraPosition {
 	 */
 	Vector3 getDirection();
 	
+	Vector3 getLeft();
+	
 	/**
 	 * Returns the distance between the camera position and
 	 * the target location.
@@ -23,6 +26,6 @@ public interface CameraPosition {
 	 */
 	double getDistance();
 	
-	void set(CameraPosition other);
+//	void set(CameraPosition other);
 	
 }

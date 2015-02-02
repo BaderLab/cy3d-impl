@@ -14,13 +14,11 @@ import java.awt.event.MouseWheelListener;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
+import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitKeyCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitMouseCommand;
-import org.baderlab.cy3d.internal.input.handler.commands.CameraPanKeyCommand;
-import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeKeyCommand;
-import org.baderlab.cy3d.internal.input.handler.commands.CameraStrafeMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraZoomCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.PopupMenuMouseCommand;
 import org.baderlab.cy3d.internal.input.handler.commands.SelectionMouseCommand;
@@ -91,7 +89,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	private void createInitialCommands() {
 		mouseWheelCommand = new CameraZoomCommand(graphicsData);
-		keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
+		keyCommand = new CameraOrbitKeyCommand(graphicsData.getCamera());
 		setMouseMode(MouseMode.getDefault()); // assume toolbar also starts off using the default
 	}
 	
@@ -110,7 +108,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		switch(mouseMode) {
 			case CAMERA: 
 				primaryMouseCommand   = new CameraOrbitMouseCommand(graphicsData.getCamera()); 
-				secondaryMouseCommand = new CameraStrafeMouseCommand(graphicsData.getCamera()); 
+				secondaryMouseCommand = new CameraOrbitMouseCommand(graphicsData.getCamera()); 
 				break;
 			case SELECT: 
 				primaryMouseCommand   = new SelectionMouseCommand(graphicsData); 
@@ -121,6 +119,11 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	
 	public void touch() {
+		networkView.updateView();
+	}
+	
+	private void updateBothRenderers() {
+		graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
 		networkView.updateView();
 	}
 	
@@ -159,21 +162,21 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		currentDragCommand = getModifiedMouseCommand(e);
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.pressed(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.dragged(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		currentDragCommand.released(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 
@@ -182,7 +185,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		MouseCommand clickCommand = getModifiedMouseCommand(e);
 		graphicsData.getPixelConverter().convertMouse(e, coords);
 		clickCommand.clicked(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	@Override
@@ -192,19 +195,19 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		graphicsData.setMouseCurrentX(coords[0]);
 		graphicsData.setMouseCurrentY(coords[1]);
 		primaryMouseCommand.moved(coords[0], coords[1]);
-		networkView.updateView();
+		updateBothRenderers();
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		primaryMouseCommand.entered();
-		networkView.updateView();
+		updateBothRenderers();
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		primaryMouseCommand.exited();
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	
@@ -242,7 +245,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 			keyCommand.right();
 		
 		if(keyUp || keyDown || keyLeft || keyRight)
-			networkView.updateView();
+			updateBothRenderers();
 	}
 	
 
@@ -253,8 +256,8 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 			case KeyEvent.VK_LEFT:  keyLeft  = true;  break;
 			case KeyEvent.VK_RIGHT: keyRight = true;  break;
 			case KeyEvent.VK_DOWN:  keyDown  = true;  break;
-			case KeyEvent.VK_ALT:
-				keyCommand = new CameraStrafeKeyCommand(graphicsData.getCamera());
+//			case KeyEvent.VK_ALT:
+//				keyCommand = new CameraStrafeKeyCommand(graphicsData.getCamera());
 		}
 	}
 
@@ -265,8 +268,8 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 			case KeyEvent.VK_LEFT:  keyLeft  = false;  break;
 			case KeyEvent.VK_RIGHT: keyRight = false;  break;
 			case KeyEvent.VK_DOWN:  keyDown  = false;  break;
-			case KeyEvent.VK_ALT:
-				keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
+//			case KeyEvent.VK_ALT:
+//				keyCommand = new CameraPanKeyCommand(graphicsData.getCamera());
 		}
 	}
 	
@@ -275,9 +278,9 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		switch(e.getKeyChar()) {
 			case 'R':
 			case 'r': 
-				graphicsData.getCamera().set(new SimpleCamera());
-				graphicsData.getNetworkView().fitContent();
-				networkView.updateView();
+				graphicsData.getCamera().reset();
+				graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
+				networkView.fitContent();
 				break;
 		}
 	}

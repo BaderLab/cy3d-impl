@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.rendering;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
@@ -44,7 +44,7 @@ public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 		int screenWidth = graphicsData.getScreenWidth();
 		int screenHeight = graphicsData.getScreenHeight();
-		SimpleCamera camera = graphicsData.getCamera();
+		CameraPosition camera = graphicsData.getCamera();
 		double drawDistance = graphicsData.getCamera().getDistance();
 		
 

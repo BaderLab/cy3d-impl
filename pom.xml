@@ -79,6 +79,7 @@
 						<exclude>org/baderlab/cy3d/internal/coordinator/*.java</exclude>
 						<exclude>org/baderlab/cy3d/internal/data/CoordinatorData.java</exclude>
 						<exclude>org/baderlab/cy3d/internal/rendering/RenderBoundingBoxProcedure.java</exclude>
+						<exclude>org/baderlab/cy3d/internal/camera/CameraPositionHolder.java</exclude>
 					</excludes>
 					
 				</configuration>

@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.tools;
 import java.util.Collection;
 import java.util.Set;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
@@ -62,7 +62,7 @@ public class NetworkToolkit {
 	 * @param distanceFactor The multiplier against the distance from the center of the nodes to the farthest node used to place the camera
 	 * @param minDistance The minimum distance between the camera and the average node position.
 	 */
-	public static void fitInView(SimpleCamera camera, Collection<View<CyNode>> nodeViews, 
+	public static void fitInView(Camera camera, Collection<View<CyNode>> nodeViews, 
 			double distanceScale, double distanceFactor, double minDistance) {
 		Vector3 center = NetworkToolkit.findCenter(nodeViews, distanceScale);
 		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(nodeViews, center, distanceScale);
@@ -78,7 +78,7 @@ public class NetworkToolkit {
 		Vector3 offset = camera.getDirection().multiply(-newDistance);
 		
 		camera.moveTo(center.plus(offset));
-		camera.setDistance(newDistance);
+//		camera.setDistance(newDistance);
 	}
 	
 	/**

@@ -1,17 +1,17 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 
 public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 
-	private final SimpleCamera camera;
+	private final Camera camera;
 	
 	private int prevX;
 	private int prevY;
 	
 	
-	public CameraOrbitMouseCommand(SimpleCamera camera) {
+	public CameraOrbitMouseCommand(Camera camera) {
 		this.camera = camera;
 	}
 	
@@ -24,11 +24,10 @@ public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void dragged(int x, int y) {
-		System.out.println("orbit");
 		int dx = x - prevX;
 		int dy = y - prevY;
 		
-		camera.orbitLeft(dx);
+		camera.orbitRight(-dx);
 		camera.orbitUp(dy);
 		
 		prevX = x;

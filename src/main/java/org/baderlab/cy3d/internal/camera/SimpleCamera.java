@@ -8,7 +8,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
  * 
  * @author paperwing (Yue Dong)
  */
-public class SimpleCamera  {
+public class SimpleCamera implements Camera {
 	
 	// A brief note about the camera:
 	// -----------------------------
@@ -96,6 +96,13 @@ public class SimpleCamera  {
 		this(new Vector3(0, 0, 3), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 	}
 	
+	
+	@Override
+	public void reset() {
+		set(new SimpleCamera());
+	}
+	
+	
 	/** Construct a new SimpleCamera object with specified position,
 	 * target, and up vectors, but with default movement/rotation speeds
 	 * 
@@ -175,6 +182,14 @@ public class SimpleCamera  {
 		this.orbitSpeed = orbitSpeed;
 		this.rollSpeed = rollSpeed;
 		this.zoomSpeed = zoomSpeed;
+	}
+	
+	public double getDefaultOrbitSpeed() {
+		return DEFAULT_ORBIT_SPEED;
+	}
+	
+	public double getDefaultZoomSpeed() {
+		return DEFAULT_ZOOM_SPEED;
 	}
 	
 	/** Return the camera's position vector
@@ -285,7 +300,7 @@ public class SimpleCamera  {
 	 * @param multiplier The multiplier against the distance moved. A negative
 	 * multiplier results in moving backwards.
 	 */
-	public void moveForwardQuickly(double multiplier) {
+	public void moveForward(double multiplier) {
 		move(direction, zoomSpeed * multiplier);
 	}
 	

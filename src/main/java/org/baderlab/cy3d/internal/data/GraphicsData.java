@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.media.opengl.GL2;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
@@ -39,7 +39,7 @@ public class GraphicsData {
 	
 	private final CyNetworkView networkView;
 	private final EventBus eventBus;
-	private final SimpleCamera camera;
+	private final OriginOrbitCamera camera;
 	private GL2 glContext;
 	private final VisualLexicon visualLexicon;
 	
@@ -70,7 +70,7 @@ public class GraphicsData {
 		selectionData = new GraphicsSelectionData();
 		pickingData = new PickingData();
 		lightingData = new LightingData();
-		camera = new SimpleCamera();
+		camera = new OriginOrbitCamera();
 		viewingVolume = new ViewingVolume();
 		edgeAnalyser = new EdgeAnalyser();
 	}
@@ -101,10 +101,10 @@ public class GraphicsData {
 		return networkView;
 	}
 
-	public SimpleCamera getCamera() {
+	public OriginOrbitCamera getCamera() {
 		return camera;
 	}
-
+	
 	public VisualLexicon getVisualLexicon() {
 		return visualLexicon;
 	}

@@ -1,9 +1,8 @@
 package org.baderlab.cy3d.internal.rendering;
 
-import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
@@ -18,8 +17,7 @@ public class PositionCameraProcedure implements ReadOnlyGraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		GL2 gl = graphicsData.getGlContext();
-		SimpleCamera camera = graphicsData.getCamera();
+		CameraPosition camera = graphicsData.getCamera();
 		
 		Vector3 position = camera.getPosition();
 		Vector3 target = camera.getTarget();

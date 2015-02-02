@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
@@ -26,14 +26,14 @@ public class CameraZoomCommand implements MouseWheelCommand {
 
 	@Override
 	public void execute(int dWheel) {
-		SimpleCamera camera = graphicsData.getCamera();
+		Camera camera = graphicsData.getCamera();
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
 		// Varying distance between camera and camera's target point
 		if (dWheel != 0) {
-			camera.moveForwardQuickly(-dWheel);
+			camera.moveForward(-dWheel);
 			
 			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 			

@@ -8,7 +8,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.PickingData;
@@ -149,7 +149,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	// Render objects into the selection buffer
 	private void performSelectionDrawing(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
-		SimpleCamera camera = graphicsData.getCamera();
+		CameraPosition camera = graphicsData.getCamera();
 		GLU glu = GLU.createGLU(gl);
 		
 		gl.glMatrixMode(GL2.GL_MODELVIEW);

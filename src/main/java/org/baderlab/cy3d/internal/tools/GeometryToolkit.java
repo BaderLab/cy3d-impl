@@ -1,7 +1,6 @@
 package org.baderlab.cy3d.internal.tools;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
-import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
@@ -20,7 +19,7 @@ public class GeometryToolkit {
 	 * intersecting plane
 	 * @return The 3D position of the mouse
 	 */
-	public static Vector3 convertScreenTo3d(int x, int y, int screenWidth, int screenHeight, double planeDistance, SimpleCamera camera) {
+	public static Vector3 convertScreenTo3d(int x, int y, int screenWidth, int screenHeight, double planeDistance, CameraPosition camera) {
 		
 		// Project mouse coordinates into 3d space for mouse interactions
 		// --------------------------------------------------------------
@@ -73,12 +72,12 @@ public class GeometryToolkit {
 	
 	// public static Vector3 projectScreenCoordinates
 	
-	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
-	// which is perpendicular to the camera.
-	public static Vector3 convertMouseTo3d(int x, int y, GraphicsData graphicsData, double planeDistance) {
-		return convertScreenTo3d(x, y, graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
-		
-	}
+//	// Projects mouse into 3d coordinates. Intersection between eye-cursor line and a given plane,
+//	// which is perpendicular to the camera.
+//	public static Vector3 convertMouseTo3d(int x, int y, GraphicsData graphicsData, double planeDistance) {
+//		return convertScreenTo3d(x, y, graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), planeDistance, graphicsData.getCamera());
+//		
+//	}
 	
 	// Needs camera direction vector, camera up vector to be unit
 	// This method also uses the Math.tan method, so there might be room for finding a faster tangent method

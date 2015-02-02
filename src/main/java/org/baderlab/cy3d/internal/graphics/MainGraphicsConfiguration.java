@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
@@ -36,6 +36,7 @@ import com.google.common.eventbus.Subscribe;
 public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	private final RenderNodeLabelsProcedure renderNodeLabelsProcedure;
+	
 	private final ShapePickingProcessor shapePickingProcessor;
 	private final CytoscapeDataProcessor dataProcessor;
 	
@@ -73,7 +74,11 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	public void initialize(GraphicsData graphicsData) {
 		super.initialize(graphicsData);
 		shapePickingProcessor.initialize(graphicsData);
+		
+		// Input handler
 		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData);
+		
+		// EventBus
 		toolPanel.setEventBus(graphicsData.getEventBus());
 		graphicsData.getEventBus().register(this);
 	}
@@ -103,7 +108,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	@Subscribe
 	public void handleFitInViewEvent(FitInViewEvent e) {
-		SimpleCamera camera = graphicsData.getCamera();
+		Camera camera = graphicsData.getCamera();
 		Collection<View<CyNode>> selectedNodeViews = e.getSelectedNodeViews();
 		NetworkToolkit.fitInView(camera, selectedNodeViews, 180.0, 2.3, 1.8);
 	}

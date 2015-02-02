@@ -18,7 +18,7 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
@@ -183,7 +183,7 @@ public class RenderEventListener implements GLEventListener {
 		graphicsData.setGlContext(gl);
 		
 		// Re-calculate the viewing volume
-		SimpleCamera camera = graphicsData.getCamera();
+		CameraPosition camera = graphicsData.getCamera();
 		graphicsData.getViewingVolume().calculateViewingVolume(
 				camera.getPosition(), 
 				camera.getDirection(), 

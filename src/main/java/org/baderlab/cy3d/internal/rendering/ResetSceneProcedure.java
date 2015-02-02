@@ -1,15 +1,11 @@
 package org.baderlab.cy3d.internal.rendering;
 
 import java.awt.Color;
-import java.awt.Paint;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
-import org.baderlab.cy3d.internal.camera.SimpleCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
@@ -21,7 +17,6 @@ public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
-		SimpleCamera camera = graphicsData.getCamera();
 		
 		// Obtain the desired network background color
 		Color backgroundColor = (Color) 
