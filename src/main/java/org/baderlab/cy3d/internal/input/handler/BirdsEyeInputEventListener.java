@@ -7,7 +7,6 @@ import java.awt.event.MouseMotionListener;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.BirdsEyeCameraChangeEvent;
-import org.baderlab.cy3d.internal.input.handler.commands.BirdsEyeBoundsMouseCommand;
 import org.cytoscape.view.model.CyNetworkView;
 
 public class BirdsEyeInputEventListener implements MouseListener, MouseMotionListener {
@@ -23,7 +22,9 @@ public class BirdsEyeInputEventListener implements MouseListener, MouseMotionLis
 	public BirdsEyeInputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
 		this.networkView = graphicsData.getNetworkView();
-		this.mouseCommand = new BirdsEyeBoundsMouseCommand(graphicsData);
+		
+//		this.mouseCommand = new BirdsEyeBoundsMouseCommand(graphicsData);
+		this.mouseCommand = MouseCommand.EMPTY;  // MKTODO for now ignore input
 	}
 	
 	public static BirdsEyeInputEventListener attach(Component component, GraphicsData graphicsData) {

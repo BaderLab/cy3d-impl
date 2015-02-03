@@ -127,7 +127,7 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelCommand.execute(e.getWheelRotation());
-		networkView.updateView();
+		updateBothRenderers();
 	}
 	
 	

@@ -3,9 +3,11 @@ package org.baderlab.cy3d.internal.rendering;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Quadrilateral;
 import org.baderlab.cy3d.internal.geometric.Vector3;
+import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 
@@ -13,27 +15,56 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 
 	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.3, 0.3, 0.3);
 	
+	// Distance between bounds and camera position
+	private static final double NEAR_BOUNDS_DISTANCE = 0.9;
+	// Distance between the back bounds and the camera
+	private static final double FAR_BOUNDS_DISTANCE = 1.1;
+	
+	private GraphicsData graphicsData;
+	private Quadrilateral nearBounds;
+//	private Quadrilateral farBounds;
+	
 	private float lineWidth;
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
+		this.graphicsData = graphicsData;
 		float ratio = graphicsData.getPixelConverter().getPixelsPerWindowUnitRatio();
 		lineWidth = 1.5f * (float) Math.max(1.0, ratio);
 	}
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		if (graphicsData.getCoordinatorData().isInitialBoundsMatched()) {
-			drawFullBox(graphicsData);
-			//drawViewingVolumePortion(graphicsData);
-			//drawHalfBox(graphicsData);
-		}
+		drawFullBox(graphicsData);
+		//drawViewingVolumePortion(graphicsData);
+		//drawHalfBox(graphicsData);
 	}
 	
+	
+	/**
+	 * The argument must be the camera from the main renderer.
+	 * @param mainCamera
+	 */
+	public void updateBounds(CameraPosition mainCamera) {
+		double aspectRatio = ((double)graphicsData.getScreenWidth()) / Math.max(1, graphicsData.getScreenHeight());
+		
+		nearBounds = GeometryToolkit.generateViewingBounds(
+						mainCamera.getPosition(), mainCamera.getDirection(), mainCamera.getUp(),
+						NEAR_BOUNDS_DISTANCE, GraphicsData.VERTICAL_VOF, aspectRatio);
+		
+//		farBounds = GeometryToolkit.generateViewingBounds(
+//						mainCamera.getPosition(), mainCamera.getDirection(), mainCamera.getUp(),
+//						FAR_BOUNDS_DISTANCE, GraphicsData.VERTICAL_VOF, aspectRatio);
+	}
+	
+	
 	private void drawHalfBox(GraphicsData graphicsData) {
+		if(nearBounds == null)
+			return;
+		
 		GL2 gl = graphicsData.getGlContext();
 		
-		Quadrilateral bounds = graphicsData.getCoordinatorData().getNearBounds();
+		Quadrilateral bounds = nearBounds;
 		double fraction = 0.25;
 		
 		Vector3 topLeft = bounds.getTopLeft();
@@ -101,9 +132,12 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	}
 
 	private void drawFullBox(GraphicsData graphicsData) {
+		if(nearBounds == null)
+			return;
+		
 		GL2 gl = graphicsData.getGlContext();
 	
-		Quadrilateral bounds = graphicsData.getCoordinatorData().getNearBounds();
+		Quadrilateral bounds = nearBounds;
 
 		Vector3 topLeft = bounds.getTopLeft();
 		Vector3 topRight = bounds.getTopRight();
@@ -143,11 +177,13 @@ public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
 	/** Draws a portion of the viewing volume.
 	 */
 	private void drawViewingVolumePortion(GraphicsData graphicsData) {
+		if(nearBounds == null /* || farBounds == null */)
+			return;
 		
 		GL2 gl = graphicsData.getGlContext();
 		
-		Quadrilateral frontFace = graphicsData.getCoordinatorData().getNearBounds();
-		Quadrilateral backFace = graphicsData.getCoordinatorData().getFarBounds();
+		Quadrilateral frontFace = nearBounds;
+		Quadrilateral backFace  = null /* farBounds */;
 
 		boolean disabledLighting = false;
 		if (gl.glIsEnabled(GL2.GL_LIGHTING)) {

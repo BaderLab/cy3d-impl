@@ -27,8 +27,8 @@ public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 		int dx = x - prevX;
 		int dy = y - prevY;
 		
-		camera.orbitRight(-dx);
-		camera.orbitUp(dy);
+		camera.orbitRight(-dx * 0.5);
+		camera.orbitUp(dy * 0.5);
 		
 		prevX = x;
 		prevY = y;

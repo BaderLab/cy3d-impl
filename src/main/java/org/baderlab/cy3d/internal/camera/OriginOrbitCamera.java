@@ -90,7 +90,7 @@ public class OriginOrbitCamera implements Camera {
 		
 		position.set(newPosition);
 		
-		up = up.projectNormal(direction);
+		up.set(left.cross(newPosition));
 		up.normalizeLocal();
 	}
 	

@@ -7,6 +7,7 @@ import org.baderlab.cy3d.internal.input.handler.BirdsEyeEventBusListener;
 import org.baderlab.cy3d.internal.input.handler.BirdsEyeInputEventListener;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderArcEdgesProcedure;
+import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
 
@@ -24,12 +25,14 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 	
 	private final CytoscapeDataProcessor dataProcessor = new BirdsEyeCytoscapeDataProcessor();;
 
+	private RenderBoundingBoxProcedure boundingBoxProc;
+	
 	public BirdsEyeGraphicsConfiguration() {
 		add(new ResetSceneProcedure());
 		add(new PositionCameraProcedure());
 		add(new RenderNodesProcedure());
 		add(new RenderArcEdgesProcedure());
-//		add(new RenderBoundingBoxProcedure());	
+		add(boundingBoxProc = new RenderBoundingBoxProcedure());	
 	}
 	
 	@Override
@@ -39,7 +42,7 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 		BirdsEyeInputEventListener.attach(graphicsData.getContainer(), graphicsData);
 		
 		EventBus eventBus = graphicsData.getEventBus();
-		BirdsEyeEventBusListener eventBusListener = new BirdsEyeEventBusListener(graphicsData);
+		BirdsEyeEventBusListener eventBusListener = new BirdsEyeEventBusListener(graphicsData, boundingBoxProc);
 		eventBus.register(eventBusListener);
 		
 		// Manually fit graph into the correct size for the first frame.

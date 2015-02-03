@@ -8,6 +8,7 @@ import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
+import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
@@ -24,10 +25,12 @@ public class BirdsEyeEventBusListener {
 	
 	// The GraphicsData from the birds-eye renderer.
 	private final GraphicsData graphicsData;
+	private final RenderBoundingBoxProcedure boundingBoxProc;
 	
 	
-	public BirdsEyeEventBusListener(GraphicsData graphicsData) {
+	public BirdsEyeEventBusListener(GraphicsData graphicsData, RenderBoundingBoxProcedure boundingBoxProc) {
 		this.graphicsData = graphicsData;
+		this.boundingBoxProc = boundingBoxProc;
 	}
 	
 	
@@ -44,6 +47,8 @@ public class BirdsEyeEventBusListener {
 	@Subscribe
 	public void handleMainCameraChangeEvent(MainCameraChangeEvent e) {
 		CameraPosition mainCamera = e.getNewCameraPosition();
+		
+		boundingBoxProc.updateBounds(mainCamera);
 		
 		OriginOrbitCamera birdsEyeCamera = graphicsData.getCamera();
 		
