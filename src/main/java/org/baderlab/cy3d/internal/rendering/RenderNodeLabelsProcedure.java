@@ -38,7 +38,7 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
-		GL2 gl = graphicsData.getGlContext();
+//		GL2 gl = graphicsData.getGlContext();
 		
 		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
 		
@@ -51,6 +51,9 @@ public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
+		if(!graphicsData.getShowLabels())
+			return;
+		
 		GL2 gl = graphicsData.getGlContext();
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();

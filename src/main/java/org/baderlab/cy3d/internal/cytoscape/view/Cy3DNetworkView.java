@@ -49,10 +49,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	private Map<Long, View<CyNode>> nodeViews;
 	private Map<Long, View<CyEdge>> edgeViews;
 	
-	/** A boolean that keeps track if fitContent() has been called to ensure the network has been centered at least once. */
-	private boolean networkCentered;
-
-	
 	
 	public Cy3DNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
 		suid = SUIDFactory.getNextSUID();
@@ -78,8 +74,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 			
 			edgeViews.put(edge.getSUID(), edgeView);
 		}
-		
-		networkCentered = false;
 		
 		this.eventBus = eventBusProvider.getEventBus(this);
 	}
@@ -173,16 +167,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 		
 		// Match the current network view to the currently applied visual style
 //		updateToMatchVisualStyle();
-		
-//		// Render at least 1 more frame to reflect changes in network
-//		if (animatorController != null) {
-//			animatorController.startAnimator();
-//		}
-		
-		// Center the network if it hasn't been centered yet
-		if (!networkCentered) {
-			fitNodesInView();
-		}
 		
 		// Request focus after the network has been updated, such as via clicking a toolbar button,
 		// in order to be ready to receive keyboard and mouse input
@@ -344,7 +328,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 */
 	private void fitNodesInView() {
 		eventBus.post(new FitInViewEvent(nodeViews.values()));
-		networkCentered = true;
 	}
 	
 //	/**

@@ -33,8 +33,11 @@ public class OriginOrbitCamera implements Camera {
 	}
 	
 	@Override
-	public void moveTo(Vector3 position) {
-		this.position = position;
+	public void moveTo(Vector3 position, Vector3 up) {
+		this.position.set(position);
+		if(up != null) {
+			this.up.set(up);
+		}
 	}
 	
 	@Override
@@ -108,8 +111,12 @@ public class OriginOrbitCamera implements Camera {
 	@Override
 	public void moveForward(double amount) {
 		double distance = getDistance();
-		
-		double newDistance = Math.min(farLimit, Math.max(nearLimit, distance - amount));
+		setDistance(distance - amount);
+	}
+	
+	public void setDistance(double newDistance) {
+		double distance = getDistance();
+		newDistance = Math.min(farLimit, Math.max(nearLimit, newDistance));
 		
 		// Similar triangles
 		double ratio = newDistance / distance;
@@ -117,6 +124,6 @@ public class OriginOrbitCamera implements Camera {
 		double y = position.y() * ratio;
 		double z = position.z() * ratio;
 		
-		position.set(x, y, z);
+		position.set(x, y, z);		
 	}
 }

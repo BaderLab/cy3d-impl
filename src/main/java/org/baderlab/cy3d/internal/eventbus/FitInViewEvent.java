@@ -7,8 +7,8 @@ import org.cytoscape.view.model.View;
 
 public class FitInViewEvent {
 
-	final Collection<View<CyNode>> selectedNodeViews;
-
+	private final Collection<View<CyNode>> selectedNodeViews;
+	
 	public FitInViewEvent(Collection<View<CyNode>> selectedNodeViews) {
 		this.selectedNodeViews = selectedNodeViews;
 	}

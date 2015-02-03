@@ -60,6 +60,7 @@ public class GraphicsData {
 	private PickingData pickingData;
 	private LightingData lightingData;
 	
+	private boolean showLabels;
 	
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus) {
@@ -183,5 +184,14 @@ public class GraphicsData {
 	
 	public EventBus getEventBus() {
 		return eventBus;
+	}
+
+
+	public void setShowLabels(boolean showLabels) {
+		this.showLabels = showLabels;
+	}
+	
+	public boolean getShowLabels() {
+		return showLabels;
 	}
 }

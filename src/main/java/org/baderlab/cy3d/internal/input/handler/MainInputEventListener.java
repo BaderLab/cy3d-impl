@@ -96,8 +96,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	
 	// *** Mode selection ***
 	
-	
-	
 	/** Called when a button on the toolbar is pressed. */
 	@Subscribe
 	public void mouseModeChanged(MouseModeChangeEvent mouseModeChangeEvent) { 
@@ -117,10 +115,6 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 		}
 	}
 	
-	
-	public void touch() {
-		networkView.updateView();
-	}
 	
 	private void updateBothRenderers() {
 		graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));

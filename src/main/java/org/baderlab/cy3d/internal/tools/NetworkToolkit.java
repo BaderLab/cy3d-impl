@@ -77,7 +77,7 @@ public class NetworkToolkit {
 		
 		Vector3 offset = camera.getDirection().multiply(-newDistance);
 		
-		camera.moveTo(center.plus(offset));
+		camera.moveTo(center.plus(offset), null);
 //		camera.setDistance(newDistance);
 	}
 	

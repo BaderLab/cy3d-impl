@@ -309,7 +309,7 @@ public class SimpleCamera implements Camera {
 	 * 
 	 * @param position The position vector representing the new position
 	 */
-	public void moveTo(Vector3 position) {
+	public void moveTo(Vector3 position, Vector3 up) {
 		this.position.set(position);
 		
 		// Recalculate the target position
@@ -317,6 +317,11 @@ public class SimpleCamera implements Camera {
 		newTarget.addLocal(this.position);
 		
 		target.set(newTarget);
+		
+		if(up != null) {
+			this.up.set(up);
+			this.up.normalizeLocal();
+		}
 	}
 	
 	/** Translates the camera to a given point. The target position vector
@@ -340,7 +345,7 @@ public class SimpleCamera implements Camera {
 		offset.normalizeLocal();
 		offset.multiplyLocal(moveSpeed);
 		
-		moveTo(this.position.plus(offset));
+		moveTo(this.position.plus(offset), null);
 	}
 	
 	/** Turn the camera leftwards by a multiplier of its turning speed

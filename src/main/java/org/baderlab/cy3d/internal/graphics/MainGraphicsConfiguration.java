@@ -4,12 +4,11 @@ import java.util.Collection;
 
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
-import org.baderlab.cy3d.internal.eventbus.ShowLabelsEvent;
+import org.baderlab.cy3d.internal.input.handler.MainEventBusListener;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
 import org.baderlab.cy3d.internal.input.handler.ToolPanel;
 import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
@@ -21,11 +20,10 @@ import org.baderlab.cy3d.internal.rendering.RenderNodeLabelsProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
-import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
 
-import com.google.common.eventbus.Subscribe;
+import com.google.common.eventbus.EventBus;
 
 /**
  * An implementation for the {@link GraphicsConfiguration} interface to be used
@@ -34,8 +32,6 @@ import com.google.common.eventbus.Subscribe;
  * 
  */
 public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
-	
-	private final RenderNodeLabelsProcedure renderNodeLabelsProcedure;
 	
 	private final ShapePickingProcessor shapePickingProcessor;
 	private final CytoscapeDataProcessor dataProcessor;
@@ -55,12 +51,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		add(new RenderArcEdgesProcedure());
 		add(new RenderSelectionBoxProcedure());
 		add(new RenderLightsProcedure());
-		
-		// Make label rendering the last element in the list so that adding and removing it doesn't change the order
-		// of the other elements in the list. 
-		// (Note, if more complex enabling/disabling of render procedures is needed in the future then AbstractGraphicsConfiguration
-		// should be changed to have a more sophisticated ordering mechanism.)
-		add(renderNodeLabelsProcedure = new RenderNodeLabelsProcedure());
+		add(new RenderNodeLabelsProcedure());
 	}
 	
 	
@@ -79,8 +70,14 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData);
 		
 		// EventBus
-		toolPanel.setEventBus(graphicsData.getEventBus());
-		graphicsData.getEventBus().register(this);
+		EventBus eventBus = graphicsData.getEventBus();
+		toolPanel.setEventBus(eventBus);
+		MainEventBusListener eventBusListener = new MainEventBusListener(graphicsData);
+		eventBus.register(eventBusListener);
+		
+		// Manually fit the network into the view for the first frame
+		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
+		eventBusListener.handleFitInViewEvent(new FitInViewEvent(nodeViews));
 	}
 	
 	
@@ -94,23 +91,6 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	@Override
 	public void dispose() {
 		inputHandler.dispose();
-	}
-	
-	@Subscribe
-	public void handleShowLabelsChangedEvent(ShowLabelsEvent showLabelsEvent) {
-		if(showLabelsEvent.showLabels()) {
-			add(renderNodeLabelsProcedure);
-		} else {
-			remove(renderNodeLabelsProcedure);
-		}
-		inputHandler.touch();
-	}
-	
-	@Subscribe
-	public void handleFitInViewEvent(FitInViewEvent e) {
-		Camera camera = graphicsData.getCamera();
-		Collection<View<CyNode>> selectedNodeViews = e.getSelectedNodeViews();
-		NetworkToolkit.fitInView(camera, selectedNodeViews, 180.0, 2.3, 1.8);
 	}
 	
 
