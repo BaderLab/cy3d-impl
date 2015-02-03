@@ -1,9 +1,11 @@
 package org.baderlab.cy3d.internal.icons;
 
+import java.awt.Cursor;
 import java.awt.Font;
 
 public interface IconManager {
 	Font getIconFont(float size);
+	Cursor getIconCursor(String icon);
 	
 	static final String ICON_GLASS = "\uf000";
 	static final String ICON_MUSIC = "\uf001";
