@@ -8,6 +8,7 @@ import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
+import org.baderlab.cy3d.internal.input.handler.InputEventListener;
 import org.baderlab.cy3d.internal.input.handler.MainEventBusListener;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
 import org.baderlab.cy3d.internal.input.handler.MouseZoneInputListener;
@@ -38,7 +39,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	private final CytoscapeDataProcessor dataProcessor;
 	
 	private JInternalFrame frame;
-	private MainInputEventListener inputHandler;
+	private InputEventListener inputHandler;
 	private ToolPanel toolPanel;
 			
 	
@@ -70,8 +71,8 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		shapePickingProcessor.initialize(graphicsData);
 		
 		// Input handler
-		MouseZoneInputListener.attach(frame, graphicsData.getContainer(), graphicsData);
-		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData);
+		MouseZoneInputListener mouseZoneListener = MouseZoneInputListener.attach(frame, graphicsData.getContainer(), graphicsData);
+		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData, mouseZoneListener);
 		
 		// EventBus
 		EventBus eventBus = graphicsData.getEventBus();

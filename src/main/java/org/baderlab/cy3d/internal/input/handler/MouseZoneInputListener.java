@@ -37,8 +37,11 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 	
 	private final Cursor rotateCursor;
 	private final Cursor orbitCursor;
+	private final Cursor defaultCursor;
 	
 	private MouseMode mouseMode;
+	private Cursor currentCursor;
+	
 	
 	
 	public MouseZoneInputListener(GraphicsData graphicsData, JInternalFrame frame, Component container) {
@@ -50,7 +53,19 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 		IconManagerImpl iconManager = new IconManagerImpl();
 		this.rotateCursor = iconManager.getIconCursor(IconManager.ICON_REFRESH);
 		this.orbitCursor  = iconManager.getIconCursor(IconManager.ICON_MOVE);
+		this.defaultCursor = Cursor.getDefaultCursor();
+		
+		this.currentCursor = this.defaultCursor;
 	}
+	
+	public boolean isRotate() {
+		return currentCursor == rotateCursor;
+	}
+	
+	public boolean isOrbit() {
+		return currentCursor == orbitCursor;
+	}
+	
 	
 	public static MouseZoneInputListener attach(JInternalFrame frame, Component component, GraphicsData graphicsData) {
 		MouseZoneInputListener inputHandler = new MouseZoneInputListener(graphicsData, frame, component);
@@ -108,14 +123,18 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 			int zoneRadius = centerRadius(width, height);
 			
 			if(distanceFromCenter > zoneRadius) {
-				frame.setCursor(rotateCursor);
+				if(currentCursor != rotateCursor) {
+					frame.setCursor(currentCursor = rotateCursor);
+				}
 			}
 			else {
-				frame.setCursor(orbitCursor);
+				if(currentCursor != orbitCursor) {
+					frame.setCursor(currentCursor = orbitCursor);
+				}
 			}
 		}
 		else {
-			frame.setCursor(Cursor.getDefaultCursor());
+			frame.setCursor(currentCursor = defaultCursor);
 		}
 	}
 	
@@ -132,7 +151,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		frame.setCursor(Cursor.getDefaultCursor());
+		frame.setCursor(currentCursor = defaultCursor);
 	}
 	
 	

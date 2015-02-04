@@ -10,4 +10,12 @@ public interface KeyCommand {
 	
 	public void right();
 	
+	
+	public static KeyCommand EMPTY = new KeyCommand() {
+		public void up() { }
+		public void right() { }
+		public void left() { }
+		public void down() { }
+	};
+	
 }
