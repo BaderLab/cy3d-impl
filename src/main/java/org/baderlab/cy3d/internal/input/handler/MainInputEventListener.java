@@ -75,7 +75,7 @@ public class MainInputEventListener extends InputEventListener {
 		
 		switch(mouseMode) {
 			case CAMERA: 
-				CameraOrbitMouseCommand orbitCommand = new CameraOrbitMouseCommand(graphicsData.getCamera());
+				CameraOrbitMouseCommand orbitCommand = new CameraOrbitMouseCommand(graphicsData);
 				orbitCommand.setIsRotateSampler(getRotateSampler());
 				setPrimaryMouseCommand(orbitCommand); 
 				setSecondaryMouseCommand(orbitCommand); 

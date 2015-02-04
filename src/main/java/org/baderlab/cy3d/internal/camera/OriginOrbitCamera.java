@@ -109,6 +109,12 @@ public class OriginOrbitCamera implements Camera {
 	}
 	
 	@Override
+	public void roll(double angle) {
+		up = up.rotate(getDirection(), angle);
+		up.normalizeLocal();
+	}
+	
+	@Override
 	public void moveForward(double amount) {
 		double distance = getDistance();
 		setDistance(distance - amount);

@@ -140,7 +140,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 	
 	private int centerRadius(int width, int height) {
 		int span = Math.min(width, height);
-		return (int)(span * 0.5 * 0.9);
+		return (int)(span * 0.5 * 0.85);
 	}
 
 	

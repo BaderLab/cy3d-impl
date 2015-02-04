@@ -631,7 +631,7 @@ public class SimpleCamera implements Camera {
 	 * 
 	 * @param angle The angle to roll, positive for clockwise
 	 */
-	private void roll(double angle) {
+	public void roll(double angle) {
 		up = up.rotate(direction, angle);
 		up.normalizeLocal();
 		

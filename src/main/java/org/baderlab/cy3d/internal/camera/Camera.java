@@ -5,21 +5,31 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 public interface Camera extends CameraPosition {
 	
 	/**
-	 * Moves the camera to the specified position and orientation.
+	 * Translates the camera to the specified position and orientation.
 	 * @param up may be null to keep current orientation.
 	 */
-	public void moveTo(Vector3 position, Vector3 up);
+	void moveTo(Vector3 position, Vector3 up);
 	
 	
-	public void orbitUp(double angle);
+	void orbitUp(double angle);
 	
-	public void orbitRight(double angle);
-	
-	
-	public void moveForward(double multiplier);
+	void orbitRight(double angle);
 	
 	
-	public void reset();
+	//void yaw(double angle);
+	
+	//void pitch(double angle);
+	
+	/**
+	 * @param angle in radians
+	 */
+	void roll(double angle);
+	
+	
+	void moveForward(double multiplier);
+	
+	
+	void reset();
 	
 
 
