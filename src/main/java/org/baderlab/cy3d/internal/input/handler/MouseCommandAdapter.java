@@ -8,11 +8,11 @@ package org.baderlab.cy3d.internal.input.handler;
 public class MouseCommandAdapter implements MouseCommand {
 
 	@Override
-	public void pressed(int x, int y) {
+	public void dragStart(int x, int y) {
 	}
 
 	@Override
-	public void dragged(int x, int y) {
+	public void dragMove(int x, int y) {
 	}
 
 	@Override
@@ -20,7 +20,7 @@ public class MouseCommandAdapter implements MouseCommand {
 	}
 
 	@Override
-	public void released(int x, int y) {
+	public void dragEnd(int x, int y) {
 	}
 	
 	@Override

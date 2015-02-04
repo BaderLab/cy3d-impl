@@ -16,7 +16,7 @@ public class BirdsEyeBoundsMouseCommand extends MouseCommandAdapter {
 
 
 	@Override
-	public void dragged(int x, int y) {
+	public void dragMove(int x, int y) {
 //		CoordinatorData coordinatorData = graphicsData.getCoordinatorData();
 //		SimpleCamera camera = graphicsData.getCamera();
 //		

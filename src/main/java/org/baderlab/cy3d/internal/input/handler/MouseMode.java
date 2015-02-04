@@ -6,6 +6,6 @@ public enum MouseMode {
 	CAMERA;
 	
 	public static MouseMode getDefault() {
-		return SELECT;
+		return CAMERA;
 	}
 }

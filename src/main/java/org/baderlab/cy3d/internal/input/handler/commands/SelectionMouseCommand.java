@@ -34,9 +34,9 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 	}
 	
 	@Override
-	public void pressed(int x, int y) {
+	public void dragStart(int x, int y) {
 		deselectOther();
-		addCommand.pressed(x, y);
+		addCommand.dragStart(x, y);
 	}
 	
 	private void deselectOther() {
@@ -57,13 +57,13 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 	
 
 	@Override
-	public void dragged(int x, int y) {
-		addCommand.dragged(x, y);
+	public void dragMove(int x, int y) {
+		addCommand.dragMove(x, y);
 	}
 
 	@Override
-	public void released(int x, int y) {
-		addCommand.released(x, y);
+	public void dragEnd(int x, int y) {
+		addCommand.dragEnd(x, y);
 	}
 	
 	@Override

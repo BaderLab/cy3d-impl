@@ -60,7 +60,7 @@ public class GraphicsData {
 	private PickingData pickingData;
 	private LightingData lightingData;
 	
-	private boolean showLabels;
+	private boolean showLabels = true;
 	
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus) {

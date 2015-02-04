@@ -155,21 +155,21 @@ public class MainInputEventListener implements MouseListener, MouseMotionListene
 	public void mousePressed(MouseEvent e) {
 		currentDragCommand = getModifiedMouseCommand(e);
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		currentDragCommand.pressed(coords[0], coords[1]);
+		currentDragCommand.dragStart(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		currentDragCommand.dragged(coords[0], coords[1]);
+		currentDragCommand.dragMove(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		currentDragCommand.released(coords[0], coords[1]);
+		currentDragCommand.dragEnd(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	

@@ -17,13 +17,13 @@ public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 	
 	
 	@Override
-	public void pressed(int x, int y) {
+	public void dragStart(int x, int y) {
 		prevX = x;
 		prevY = y;
 	}
 
 	@Override
-	public void dragged(int x, int y) {
+	public void dragMove(int x, int y) {
 		int dx = x - prevX;
 		int dy = y - prevY;
 		

@@ -15,17 +15,17 @@ public interface MouseCommand {
 	/**
 	 * Start of a drag operation.
 	 */
-	void pressed(int x, int y);
+	void dragStart(int x, int y);
 	
 	/**
 	 * The mouse was dragged by some amount.
 	 */
-	void dragged(int x, int y);
+	void dragMove(int x, int y);
 	
 	/**
 	 * End of a drag operation.
 	 */
-	void released(int x, int y);
+	void dragEnd(int x, int y);
 	
 	/**
 	 * A full click (press then release) of the mouse button.

@@ -57,14 +57,14 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	// Drag movement
 	
 	@Override
-	public void pressed(int x, int y) {
+	public void dragStart(int x, int y) {
 		selectionData.setSelectTopLeftX(x);
 		selectionData.setSelectTopLeftY(y);
 		selectionData.setSelectTopLeftFound(true);
 	}
 
 	@Override
-	public void dragged(int x, int y) {
+	public void dragMove(int x, int y) {
 		selectionData.setSelectBottomRightX(x);
 		selectionData.setSelectBottomRightY(y);
 		
@@ -74,7 +74,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	}
 
 	@Override
-	public void released(int x, int y) {
+	public void dragEnd(int x, int y) {
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		PickingData pickingData = graphicsData.getPickingData();
 		

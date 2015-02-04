@@ -42,21 +42,21 @@ public class BirdsEyeInputEventListener implements MouseListener, MouseMotionLis
 	@Override
 	public void mousePressed(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		mouseCommand.pressed(coords[0], coords[1]);
+		mouseCommand.dragStart(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		mouseCommand.dragged(coords[0], coords[1]);
+		mouseCommand.dragMove(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		graphicsData.getPixelConverter().convertMouse(e, coords);
-		mouseCommand.released(coords[0], coords[1]);
+		mouseCommand.dragEnd(coords[0], coords[1]);
 		updateBothRenderers();
 	}
 	
