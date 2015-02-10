@@ -73,14 +73,6 @@
 						<Xmaxwarns>10000</Xmaxwarns>
 						<Xmaxerrs>10000</Xmaxerrs>
 					</compilerArguments>
-					
-					<excludes>
-						<exclude>org/baderlab/cy3d/internal/input/*.java</exclude>
-						<exclude>org/baderlab/cy3d/internal/coordinator/*.java</exclude>
-						<exclude>org/baderlab/cy3d/internal/data/CoordinatorData.java</exclude>
-						<exclude>org/baderlab/cy3d/internal/camera/CameraPositionHolder.java</exclude>
-					</excludes>
-					
 				</configuration>
 			</plugin>
 			<plugin>
