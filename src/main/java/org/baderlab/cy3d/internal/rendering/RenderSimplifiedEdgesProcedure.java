@@ -21,7 +21,7 @@ import org.cytoscape.view.model.View;
 /**
  * This procedure renders edges in a simplified form for the bird's eye view.
  */
-public class RenderSimplifiedEdgesProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderSimplifiedEdgesProcedure implements GraphicsProcedure {
 
 	private EdgeShapeDrawer shapeDrawer;
 	

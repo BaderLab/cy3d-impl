@@ -11,7 +11,7 @@ import org.cytoscape.view.model.View;
  * edge coordinates that are used for rendering segmented edges.
  */
 public class AugmentedEdgeContainer {
-	private View<CyEdge> edgeView;
+	private final View<CyEdge> edgeView;
 	
 	// Identifies the pair of nodes that the edge connects
 	private PairIdentifier pairIdentifier = null;
@@ -38,12 +38,12 @@ public class AugmentedEdgeContainer {
 	
 	private Vector3[] coordinates;
 
+	public AugmentedEdgeContainer(View<CyEdge> edgeView) {
+		this.edgeView = edgeView;
+	}
+	
 	public View<CyEdge> getEdgeView() {
 		return edgeView;
-	}
-
-	public void setEdgeView(View<CyEdge> edgeView) {
-		this.edgeView = edgeView;
 	}
 
 	public PairIdentifier getPairIdentifier() {

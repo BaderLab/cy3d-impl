@@ -1,11 +1,6 @@
 package org.baderlab.cy3d.internal.rendering;
 
-import java.util.List;
-
-import javax.media.opengl.GL2;
-
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 
 /**
  * This class represents a rendering procedure. Rendering procedures
@@ -16,7 +11,7 @@ import org.baderlab.cy3d.internal.graphics.RenderEventListener;
  * 
  * @author Yue Dong (Paperwing)
  */
-public interface ReadOnlyGraphicsProcedure {
+public interface GraphicsProcedure {
 	
 	/**
 	 * Initialize the graphics procedure, if any intialization is needed.
@@ -32,7 +27,7 @@ public interface ReadOnlyGraphicsProcedure {
 	 * Execute the graphics procedure.
 	 * 
 	 * @param graphicsData The {@link GraphicsData} object containing information
-	 * about the current state of rendering. The {@link ReadOnlyGraphicsProcedure}
+	 * about the current state of rendering. The {@link GraphicsProcedure}
 	 * is allowed to freely read from this data object to carry out its task, but it 
 	 * is generally not permitted to write to it.
 	 */

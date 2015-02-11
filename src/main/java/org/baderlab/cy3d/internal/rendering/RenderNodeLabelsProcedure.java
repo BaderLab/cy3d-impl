@@ -23,7 +23,7 @@ import com.jogamp.graph.curve.opengl.GLRegion;
 import com.jogamp.graph.font.FontFactory;
 */
 
-public class RenderNodeLabelsProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 
 	private static final int TEXT_FONT_SIZE = 9;
 	private static final String DEFAULT_FONT_NAME = "SansSerif";

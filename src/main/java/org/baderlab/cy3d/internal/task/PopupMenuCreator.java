@@ -26,7 +26,7 @@ import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 /**
- * This class is responsible for creating and populating pop-up menus created when right-clicking the network.
+ * This class is responsible for creating and populating pop-up menus when right-clicking the network.
  */
 public class PopupMenuCreator {
 	
@@ -59,6 +59,9 @@ public class PopupMenuCreator {
 	};
 	
 	
+	/**
+	 * Filter out menu items that currently cause problems.
+	 */
 	private static boolean filter(String[][] filter, Map<String,Object> properties) {
 		String preferredMenu = (String) properties.get("preferredMenu");
 		String title = (String) properties.get("title");

@@ -6,9 +6,13 @@ import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 
-public class PositionCameraProcedure implements ReadOnlyGraphicsProcedure {
+/**
+ * Sets the OpenGL camera to the position specified by the Camera
+ * object held in the GraphicsData object.
+ */
+public class PositionCameraProcedure implements GraphicsProcedure {
 
-	GLU glu;
+	private GLU glu;
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {

@@ -8,7 +8,7 @@ import javax.media.opengl.GL2;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-public class ResetSceneProcedure implements ReadOnlyGraphicsProcedure {
+public class ResetSceneProcedure implements GraphicsProcedure {
 
 	@Override
 	public void initialize(GraphicsData graphicsData) {

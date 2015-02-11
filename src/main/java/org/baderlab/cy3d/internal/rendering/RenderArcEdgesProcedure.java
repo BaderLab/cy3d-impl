@@ -20,7 +20,7 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
 
-public class RenderArcEdgesProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderArcEdgesProcedure implements GraphicsProcedure {
 
 	private static final float SEGMENT_RADIUS = 0.013f; // 0.007 default
 	private static final int SEGMENT_SLICES = 4;

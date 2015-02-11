@@ -3,9 +3,7 @@ package org.baderlab.cy3d.internal.tools;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import org.baderlab.cy3d.internal.data.LightingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.lighting.Light;
 
 public class RenderToolkit {
 

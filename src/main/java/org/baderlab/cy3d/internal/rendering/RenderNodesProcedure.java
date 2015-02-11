@@ -20,7 +20,7 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.values.NodeShape;
 
-public class RenderNodesProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderNodesProcedure implements GraphicsProcedure {
 
 	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.67, 0.67, 0.67);
 	private static final RenderColor DEFAULT_SELECTED_COLOR = new RenderColor(0.73, 0.73, 0.6);

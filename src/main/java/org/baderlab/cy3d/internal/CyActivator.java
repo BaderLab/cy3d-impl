@@ -10,9 +10,9 @@ import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.BirdsEyeGraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
+import org.baderlab.cy3d.internal.layouts.CyLayoutAlgorithmAdapter;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
-import org.baderlab.cy3d.internal.layouts.WrappedLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.service.util.AbstractCyActivator;
@@ -24,7 +24,6 @@ import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
-import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
@@ -40,16 +39,15 @@ import org.osgi.framework.BundleContext;
 public class CyActivator extends AbstractCyActivator {
 
 	public void start(BundleContext bc) {
-		CyNetworkViewManager cyNetworkViewManagerRef = getService(bc, CyNetworkViewManager.class);
-		RenderingEngineManager cyRenderingEngineManagerRef = getService(bc, RenderingEngineManager.class);
-		CyServiceRegistrar cyServiceRegistrarRef = getService(bc, CyServiceRegistrar.class);
-		VisualMappingManager visualMappingManagerServiceRef = getService(bc, VisualMappingManager.class);
+		RenderingEngineManager renderingEngineManager = getService(bc, RenderingEngineManager.class);
+		CyServiceRegistrar serviceRegistrar = getService(bc, CyServiceRegistrar.class);
+		VisualMappingManager visualMappingManagerService = getService(bc, VisualMappingManager.class);
 		UndoSupport undoSupport = getService(bc, UndoSupport.class);
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(bc, CyLayoutAlgorithmManager.class);
 		TunableSetter tunableSetter = getService(bc, TunableSetter.class);
 		
 		// TaskManager object used to execute tasks
-		DialogTaskManager cyDialogTaskManager = getService(bc, DialogTaskManager.class);
+		DialogTaskManager dialogTaskManager = getService(bc, DialogTaskManager.class);
 		
 		// Register service to collect references to relevant task factories for the right-click context menu
 		TaskFactoryListener taskFactoryListener = new TaskFactoryListener();
@@ -60,7 +58,6 @@ public class CyActivator extends AbstractCyActivator {
 		
 		// Cy3D Visual Lexicon
 		Cy3DVisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
-		
 		Properties cy3dVisualLexiconProps = new Properties();
 		cy3dVisualLexiconProps.setProperty("serviceType", "visualLexicon");
 		cy3dVisualLexiconProps.setProperty("id", "cy3d");
@@ -69,8 +66,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Cy3D NetworkView factory
 		EventBusProvider eventBusProvider = new EventBusProvider();
 		Cy3DNetworkViewFactory cy3dNetworkViewFactory =
-			new Cy3DNetworkViewFactory(cyServiceRegistrarRef, cy3dVisualLexicon, visualMappingManagerServiceRef, eventBusProvider);
-		
+			new Cy3DNetworkViewFactory(serviceRegistrar, cy3dVisualLexicon, visualMappingManagerService, eventBusProvider);
 		Properties cy3dNetworkViewFactoryProps = new Properties();
 		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");
 		registerService(bc, cy3dNetworkViewFactory, CyNetworkViewFactory.class, cy3dNetworkViewFactoryProps);
@@ -79,16 +75,20 @@ public class CyActivator extends AbstractCyActivator {
 		// Main RenderingEngine factory
 		MainGraphicsConfiguration mainGraphicsConfiguration = new MainGraphicsConfiguration();
 		Cy3DRenderingEngineFactory cy3dMainRenderingEngineFactory = new Cy3DRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, eventBusProvider, mainGraphicsConfiguration);
+				renderingEngineManager, cy3dVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainGraphicsConfiguration);
 		
 		// Bird's Eye RenderingEngine factory
 		BirdsEyeGraphicsConfiguration birdsEyeGraphicsConfiguration = new BirdsEyeGraphicsConfiguration();
 		Cy3DRenderingEngineFactory cy3dBirdsEyeRenderingEngineFactory = new Cy3DRenderingEngineFactory(
-				cyRenderingEngineManagerRef, cy3dVisualLexicon, taskFactoryListener, cyDialogTaskManager, eventBusProvider, birdsEyeGraphicsConfiguration);
+				renderingEngineManager, cy3dVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeGraphicsConfiguration);
 
+		
+		// NetworkViewRenderer, this is the main entry point that Cytoscape will call into
 		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
+		
+		// Layout algorithms
 		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);
 		Properties sphericalLayoutAlgorithmProps = new Properties();
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager", "menu");
@@ -113,13 +113,15 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
 		
 		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
-		WrappedLayoutAlgorithm fr3DAlgorithm = new WrappedLayoutAlgorithm(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
+		CyLayoutAlgorithmAdapter fr3DAlgorithm = new CyLayoutAlgorithmAdapter(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
 		Properties fr3DProps = new Properties();
 		fr3DProps.setProperty("preferredTaskManager","menu");
 		fr3DProps.setProperty(MENU_GRAVITY, "30.1");
 		fr3DProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
 		registerService(bc, fr3DAlgorithm, CyLayoutAlgorithm.class, fr3DProps);
 		
+		
+		// Special handling for JOGL library
 		try {
 			JoglInitializer.unpackNativeLibrariesForJOGL(bc);
 		} catch (IOException e) {

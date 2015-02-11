@@ -1,4 +1,4 @@
-package org.baderlab.cy3d.internal.rendering.text;
+package org.baderlab.cy3d.internal.rendering.shapes;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,7 +13,7 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.PickingData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
-import org.baderlab.cy3d.internal.rendering.ReadOnlyGraphicsProcedure;
+import org.baderlab.cy3d.internal.rendering.GraphicsProcedure;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
@@ -33,10 +33,10 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	public static final int NO_INDEX = -1; // Value representing that no node
 											// or edge index is being held
 
-	private ReadOnlyGraphicsProcedure drawNodesProcedure;
-	private ReadOnlyGraphicsProcedure drawEdgesProcedure;
+	private GraphicsProcedure drawNodesProcedure;
+	private GraphicsProcedure drawEdgesProcedure;
 	
-	public DefaultShapePickingProcessor(ReadOnlyGraphicsProcedure drawNodesProcedure, ReadOnlyGraphicsProcedure drawEdgesProcedure) {
+	public DefaultShapePickingProcessor(GraphicsProcedure drawNodesProcedure, GraphicsProcedure drawEdgesProcedure) {
 		this.drawNodesProcedure = drawNodesProcedure;
 		this.drawEdgesProcedure = drawEdgesProcedure;
 	}

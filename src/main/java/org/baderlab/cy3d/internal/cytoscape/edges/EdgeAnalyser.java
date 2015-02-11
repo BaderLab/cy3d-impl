@@ -103,8 +103,7 @@ public class EdgeAnalyser {
 			AugmentedEdgeContainer edgeContainer = edgeContainers.get(edgeView);
 			
 			if (edgeContainer == null) {
-				edgeContainer = new AugmentedEdgeContainer();
-				edgeContainer.setEdgeView(edgeView);
+				edgeContainer = new AugmentedEdgeContainer(edgeView);
 				edgeContainers.put(edgeView, edgeContainer);
 			}
 			
@@ -157,7 +156,7 @@ public class EdgeAnalyser {
 		
 			if (totalCoincidentEdgesCount != null) {
 				
-			edgeContainer.setTotalCoincidentEdges(totalCoincidentEdgesCount);
+				edgeContainer.setTotalCoincidentEdges(totalCoincidentEdgesCount);
 			
 				// If there was only 1 edge for that pair of nodes, make it a straight edge
 				if (edgeContainer.getTotalCoincidentEdges() == 1 && !edgeContainer.isSelfEdge()) {

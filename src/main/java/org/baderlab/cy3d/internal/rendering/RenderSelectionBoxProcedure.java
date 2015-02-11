@@ -9,7 +9,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 
-public class RenderSelectionBoxProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderSelectionBoxProcedure implements GraphicsProcedure {
 	
 	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.58, 0.68, 0.85);
 	

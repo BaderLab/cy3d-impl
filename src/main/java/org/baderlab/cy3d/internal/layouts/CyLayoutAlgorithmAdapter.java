@@ -17,7 +17,7 @@ import org.cytoscape.work.TunableSetter;
  * 
  * @author mkucera
  */
-public class WrappedLayoutAlgorithm implements CyLayoutAlgorithm {
+public class CyLayoutAlgorithmAdapter implements CyLayoutAlgorithm {
 	
 	private static final String LAYOUT_3D_PROPERTY = "layout3D";
 	
@@ -29,7 +29,7 @@ public class WrappedLayoutAlgorithm implements CyLayoutAlgorithm {
 	private Object defaultContext;
 	
 	
-	public WrappedLayoutAlgorithm(CyLayoutAlgorithm delegate, TunableSetter tunableSetter, String computerName, String humanName) {
+	public CyLayoutAlgorithmAdapter(CyLayoutAlgorithm delegate, TunableSetter tunableSetter, String computerName, String humanName) {
 		this.tunableSetter = tunableSetter;
 		this.delegate = delegate;
 		this.computerName = computerName;

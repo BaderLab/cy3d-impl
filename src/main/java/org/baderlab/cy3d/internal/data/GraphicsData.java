@@ -58,7 +58,6 @@ public class GraphicsData {
 	private PixelConverter pixelConverter;
 	private GraphicsSelectionData selectionData;
 	private PickingData pickingData;
-	private LightingData lightingData;
 	
 	private boolean showLabels = true;
 	
@@ -70,7 +69,6 @@ public class GraphicsData {
 		
 		selectionData = new GraphicsSelectionData();
 		pickingData = new PickingData();
-		lightingData = new LightingData();
 		camera = new OriginOrbitCamera();
 		viewingVolume = new ViewingVolume();
 		edgeAnalyser = new EdgeAnalyser();
@@ -140,10 +138,6 @@ public class GraphicsData {
 
 	public ViewingVolume getViewingVolume() {
 		return viewingVolume;
-	}
-
-	public LightingData getLightingData() {
-		return lightingData;
 	}
 
 	public Component getContainer() {

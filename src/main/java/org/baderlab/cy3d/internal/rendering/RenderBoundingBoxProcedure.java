@@ -11,7 +11,7 @@ import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 
-public class RenderBoundingBoxProcedure implements ReadOnlyGraphicsProcedure {
+public class RenderBoundingBoxProcedure implements GraphicsProcedure {
 
 	private static final RenderColor DEFAULT_COLOR = new RenderColor(0.3, 0.3, 0.3);
 	

@@ -1,7 +1,5 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import org.baderlab.cy3d.internal.cytoscape.processing.BirdsEyeCytoscapeDataProcessor;
-import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.input.handler.BirdsEyeEventBusListener;
 import org.baderlab.cy3d.internal.input.handler.BirdsEyeInputEventListener;
@@ -23,7 +21,6 @@ import com.google.common.eventbus.EventBus;
  */
 public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
-	private final CytoscapeDataProcessor dataProcessor = new BirdsEyeCytoscapeDataProcessor();;
 
 	private RenderBoundingBoxProcedure boundingBoxProc;
 	
@@ -49,10 +46,6 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 		eventBusListener.handleFitInViewEvent(null);
 	}
 	
-	@Override
-	public void update() {
-		dataProcessor.processCytoscapeData(graphicsData);
-	}
 	
 	@Override
 	public String toString() {

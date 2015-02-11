@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import javax.swing.JInternalFrame;
 
-import org.baderlab.cy3d.internal.cytoscape.processing.CytoscapeDataProcessor;
-import org.baderlab.cy3d.internal.cytoscape.processing.MainCytoscapeDataProcessor;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.baderlab.cy3d.internal.input.handler.InputEventListener;
@@ -17,7 +15,6 @@ import org.baderlab.cy3d.internal.picking.DefaultShapePickingProcessor;
 import org.baderlab.cy3d.internal.picking.ShapePickingProcessor;
 import org.baderlab.cy3d.internal.rendering.PositionCameraProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderArcEdgesProcedure;
-import org.baderlab.cy3d.internal.rendering.RenderLightsProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderNodeLabelsProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
@@ -36,7 +33,6 @@ import com.google.common.eventbus.EventBus;
 public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	private final ShapePickingProcessor shapePickingProcessor;
-	private final CytoscapeDataProcessor dataProcessor;
 	
 	private JInternalFrame frame;
 	private InputEventListener inputHandler;
@@ -44,7 +40,6 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 			
 	
 	public MainGraphicsConfiguration() {
-		dataProcessor = new MainCytoscapeDataProcessor();
 		shapePickingProcessor = new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderArcEdgesProcedure());
 		
 		add(new ResetSceneProcedure());
@@ -53,7 +48,6 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		add(new RenderNodesProcedure());
 		add(new RenderArcEdgesProcedure());
 		add(new RenderSelectionBoxProcedure());
-		add(new RenderLightsProcedure());
 		add(new RenderNodeLabelsProcedure());
 	}
 	
@@ -89,7 +83,6 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	@Override
 	public void update() {
 		shapePickingProcessor.processPicking(graphicsData);
-		dataProcessor.processCytoscapeData(graphicsData);
 	}
 
 	
