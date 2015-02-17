@@ -5,6 +5,7 @@ import javax.swing.JComponent;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
+import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.View;
@@ -26,7 +27,7 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final DialogTaskManager taskManager;
 	private final EventBusProvider eventBusProvider;
 	
-	private final GraphicsConfiguration configuration;
+	private final GraphicsConfigurationFactory graphicsConfigFactory;
 	
 	
 	public Cy3DRenderingEngineFactory(
@@ -35,14 +36,14 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
 			EventBusProvider eventBusFactory,
-			GraphicsConfiguration configuration) {	
+			GraphicsConfigurationFactory graphicsConfigFactory) {	
 		
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
 		this.eventBusProvider = eventBusFactory;
-		this.configuration = configuration;
+		this.graphicsConfigFactory = graphicsConfigFactory;
 	}
 	
 	
@@ -57,6 +58,8 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		// Verify the type of the view up front.
 		Cy3DNetworkView cy3dViewModel = (Cy3DNetworkView) viewModel;
 		JComponent component = (JComponent) container;
+		
+		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();
 		
 		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(component, cy3dViewModel, visualLexicon, eventBusProvider,
 				                                             configuration, taskFactoryListener, taskManager);
