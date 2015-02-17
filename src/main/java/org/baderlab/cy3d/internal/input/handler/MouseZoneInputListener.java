@@ -8,14 +8,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JInternalFrame;
-
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
 import org.baderlab.cy3d.internal.icons.IconManager;
 import org.baderlab.cy3d.internal.icons.IconManagerImpl;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 
@@ -33,7 +30,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 
 	private final GraphicsData graphicsData;
 	private final Component container;
-	private final JInternalFrame frame;
+	private final Component frame;
 	
 	private final Cursor rotateCursor;
 	private final Cursor orbitCursor;
@@ -44,7 +41,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 	
 	
 	
-	public MouseZoneInputListener(GraphicsData graphicsData, JInternalFrame frame, Component container) {
+	public MouseZoneInputListener(GraphicsData graphicsData, Component frame, Component container) {
 		this.graphicsData = graphicsData;
 		this.container = container;
 		this.frame = frame;
@@ -66,18 +63,23 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 		return currentCursor == orbitCursor;
 	}
 	
-	
-	public static MouseZoneInputListener attach(JInternalFrame frame, Component component, GraphicsData graphicsData) {
-		MouseZoneInputListener inputHandler = new MouseZoneInputListener(graphicsData, frame, component);
-		component.addMouseMotionListener(inputHandler);
-		component.addMouseListener(inputHandler);
-		
-		EventBus eventBus = graphicsData.getEventBus();
-		eventBus.register(inputHandler);
-		
-		return inputHandler;
+	public void setMouseMode(MouseMode mouseMode) {
+		this.mouseMode = mouseMode;
 	}
 	
+	
+	public static MouseZoneInputListener attach(Component frame, Component component, GraphicsData graphicsData) {
+		MouseZoneInputListener zoneInputListener = new MouseZoneInputListener(graphicsData, frame, component);
+		component.addMouseMotionListener(zoneInputListener);
+		component.addMouseListener(zoneInputListener);
+		return zoneInputListener;
+	}
+	
+	/**
+	 * Note that registration with the event bus must be done by the caller.
+	 * This is because the Birds Eye view does not want to register for mouse
+	 * change events and always wants to stay in camera mode.
+	 */
 	@Subscribe
 	public void mouseModeChanged(MouseModeChangeEvent mouseModeChangeEvent) { 
 		mouseMode = mouseModeChangeEvent.getMouseMode();

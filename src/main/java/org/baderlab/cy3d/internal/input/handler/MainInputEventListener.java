@@ -63,6 +63,12 @@ public class MainInputEventListener extends InputEventListener {
 	}
 	
 	
+	@Override
+	protected void fireUpdateEvents() {
+		graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
+	}
+	
+	
 	// *** Mode selection ***
 	
 	/** Called when a button on the toolbar is pressed. */
@@ -76,7 +82,7 @@ public class MainInputEventListener extends InputEventListener {
 		switch(mouseMode) {
 			case CAMERA: 
 				CameraOrbitMouseCommand orbitCommand = new CameraOrbitMouseCommand(graphicsData);
-				orbitCommand.setIsRotateSampler(getRotateSampler());
+				orbitCommand.setIsRotateSampler(mouseZoneListener);
 				setPrimaryMouseCommand(orbitCommand); 
 				setSecondaryMouseCommand(orbitCommand); 
 				break;
@@ -87,14 +93,6 @@ public class MainInputEventListener extends InputEventListener {
 		}
 	}
 	
-	
-	private CameraOrbitMouseCommand.IsRotateSampler getRotateSampler() {
-		return new CameraOrbitMouseCommand.IsRotateSampler() {
-			public boolean isRotate() {
-				return mouseZoneListener.isRotate();
-			}
-		};
-	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {

@@ -2,6 +2,7 @@ package org.baderlab.cy3d.internal.graphics;
 
 import java.util.Collection;
 
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
@@ -34,7 +35,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	private final ShapePickingProcessor shapePickingProcessor;
 	
-	private JInternalFrame frame;
+	private JComponent frame;
 	private InputEventListener inputHandler;
 	private ToolPanel toolPanel;
 			
@@ -53,9 +54,11 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	
 	@Override
-	public void initializeFrame(JInternalFrame frame) {
+	public void initializeFrame(JComponent frame) {
 		this.frame = frame;
-		this.toolPanel = new ToolPanel(frame);
+		if(frame instanceof JInternalFrame) {
+			this.toolPanel = new ToolPanel((JInternalFrame)frame);
+		}
 	}
 	
 	
@@ -70,9 +73,12 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		
 		// EventBus
 		EventBus eventBus = graphicsData.getEventBus();
-		toolPanel.setEventBus(eventBus);
+		if(toolPanel != null) {
+			toolPanel.setEventBus(eventBus);
+		}
 		MainEventBusListener eventBusListener = new MainEventBusListener(graphicsData);
 		eventBus.register(eventBusListener);
+		eventBus.register(mouseZoneListener);
 		
 		// Manually fit the network into the view for the first frame
 		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 

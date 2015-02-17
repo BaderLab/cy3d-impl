@@ -3,6 +3,7 @@ package org.baderlab.cy3d.internal.input.handler.commands;
 import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
+import org.baderlab.cy3d.internal.input.handler.MouseZoneInputListener;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 
 public class CameraOrbitMouseCommand extends MouseCommandAdapter {
@@ -27,6 +28,15 @@ public class CameraOrbitMouseCommand extends MouseCommandAdapter {
 		this.sampler = sampler;
 	}
 	
+	public void setIsRotateSampler(final MouseZoneInputListener mouseZoneListener) {
+		setIsRotateSampler(
+			new IsRotateSampler() {
+				public boolean isRotate() {
+					return mouseZoneListener.isRotate();
+				}
+			}
+		);
+	}
 	
 	@Override
 	public void dragStart(int x, int y) {

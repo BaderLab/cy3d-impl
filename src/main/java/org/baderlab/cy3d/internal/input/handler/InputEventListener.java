@@ -15,7 +15,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.cytoscape.view.model.CyNetworkView;
 
 /**
@@ -79,10 +78,18 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	
 
 	private void updateBothRenderers() {
-		graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
+		fireUpdateEvents();
 		networkView.updateView();
 	}
 
+	
+	/** 
+	 * Called before the view is updated, subclasses may override
+	 * to fire any additional events.
+	 */
+	protected void fireUpdateEvents() {
+		
+	}
 	
 	// *** Mouse event handling ***
 	

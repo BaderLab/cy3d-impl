@@ -3,27 +3,36 @@ package org.baderlab.cy3d.internal.input.handler;
 import java.awt.Component;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.BirdsEyeCameraChangeEvent;
+import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitMouseCommand;
 
 /**
- * MKTODO For now the birds eye input listener doesn't do anything.
+ * 
  * @author mkucera
- *
  */
 public class BirdsEyeInputEventListener extends InputEventListener {
 
 
-	public BirdsEyeInputEventListener(GraphicsData graphicsData) {
+	public BirdsEyeInputEventListener(GraphicsData graphicsData, MouseZoneInputListener mouseZoneListener) {
 		super(graphicsData);
+		
+		CameraOrbitMouseCommand orbitCommand = new CameraOrbitMouseCommand(graphicsData);
+		orbitCommand.setIsRotateSampler(mouseZoneListener);
+		setPrimaryMouseCommand(orbitCommand); 
+		setSecondaryMouseCommand(orbitCommand); 
 	}
 	
-	public static BirdsEyeInputEventListener attach(Component component, GraphicsData graphicsData) {
-//		BirdsEyeInputEventListener inputListener = new BirdsEyeInputEventListener(graphicsData);
-//		
-//		component.addMouseMotionListener(inputListener);
-//		component.addMouseListener(inputListener);
-//		
-//		return inputListener;
-		return null;
+	public static BirdsEyeInputEventListener attach(Component component, GraphicsData graphicsData, MouseZoneInputListener mouseZoneListener) {
+		BirdsEyeInputEventListener inputListener = new BirdsEyeInputEventListener(graphicsData, mouseZoneListener);
+		
+		component.addMouseMotionListener(inputListener);
+		component.addMouseListener(inputListener);
+	
+		return inputListener;
 	}
 	
+	@Override
+	protected void fireUpdateEvents() {
+		graphicsData.getEventBus().post(new BirdsEyeCameraChangeEvent(graphicsData.getCamera()));
+	}
 }

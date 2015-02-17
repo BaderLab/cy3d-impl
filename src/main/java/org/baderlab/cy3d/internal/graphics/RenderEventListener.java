@@ -14,7 +14,6 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
@@ -69,7 +68,7 @@ public class RenderEventListener implements GLEventListener {
 		graphicsData.setContainer(component);
 	}
 	
-	public void initializeFrame(JInternalFrame frame) {
+	public void initializeFrame(JComponent frame) {
 		configuration.initializeFrame(frame);
 	}
 

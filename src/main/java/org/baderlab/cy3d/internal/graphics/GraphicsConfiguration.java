@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.graphics;
 
-import javax.swing.JInternalFrame;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 
@@ -41,7 +41,7 @@ public interface GraphicsConfiguration {
 	 * Called once when the JInternalFrame is created.
 	 * Called first, before initialize(GraphicsData) is called.
 	 */
-	public void initializeFrame(JInternalFrame container);
+	public void initializeFrame(JComponent container);
 	
 	
 	/**

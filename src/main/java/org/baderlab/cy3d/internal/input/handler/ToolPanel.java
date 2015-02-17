@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.RootPaneContainer;
 import javax.swing.ToolTipManager;
 
 import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
@@ -64,7 +65,7 @@ public class ToolPanel {
 		this.eventBus = eventBus;
 	}
 	
-	private void setUpGlassPane(JInternalFrame frame) {
+	private void setUpGlassPane(RootPaneContainer frame) {
 		JPanel glass = (JPanel) frame.getGlassPane();
 		glass.setLayout(new BorderLayout());
 		glass.setVisible(true);
@@ -205,7 +206,7 @@ public class ToolPanel {
 	
 	
 	@SuppressWarnings("serial")
-	private void setUpKeyboardInput(JInternalFrame frame) {
+	private void setUpKeyboardInput(JComponent frame) {
 		String FORCE_CAMERA = "force_camera", UNFORCE_CAMERA = "unforce_camera";
 		String FORCE_SELECT = "force_select", UNFORCE_SELECT = "unforce_select";
 		

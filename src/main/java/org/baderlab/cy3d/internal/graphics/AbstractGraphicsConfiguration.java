@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.media.opengl.GL2;
-import javax.swing.JInternalFrame;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.rendering.GraphicsProcedure;
@@ -67,7 +67,7 @@ public abstract class AbstractGraphicsConfiguration implements GraphicsConfigura
 	}
 	
 	@Override
-	public void initializeFrame(JInternalFrame container) {
+	public void initializeFrame(JComponent container) {
 	}
 
 }

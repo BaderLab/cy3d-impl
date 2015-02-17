@@ -6,6 +6,7 @@ import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.BoundingBoxUpdateEvent;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
@@ -37,25 +38,28 @@ public class BirdsEyeEventBusListener {
 	@Subscribe
 	public void handleFitInViewEvent(FitInViewEvent e) {
 		Camera camera = graphicsData.getCamera();
-		
 		// ignore selected node views, always use all of them
 		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
-		
 		NetworkToolkit.fitInView(camera, nodeViews, GraphicsData.DISTANCE_SCALE, 3.0, 5.0);
 	}
 
+	
 	@Subscribe
 	public void handleMainCameraChangeEvent(MainCameraChangeEvent e) {
 		CameraPosition mainCamera = e.getNewCameraPosition();
-		
-		boundingBoxProc.updateBounds(mainCamera);
-		
 		OriginOrbitCamera birdsEyeCamera = graphicsData.getCamera();
 		
 		// maintain constant distance, originally set by the FitInViewEvent
 		double distance = birdsEyeCamera.getDistance();
 		birdsEyeCamera.moveTo(mainCamera.getPosition(), mainCamera.getUp());
 		birdsEyeCamera.setDistance(distance);
+	}
+	
+	
+	@Subscribe
+	public void handleBoundingBoxUpdateEvent(BoundingBoxUpdateEvent e) {
+		CameraPosition mainCamera = e.getCameraPosition();
+		boundingBoxProc.updateBounds(mainCamera);
 	}
 	
 }

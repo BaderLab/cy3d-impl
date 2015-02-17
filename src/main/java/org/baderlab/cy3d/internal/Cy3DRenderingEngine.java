@@ -85,12 +85,12 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 			Container pane = frame.getContentPane();
 			pane.setLayout(new BorderLayout());
 			pane.add(panel, BorderLayout.CENTER);
-			renderEventListener.initializeFrame(frame);
 		} 
 		else {
 			container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
 		}
+		renderEventListener.initializeFrame(container);
 	}
 	
 	
