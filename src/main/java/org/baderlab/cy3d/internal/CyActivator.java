@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.BirdsEyeGraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.MainGraphicsConfiguration;
@@ -16,7 +17,6 @@ import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.service.util.AbstractCyActivator;
-import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
@@ -40,7 +40,6 @@ public class CyActivator extends AbstractCyActivator {
 
 	public void start(BundleContext bc) {
 		RenderingEngineManager renderingEngineManager = getService(bc, RenderingEngineManager.class);
-		CyServiceRegistrar serviceRegistrar = getService(bc, CyServiceRegistrar.class);
 		VisualMappingManager visualMappingManagerService = getService(bc, VisualMappingManager.class);
 		UndoSupport undoSupport = getService(bc, UndoSupport.class);
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(bc, CyLayoutAlgorithmManager.class);
@@ -57,7 +56,7 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(bc, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
 		
 		// Cy3D Visual Lexicon
-		Cy3DVisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
+		VisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
 		Properties cy3dVisualLexiconProps = new Properties();
 		cy3dVisualLexiconProps.setProperty("serviceType", "visualLexicon");
 		cy3dVisualLexiconProps.setProperty("id", "cy3d");
@@ -65,8 +64,7 @@ public class CyActivator extends AbstractCyActivator {
 
 		// Cy3D NetworkView factory
 		EventBusProvider eventBusProvider = new EventBusProvider();
-		Cy3DNetworkViewFactory cy3dNetworkViewFactory =
-			new Cy3DNetworkViewFactory(serviceRegistrar, cy3dVisualLexicon, visualMappingManagerService, eventBusProvider);
+		Cy3DNetworkViewFactory cy3dNetworkViewFactory = new Cy3DNetworkViewFactory(cy3dVisualLexicon, visualMappingManagerService, eventBusProvider);
 		Properties cy3dNetworkViewFactoryProps = new Properties();
 		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");
 		registerService(bc, cy3dNetworkViewFactory, CyNetworkViewFactory.class, cy3dNetworkViewFactoryProps);

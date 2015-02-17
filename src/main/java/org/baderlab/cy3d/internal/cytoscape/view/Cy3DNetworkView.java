@@ -16,7 +16,6 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.SUIDFactory;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -27,13 +26,11 @@ import org.cytoscape.view.vizmap.VisualStyle;
 
 import com.google.common.eventbus.EventBus;
 
-public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements CyNetworkView {
+public class Cy3DNetworkView extends Cy3DView<CyNetwork> implements CyNetworkView {
 
-	private final Long suid;
 	private final CyNetwork network;
 	
 	private final VisualLexicon visualLexicon;
-	private final DefaultValueVault defaultValues;
 	private final VisualMappingManager visualMappingManager;
 	private final EventBus eventBus;
 	
@@ -41,8 +38,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	 * The camera associated with the main network viewing window used to
 	 * perform operations such as fitting all nodes onto the screen
 	 */
-//	private SimpleCamera networkCamera = null;
-	
 	private List<Component> canvases = new ArrayList<>(2);
 	
 	// Assumes indices of nodes are unique
@@ -51,41 +46,31 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	
 	
 	public Cy3DNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
-		suid = SUIDFactory.getNextSUID();
+		super(new DefaultValueVault(visualLexicon));
 		
 		this.network = network;
 		this.visualLexicon = visualLexicon;
 		this.visualMappingManager = visualMappingManager;
 		
-		defaultValues = new DefaultValueVault(visualLexicon);
+		this.eventBus = eventBusProvider.getEventBus(this);
+		
 		nodeViews = new HashMap<>();
 		edgeViews = new HashMap<>();
 		
-		Cy3DNodeView nodeView;
 		for (CyNode node : network.getNodeList()) {
-			nodeView = new Cy3DNodeView(defaultValues, node);
-			
+			Cy3DNodeView nodeView = new Cy3DNodeView(defaultValues, node);
 			nodeViews.put(node.getSUID(), nodeView);
 		}
 		
-		Cy3DEdgeView edgeView;
 		for (CyEdge edge : network.getEdgeList()) {
-			edgeView = new Cy3DEdgeView(defaultValues, edge);
-			
+			Cy3DEdgeView edgeView = new Cy3DEdgeView(defaultValues, edge);
 			edgeViews.put(edge.getSUID(), edgeView);
 		}
-		
-		this.eventBus = eventBusProvider.getEventBus(this);
 	}
 	
 	@Override
 	public CyNetwork getModel() {
 		return network;
-	}
-
-	@Override
-	public Long getSUID() {
-		return suid;
 	}
 
 	@Override
@@ -110,13 +95,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public Collection<View<? extends CyIdentifiable>> getAllViews() {
-		Collection<View<? extends CyIdentifiable>> views = new HashSet<View<? extends CyIdentifiable>>();
-		
-		// Return views for Node, Edge, Network
+		Collection<View<? extends CyIdentifiable>> views = new HashSet<>();
 		views.addAll(getNodeViews());
 		views.addAll(getEdgeViews());
 		views.add(this);
-		
 		return views;
 	}
 
@@ -126,10 +108,6 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	@Override
 	public void fitContent() {
 		fitNodesInView();
-		
-		// Request focus for the network view to be ready for keyboard input
-//		requestNetworkFocus();
-		
 		updateView();
 	}
 
@@ -159,23 +137,12 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public void updateView() {
-		// TODO: Check if correct place to put this; below code should ensure having a view
-		// for every node/edge in the network
-		
 		matchNodes();
 		matchEdges();
-		
-		// Match the current network view to the currently applied visual style
-//		updateToMatchVisualStyle();
-		
-		// Request focus after the network has been updated, such as via clicking a toolbar button,
-		// in order to be ready to receive keyboard and mouse input
-//		requestNetworkFocus();
 		
 		for(int i = 0; i < canvases.size(); i++) {
 			canvases.get(i).repaint();
 		}
-		
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -301,10 +268,10 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 	
 	@Override
 	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty, V defaultValue) {
-		
 		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
 	}
 
+	
 	@Override
 	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
 		T value = super.getVisualProperty(visualProperty);
@@ -341,14 +308,11 @@ public class Cy3DNetworkView extends VisualPropertyKeeper<CyNetwork> implements 
 
 	@Override
 	public void dispose() {
-		// MKTODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public String getRendererId() {
 		return Cy3DNetworkViewRenderer.ID;
 	}
-
 
 }

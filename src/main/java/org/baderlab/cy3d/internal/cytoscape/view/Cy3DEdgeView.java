@@ -1,43 +1,19 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.SUIDFactory;
-import org.cytoscape.view.model.VisualProperty;
 
-public class Cy3DEdgeView extends VisualPropertyKeeper<CyEdge> {
+public class Cy3DEdgeView extends Cy3DView<CyEdge> {
 
-	private CyEdge edge;
-	private Long suid;
-	private DefaultValueVault defaultValueVault;
+	private final CyEdge edge;
 	
 	public Cy3DEdgeView(DefaultValueVault defaultValueVault, CyEdge edge) {
+		super(defaultValueVault);
 		this.edge = edge;
-		this.suid = SUIDFactory.getNextSUID();	
-		this.defaultValueVault = defaultValueVault;
 	}
 	
-	@Override
-	public Long getSUID() {
-		return suid;
-	}
-
 	@Override
 	public CyEdge getModel() {
 		return edge;
 	}
-	
-	@Override
-	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
-		T value = super.getVisualProperty(visualProperty);
-		
-		if (value != null) {
-			// If we were given an explicit value, return it
-			return value;
-		} else {
-			// Otherwise, return the default value
-			return defaultValueVault.getDefaultValue(visualProperty);
-		}
-	}
-
 	
 }

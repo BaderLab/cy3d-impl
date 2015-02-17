@@ -78,7 +78,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
 			//System.out.printf("(%f,%f,%f)\n", width, height, depth);
-			
+			 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) 
 					&& 

@@ -1,11 +1,11 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
-public class VisualPropertyValueHolder<V> {
-	private V value;
+public class VisualPropertyValue<V> {
 	
+	private final V value;
 	private boolean isValueLocked;
 	
-	public VisualPropertyValueHolder(V value) {
+	public VisualPropertyValue(V value) {
 		this.value = value;
 	}
 	
