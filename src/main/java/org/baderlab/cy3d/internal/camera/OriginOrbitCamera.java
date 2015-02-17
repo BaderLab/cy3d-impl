@@ -19,7 +19,7 @@ public class OriginOrbitCamera implements Camera {
 	private Vector3 up;
 	
 	private double nearLimit = 1.0;
-	private double farLimit  = 100.0;
+	private double farLimit  = 500.0;
 	
 	public OriginOrbitCamera() {
 		reset();
