@@ -11,6 +11,7 @@ import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.CyLayoutAlgorithmAdapter;
+import org.baderlab.cy3d.internal.layouts.FlattenLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
@@ -86,6 +87,14 @@ public class CyActivator extends AbstractCyActivator {
 		
 		
 		// Layout algorithms
+		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
+		CyLayoutAlgorithmAdapter fr3DAlgorithm = new CyLayoutAlgorithmAdapter(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
+		Properties fr3DProps = new Properties();
+		fr3DProps.setProperty("preferredTaskManager","menu");
+		fr3DProps.setProperty(MENU_GRAVITY, "30.1");
+		fr3DProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
+		registerService(bc, fr3DAlgorithm, CyLayoutAlgorithm.class, fr3DProps);
+		
 		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);
 		Properties sphericalLayoutAlgorithmProps = new Properties();
 		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager", "menu");
@@ -106,16 +115,15 @@ public class CyActivator extends AbstractCyActivator {
 		boxLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
 		boxLayoutAlgorithmProps.setProperty(TITLE, boxLayoutAlgorithm.toString());
 		boxLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.4");
-		boxLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_AFTER, "true");
 		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
 		
-		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
-		CyLayoutAlgorithmAdapter fr3DAlgorithm = new CyLayoutAlgorithmAdapter(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
-		Properties fr3DProps = new Properties();
-		fr3DProps.setProperty("preferredTaskManager","menu");
-		fr3DProps.setProperty(MENU_GRAVITY, "30.1");
-		fr3DProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
-		registerService(bc, fr3DAlgorithm, CyLayoutAlgorithm.class, fr3DProps);
+		FlattenLayoutAlgorithm flattenLayoutAlgorithm = new FlattenLayoutAlgorithm(undoSupport);
+		Properties flattenLayoutAlgorithmProps = new Properties();
+		flattenLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
+		flattenLayoutAlgorithmProps.setProperty(TITLE, flattenLayoutAlgorithm.toString());
+		flattenLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.5");
+		flattenLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_AFTER, "true");
+		registerService(bc, flattenLayoutAlgorithm, CyLayoutAlgorithm.class, flattenLayoutAlgorithmProps);
 		
 		
 		// Special handling for JOGL library
