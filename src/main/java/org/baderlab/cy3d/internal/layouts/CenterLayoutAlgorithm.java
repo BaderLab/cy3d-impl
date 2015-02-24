@@ -9,15 +9,15 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.undo.UndoSupport;
 
-public class GridLayoutAlgorithm extends AbstractLayoutAlgorithm {
+public class CenterLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
-	public GridLayoutAlgorithm(UndoSupport undo) {
-		super("grid3D", "3D Grid Layout", undo);
+	public CenterLayoutAlgorithm(UndoSupport undoSupport) {
+		super("center3d", "Center Network", undoSupport);
 	}
 
 	@Override
 	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
-		return new TaskIterator(new GridLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
+		return new TaskIterator(new CenterLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
 	}
-	
+
 }

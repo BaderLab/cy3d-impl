@@ -17,11 +17,7 @@ public class SphericalLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 	@Override
 	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
-		return new TaskIterator(new SphericalLayoutAlgorithmTask(getName(), (SphericalLayoutContext)context, networkView, nodesToLayOut, layoutAttribute, undoSupport));
+		return new TaskIterator(new SphericalLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
 	}
 	
-	@Override
-	public SphericalLayoutContext createLayoutContext() {
-		return new SphericalLayoutContext();
-	}
 }

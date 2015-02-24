@@ -20,12 +20,9 @@ import org.cytoscape.work.undo.UndoSupport;
 
 public class GridLayoutAlgorithmTask extends AbstractLayoutTask {
 
-	private GridLayoutContext context;
 	
-	public GridLayoutAlgorithmTask(String name, GridLayoutContext context, CyNetworkView networkView,
-                                   Set<View<CyNode>> nodesToLayOut, String layoutAttribute, UndoSupport undo) {
+	public GridLayoutAlgorithmTask(String name, CyNetworkView networkView, Set<View<CyNode>> nodesToLayOut, String layoutAttribute, UndoSupport undo) {
 		super(name, networkView, nodesToLayOut, layoutAttribute, undo);
-		this.context = context;
 	}
 
 	@Override
@@ -33,7 +30,6 @@ public class GridLayoutAlgorithmTask extends AbstractLayoutTask {
 		
 		// Break graph into partitions
 		List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
-		int numPartitions = layoutPartitions.size();
 		
 		Collection<Collection<View<CyNode>>> partitions = new HashSet<Collection<View<CyNode>>>(layoutPartitions.size());
 		

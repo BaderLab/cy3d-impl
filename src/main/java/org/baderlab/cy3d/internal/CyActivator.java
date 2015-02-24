@@ -10,6 +10,7 @@ import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;
 import org.baderlab.cy3d.internal.layouts.BoxLayoutAlgorithm;
+import org.baderlab.cy3d.internal.layouts.CenterLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.CyLayoutAlgorithmAdapter;
 import org.baderlab.cy3d.internal.layouts.FlattenLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
@@ -89,41 +90,15 @@ public class CyActivator extends AbstractCyActivator {
 		// Layout algorithms
 		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
 		CyLayoutAlgorithmAdapter fr3DAlgorithm = new CyLayoutAlgorithmAdapter(frAlgorithm, tunableSetter, "fruchterman-rheingold-3D", "3D Force directed (BioLayout)");
-		Properties fr3DProps = new Properties();
-		fr3DProps.setProperty("preferredTaskManager","menu");
-		fr3DProps.setProperty(MENU_GRAVITY, "30.1");
-		fr3DProps.setProperty(INSERT_SEPARATOR_BEFORE, "true");
-		registerService(bc, fr3DAlgorithm, CyLayoutAlgorithm.class, fr3DProps);
 		
-		SphericalLayoutAlgorithm sphericalLayoutAlgorithm = new SphericalLayoutAlgorithm(undoSupport);
-		Properties sphericalLayoutAlgorithmProps = new Properties();
-		sphericalLayoutAlgorithmProps.setProperty("preferredTaskManager", "menu");
-		sphericalLayoutAlgorithmProps.setProperty(TITLE, sphericalLayoutAlgorithm.toString());
-		sphericalLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.2");
-		sphericalLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_BEFORE, "false");
-		registerService(bc, sphericalLayoutAlgorithm, CyLayoutAlgorithm.class, sphericalLayoutAlgorithmProps);
-		
-		GridLayoutAlgorithm gridLayoutAlgorithm = new GridLayoutAlgorithm(undoSupport);
-		Properties gridLayoutAlgorithmProps = new Properties();
-		gridLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		gridLayoutAlgorithmProps.setProperty(TITLE, gridLayoutAlgorithm.toString());
-		gridLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.3");
-		registerService(bc, gridLayoutAlgorithm, CyLayoutAlgorithm.class, gridLayoutAlgorithmProps);
-		
-		BoxLayoutAlgorithm boxLayoutAlgorithm = new BoxLayoutAlgorithm(undoSupport);
-		Properties boxLayoutAlgorithmProps = new Properties();
-		boxLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		boxLayoutAlgorithmProps.setProperty(TITLE, boxLayoutAlgorithm.toString());
-		boxLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.4");
-		registerService(bc, boxLayoutAlgorithm, CyLayoutAlgorithm.class, boxLayoutAlgorithmProps);
-		
-		FlattenLayoutAlgorithm flattenLayoutAlgorithm = new FlattenLayoutAlgorithm(undoSupport);
-		Properties flattenLayoutAlgorithmProps = new Properties();
-		flattenLayoutAlgorithmProps.setProperty("preferredTaskManager","menu");
-		flattenLayoutAlgorithmProps.setProperty(TITLE, flattenLayoutAlgorithm.toString());
-		flattenLayoutAlgorithmProps.setProperty(MENU_GRAVITY, "30.5");
-		flattenLayoutAlgorithmProps.setProperty(INSERT_SEPARATOR_AFTER, "true");
-		registerService(bc, flattenLayoutAlgorithm, CyLayoutAlgorithm.class, flattenLayoutAlgorithmProps);
+		registerLayoutAlgorithms(bc,
+				fr3DAlgorithm,
+				new SphericalLayoutAlgorithm(undoSupport),
+				new GridLayoutAlgorithm(undoSupport),
+				new BoxLayoutAlgorithm(undoSupport),
+				new FlattenLayoutAlgorithm(undoSupport),
+				new CenterLayoutAlgorithm(undoSupport)
+		);
 		
 		
 		// Special handling for JOGL library
@@ -136,5 +111,19 @@ public class CyActivator extends AbstractCyActivator {
 	}
 
 	
+	private void registerLayoutAlgorithms(BundleContext bc, CyLayoutAlgorithm... algorithms) {
+		for(int i = 0; i < algorithms.length; i++) {
+			Properties props = new Properties();
+			props.setProperty("preferredTaskManager", "menu");
+			props.setProperty(TITLE, algorithms[i].toString());
+			props.setProperty(MENU_GRAVITY, "30." + (i+1));
+			if(i == 0)
+				props.setProperty(INSERT_SEPARATOR_BEFORE, "true");
+			if(i == algorithms.length-1)
+				props.setProperty(INSERT_SEPARATOR_AFTER, "true");
+			
+			registerService(bc, algorithms[i], CyLayoutAlgorithm.class, props);
+		}
+	}
 	
 }

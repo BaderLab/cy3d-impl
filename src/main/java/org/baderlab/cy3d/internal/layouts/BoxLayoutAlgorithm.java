@@ -15,13 +15,9 @@ public class BoxLayoutAlgorithm extends AbstractLayoutAlgorithm {
 		super("box", "3D Box Layout", undo);
 	}
 
-	@Override
-	public BoxLayoutContext createLayoutContext() {
-		return new BoxLayoutContext();
-	}
 
 	@Override
 	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
-		return new TaskIterator(new BoxLayoutAlgorithmTask(getName(), (BoxLayoutContext)context, networkView, nodesToLayOut, layoutAttribute, undoSupport));
+		return new TaskIterator(new BoxLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
 	}
 }
