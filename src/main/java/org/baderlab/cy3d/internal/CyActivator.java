@@ -17,11 +17,13 @@ import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.application.NetworkViewRenderer;
+import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
 import org.cytoscape.task.NetworkViewTaskFactory;
 import org.cytoscape.task.NodeViewTaskFactory;
+import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -40,6 +42,8 @@ import org.osgi.framework.BundleContext;
 public class CyActivator extends AbstractCyActivator {
 
 	public void start(BundleContext bc) {
+		CySwingApplication application = getService(bc, CySwingApplication.class);
+		OpenBrowser openBrowser = getService(bc, OpenBrowser.class);
 		RenderingEngineManager renderingEngineManager = getService(bc, RenderingEngineManager.class);
 		VisualMappingManager visualMappingManagerService = getService(bc, VisualMappingManager.class);
 		UndoSupport undoSupport = getService(bc, UndoSupport.class);
@@ -99,6 +103,11 @@ public class CyActivator extends AbstractCyActivator {
 				new FlattenLayoutAlgorithm(undoSupport),
 				new CenterLayoutAlgorithm(undoSupport)
 		);
+		
+		// About dialog
+		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);
+		aboutDialogAction.setPreferredMenu("Apps.Cy3D");
+		registerAllServices(bc, aboutDialogAction, new Properties());
 		
 		
 		// Special handling for JOGL library

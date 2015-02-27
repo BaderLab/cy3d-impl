@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+	<name>Cytoscape 3D Renderer</name>
 
 	<groupId>org.cytoscape</groupId>
 	<artifactId>cy3d-impl</artifactId>
-	<version>0.0.1</version>
+	<version>${project.version}</version>
+	
 	<modelVersion>4.0.0</modelVersion>
-	<name>Cytoscape 3D Renderer</name>
 	<packaging>bundle</packaging>
 
 	<properties>
 		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
 		<bundle.namespace>org.baderlab.cy3d.internal</bundle.namespace>
 		<cytoscape.api>3.3.0-SNAPSHOT</cytoscape.api>
+		<project.version>0.9.0</project.version>
+		<timestamp>${maven.build.timestamp}</timestamp>
 		<jogl.version>2.2.4</jogl.version>
 	</properties>
 
@@ -42,6 +45,22 @@
 	</repositories>
 
 	<build>
+		<resources>
+				<resource>
+		        <directory>src/main/resources</directory>
+		        <filtering>true</filtering>
+		        <includes>
+		          	<include>**/buildinfo.props</include>
+		        </includes>
+	      	</resource>
+	      	<resource>
+		        <directory>src/main/resources</directory>
+		        <filtering>false</filtering>
+		        <excludes>
+		          	<exclude>**/buildinfo.props</exclude>
+		        </excludes>
+	      	</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
