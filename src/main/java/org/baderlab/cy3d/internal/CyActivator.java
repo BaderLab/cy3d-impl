@@ -90,6 +90,10 @@ public class CyActivator extends AbstractCyActivator {
 		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
+		// Still need to register the rendering engine factory directly
+		Properties renderingEngineProps = new Properties();
+		renderingEngineProps.setProperty(ID, Cy3DNetworkViewRenderer.ID);
+		registerAllServices(bc, cy3dMainRenderingEngineFactory, renderingEngineProps);
 		
 		// Layout algorithms
 		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");
