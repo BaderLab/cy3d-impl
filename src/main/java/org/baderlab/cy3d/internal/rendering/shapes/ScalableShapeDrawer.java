@@ -1,8 +1,5 @@
 package org.baderlab.cy3d.internal.rendering.shapes;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
@@ -10,38 +7,55 @@ import javax.media.opengl.glu.GLUquadric;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 public class ScalableShapeDrawer {
 	
-	private static final int SPHERE_SLICES_DETAIL = 12;
-	private static final int SPHERE_STACKS_DETAIL = 12;
-	
-	public static enum ShapeType {
+	public static enum Shape {
 		SHAPE_SPHERE,
 		SHAPE_CUBE, 
-		SHAPE_CUBE_SLICED_CORNERS,
 		SHAPE_TETRAHEDRON,
-		SHAPE_CONE,
-		SHAPE_CYLINDER,
-		SHAPE_DOUGHNUT,
 	}
 	
-	private Map<ShapeType, Integer> shapeLists;
-	
-	public ScalableShapeDrawer() {
-		shapeLists = new HashMap<ShapeType, Integer>(12);
+	public static enum Detail {
+		DETAIL_LOW(6),
+		DETAIL_MED(12),
+		DETAIL_HIGH(24);
+		
+		private final int sphereDetail;
+		
+		private Detail(int sphereDetail) {
+			this.sphereDetail = sphereDetail;
+		}
 	}
+	
+	private Table<Shape, Detail, Integer> shapeLists = ImmutableTable.of();
+	
 	
 	public void initialize(GL2 gl) {
-		initializeSphere(gl);
-		initializeCube(gl);
-		initializeCubeSlicedCorners(gl);
-		initializeTetrahedron(gl);
+		ImmutableTable.Builder<Shape, Detail, Integer> builder = ImmutableTable.builder();
+		
+		builder.put(Shape.SHAPE_SPHERE, Detail.DETAIL_LOW,  initializeSphere(gl, Detail.DETAIL_LOW));
+		builder.put(Shape.SHAPE_SPHERE, Detail.DETAIL_MED,  initializeSphere(gl, Detail.DETAIL_MED));
+		builder.put(Shape.SHAPE_SPHERE, Detail.DETAIL_HIGH, initializeSphere(gl, Detail.DETAIL_HIGH));
+		
+		int cubeIndex = initializeCube(gl);
+		builder.put(Shape.SHAPE_CUBE, Detail.DETAIL_LOW, cubeIndex);
+		builder.put(Shape.SHAPE_CUBE, Detail.DETAIL_MED, cubeIndex);
+		builder.put(Shape.SHAPE_CUBE, Detail.DETAIL_HIGH, cubeIndex);
+		
+		int tetIndex = initializeTetrahedron(gl);
+		builder.put(Shape.SHAPE_TETRAHEDRON, Detail.DETAIL_LOW, tetIndex);
+		builder.put(Shape.SHAPE_TETRAHEDRON, Detail.DETAIL_MED, tetIndex);
+		builder.put(Shape.SHAPE_TETRAHEDRON, Detail.DETAIL_HIGH, tetIndex);
+		
+		shapeLists = builder.build();
 	}
 	
 	// Diameter 1 sphere
-	private void initializeSphere(GL2 gl) {
+	private int initializeSphere(GL2 gl, Detail detailLevel) {
 		int shapeListIndex = gl.glGenLists(1);
 
 		GLU glu = GLU.createGLU(gl);
@@ -51,15 +65,14 @@ public class ScalableShapeDrawer {
 		glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH);
 		
 		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
-		glu.gluSphere(quadric, 0.5, SPHERE_SLICES_DETAIL, SPHERE_STACKS_DETAIL); 
+		glu.gluSphere(quadric, 0.5, detailLevel.sphereDetail, detailLevel.sphereDetail); 
 		gl.glEndList();
 		
-		
-		shapeLists.put(ShapeType.SHAPE_SPHERE, shapeListIndex);
+		return shapeListIndex;
 	}
 	
 	// Cube inscribed in a radius 0.5 sphere
-	private void initializeCube(GL2 gl) {
+	private int initializeCube(GL2 gl) {
 		int shapeListIndex = gl.glGenLists(1);
 
 		GLU glu = GLU.createGLU(gl);
@@ -88,75 +101,12 @@ public class ScalableShapeDrawer {
 		
 		gl.glEndList();
 		
-		shapeLists.put(ShapeType.SHAPE_CUBE, shapeListIndex);
+		return shapeListIndex;
 	}
 	
-	// Cube inscribed in a radius 0.5 sphere
-	private void initializeCubeSlicedCorners(GL2 gl) {
-		int shapeListIndex = gl.glGenLists(1);
-
-		float halfLength = (float) (1.0 / Math.sqrt(2) / 2);
-		
-		gl.glNewList(shapeListIndex, GL2.GL_COMPILE);
-		// gl.glBegin(GL2.GL_TRIANGLE_STRIP);
-		
-		gl.glPushMatrix();
-		gl.glScalef(halfLength, halfLength, halfLength);
-		
-		gl.glBegin(GL2.GL_QUADS);
-		
-		// +y face
-		gl.glNormal3i(0, 1, 0);
-		gl.glVertex3i(-1, 1, -1); // -x, -z
-		gl.glVertex3i(1, 1, -1); // +x, -z
-		gl.glVertex3i(1, 1, 1); // +x, +z
-		gl.glVertex3i(-1, 1, 1); // -x, +z
-		
-		// +z face
-		gl.glNormal3i(0, 0, 1);
-		gl.glVertex3i(-1, 1, 1);
-		gl.glVertex3i(1, 1, 1);
-		gl.glVertex3i(1, -1, 1);
-		gl.glVertex3i(-1, -1, 1);
-		
-		// +x face
-		gl.glNormal3i(1, 0, 0);
-		gl.glVertex3i(1, 1, 1);
-		gl.glVertex3i(1, 1, -1);
-		gl.glVertex3i(1, -1, -1);
-		gl.glVertex3i(1, -1, 1);
-		
-		// -y face
-		gl.glNormal3i(0, -1, 0);
-		gl.glVertex3i(-1, -1, -1);
-		gl.glVertex3i(1, -1, -1);
-		gl.glVertex3i(1, -1, 1);
-		gl.glVertex3i(-1, -1, 1);
-		
-		// -z face
-		gl.glNormal3i(0, 0, -1);
-		gl.glVertex3i(-1, 1, -1);
-		gl.glVertex3i(1, 1, -1);
-		gl.glVertex3i(1, -1, -1);
-		gl.glVertex3i(-1, -1, -1);
-		
-		// -x face
-		gl.glNormal3i(-1, 0, 0);
-		gl.glVertex3i(-1, 1, 1);
-		gl.glVertex3i(-1, 1, -1);
-		gl.glVertex3i(-1, -1, -1);
-		gl.glVertex3i(-1, -1, 1);
-		
-		gl.glEnd();
-		gl.glPopMatrix();
-		
-		gl.glEndList();
-		
-		shapeLists.put(ShapeType.SHAPE_CUBE_SLICED_CORNERS, shapeListIndex);
-	}
 	
 	// Tetrahedron inscribed in circle with radius 0.5
-	private void initializeTetrahedron(GL2 gl) {
+	private int initializeTetrahedron(GL2 gl) {
 		int shapeListIndex = gl.glGenLists(1);
 
 		double radius = 0.5;
@@ -206,11 +156,12 @@ public class ScalableShapeDrawer {
 		
 		gl.glEndList();
 		
-		shapeLists.put(ShapeType.SHAPE_TETRAHEDRON, shapeListIndex);
+		return shapeListIndex;
 	}
 	
-	public void drawShape(GL2 gl, ShapeType shapeType) {
-		Integer listIndex = shapeLists.get(shapeType);
+	
+	public void drawShape(GL2 gl, Shape shapeType, Detail detailLevel) {
+		Integer listIndex = shapeLists.get(shapeType, detailLevel);
 		
 		if (listIndex != null) {
 			gl.glCallList(listIndex);

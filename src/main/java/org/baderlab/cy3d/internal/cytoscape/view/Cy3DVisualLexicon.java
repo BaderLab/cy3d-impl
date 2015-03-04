@@ -1,12 +1,9 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
 import static java.util.Arrays.asList;
-import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.DOT;
-import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.EQUAL_DASH;
-import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.SOLID;
-import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.ELLIPSE;
-import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.RECTANGLE;
-import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.TRIANGLE;
+import static org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty.*;
+import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.*;
+import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,32 +13,30 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.DiscreteRange;
 import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
 
-/**
- * This VisualLexicon does not extend the BasicVisualLexicon.
- * Instead the VisualLexicon is implemented from scratch, and visual properties 
- * from BasicVisualLexicon are added to this lexicon.
- * 
- * @author mkucera
- */
+
 public class Cy3DVisualLexicon extends BasicVisualLexicon {
 
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CY3D_ROOT", "cy3d Rendering Engine Root Visual Property");
 	
-	private final Set<VisualProperty<?>> supportedProps;
-	private final Map<VisualProperty<?>, Collection<?>> supportedValuesMap;
+	public static final VisualProperty<DetailLevel> DETAIL_LEVEL = new DetailLevelVisualProperty("DETAIL_LEVEL", "Detail Level", CyNetwork.class);
+	
+	private final Set<VisualProperty<?>> supportedProps = new HashSet<>();
+	private final Map<VisualProperty<?>, Collection<?>> supportedValuesMap = new HashMap<>();
 	
 	
 	public Cy3DVisualLexicon() {
 		super(ROOT);
-		supportedProps = new HashSet<>();
-		supportedValuesMap = new HashMap<>();
+		
+		addVisualProperty(DETAIL_LEVEL, BasicVisualLexicon.NETWORK);
+		
 		initSupportedProps();
 	}
 	
@@ -73,8 +68,11 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 		supportedProps.add(BasicVisualLexicon.EDGE_LINE_TYPE);
 		supportedProps.add(BasicVisualLexicon.EDGE_SELECTED);
 		
+		supportedProps.add(DETAIL_LEVEL);
+		
 		supportedValuesMap.put(NODE_SHAPE, asList(RECTANGLE, ELLIPSE, TRIANGLE));
 		supportedValuesMap.put(EDGE_LINE_TYPE, asList(SOLID, DOT, EQUAL_DASH));
+		supportedValuesMap.put(DETAIL_LEVEL, asList(DETAIL_LOW, DETAIL_MED, DETAIL_HIGH));
 	}
 	
 	@Override

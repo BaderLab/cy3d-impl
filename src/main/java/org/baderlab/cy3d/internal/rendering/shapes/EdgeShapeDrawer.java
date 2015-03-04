@@ -7,7 +7,7 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
-import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
+import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.Shape;
 
 public class EdgeShapeDrawer {
 	

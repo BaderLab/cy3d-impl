@@ -2,15 +2,17 @@ package org.baderlab.cy3d.internal.rendering;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.media.opengl.GL2;
 
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
+import org.baderlab.cy3d.internal.cytoscape.view.DetailLevel;
+import org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer;
-import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.ShapeType;
+import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.Detail;
+import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.Shape;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyNode;
@@ -29,26 +31,34 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 	/** The default radius of the spherical nodes */
 	private static final float NODE_SIZE_RADIUS = 0.322f; // 0.015f
 	
-	private Map<NodeShape, ShapeType> cytoscapeShapeMap;
-	private ScalableShapeDrawer shapeDrawer;
+	private ScalableShapeDrawer shapeDrawer = new ScalableShapeDrawer();
 	
 	
-	public RenderNodesProcedure() {
-		shapeDrawer = new ScalableShapeDrawer();
-	}	
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
-		
 		shapeDrawer.initialize(gl);
-		
-		cytoscapeShapeMap = new HashMap<NodeShape, ShapeType>(8);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.TRIANGLE, ShapeType.SHAPE_TETRAHEDRON);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.DIAMOND, ShapeType.SHAPE_CUBE);
-		cytoscapeShapeMap.put(NodeShapeVisualProperty.ELLIPSE, ShapeType.SHAPE_SPHERE);
+	}
+	
+	
+	private static Shape mapNodeShape(NodeShape nodeShape) {
+		if(NodeShapeVisualProperty.TRIANGLE.equals(nodeShape))
+			return Shape.SHAPE_TETRAHEDRON;
+		if(NodeShapeVisualProperty.ELLIPSE.equals(nodeShape))
+			return Shape.SHAPE_SPHERE;
+		return Shape.SHAPE_CUBE;
 	}
 
+	private static Detail mapDetailLevel(DetailLevel detailLevel) {
+		System.out.println("ss" + detailLevel.getSerializableString());
+		if(DetailLevelVisualProperty.DETAIL_MED.equals(detailLevel))
+			return Detail.DETAIL_MED;
+		if(DetailLevelVisualProperty.DETAIL_HIGH.equals(detailLevel))
+			return Detail.DETAIL_HIGH;
+		return Detail.DETAIL_LOW;
+	}
+	
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		GL2 gl = graphicsData.getGlContext();
@@ -110,13 +120,12 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 							depth.floatValue() / nodeSizeScale);
 				}
 				
-				ShapeType shapeType = cytoscapeShapeMap.get(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
+				Shape shapeType = mapNodeShape(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
+				Detail detail = mapDetailLevel(networkView.getVisualProperty(Cy3DVisualLexicon.DETAIL_LEVEL)); 
 				
-				if (shapeType != null) {
-					shapeDrawer.drawShape(gl, shapeType);
-				} else {
-					shapeDrawer.drawShape(gl, ShapeType.SHAPE_CUBE);
-				}
+				System.out.println(detail);
+				
+				shapeDrawer.drawShape(gl, shapeType, detail);
 				
 				gl.glPopName();
 				gl.glPopMatrix();
