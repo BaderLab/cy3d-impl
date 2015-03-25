@@ -1,5 +1,6 @@
-package org.baderlab.cy3d.internal.cytoscape.view;
+package org.baderlab.cy3d.internal;
 
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;

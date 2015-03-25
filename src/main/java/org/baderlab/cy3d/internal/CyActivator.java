@@ -5,7 +5,6 @@ import static org.cytoscape.work.ServiceProperties.*;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkViewFactory;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;

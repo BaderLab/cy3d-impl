@@ -51,7 +51,6 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 	}
 
 	private static Detail mapDetailLevel(DetailLevel detailLevel) {
-		System.out.println("ss" + detailLevel.getSerializableString());
 		if(DetailLevelVisualProperty.DETAIL_MED.equals(detailLevel))
 			return Detail.DETAIL_MED;
 		if(DetailLevelVisualProperty.DETAIL_HIGH.equals(detailLevel))
@@ -122,8 +121,6 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 				
 				Shape shapeType = mapNodeShape(nodeView.getVisualProperty(BasicVisualLexicon.NODE_SHAPE));
 				Detail detail = mapDetailLevel(networkView.getVisualProperty(Cy3DVisualLexicon.DETAIL_LEVEL)); 
-				
-				System.out.println(detail);
 				
 				shapeDrawer.drawShape(gl, shapeType, detail);
 				

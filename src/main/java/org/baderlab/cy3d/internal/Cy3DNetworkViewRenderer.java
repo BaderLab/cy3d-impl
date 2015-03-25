@@ -14,7 +14,7 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 public class Cy3DNetworkViewRenderer implements NetworkViewRenderer {
 
 	public static final String ID = "org.baderlab.cy3d";
-	public static final String DISPLAY_NAME = "Cytoscape 3D";
+	public static final String DISPLAY_NAME = "Cy3D";
 	
 	private final CyNetworkViewFactory networkViewFactory;
 	private final RenderingEngineFactory<CyNetwork> mainFactory;
