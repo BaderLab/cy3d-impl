@@ -8,16 +8,17 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 
+import com.google.common.collect.ImmutableSet;
 import com.jogamp.common.util.IOUtil;
 import com.jogamp.common.util.JarUtil;
 
@@ -27,27 +28,31 @@ import com.jogamp.common.util.JarUtil;
  */
 public class JoglInitializer {
 	
+	private static final boolean DEBUG = false;
 	
 	private static final String GLUEGEN_JAR = "gluegen-rt-2.2.4.jar";
-	private static final String JOGL_JAR = "jogl-all-2.2.4.jar";
+	private static final String JOGL_JAR    = "jogl-all-2.2.4.jar";
 
 	private JoglInitializer() {}
 	
 	
 	public static void unpackNativeLibrariesForJOGL(BundleContext bc) throws IOException {
-		
 		// Get the URLs for the JOGL jar files that are contained in the bundle.
 		List<URL> jarFileURLs = getJarFileURLs(bc);
+		
+		if(DEBUG)
+			System.out.println("JoglInitializer.jarFileURLs: " + jarFileURLs);
 		
 		// Copy the jar files to the persistent storage area, return a map of file paths.
 		Map<String,String> pathMap = copyJarFiles(jarFileURLs, bc);
 		
+		if(DEBUG)
+			System.out.println("JoglInitializer.pathMap: " + pathMap);
+		
 		// Create a URL resolver object and register it with JOGL.
 		JarUtil.Resolver resolver = createJarResolver(pathMap);
 		JarUtil.setResolver(resolver);
-		
 	}
-	
 	
 	
 	@SuppressWarnings("unchecked")
@@ -101,12 +106,9 @@ public class JoglInitializer {
 	private static JarUtil.Resolver createJarResolver(final Map<String,String> pathMap) {
 		return new JarUtil.Resolver() {
 			
-			private final Set<String> gluegenPrefixes = new HashSet<>(); 
-			{
-				gluegenPrefixes.add("/com/jogamp/common");
-				gluegenPrefixes.add("/com/jogamp/gluegen");
-				gluegenPrefixes.add("/jogamp/common");
-			}
+			final Set<String> gluegenPrefixes = ImmutableSet.of("/com/jogamp/common", 
+					                                            "/com/jogamp/gluegen", 
+					                                            "/jogamp/common");
 			
 			private boolean isGluegen(String path) {
 				for(String prefix : gluegenPrefixes) {
@@ -118,16 +120,23 @@ public class JoglInitializer {
 			}
 			
 			@Override
-			public URL resolve(URL url) {
-				String path = url.getPath();
-				String jarToUse = isGluegen(path) ? GLUEGEN_JAR : JOGL_JAR;
-				String urlString = "jar:file:" + pathMap.get(jarToUse) + "!" + path;
+			public URL resolve(URL joglUrl) {
+				String qualifiedClassName = joglUrl.getPath();
+				String jarToUse = isGluegen(qualifiedClassName) ? GLUEGEN_JAR : JOGL_JAR;
+				String localFilePath = pathMap.get(jarToUse);
+				
 				try {
+					String encodedLocalPath = Paths.get(localFilePath).toUri().toURL().getPath();
+					String urlString = "jar:file:" + encodedLocalPath + "!" + qualifiedClassName;
 					URL newUrl = new URL(urlString);
+					
+					if(DEBUG)
+						System.out.println("JoglInitializer.createJarResolver: " + joglUrl + " -> " + newUrl);
+					
 					return newUrl;
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
-					return url;
+					return joglUrl;
 				}
 			}
 			
