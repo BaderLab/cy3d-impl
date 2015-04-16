@@ -11,6 +11,7 @@ import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer;
 import org.baderlab.cy3d.internal.rendering.shapes.EdgeShapeDrawer.EdgeShapeType;
+import org.baderlab.cy3d.internal.tools.GeometryToolkit;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
@@ -95,8 +96,8 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 				
 				// General points along the arc
 				Vector3[] points = container.getCoordinates();
+				GeometryToolkit.negateYCoords(points);
 				
-
 				// Draw the correct type of edge depending on the visual property
 				if (edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE) == LineTypeVisualProperty.EQUAL_DASH) {
 					drawDashedArc(gl, points);

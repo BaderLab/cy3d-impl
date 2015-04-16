@@ -55,7 +55,12 @@ public class RenderSimplifiedEdgesProcedure implements GraphicsProcedure {
 			if (!drawnPairs.contains(pairIdentifier)) {
 			
 				Vector3 start = NetworkToolkit.obtainNodeCoordinates(source, networkView, (double) GraphicsData.DISTANCE_SCALE);
-				Vector3 end = NetworkToolkit.obtainNodeCoordinates(target, networkView, (double) GraphicsData.DISTANCE_SCALE);
+				Vector3 end   = NetworkToolkit.obtainNodeCoordinates(target, networkView, (double) GraphicsData.DISTANCE_SCALE);
+				
+				// Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
+				start.set(start.x(), -start.y(), start.z());
+				end.set(end.x(), -end.y(), end.z());
+				
 				Vector3 displacement = end.subtract(start);
 				
 				gl.glPushMatrix();

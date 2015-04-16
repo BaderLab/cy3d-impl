@@ -82,6 +82,8 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
+			
+			y = -y; // Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
 
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {

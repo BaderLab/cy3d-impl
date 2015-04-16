@@ -22,6 +22,8 @@ public class CenterLayoutAlgorithmTask extends AbstractLayoutTask {
 		Collection<View<CyNode>> nodeViews = networkView.getNodeViews();
 		int n = nodeViews.size();
 		
+		// MKTODO This duplicates the logic found in LayoutToolkit.findCenter()
+		
 		double sumX = 0, sumY = 0, sumZ = 0;
 		
 		for(View<CyNode> nodeView : nodeViews) {

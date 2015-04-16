@@ -329,4 +329,16 @@ public class GeometryToolkit {
 		result.multiplyLocal(180.0 / Math.PI);
 		return result;
 	}
+	
+	
+	/**
+	 * Negates the Y coordinate of each given point.
+	 * This is usually required because Cytoscape(Swing) measures the Y coordinate from the
+	 * top of the screen and OpenGL measures the Y coordinate from the bottom of the screen.
+	 */
+	public static void negateYCoords(Vector3 ... points) {
+		for(Vector3 point : points) {
+			point.set(point.x(), -point.y(), point.z());
+		}
+	}
 }

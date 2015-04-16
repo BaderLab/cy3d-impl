@@ -81,19 +81,15 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
+			
+			y = -y; // Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
 
 			Double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
 			Double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
 			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
-			//System.out.printf("(%f,%f,%f)\n", width, height, depth);
-			 
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) 
-					&& 
-					graphicsData
-					.getViewingVolume()
-					.inside(new Vector3(x, y, z), 1)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData .getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
 				long suid = nodeView.getModel().getSUID();
 				
