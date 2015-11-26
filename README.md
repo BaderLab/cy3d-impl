@@ -1,7 +1,4 @@
-Cy3D
-====
-
-## A 3D Network View Renderer App for Cytoscape.
+## Cy3D - A 3D Renderer App for Cytoscape.
 
 Requires Cytoscape 3.3.
 
