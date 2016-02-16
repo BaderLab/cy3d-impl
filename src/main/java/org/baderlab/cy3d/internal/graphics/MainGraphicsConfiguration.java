@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.graphics;
 import java.util.Collection;
 
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
+import javax.swing.RootPaneContainer;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
@@ -54,10 +54,10 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	
 	@Override
-	public void initializeFrame(JComponent frame) {
-		this.frame = frame;
-		if(frame instanceof JInternalFrame) {
-			this.toolPanel = new ToolPanel((JInternalFrame)frame);
+	public void initializeFrame(JComponent component) {
+		this.frame = component;
+		if(component instanceof RootPaneContainer) {
+			this.toolPanel = new ToolPanel((RootPaneContainer)component, component);
 		}
 	}
 	

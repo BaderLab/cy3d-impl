@@ -21,7 +21,6 @@ import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -56,9 +55,9 @@ public class ToolPanel {
 	
 	private EventBus eventBus = null;
 	
-	public ToolPanel(JInternalFrame frame) {
-		setUpGlassPane(frame);
-		setUpKeyboardInput(frame);
+	public ToolPanel(RootPaneContainer rootPaneContainer, JComponent component) {
+		setUpGlassPane(rootPaneContainer);
+		setUpKeyboardInput(component);
 	}
 	
 	public void setEventBus(EventBus eventBus) {

@@ -13,7 +13,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
+import javax.swing.RootPaneContainer;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
@@ -80,16 +80,16 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		
 		networkView.addContainer(panel); // When networkView.updateView() is called it will repaint all containers it owns
 
-		if (container instanceof JInternalFrame) {
-			JInternalFrame frame = (JInternalFrame) container;
-			Container pane = frame.getContentPane();
+		if (container instanceof RootPaneContainer) {
+			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
+			Container pane = rootPaneContainer.getContentPane();
 			pane.setLayout(new BorderLayout());
 			pane.add(panel, BorderLayout.CENTER);
-		} 
-		else {
+		} else {
 			container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
 		}
+		
 		renderEventListener.initializeFrame(container);
 	}
 	

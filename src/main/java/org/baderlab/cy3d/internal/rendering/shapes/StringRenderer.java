@@ -5,8 +5,6 @@ import java.util.Map;
 
 import javax.media.opengl.GL2;
 
-import org.baderlab.cy3d.internal.geometric.Vector3;
-
 public class StringRenderer {
 	
 	private static final float CHARACTER_SPACING = 0.1f;

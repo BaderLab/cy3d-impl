@@ -1,6 +1,5 @@
 package org.baderlab.cy3d.internal.task;
 
-import java.awt.datatransfer.Transferable;
 import java.awt.geom.Point2D;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;

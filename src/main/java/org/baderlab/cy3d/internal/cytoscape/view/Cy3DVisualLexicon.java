@@ -1,9 +1,15 @@
 package org.baderlab.cy3d.internal.cytoscape.view;
 
 import static java.util.Arrays.asList;
-import static org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty.*;
-import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.*;
-import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.*;
+import static org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty.DETAIL_HIGH;
+import static org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty.DETAIL_LOW;
+import static org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty.DETAIL_MED;
+import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.DOT;
+import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.EQUAL_DASH;
+import static org.cytoscape.view.presentation.property.LineTypeVisualProperty.SOLID;
+import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.ELLIPSE;
+import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.RECTANGLE;
+import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.TRIANGLE;
 
 import java.util.Collection;
 import java.util.Collections;
