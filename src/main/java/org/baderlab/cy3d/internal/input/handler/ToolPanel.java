@@ -87,7 +87,7 @@ public class ToolPanel {
 		cameraToolBar.add(Box.createHorizontalStrut(4));
 		
 		labelsButton = createToolbarButton("Labels");
-		labelsButton.setSelected(true);
+		labelsButton.setSelected(false);
 		labelsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(eventBus != null) {

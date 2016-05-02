@@ -59,7 +59,7 @@ public class GraphicsData {
 	private GraphicsSelectionData selectionData;
 	private PickingData pickingData;
 	
-	private boolean showLabels = true;
+	private boolean showLabels = false;
 	
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent) {
