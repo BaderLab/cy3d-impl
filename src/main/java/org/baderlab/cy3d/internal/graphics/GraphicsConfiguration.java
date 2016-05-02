@@ -41,7 +41,7 @@ public interface GraphicsConfiguration {
 	 * Called once when the JInternalFrame is created.
 	 * Called first, before initialize(GraphicsData) is called.
 	 */
-	public void initializeFrame(JComponent container);
+	public void initializeFrame(JComponent container, JComponent inputComponent);
 	
 	
 	/**

@@ -13,8 +13,8 @@
 	<properties>
 		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
 		<bundle.namespace>org.baderlab.cy3d.internal</bundle.namespace>
-		<cytoscape.api>3.3.0</cytoscape.api>
-		<project.version>1.0.0</project.version>
+		<cytoscape.api>3.4.0-SNAPSHOT</cytoscape.api>
+		<project.version>1.1.0-SNAPSHOT</project.version>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<jogl.version>2.2.4</jogl.version>
 	</properties>

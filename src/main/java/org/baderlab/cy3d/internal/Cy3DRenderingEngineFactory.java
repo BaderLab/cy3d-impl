@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal;
 
+import java.awt.Container;
+
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
@@ -61,12 +63,34 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();
 		
-		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(component, cy3dViewModel, visualLexicon, eventBusProvider,
+		// TODO the birds eye view should not be attaching input listeners to the outer component
+		// Is the Birds eye view above the top glass pane?
+		JComponent inputComponent = getKeyboardComponent(component, cy3dViewModel.getSUID());
+		if(inputComponent == null)
+			inputComponent = component; // happens for birds-eye-view
+		
+		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(component, inputComponent, cy3dViewModel, visualLexicon, eventBusProvider,
 				                                             configuration, taskFactoryListener, taskManager);
 		
 		renderingEngineManager.addRenderingEngine(engine);
 		return engine;
 	}
+	
+	/**
+	 * This is a HACK for now to get the component to attach hotkeys and cursors to.
+	 */
+	private JComponent getKeyboardComponent(JComponent start, long suid) {
+		String componentName = "__CyNetworkView_" + suid; // see ViewUtil.createUniqueKey(CyNetworkView)
+		Container parent = start;
+		while(parent != null) {
+			if(componentName.equals(parent.getName())) {
+				return (JComponent) parent;
+			}
+			parent = parent.getParent();
+		}
+		return null;
+	}
+	
 	
 	@Override
 	public VisualLexicon getVisualLexicon() {

@@ -41,6 +41,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	public Cy3DRenderingEngine(
 			JComponent component,
+			JComponent inputComponent,
 			Cy3DNetworkView viewModel, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
@@ -51,7 +52,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
 		
-		setUpCanvas(component, configuration, eventBusProvider, taskFactoryListener, taskManager);
+		setUpCanvas(component, inputComponent, configuration, eventBusProvider, taskFactoryListener, taskManager);
 	}
 	
 	
@@ -61,7 +62,8 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	 * @param container A container in the GUI window used to contain
 	 * the rendered results
 	 */
-	private void setUpCanvas(JComponent container, GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
+	private void setUpCanvas(JComponent container, JComponent inputComponent, 
+			                 GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
 			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {
 		
 		GLProfile profile = GLProfile.getDefault(); // Use the system's default version of OpenGL
@@ -74,7 +76,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		//panel.setDoubleBuffered(true);
 		
 		RenderEventListener renderEventListener = new RenderEventListener(networkView, visualLexicon, eventBusProvider, 
-				                                                          configuration, taskFactoryListener, taskManager, panel);
+				                                                          configuration, taskFactoryListener, taskManager, panel, inputComponent);
 
 		panel.addGLEventListener(renderEventListener);
 		
@@ -90,7 +92,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 			container.add(panel, BorderLayout.CENTER);
 		}
 		
-		renderEventListener.initializeFrame(container);
+		configuration.initializeFrame(container, inputComponent);
 	}
 	
 	

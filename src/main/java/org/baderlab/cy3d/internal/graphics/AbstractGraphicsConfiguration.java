@@ -67,7 +67,7 @@ public abstract class AbstractGraphicsConfiguration implements GraphicsConfigura
 	}
 	
 	@Override
-	public void initializeFrame(JComponent container) {
+	public void initializeFrame(JComponent container, JComponent inputComponent) {
 	}
 
 }

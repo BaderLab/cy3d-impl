@@ -30,7 +30,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 
 	private final GraphicsData graphicsData;
 	private final Component container;
-	private final Component frame;
+	private final Component cursorComponent;
 	
 	private final Cursor rotateCursor;
 	private final Cursor orbitCursor;
@@ -41,10 +41,10 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 	
 	
 	
-	public MouseZoneInputListener(GraphicsData graphicsData, Component frame, Component container) {
+	public MouseZoneInputListener(GraphicsData graphicsData, Component container, Component cursorComponent) {
 		this.graphicsData = graphicsData;
 		this.container = container;
-		this.frame = frame;
+		this.cursorComponent = cursorComponent;
 		this.mouseMode = MouseMode.getDefault();
 		
 		IconManagerImpl iconManager = new IconManagerImpl();
@@ -97,7 +97,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		mouseMoved(e);
+		chooseCursor(e.getX(), e.getY());
 	}
 	
 	@Override
@@ -125,18 +125,22 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 			int zoneRadius = centerRadius(width, height);
 			
 			if(distanceFromCenter > zoneRadius) {
-				if(currentCursor != rotateCursor) {
-					frame.setCursor(currentCursor = rotateCursor);
-				}
+				setCursor(rotateCursor);
 			}
 			else {
-				if(currentCursor != orbitCursor) {
-					frame.setCursor(currentCursor = orbitCursor);
-				}
+				setCursor(orbitCursor);
 			}
 		}
 		else {
-			frame.setCursor(currentCursor = defaultCursor);
+			setCursor(defaultCursor);
+		}
+	}
+	
+	
+	private void setCursor(Cursor cursor) {
+		if(currentCursor != cursor) {
+			currentCursor = cursor;
+			cursorComponent.setCursor(cursor);
 		}
 	}
 	
@@ -153,7 +157,7 @@ public class MouseZoneInputListener implements MouseListener, MouseMotionListene
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		frame.setCursor(currentCursor = defaultCursor);
+		setCursor(defaultCursor);
 	}
 	
 	

@@ -7,9 +7,12 @@ import org.baderlab.cy3d.internal.eventbus.BirdsEyeCameraChangeEvent;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitMouseCommand;
 
 /**
- * 
  * @author mkucera
+ * 
+ * @deprecated In Cytoscape 3.4 the birds-eye view is layered on top of the main renderer. 
+ * So we actually don't want to steal the input away from the main renderer.
  */
+@Deprecated
 public class BirdsEyeInputEventListener extends InputEventListener {
 
 

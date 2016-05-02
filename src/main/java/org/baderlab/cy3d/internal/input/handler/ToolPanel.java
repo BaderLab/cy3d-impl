@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -220,28 +221,30 @@ public class ToolPanel {
 		inputMap.put(KeyStroke.getKeyStroke("shift alt pressed SHIFT"), FORCE_SELECT);
 		inputMap.put(KeyStroke.getKeyStroke("alt released SHIFT"), UNFORCE_SELECT);
 		
-		frame.getActionMap().put(FORCE_CAMERA, new AbstractAction() {
+		ActionMap actionMap = frame.getActionMap();
+		
+		actionMap.put(FORCE_CAMERA, new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				forceCamera = true;
 				fireForce();
 			}
 		});
 		
-		frame.getActionMap().put(UNFORCE_CAMERA, new AbstractAction() {
+		actionMap.put(UNFORCE_CAMERA, new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				forceCamera = false;
 				fireForce();
 			}
 		});
 		
-		frame.getActionMap().put(FORCE_SELECT, new AbstractAction() {
+		actionMap.put(FORCE_SELECT, new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				forceSelect = true;
 				fireForce();
 			}
 		});
 		
-		frame.getActionMap().put(UNFORCE_SELECT, new AbstractAction() {
+		actionMap.put(UNFORCE_SELECT, new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				forceSelect = false;
 				fireForce();

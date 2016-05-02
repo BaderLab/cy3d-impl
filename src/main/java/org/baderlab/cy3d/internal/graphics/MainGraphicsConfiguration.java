@@ -54,10 +54,10 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	
 	@Override
-	public void initializeFrame(JComponent component) {
+	public void initializeFrame(JComponent component, JComponent inputComponent) {
 		this.frame = component;
 		if(component instanceof RootPaneContainer) {
-			this.toolPanel = new ToolPanel((RootPaneContainer)component, component);
+			this.toolPanel = new ToolPanel((RootPaneContainer)component, inputComponent);
 		}
 	}
 	
@@ -68,8 +68,8 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		shapePickingProcessor.initialize(graphicsData);
 		
 		// Input handler
-		MouseZoneInputListener mouseZoneListener = MouseZoneInputListener.attach(frame, graphicsData.getContainer(), graphicsData);
-		inputHandler = MainInputEventListener.attach(graphicsData.getContainer(), graphicsData, mouseZoneListener);
+		MouseZoneInputListener mouseZoneListener = MouseZoneInputListener.attach(frame, graphicsData.getInputComponent(), graphicsData);
+		inputHandler = MainInputEventListener.attach(graphicsData.getInputComponent(), graphicsData, mouseZoneListener);
 		
 		// EventBus
 		EventBus eventBus = graphicsData.getEventBus();

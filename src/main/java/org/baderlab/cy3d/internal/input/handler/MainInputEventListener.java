@@ -1,7 +1,12 @@
 package org.baderlab.cy3d.internal.input.handler;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
@@ -46,7 +51,7 @@ public class MainInputEventListener extends InputEventListener {
 		startKeyboardAnimation();
 	}
 	
-	public static MainInputEventListener attach(Component component, GraphicsData graphicsData, MouseZoneInputListener mouseZoneListener) {
+	public static MainInputEventListener attach(JComponent component, GraphicsData graphicsData, MouseZoneInputListener mouseZoneListener) {
 		MainInputEventListener inputHandler = new MainInputEventListener(graphicsData, mouseZoneListener);
 		inputHandler.attachAll(component);
 		
@@ -77,8 +82,8 @@ public class MainInputEventListener extends InputEventListener {
 		setMouseMode(mouseModeChangeEvent.getMouseMode());
 	}
 	
+	
 	private void setMouseMode(MouseMode mouseMode) {
-		
 		switch(mouseMode) {
 			case CAMERA: 
 				CameraOrbitMouseCommand orbitCommand = new CameraOrbitMouseCommand(graphicsData);
@@ -94,16 +99,24 @@ public class MainInputEventListener extends InputEventListener {
 	}
 	
 	
+	@SuppressWarnings("serial")
 	@Override
-	public void keyTyped(KeyEvent e) {
-		switch(e.getKeyChar()) {
-			case 'R':
-			case 'r': 
+	protected void setUpKeyboardInput(JComponent component) {
+		super.setUpKeyboardInput(component);
+		
+		InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		ActionMap actionMap = component.getActionMap();
+		
+		inputMap.put(KeyStroke.getKeyStroke("pressed R"), "PRESSED_R");
+		 
+		actionMap.put("PRESSED_R", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				graphicsData.getCamera().reset();
 				graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
 				networkView.fitContent();
-				break;
-		}
+			}
+		});
 	}
 	
 }

@@ -1,8 +1,7 @@
 package org.baderlab.cy3d.internal.data;
 
-import java.awt.Component;
-
 import javax.media.opengl.GL2;
+import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
@@ -50,7 +49,8 @@ public class GraphicsData {
 	private int screenHeight;
 	private int screenWidth;
 	
-	private Component container;
+	private final JComponent container;
+	private final JComponent inputComponent;
 	
 	private TaskFactoryListener taskFactoryListener;
 	private DialogTaskManager taskManager;
@@ -62,10 +62,12 @@ public class GraphicsData {
 	private boolean showLabels = true;
 	
 	
-	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus) {
+	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent) {
 		this.networkView = networkView;
 		this.eventBus = eventBus;
 		this.visualLexicon = visualLexicon;
+		this.container = container;
+		this.inputComponent = inputComponent;
 		
 		selectionData = new GraphicsSelectionData();
 		pickingData = new PickingData();
@@ -77,10 +79,6 @@ public class GraphicsData {
 	
 	public void setGlContext(GL2 glContext) {
 		this.glContext = glContext;
-	}
-	
-	public void setContainer(Component container) {
-		this.container = container;
 	}
 	
 	public void setPixelConverter(PixelConverter pixelConverter) {
@@ -140,10 +138,14 @@ public class GraphicsData {
 		return viewingVolume;
 	}
 
-	public Component getContainer() {
+	public JComponent getContainer() {
 		return container;
 	}
 
+	public JComponent getInputComponent() {
+		return inputComponent;
+	}
+	
 	public TaskFactoryListener getTaskFactoryListener() {
 		return taskFactoryListener;
 	}

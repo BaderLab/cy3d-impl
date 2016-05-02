@@ -1,16 +1,19 @@
 package org.baderlab.cy3d.internal.input.handler;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -25,7 +28,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * 
  * @author mkucera
  */
-public class InputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class InputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	protected final GraphicsData graphicsData;
 	protected final CyNetworkView networkView;
@@ -33,10 +36,8 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	
 	private Timer heartBeat;
 	
-	private boolean keyUp;
-	private boolean keyLeft;
-	private boolean keyRight;
-	private boolean keyDown;
+	private int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
+	private boolean[] key = new boolean[4];
 	
 	private MouseWheelCommand mouseWheelCommand = MouseWheelCommand.EMPTY;
 	private MouseCommand primaryMouseCommand = MouseCommand.EMPTY;
@@ -69,11 +70,11 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	}
 
 	
-	public void attachAll(Component component) {
+	public void attachAll(JComponent component) {
 		component.addMouseWheelListener(this);
 		component.addMouseMotionListener(this);
 		component.addMouseListener(this);
-		component.addKeyListener(this);
+		setUpKeyboardInput(component);
 	}
 	
 
@@ -182,49 +183,70 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 				tickKey();
 			}
 		});
-		heartBeat.start();
 	}
 
 	public void dispose() {
-		heartBeat.stop();
+		if(heartBeat != null) {
+			heartBeat.stop();
+		}
 	}
 
 	private void tickKey() {
-		if(keyUp)
+		if(key[UP])
 			keyCommand.up();
-		if(keyDown)
+		if(key[DOWN])
 			keyCommand.down();
-		if(keyLeft)
+		if(key[LEFT])
 			keyCommand.left();
-		if(keyRight)
+		if(key[RIGHT])
 			keyCommand.right();
 		
-		if(keyUp || keyDown || keyLeft || keyRight)
+		if(key[UP] || key[DOWN] || key[LEFT] || key[RIGHT]) {
 			updateBothRenderers();
+		}
+		else {
+			heartBeat.stop();
+		}
+	}
+	
+	
+	protected void setUpKeyboardInput(JComponent component) {
+		InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		ActionMap actionMap = component.getActionMap();
+		
+		inputMap.put(KeyStroke.getKeyStroke("pressed UP"),    "PRESSED_UP");
+		inputMap.put(KeyStroke.getKeyStroke("pressed DOWN"),  "PRESSED_DOWN");
+		inputMap.put(KeyStroke.getKeyStroke("pressed LEFT"),  "PRESSED_LEFT");
+		inputMap.put(KeyStroke.getKeyStroke("pressed RIGHT"), "PRESSED_RIGHT");
+		
+		inputMap.put(KeyStroke.getKeyStroke("released UP"),    "RELEASED_UP");
+		inputMap.put(KeyStroke.getKeyStroke("released DOWN"),  "RELEASED_DOWN");
+		inputMap.put(KeyStroke.getKeyStroke("released LEFT"),  "RELEASED_LEFT");
+		inputMap.put(KeyStroke.getKeyStroke("released RIGHT"), "RELEASED_RIGHT");
+		 
+		actionMap.put("PRESSED_UP",    keyAction(UP, true));
+		actionMap.put("PRESSED_DOWN",  keyAction(DOWN, true));
+		actionMap.put("PRESSED_LEFT",  keyAction(LEFT, true));
+		actionMap.put("PRESSED_RIGHT", keyAction(RIGHT, true));
+		
+		actionMap.put("RELEASED_UP",    keyAction(UP, false));
+		actionMap.put("RELEASED_DOWN",  keyAction(DOWN, false));
+		actionMap.put("RELEASED_LEFT",  keyAction(LEFT, false));
+		actionMap.put("RELEASED_RIGHT", keyAction(RIGHT, false));
+	}
+	
+	
+	@SuppressWarnings("serial")
+	private Action keyAction(final int keyIndex, final boolean pressed) {
+		return new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				key[keyIndex] = pressed;
+				if(pressed && heartBeat != null) {
+					heartBeat.start();
+				}
+			}
+		};
 	}
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-			switch(e.getKeyCode()) {
-				case KeyEvent.VK_UP:    keyUp    = true;  break;
-				case KeyEvent.VK_LEFT:  keyLeft  = true;  break;
-				case KeyEvent.VK_RIGHT: keyRight = true;  break;
-				case KeyEvent.VK_DOWN:  keyDown  = true;  break;
-			}
-		}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-			switch(e.getKeyCode()) {
-				case KeyEvent.VK_UP:    keyUp    = false;  break;
-				case KeyEvent.VK_LEFT:  keyLeft  = false;  break;
-				case KeyEvent.VK_RIGHT: keyRight = false;  break;
-				case KeyEvent.VK_DOWN:  keyDown  = false;  break;
-			}
-		}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
 
 }

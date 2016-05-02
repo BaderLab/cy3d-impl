@@ -57,21 +57,17 @@ public class RenderEventListener implements GLEventListener {
 			GraphicsConfiguration configuration,
 			TaskFactoryListener taskFactoryListener, 
 			DialogTaskManager taskManager,
-			JComponent component) {
+			JComponent component,
+			JComponent inputComponent) {
 		
 		this.configuration = checkNotNull(configuration);
 		EventBus eventBus = eventBusProvider.getEventBus(networkView);
 		
-		graphicsData = new GraphicsData(networkView, visualLexicon, eventBus);
+		graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, component, inputComponent);
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
-		graphicsData.setContainer(component);
 	}
 	
-	public void initializeFrame(JComponent frame) {
-		configuration.initializeFrame(frame);
-	}
-
 	
 	/** 
 	 * Initialize the Graphics object, performing certain OpenGL initializations.

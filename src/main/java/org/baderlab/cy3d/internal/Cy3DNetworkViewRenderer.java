@@ -43,10 +43,11 @@ public class Cy3DNetworkViewRenderer implements NetworkViewRenderer {
 	@Override
 	public RenderingEngineFactory<CyNetwork> getRenderingEngineFactory(String context) {
 		switch(context) {
-			default:
 			case DEFAULT_CONTEXT: return mainFactory;
 			case BIRDS_EYE_CONTEXT: return birdsEyeFactory;
-			case VISUAL_STYLE_PREVIEW_CONTEXT: return null; // MKTODO what to return here?
+			case THUMBNAIL_CONTEXT: return null;
+			case VISUAL_STYLE_PREVIEW_CONTEXT: return null;
+			default: return null;
 		}
 	}
 
