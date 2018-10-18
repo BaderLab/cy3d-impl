@@ -72,7 +72,6 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		Cy3DRenderingEngine engine = new Cy3DRenderingEngine(component, inputComponent, cy3dViewModel, visualLexicon, eventBusProvider,
 				                                             configuration, taskFactoryListener, taskManager);
 		
-		renderingEngineManager.addRenderingEngine(engine);
 		return engine;
 	}
 	

@@ -3,6 +3,7 @@ package org.baderlab.cy3d.internal;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
@@ -27,6 +28,9 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
 
+import com.jogamp.common.util.awt.AWTEDTExecutor;
+import com.jogamp.nativewindow.awt.AWTPrintLifecycle;
+
 /** 
  * This class represents a Cy3DRenderingEngine, responsible for
  * creating a rendering of a {@link CyNetwork}.
@@ -37,6 +41,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	private final VisualLexicon visualLexicon;
 	
 	private GLJPanel panel;
+	private Properties props;
 	
 	
 	public Cy3DRenderingEngine(
@@ -51,6 +56,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
+		this.props = new Properties();
 		
 		setUpCanvas(component, inputComponent, configuration, eventBusProvider, taskFactoryListener, taskManager);
 	}
@@ -108,7 +114,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 
 	@Override
 	public Properties getProperties() {
-		return null;
+		return props; // can't return null or (File > Print) won't work
 	}
 	
 	@Override
@@ -135,7 +141,20 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	}
 
 	@Override
-	public void printCanvas(java.awt.Graphics printCanvas) {
+	public void printCanvas(final Graphics printCanvas) {
+		double scaleX = (double)panel.getWidth()  / (double)panel.getSurfaceWidth();
+		double scaleY = (double)panel.getHeight() / (double)panel.getSurfaceHeight();
+		
+		AWTPrintLifecycle.Context ctx = AWTPrintLifecycle.Context.setupPrint(panel, scaleX, scaleY, 0, -1, -1);
+		try {
+			AWTEDTExecutor.singleton.invoke(true, new Runnable() {
+				public void run() {
+					panel.print(printCanvas);
+				}
+			});
+		} finally {
+			ctx.releasePrint();
+		}
 	}
 	
 	@Override
