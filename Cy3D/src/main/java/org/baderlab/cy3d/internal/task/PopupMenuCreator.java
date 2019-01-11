@@ -62,7 +62,7 @@ public class PopupMenuCreator {
 	/**
 	 * Filter out menu items that currently cause problems.
 	 */
-	private static boolean filter(String[][] filter, Map<String,Object> properties) {
+	private static boolean filter(String[][] filter, Map<String,String> properties) {
 		String preferredMenu = (String) properties.get("preferredMenu");
 		String title = (String) properties.get("title");
 		
@@ -90,15 +90,15 @@ public class PopupMenuCreator {
 	}
 	
 	public JPopupMenu createEdgeMenu(View<CyEdge> edgeView, CyNetworkView networkView, VisualLexicon visualLexicon, 
-			                         Map<EdgeViewTaskFactory, Map<String, Object>> taskFactories) {
+			                         Map<EdgeViewTaskFactory, Map<String, String>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
 		
 		if (taskFactories.size() >= 1) {
-			for (Entry<EdgeViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
+			for (Entry<EdgeViewTaskFactory, Map<String, String>> entry : taskFactories.entrySet()) {
 				EdgeViewTaskFactory edgeViewTaskFactory = entry.getKey();
-				Map<String, Object> properties = entry.getValue();
+				Map<String, String> properties = entry.getValue();
 				
 				if(!filter(edgeFilter, properties)) continue;
 				
@@ -112,15 +112,15 @@ public class PopupMenuCreator {
 	
 	
 	public JPopupMenu createNodeMenu(View<CyNode> nodeView, CyNetworkView networkView, VisualLexicon visualLexicon,
-			                         Map<NodeViewTaskFactory, Map<String, Object>> taskFactories) {
+			                         Map<NodeViewTaskFactory, Map<String, String>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
 		
 		if (taskFactories.size() >= 1) {
-			for (Entry<NodeViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
+			for (Entry<NodeViewTaskFactory, Map<String, String>> entry : taskFactories.entrySet()) {
 				NodeViewTaskFactory nodeViewTaskFactory = entry.getKey();
-				Map<String, Object> properties = entry.getValue();
+				Map<String, String> properties = entry.getValue();
 				
 				if(!filter(nodeFilter, properties)) continue;
 				
@@ -134,15 +134,15 @@ public class PopupMenuCreator {
 	
 	
 	public JPopupMenu createNetworkMenu(CyNetworkView networkView, VisualLexicon visualLexicon,
-			                            Map<NetworkViewTaskFactory, Map<String, Object>> taskFactories) {
+			                            Map<NetworkViewTaskFactory, Map<String, String>> taskFactories) {
 		
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuTracker tracker = new JMenuTracker(popupMenu);
 		
 		if (taskFactories.size() >= 1) {
-			for (Entry<NetworkViewTaskFactory, Map<String, Object>> entry : taskFactories.entrySet()) {
+			for (Entry<NetworkViewTaskFactory, Map<String, String>> entry : taskFactories.entrySet()) {
 				NetworkViewTaskFactory networkViewTaskFactory = entry.getKey();
-				Map<String, Object> properties = entry.getValue();
+				Map<String, String> properties = entry.getValue();
 				
 				if(!filter(networkFilter, properties)) continue;
 				
@@ -161,7 +161,7 @@ public class PopupMenuCreator {
 
 	
 	private void createMenuItem(View<?> view, VisualLexicon visualLexicon, JPopupMenu popupMenu, TaskFactory taskFactory,
-	                            JMenuTracker tracker, Map<String, Object> properties) {
+	                            JMenuTracker tracker, Map<String, String> properties) {
 		
 		String title = null;
 		if (properties.get("title") != null) {

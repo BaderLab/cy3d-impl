@@ -16,12 +16,12 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
-import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
@@ -51,7 +51,7 @@ public class RenderEventListener implements GLEventListener {
 	
 	
 	public RenderEventListener(
-			Cy3DNetworkView networkView, 
+			CyNetworkView networkView, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,

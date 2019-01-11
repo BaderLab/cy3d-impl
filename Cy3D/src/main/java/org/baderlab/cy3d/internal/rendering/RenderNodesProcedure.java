@@ -67,6 +67,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
+		
 		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float nodeSizeScale = 60;
 

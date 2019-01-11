@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
+import org.cytoscape.view.model.CyNetworkView;
 
 import com.google.common.eventbus.EventBus;
 
@@ -27,7 +27,7 @@ public class EventBusProvider {
 	 * Note: The parameter type is rather restrictive to ensure its not accidentally
 	 * called on any CyIdentifiable.
 	 */
-	public synchronized EventBus getEventBus(Cy3DNetworkView identifiable) {
+	public synchronized EventBus getEventBus(CyNetworkView identifiable) {
 		Long suid = checkNotNull(identifiable).getSUID();
 		EventBus eventBus = eventBusMap.get(suid);
 		if(eventBus == null) {

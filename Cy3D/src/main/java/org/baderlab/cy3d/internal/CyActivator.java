@@ -30,6 +30,7 @@ import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
+import org.cytoscape.view.model.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
@@ -58,10 +59,10 @@ public class CyActivator extends AbstractCyActivator {
 		
 		// Register service to collect references to relevant task factories for the right-click context menu
 		TaskFactoryListener taskFactoryListener = new TaskFactoryListener();
-		registerServiceListener(bc, taskFactoryListener, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
-		registerServiceListener(bc, taskFactoryListener, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
-		registerServiceListener(bc, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
-		registerServiceListener(bc, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener::addNodeViewTaskFactory, taskFactoryListener::removeNodeViewTaskFactory, NodeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener::addEdgeViewTaskFactory, taskFactoryListener::removeEdgeViewTaskFactory, EdgeViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener::addNetworkViewTaskFactory, taskFactoryListener::removeNetworkViewTaskFactory, NetworkViewTaskFactory.class);
+		registerServiceListener(bc, taskFactoryListener::addNetworkViewLocationTaskFactory, taskFactoryListener::removeNetworkViewLocationTaskFactory, NetworkViewLocationTaskFactory.class);
 		
 		// Cy3D Visual Lexicon
 		VisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
@@ -72,10 +73,15 @@ public class CyActivator extends AbstractCyActivator {
 
 		// Cy3D NetworkView factory
 		EventBusProvider eventBusProvider = new EventBusProvider();
-		Cy3DNetworkViewFactory cy3dNetworkViewFactory = new Cy3DNetworkViewFactory(cy3dVisualLexicon, visualMappingManagerService, eventBusProvider);
+		
+		CyNetworkViewFactoryFactory netViewFactoryFactory = getService(bc, CyNetworkViewFactoryFactory.class);
+		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID);
+		
+		System.out.println("Cy3D: netViewFactory: " + netViewFactory);
+		
 		Properties cy3dNetworkViewFactoryProps = new Properties();
 		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");
-		registerService(bc, cy3dNetworkViewFactory, CyNetworkViewFactory.class, cy3dNetworkViewFactoryProps);
+		registerService(bc, netViewFactory, CyNetworkViewFactory.class, cy3dNetworkViewFactoryProps);
 
 		
 		// Main RenderingEngine factory
@@ -90,7 +96,7 @@ public class CyActivator extends AbstractCyActivator {
 
 		
 		// NetworkViewRenderer, this is the main entry point that Cytoscape will call into
-		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(cy3dNetworkViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
+		Cy3DNetworkViewRenderer networkViewRenderer = new Cy3DNetworkViewRenderer(netViewFactory, cy3dMainRenderingEngineFactory, cy3dBirdsEyeRenderingEngineFactory);
 		registerService(bc, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
 		// Still need to register the rendering engine factory directly

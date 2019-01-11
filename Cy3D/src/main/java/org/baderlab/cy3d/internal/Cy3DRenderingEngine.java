@@ -16,12 +16,13 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.RootPaneContainer;
 
-import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.CyNetworkViewListener;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
@@ -37,7 +38,7 @@ import com.jogamp.nativewindow.awt.AWTPrintLifecycle;
  */
 class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
-	private final Cy3DNetworkView networkView;
+	private final CyNetworkView networkView;
 	private final VisualLexicon visualLexicon;
 	
 	private GLJPanel panel;
@@ -47,7 +48,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	public Cy3DRenderingEngine(
 			JComponent component,
 			JComponent inputComponent,
-			Cy3DNetworkView viewModel, 
+			CyNetworkView viewModel, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,
@@ -86,7 +87,19 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 
 		panel.addGLEventListener(renderEventListener);
 		
-		networkView.addContainer(panel); // When networkView.updateView() is called it will repaint all containers it owns
+		networkView.addNetworkViewListener(new CyNetworkViewListener() {
+			@Override
+			public void handleUpdateView() {
+				panel.repaint();
+			}
+			@Override
+			public void handleFitSelected() {
+			}
+			@Override
+			public void handleFitContent() {
+			}
+		});
+//		networkView.addContainer(pa nel); // When networkView.updateView() is called it will repaint all containers it owns
 
 		if (container instanceof RootPaneContainer) {
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;

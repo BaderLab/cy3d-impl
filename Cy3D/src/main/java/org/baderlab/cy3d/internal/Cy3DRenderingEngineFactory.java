@@ -4,12 +4,12 @@ import java.awt.Container;
 
 import javax.swing.JComponent;
 
-import org.baderlab.cy3d.internal.cytoscape.view.Cy3DNetworkView;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
@@ -58,7 +58,7 @@ public class Cy3DRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	@Override
 	public RenderingEngine<CyNetwork> createRenderingEngine(Object container, View<CyNetwork> viewModel) {
 		// Verify the type of the view up front.
-		Cy3DNetworkView cy3dViewModel = (Cy3DNetworkView) viewModel;
+		CyNetworkView cy3dViewModel = (CyNetworkView) viewModel;
 		JComponent component = (JComponent) container;
 		
 		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();

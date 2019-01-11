@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<name>Cy3D</name>
+	<name>Cy3DTest</name>
 
 	<groupId>org.cytoscape</groupId>
-	<artifactId>cy3d</artifactId>
-	<version>1.0.2</version>
+	<artifactId>cy3dtest</artifactId>
+	<version>1.0.4-SNAPSHOT</version>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>bundle</packaging>
@@ -13,7 +13,7 @@
 	<properties>
 		<bundle.symbolicName>org.baderlab.cy3d-impl</bundle.symbolicName>
 		<bundle.namespace>org.baderlab.cy3d.internal</bundle.namespace>
-		<cytoscape.api>3.4.0</cytoscape.api>
+		<cytoscape.api>3.7.1-SNAPSHOT</cytoscape.api>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<jogl.version>2.2.4</jogl.version>
 	</properties>
@@ -64,39 +64,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<executions>
-					<execution>
-						<id>default-testCompile</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>testCompile</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
+				<version>3.0</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<optimize>true</optimize>
-					<showWarnings>true</showWarnings>
-					<showDeprecation>true</showDeprecation>
-					<compilerArguments>
-						<Xmaxwarns>10000</Xmaxwarns>
-						<Xmaxerrs>10000</Xmaxerrs>
-					</compilerArguments>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
+				<version>2.4.0</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
