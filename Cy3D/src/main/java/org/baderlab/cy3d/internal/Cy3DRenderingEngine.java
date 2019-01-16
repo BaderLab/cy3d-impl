@@ -8,6 +8,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
@@ -16,19 +19,22 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.RootPaneContainer;
 
+import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
+import org.baderlab.cy3d.internal.eventbus.UpdateNetworkViewEvent;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.CyNetworkViewListener;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.jogamp.common.util.awt.AWTEDTExecutor;
 import com.jogamp.nativewindow.awt.AWTPrintLifecycle;
 
@@ -43,6 +49,8 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	private GLJPanel panel;
 	private Properties props;
+	
+	private ScheduledExecutorService scheduler;
 	
 	
 	public Cy3DRenderingEngine(
@@ -82,25 +90,16 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		panel.setIgnoreRepaint(true); // TODO: check if negative effects produced by this
 		//panel.setDoubleBuffered(true);
 		
-		RenderEventListener renderEventListener = new RenderEventListener(networkView, visualLexicon, eventBusProvider, 
-				                                                          configuration, taskFactoryListener, taskManager, panel, inputComponent);
+		EventBus eventBus = eventBusProvider.getEventBus(networkView);
+		
+		GraphicsData graphicsData = new GraphicsData(visualLexicon, eventBus, panel, inputComponent);
+		graphicsData.setTaskFactoryListener(taskFactoryListener);
+		graphicsData.setTaskManager(taskManager);
+		
+		RenderEventListener renderEventListener = new RenderEventListener(networkView, configuration, graphicsData);
 
 		panel.addGLEventListener(renderEventListener);
 		
-		networkView.addNetworkViewListener(new CyNetworkViewListener() {
-			@Override
-			public void handleUpdateView() {
-				panel.repaint();
-			}
-			@Override
-			public void handleFitSelected() {
-			}
-			@Override
-			public void handleFitContent() {
-			}
-		});
-//		networkView.addContainer(pa nel); // When networkView.updateView() is called it will repaint all containers it owns
-
 		if (container instanceof RootPaneContainer) {
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
 			Container pane = rootPaneContainer.getContentPane();
@@ -112,6 +111,22 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		}
 		
 		configuration.initializeFrame(container, inputComponent);
+		
+		// Check if the view model has changed approximately 60 times per second
+		scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleAtFixedRate(() -> {
+			if(networkView.isDirty()) {
+				panel.repaint();
+			}
+		}, 0, 20, TimeUnit.MILLISECONDS);
+		
+		// Also update the panel if the renderer's internal state changes, eg on mouse input
+		eventBus.register(new Object() {
+			@Subscribe
+			public void handleUpdateNetworkViewEvent(UpdateNetworkViewEvent e) {
+				panel.repaint();
+			}
+		});
 	}
 	
 	
@@ -177,5 +192,12 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	@Override
 	public void dispose() {
+		System.out.println("Cy3DRenderingEngine.dispose()");
+		try {
+			scheduler.shutdownNow();
+			scheduler.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

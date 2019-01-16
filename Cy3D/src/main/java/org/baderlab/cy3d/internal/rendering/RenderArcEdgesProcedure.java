@@ -58,7 +58,7 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		GL2 gl = graphicsData.getGlContext();
 		
 		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };

@@ -11,6 +11,7 @@ import org.baderlab.cy3d.internal.eventbus.BoundingBoxUpdateEvent;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.baderlab.cy3d.internal.eventbus.ShowLabelsEvent;
+import org.baderlab.cy3d.internal.eventbus.UpdateNetworkViewEvent;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
@@ -29,8 +30,9 @@ public class MainEventBusListener {
 	@Subscribe
 	public void handleShowLabelsEvent(ShowLabelsEvent showLabelsEvent) {
 		graphicsData.setShowLabels(showLabelsEvent.showLabels());
-		graphicsData.getNetworkView().updateView();
+		graphicsData.getEventBus().post(new UpdateNetworkViewEvent());
 	}
+	
 	
 	@Subscribe
 	public void handleFitInViewEvent(FitInViewEvent e) {

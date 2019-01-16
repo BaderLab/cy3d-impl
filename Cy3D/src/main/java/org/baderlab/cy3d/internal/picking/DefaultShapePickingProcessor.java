@@ -89,7 +89,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	private void performPick(int x, int y, int width, int height, boolean selectAll, GraphicsData graphicsData) {
 		int bufferSize = 1024;
 		if (selectAll) {
-			bufferSize = Math.max(4096, graphicsData.getNetworkView().getAllViews().size() * 64);
+			bufferSize = Math.max(4096, graphicsData.getNetworkSnapshot().getAllViews().size() * 64);
 		}
 
 		GL2 gl = graphicsData.getGlContext();

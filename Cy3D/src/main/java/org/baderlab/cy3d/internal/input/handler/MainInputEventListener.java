@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
+import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
 import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.baderlab.cy3d.internal.eventbus.MouseModeChangeEvent;
 import org.baderlab.cy3d.internal.input.handler.commands.CameraOrbitKeyCommand;
@@ -114,7 +115,8 @@ public class MainInputEventListener extends InputEventListener {
 			public void actionPerformed(ActionEvent e) {
 				graphicsData.getCamera().reset();
 				graphicsData.getEventBus().post(new MainCameraChangeEvent(graphicsData.getCamera()));
-				networkView.fitContent();
+				// MKTODO there could be another constructor for FitINViewEvent that just takes the network
+				graphicsData.getEventBus().post(new FitInViewEvent(graphicsData.getNetworkSnapshot().getNodeViews()));
 			}
 		});
 	}

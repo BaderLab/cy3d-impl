@@ -20,7 +20,7 @@ public class ResetSceneProcedure implements GraphicsProcedure {
 		
 		// Obtain the desired network background color
 		Color backgroundColor = (Color) 
-			graphicsData.getNetworkView().getVisualProperty(
+			graphicsData.getNetworkSnapshot().getVisualProperty(
 					BasicVisualLexicon.NETWORK_BACKGROUND_PAINT);
 		
 		if (backgroundColor != null) {

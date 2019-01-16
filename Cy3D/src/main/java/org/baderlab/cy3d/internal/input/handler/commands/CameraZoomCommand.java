@@ -29,11 +29,13 @@ public class CameraZoomCommand implements MouseWheelCommand {
 		Camera camera = graphicsData.getCamera();
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		
 		// Varying distance between camera and camera's target point
 		if (dWheel != 0) {
 			camera.moveForward(-dWheel);
+			
+			// MKTODO the underlying model is still mutable, there should be a better way to get selection
 			
 			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 			

@@ -7,8 +7,11 @@ import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
+import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 import com.google.common.eventbus.EventBus;
@@ -36,11 +39,14 @@ public class GraphicsData {
 	public static final float FAR_Z = 500f;
 	
 	
-	private final CyNetworkView networkView;
+	
 	private final EventBus eventBus;
 	private final OriginOrbitCamera camera;
-	private GL2 glContext;
 	private final VisualLexicon visualLexicon;
+	
+	// updated on every frame
+	private GL2 glContext;
+	private CyNetworkView networkSnapshot;
 	
 	private ViewingVolume viewingVolume;
 	
@@ -62,8 +68,7 @@ public class GraphicsData {
 	private boolean showLabels = false;
 	
 	
-	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent) {
-		this.networkView = networkView;
+	public GraphicsData(VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent) {
 		this.eventBus = eventBus;
 		this.visualLexicon = visualLexicon;
 		this.container = container;
@@ -81,6 +86,17 @@ public class GraphicsData {
 		this.glContext = glContext;
 	}
 	
+	public void setNetworkSnapshot(CyNetworkView networkView) {
+		this.networkSnapshot = networkView;
+		
+		for(View<CyNode> node : networkView.getNodeViews()) {
+			Double x = node.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+			System.out.println("node:" + node.getSUID() + " x' = " + x);
+		}
+		
+		
+	}
+	
 	public void setPixelConverter(PixelConverter pixelConverter) {
 		this.pixelConverter = pixelConverter;
 	}
@@ -93,9 +109,8 @@ public class GraphicsData {
 		this.taskManager = taskManager;
 	}
 	
-	
-	public CyNetworkView getNetworkView() {
-		return networkView;
+	public CyNetworkView getNetworkSnapshot() {
+		return networkSnapshot;
 	}
 
 	public OriginOrbitCamera getCamera() {

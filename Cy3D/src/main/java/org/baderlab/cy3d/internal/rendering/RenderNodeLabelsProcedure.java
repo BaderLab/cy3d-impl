@@ -56,7 +56,7 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 		
 		GL2 gl = graphicsData.getGlContext();
 		
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float x, y, z;
 

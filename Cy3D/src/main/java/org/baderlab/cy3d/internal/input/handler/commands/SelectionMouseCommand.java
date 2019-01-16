@@ -40,7 +40,7 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 	}
 	
 	private void deselectOther() {
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		
 		// Deselect currently selected nodes
 		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);

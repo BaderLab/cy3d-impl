@@ -39,7 +39,7 @@ public class BirdsEyeEventBusListener {
 	public void handleFitInViewEvent(FitInViewEvent e) {
 		Camera camera = graphicsData.getCamera();
 		// ignore selected node views, always use all of them
-		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
+		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
 		NetworkToolkit.fitInView(camera, nodeViews, GraphicsData.DISTANCE_SCALE, 3.0, 5.0);
 	}
 

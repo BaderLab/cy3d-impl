@@ -81,7 +81,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		eventBus.register(mouseZoneListener);
 		
 		// Manually fit the network into the view for the first frame
-		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
+		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
 		eventBusListener.handleFitInViewEvent(new FitInViewEvent(nodeViews));
 	}
 	

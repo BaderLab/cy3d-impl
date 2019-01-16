@@ -66,7 +66,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		
 		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float nodeSizeScale = 60;
@@ -82,6 +82,8 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
+			
+//			System.out.println("x = " + x);
 			
 			y = -y; // Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
 

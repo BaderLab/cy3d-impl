@@ -13,19 +13,16 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
-import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.data.PixelConverter;
-import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
-import org.baderlab.cy3d.internal.task.TaskFactoryListener;
 import org.baderlab.cy3d.internal.tools.GeometryToolkit;
+import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-import com.google.common.eventbus.EventBus;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -48,24 +45,13 @@ public class RenderEventListener implements GLEventListener {
 	// Contains the "global" state used by one renderer.
 	private final GraphicsData graphicsData;
 	private final GraphicsConfiguration configuration;
+	private final CyNetworkView networkView;
 	
 	
-	public RenderEventListener(
-			CyNetworkView networkView, 
-			VisualLexicon visualLexicon, 
-			EventBusProvider eventBusProvider, 
-			GraphicsConfiguration configuration,
-			TaskFactoryListener taskFactoryListener, 
-			DialogTaskManager taskManager,
-			JComponent component,
-			JComponent inputComponent) {
-		
+	public RenderEventListener(CyNetworkView networkView, GraphicsConfiguration configuration, GraphicsData graphicsData) {
 		this.configuration = checkNotNull(configuration);
-		EventBus eventBus = eventBusProvider.getEventBus(networkView);
-		
-		graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, component, inputComponent);
-		graphicsData.setTaskFactoryListener(taskFactoryListener);
-		graphicsData.setTaskManager(taskManager);
+		this.networkView = networkView;
+		this.graphicsData = graphicsData;
 	}
 	
 	
@@ -74,11 +60,8 @@ public class RenderEventListener implements GLEventListener {
 	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
+		System.out.println("RenderEventListener.init()");
 		GL2 gl = drawable.getGL().getGL2();
-		graphicsData.setGlContext(gl);
-		graphicsData.setPixelConverter(new PixelConverter(drawable.getNativeSurface()));
-		
-		configuration.initialize(graphicsData);
 		
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -94,8 +77,22 @@ public class RenderEventListener implements GLEventListener {
 		// Correct lightning for scaling certain models
 		gl.glEnable(GL2.GL_NORMALIZE);
 
+		for(View<CyNode> nv : networkView.getNodeViews()) {
+			Double depth = nv.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
+			if(depth == null || depth.doubleValue() == 0.0) {
+				nv.setVisualProperty(BasicVisualLexicon.NODE_DEPTH, nv.getVisualProperty(BasicVisualLexicon.NODE_WIDTH));
+			}
+		}
+		
+		graphicsData.setGlContext(gl);
+		graphicsData.setPixelConverter(new PixelConverter(drawable.getNativeSurface()));
+		graphicsData.setNetworkSnapshot(networkView.createSnapshot());
+		
+		configuration.initialize(graphicsData);
+		
+		
 		// force render of first frame
-		graphicsData.getNetworkView().updateView();
+//		graphicsData.getNetworkView().updateView();
 	}
 
 	// MKTODO this should be moved into the GraphicsConfiguration
@@ -110,8 +107,10 @@ public class RenderEventListener implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		System.out.println("RenderEventListener.display() " + System.currentTimeMillis());
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
+		graphicsData.setNetworkSnapshot(networkView.createSnapshot());
 		
 		// Re-calculate the viewing volume
 		CameraPosition camera = graphicsData.getCamera();
@@ -166,6 +165,7 @@ public class RenderEventListener implements GLEventListener {
 	
 	@Override
 	public void dispose(GLAutoDrawable autoDrawable) {
+		System.out.println("RenderEventListener.dispose()");
 		configuration.dispose();
 	}
 	

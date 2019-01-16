@@ -24,7 +24,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	
 	@Override
 	public void clicked(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 
@@ -75,7 +75,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void dragEnd(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		PickingData pickingData = graphicsData.getPickingData();
 		
 		selectionData.setDragSelectMode(false);

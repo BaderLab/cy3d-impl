@@ -27,8 +27,9 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager());
 		}
 		
-		CyNetworkView networkView = graphicsData.getNetworkView();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
 		
+		// MKTODO should not have to go to the underlying mutable model, the selection data should store View IDs
 		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
 		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
 		

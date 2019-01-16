@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
-import org.cytoscape.view.model.CyNetworkView;
+import org.baderlab.cy3d.internal.eventbus.UpdateNetworkViewEvent;
 
 /**
  * Provides reusable input event listening with pluggable Commands.
@@ -31,7 +31,6 @@ import org.cytoscape.view.model.CyNetworkView;
 public class InputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	protected final GraphicsData graphicsData;
-	protected final CyNetworkView networkView;
 	private final int[] coords = new int[2];
 	
 	private Timer heartBeat;
@@ -49,7 +48,6 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	
 	public InputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
-		this.networkView = graphicsData.getNetworkView();
 	}
 	
 	
@@ -80,7 +78,7 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 
 	private void updateBothRenderers() {
 		fireUpdateEvents();
-		networkView.updateView();
+		graphicsData.getEventBus().post(new UpdateNetworkViewEvent()); // redraw
 	}
 
 	
