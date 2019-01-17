@@ -11,6 +11,7 @@ import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.E
 import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.RECTANGLE;
 import static org.cytoscape.view.presentation.property.NodeShapeVisualProperty.TRIANGLE;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,6 +80,15 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 		supportedValuesMap.put(NODE_SHAPE, asList(RECTANGLE, ELLIPSE, TRIANGLE));
 		supportedValuesMap.put(EDGE_LINE_TYPE, asList(SOLID, DOT, EQUAL_DASH));
 		supportedValuesMap.put(DETAIL_LEVEL, asList(DETAIL_LOW, DETAIL_MED, DETAIL_HIGH));
+	}
+	
+	@Override
+	public Collection<VisualProperty<?>> getNonClearableVisualProperties() {
+		return Arrays.asList(
+			BasicVisualLexicon.NODE_X_LOCATION,
+			BasicVisualLexicon.NODE_Y_LOCATION,
+			BasicVisualLexicon.NODE_Z_LOCATION
+		);
 	}
 	
 	@Override

@@ -275,8 +275,8 @@ public class NetworkToolkit {
 		
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
-		networkView.getNodeView(network.getNode(suid)).setVisualProperty(
-				BasicVisualLexicon.NODE_SELECTED, selected);
+//		networkView.getNodeView(network.getNode(suid)).setVisualProperty(
+//				BasicVisualLexicon.NODE_SELECTED, selected);
 	}
 
 	public static boolean checkNodeSelected(long index, CyNetworkView networkView) {
@@ -317,8 +317,8 @@ public class NetworkToolkit {
 		
 		row.set(SELECTED_COLUMN_NAME, selected);
 		
-		networkView.getEdgeView(network.getEdge(suid)).setVisualProperty(
-				BasicVisualLexicon.EDGE_SELECTED, selected);
+//		networkView.getEdgeView(network.getEdge(suid)).setVisualProperty(
+//				BasicVisualLexicon.EDGE_SELECTED, selected);
 	}
 	
 	public static boolean checkEdgeSelected(long index, CyNetworkView networkView) {

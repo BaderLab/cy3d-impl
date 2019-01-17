@@ -91,6 +91,11 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			Double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
 			Double depth  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_DEPTH);
 			
+			// Avoid flat pancake nodes
+			if(depth == null || depth.doubleValue() == 0.0) {
+				depth = width;
+			}
+			
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData .getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				

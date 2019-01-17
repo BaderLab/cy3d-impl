@@ -7,11 +7,8 @@ import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 import com.google.common.eventbus.EventBus;
@@ -88,13 +85,6 @@ public class GraphicsData {
 	
 	public void setNetworkSnapshot(CyNetworkView networkView) {
 		this.networkSnapshot = networkView;
-		
-		for(View<CyNode> node : networkView.getNodeViews()) {
-			Double x = node.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
-			System.out.println("node:" + node.getSUID() + " x' = " + x);
-		}
-		
-		
 	}
 	
 	public void setPixelConverter(PixelConverter pixelConverter) {

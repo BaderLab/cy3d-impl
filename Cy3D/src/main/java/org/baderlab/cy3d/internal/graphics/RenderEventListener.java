@@ -107,7 +107,7 @@ public class RenderEventListener implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		System.out.println("RenderEventListener.display() " + System.currentTimeMillis());
+//		System.out.println("RenderEventListener.display() " + System.currentTimeMillis());
 		GL2 gl = drawable.getGL().getGL2();
 		graphicsData.setGlContext(gl);
 		graphicsData.setNetworkSnapshot(networkView.createSnapshot());
