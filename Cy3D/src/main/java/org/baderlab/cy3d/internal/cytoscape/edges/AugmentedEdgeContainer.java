@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.cytoscape.edges;
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.ReadableView;
 
 /**
  * A container class for View<CyEdge> objects that also contains extra information about the edge,
@@ -11,7 +11,7 @@ import org.cytoscape.view.model.View;
  * edge coordinates that are used for rendering segmented edges.
  */
 public class AugmentedEdgeContainer {
-	private final View<CyEdge> edgeView;
+	private final ReadableView<CyEdge> edgeView;
 	
 	// Identifies the pair of nodes that the edge connects
 	private PairIdentifier pairIdentifier = null;
@@ -38,11 +38,11 @@ public class AugmentedEdgeContainer {
 	
 	private Vector3[] coordinates;
 
-	public AugmentedEdgeContainer(View<CyEdge> edgeView) {
+	public AugmentedEdgeContainer(ReadableView<CyEdge> edgeView) {
 		this.edgeView = edgeView;
 	}
 	
-	public View<CyEdge> getEdgeView() {
+	public ReadableView<CyEdge> getEdgeView() {
 		return edgeView;
 	}
 
@@ -117,10 +117,5 @@ public class AugmentedEdgeContainer {
 	public Vector3 getEnd() {
 		return end;
 	}
-
-
-
-	
-	
 	
 }

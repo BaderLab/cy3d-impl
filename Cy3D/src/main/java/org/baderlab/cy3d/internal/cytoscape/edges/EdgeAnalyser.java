@@ -1,10 +1,10 @@
 package org.baderlab.cy3d.internal.cytoscape.edges;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.EdgeCoordinateCalculator;
@@ -13,7 +13,9 @@ import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
+import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.SnapshotEdgeInfo;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
 
@@ -42,15 +44,6 @@ public class EdgeAnalyser {
 	 * A set of {@link AugmentedEdgeContainer} objects containing extra generated data relating to each
 	 * edge as well as a reference to the edge it contains
 	 */
-	private Map<View<CyEdge>, AugmentedEdgeContainer> edgeContainers;
-	
-	/** The frame number that the generated edge data is current for */
-//	private long currentFrame;
-	
-	public EdgeAnalyser() {
-		edgeContainers = new HashMap<View<CyEdge>, AugmentedEdgeContainer>();
-//		currentFrame = 0L;
-	}
 
 	/**
 	 * Return a set of analyzed edges containing edge coordinates to be used for rendering. If an up-to-date
@@ -61,32 +54,14 @@ public class EdgeAnalyser {
 	 * @param currentFrame The current frame of rendering.
 	 * @return An up-to-date set of analyzed edge data to be used for rendering.
 	 */
-	public Collection<AugmentedEdgeContainer> getAnalyzedEdges(CyNetworkView networkView, double distanceScale/*, long currentFrame*/) {
-
-//		if (currentFrame - this.currentFrame > 0) {
-			calculateEdgeProperties(networkView, distanceScale);
-			calculateEdgeCoordinates();
-//			this.currentFrame = currentFrame;
-//		}
-		
-		// Prepare to remove edgeContainers for edges that are no longer in the network
-		Set<AugmentedEdgeContainer> edgeContainersToBeRemoved = new HashSet<AugmentedEdgeContainer>();
-		
-		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
-			// Check if this edge container holds an edge that is no longer in the network
-			if (networkView.getModel().getEdge(edgeContainer.getEdgeView().getModel().getSUID()) == null) {
-				edgeContainersToBeRemoved.add(edgeContainer);
-			}
-		}
-		
-		for (AugmentedEdgeContainer edgeContainer : edgeContainersToBeRemoved) {
-			edgeContainers.remove(edgeContainer.getEdgeView());
-		}
-		
-		return edgeContainers.values();		
+	public static Collection<AugmentedEdgeContainer> getAnalyzedEdges(CyNetworkViewSnapshot networkView, double distanceScale/*, long currentFrame*/) {
+		List<AugmentedEdgeContainer> edgeContainers = calculateEdgeProperties(networkView, distanceScale);
+		calculateEdgeCoordinates(edgeContainers);
+		return edgeContainers;		
 	}	
 	
-	private void calculateEdgeProperties(CyNetworkView networkView, double distanceScale) {
+	private static List<AugmentedEdgeContainer> calculateEdgeProperties(CyNetworkViewSnapshot networkView, double distanceScale) {
+		List<AugmentedEdgeContainer> edgeContainers = new ArrayList<>(networkView.getEdgeCount());
 		
 		// This map maps each node-pair identifier to the number of edges between that pair of nodes
 		// The identifier is: max(sourceIndex, targetIndex) * nodeCount + min(sourceIndex, targetIndex)
@@ -95,25 +70,20 @@ public class EdgeAnalyser {
 		PairIdentifier identifier;
 		long sourceIndex, targetIndex;
 		int edgeNumber;
-		int nodeCount = networkView.getModel().getNodeCount();
-		CyEdge edge;
 		
-		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+		for (ReadableView<CyEdge> edgeView : networkView.getEdgeViews()) {
 			
-			AugmentedEdgeContainer edgeContainer = edgeContainers.get(edgeView);
+			AugmentedEdgeContainer edgeContainer = new AugmentedEdgeContainer(edgeView);
+			edgeContainers.add(edgeContainer);
 			
-			if (edgeContainer == null) {
-				edgeContainer = new AugmentedEdgeContainer(edgeView);
-				edgeContainers.put(edgeView, edgeContainer);
-			}
+			SnapshotEdgeInfo edgeInfo = networkView.getEdgeInfo(edgeView);
 			
-			edge = edgeView.getModel();
-			
-			sourceIndex = edge.getSource().getSUID();
-			targetIndex = edge.getTarget().getSUID();
+			sourceIndex = edgeInfo.getSourceSUID();
+			targetIndex = edgeInfo.getTargetSUID();
 			
 			// Assign an identifier to each pair of nodes
-			identifier = NetworkToolkit.obtainPairIdentifier(edge.getSource(), edge.getTarget(), networkView.getNodeViews().size());
+			
+			identifier = new PairIdentifier(sourceIndex, targetIndex);
 			
 			// Assign a value that represents how many edges have been found between this pair
 			if (!pairCoincidenceCount.containsKey(identifier)) {
@@ -134,8 +104,8 @@ public class EdgeAnalyser {
 			}
 			
 			// Find edge start and end points
-			edgeContainer.setStart(NetworkToolkit.obtainNodeCoordinates(edge.getSource(), networkView, distanceScale));
-			edgeContainer.setEnd(NetworkToolkit.obtainNodeCoordinates(edge.getTarget(), networkView, distanceScale));
+			edgeContainer.setStart(NetworkToolkit.obtainNodeCoordinates(edgeInfo.getSourceNodeView(), networkView, distanceScale));
+			edgeContainer.setEnd  (NetworkToolkit.obtainNodeCoordinates(edgeInfo.getTargetNodeView(), networkView, distanceScale));
 			
 			// Determine if edge has sufficient length to be drawn
 			if (edgeContainer.getStart() != null && edgeContainer.getEnd() != null && 
@@ -145,11 +115,9 @@ public class EdgeAnalyser {
 				edgeContainer.setSufficientLength(false);
 			}
 		}
-
-		
 		
 		// Update the value for the total number of edges between this pair of nodes
-		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
+		for (AugmentedEdgeContainer edgeContainer : edgeContainers) {
 			
 			PairIdentifier pairIdentifier = edgeContainer.getPairIdentifier();
 			Integer totalCoincidentEdgesCount = pairCoincidenceCount.get(pairIdentifier);
@@ -165,6 +133,8 @@ public class EdgeAnalyser {
 			
 			}
 		}
+		
+		return edgeContainers;
 	}
 	
 	
@@ -176,7 +146,7 @@ public class EdgeAnalyser {
 	 * edge, including its index amongst the other edges that connect the same pair of nodes
 	 * @param selfEdge Whether or not the edge leads from a node to itself
 	 */
-	private double[] findArcEdgeMetrics(AugmentedEdgeContainer edgeContainer) {
+	private static double[] findArcEdgeMetrics(AugmentedEdgeContainer edgeContainer) {
 		
 		// Level 1 has 2^2 - 1^1 = 3 edges, level 2 has 3^3 - 2^2 = 5, level 3 has 7
 		int edgeLevel = (int) (Math.sqrt((double) edgeContainer.getEdgeNumber()));
@@ -218,7 +188,7 @@ public class EdgeAnalyser {
 	 * edge, including its index amongst the other edges that connect the same pair of nodes
 	 * @return A position vector representing the center of the circle
 	 */
-	private Vector3 findCircleCenter(AugmentedEdgeContainer edgeContainer) {
+	private static Vector3 findCircleCenter(AugmentedEdgeContainer edgeContainer) {
 		
 		Vector3 start = edgeContainer.getStart();
 		Vector3 end = edgeContainer.getEnd();
@@ -264,17 +234,17 @@ public class EdgeAnalyser {
 		}
 	}
 	
-	private void calculateEdgeCoordinates() {
+	private static void calculateEdgeCoordinates(List<AugmentedEdgeContainer> edgeContainers) {
 		
 		boolean selfEdge;
 		Vector3 start, end;
 		
-		for (AugmentedEdgeContainer edgeContainer : edgeContainers.values()) {
+		for (AugmentedEdgeContainer edgeContainer : edgeContainers) {
 			
 			// Only perform coordinate calculations if the edge has sufficient length
 			if (edgeContainer.isSufficientLength()) {
 				
-				View<CyEdge> edgeView = edgeContainer.getEdgeView();
+				ReadableView<CyEdge> edgeView = edgeContainer.getEdgeView();
 				
 				start = edgeContainer.getStart();
 				end = edgeContainer.getEnd();

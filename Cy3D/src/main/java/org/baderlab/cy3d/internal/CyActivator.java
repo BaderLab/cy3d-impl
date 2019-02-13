@@ -30,8 +30,8 @@ import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
-import org.cytoscape.view.model.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.model.VisualLexicon;
+import org.cytoscape.view.presentation.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TunableSetter;
@@ -65,7 +65,7 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(bc, taskFactoryListener::addNetworkViewLocationTaskFactory, taskFactoryListener::removeNetworkViewLocationTaskFactory, NetworkViewLocationTaskFactory.class);
 		
 		// Cy3D Visual Lexicon
-		VisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
+		Cy3DVisualLexicon cy3dVisualLexicon = new Cy3DVisualLexicon();
 		Properties cy3dVisualLexiconProps = new Properties();
 		cy3dVisualLexiconProps.setProperty("serviceType", "visualLexicon");
 		cy3dVisualLexiconProps.setProperty("id", "cy3d");

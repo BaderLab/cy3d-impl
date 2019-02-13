@@ -3,17 +3,17 @@ package org.baderlab.cy3d.internal.eventbus;
 import java.util.Collection;
 
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.ReadableView;
 
 public class FitInViewEvent {
 
-	private final Collection<View<CyNode>> selectedNodeViews;
+	private final Collection<? extends ReadableView<CyNode>> selectedNodeViews;
 	
-	public FitInViewEvent(Collection<View<CyNode>> selectedNodeViews) {
+	public FitInViewEvent(Collection<? extends ReadableView<CyNode>> selectedNodeViews) {
 		this.selectedNodeViews = selectedNodeViews;
 	}
 	
-	public Collection<View<CyNode>> getSelectedNodeViews() {
+	public Collection<? extends ReadableView<CyNode>> getSelectedNodeViews() {
 		return selectedNodeViews;
 	}
 	

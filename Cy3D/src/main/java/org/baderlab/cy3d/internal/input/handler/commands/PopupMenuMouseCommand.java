@@ -27,23 +27,19 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 			popupMenuCreator = new PopupMenuCreator(graphicsData.getTaskManager());
 		}
 		
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot().getMutableNetworkView();
+		long hoverNodeIndex = graphicsData.getSelectionData().getHoverNodeIndex();
+		long hoverEdgeIndex = graphicsData.getSelectionData().getHoverEdgeIndex();
 		
-		// MKTODO should not have to go to the underlying mutable model, the selection data should store View IDs
-		CyNode node = networkView.getModel().getNode(graphicsData.getSelectionData().getHoverNodeIndex());
-		CyEdge edge = networkView.getModel().getEdge(graphicsData.getSelectionData().getHoverEdgeIndex());
+		View<CyNode> nodeView = getHoverNode(networkView, hoverNodeIndex);
+		View<CyEdge> edgeView = getHoverEdge(networkView, hoverEdgeIndex);
 		
 		JPopupMenu popupMenu = null;
-		
-		if (node != null) {
-			View<CyNode> nodeView = networkView.getNodeView(node);
-			
+		if (nodeView != null) {
 			popupMenu = popupMenuCreator.createNodeMenu(nodeView, 
 					networkView, graphicsData.getVisualLexicon(), 
 					graphicsData.getTaskFactoryListener().getNodeViewTaskFactories());
-		} else if (edge != null) {
-			View<CyEdge> edgeView = networkView.getEdgeView(edge);
-			
+		} else if (edgeView != null) {
 			popupMenu = popupMenuCreator.createEdgeMenu(edgeView, 
 					networkView, graphicsData.getVisualLexicon(), 
 					graphicsData.getTaskFactoryListener().getEdgeViewTaskFactories());
@@ -59,6 +55,24 @@ public class PopupMenuMouseCommand extends MouseCommandAdapter {
 			graphicsData.getPixelConverter().convertToWindowUnits(p);
 			popupMenu.show(graphicsData.getContainer(), p.x, p.y);
 		}
+	}
+
+	private static View<CyNode> getHoverNode(CyNetworkView networkView, long hoverNodeIndex) {
+		for(View<CyNode> nodeView : networkView.getNodeViews()) {
+			if(nodeView.getSUID().equals(hoverNodeIndex)) {
+				return nodeView;
+			}
+		}
+		return null;
+	}
+	
+	private static View<CyEdge> getHoverEdge(CyNetworkView networkView, long hoverEdgeIndex) {
+		for(View<CyEdge> edgeView : networkView.getEdgeViews()) {
+			if(edgeView.getSUID().equals(hoverEdgeIndex)) {
+				return edgeView;
+			}
+		}
+		return null;
 	}
 
 }

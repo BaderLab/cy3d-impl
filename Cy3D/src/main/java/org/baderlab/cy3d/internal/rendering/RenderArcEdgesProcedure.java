@@ -16,8 +16,8 @@ import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
+import org.cytoscape.view.model.ReadableView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
 
@@ -58,7 +58,7 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		GL2 gl = graphicsData.getGlContext();
 		
 		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -66,7 +66,7 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 1);
 		
 		Collection<AugmentedEdgeContainer> edgeContainers = graphicsData.getEdgeAnalyser().getAnalyzedEdges(networkView, GraphicsData.DISTANCE_SCALE);
-		View<CyEdge> edgeView;
+		ReadableView<CyEdge> edgeView;
 
 		Number edgeWidth;
 		
@@ -87,7 +87,7 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 				chooseColor(gl, edgeView, graphicsData);
 				
 				// Load name for edge picking
-				long suid = edgeView.getModel().getSUID();
+				long suid = edgeView.getSUID();
 				int upper = SUIDToolkit.upperInt(suid);
 				int lower = SUIDToolkit.lowerInt(suid);
 				
@@ -114,7 +114,7 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 	}
 	
 	// Picks a color according to the edgeView and passes it to OpenGL
-	private void chooseColor(GL2 gl, View<CyEdge> edgeView, GraphicsData graphicsData) {
+	private void chooseColor(GL2 gl, ReadableView<CyEdge> edgeView, GraphicsData graphicsData) {
 		Color visualPropertyColor = null;
 		visualPropertyColor = (Color) edgeView.getVisualProperty(BasicVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT);
 		

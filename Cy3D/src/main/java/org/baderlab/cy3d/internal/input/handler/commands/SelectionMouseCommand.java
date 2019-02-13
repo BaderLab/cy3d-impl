@@ -40,18 +40,18 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 	}
 	
 	private void deselectOther() {
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkView networkView = graphicsData.getNetworkSnapshot().getMutableNetworkView();
 		
 		// Deselect currently selected nodes
 		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
 		for (CyNode node : selectedNodes) {
-			NetworkToolkit.setNodeSelected(node.getSUID(), networkView, false);
+			NetworkToolkit.setNodeSelection(node.getSUID(), networkView, false);
 		}
 
 		// Deselect currently selected edges
 		List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(networkView.getModel(), "selected", true);
 		for (CyEdge edge : selectedEdges) {
-			NetworkToolkit.setEdgeSelected(edge.getSUID(), networkView, false);
+			NetworkToolkit.setEdgeSelection(edge.getSUID(), networkView, false);
 		}
 	}
 	

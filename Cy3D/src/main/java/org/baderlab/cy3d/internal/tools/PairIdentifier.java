@@ -13,11 +13,11 @@ public class PairIdentifier {
 	private long suid1;
 	private long suid2;
 	
-	PairIdentifier(CyIdentifiable id1, CyIdentifiable id2) {
+	public PairIdentifier(CyIdentifiable id1, CyIdentifiable id2) {
 		this(id1.getSUID(), id2.getSUID());
 	}
 	
-	PairIdentifier(long id1, long id2) {
+	public PairIdentifier(long id1, long id2) {
 		if(id1 >= id2) {
 			suid1 = id1;
 			suid2 = id2;

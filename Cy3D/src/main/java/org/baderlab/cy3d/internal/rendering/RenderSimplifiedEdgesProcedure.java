@@ -15,8 +15,9 @@ import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
+import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.SnapshotEdgeInfo;
 
 /**
  * This procedure renders edges in a simplified form for the bird's eye view.
@@ -33,23 +34,23 @@ public class RenderSimplifiedEdgesProcedure implements GraphicsProcedure {
 
 	@Override
 	public void execute(GraphicsData graphicsData) {
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		GL2 gl = graphicsData.getGlContext();
 		
 		float[] specularReflection = { 0.1f, 0.1f, 0.1f, 1.0f };
-		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR,
-				FloatBuffer.wrap(specularReflection));
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 1);
 		
 		// A set containing all pairs of nodes that have had an edge drawn between them
 		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
-		CyNode source, target;
+		ReadableView<CyNode> source, target;
 		
-		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
-			source = edgeView.getModel().getSource();
-			target = edgeView.getModel().getTarget();
+		for (ReadableView<CyEdge> edgeView : networkView.getEdgeViews()) {
+			SnapshotEdgeInfo edgeInfo = networkView.getEdgeInfo(edgeView);
+			source = edgeInfo.getSourceNodeView();
+			target = edgeInfo.getTargetNodeView();
 			
-			PairIdentifier pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
+			PairIdentifier pairIdentifier = new PairIdentifier(source.getSUID(), target.getSUID());
 			
 			// Only draw an edge between this source-target pair if one has not been drawn already
 			if (!drawnPairs.contains(pairIdentifier)) {

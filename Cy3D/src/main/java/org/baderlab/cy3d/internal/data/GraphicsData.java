@@ -7,7 +7,7 @@ import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
 import org.baderlab.cy3d.internal.cytoscape.edges.EdgeAnalyser;
 import org.baderlab.cy3d.internal.geometric.ViewingVolume;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
-import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
@@ -43,7 +43,7 @@ public class GraphicsData {
 	
 	// updated on every frame
 	private GL2 glContext;
-	private CyNetworkView networkSnapshot;
+	private CyNetworkViewSnapshot networkSnapshot;
 	
 	private ViewingVolume viewingVolume;
 	
@@ -83,7 +83,7 @@ public class GraphicsData {
 		this.glContext = glContext;
 	}
 	
-	public void setNetworkSnapshot(CyNetworkView networkView) {
+	public void setNetworkSnapshot(CyNetworkViewSnapshot networkView) {
 		this.networkSnapshot = networkView;
 	}
 	
@@ -99,7 +99,7 @@ public class GraphicsData {
 		this.taskManager = taskManager;
 	}
 	
-	public CyNetworkView getNetworkSnapshot() {
+	public CyNetworkViewSnapshot getNetworkSnapshot() {
 		return networkSnapshot;
 	}
 

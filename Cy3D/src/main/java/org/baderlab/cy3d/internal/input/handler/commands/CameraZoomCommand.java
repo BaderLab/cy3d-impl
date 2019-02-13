@@ -1,8 +1,6 @@
 package org.baderlab.cy3d.internal.input.handler.commands;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 import org.baderlab.cy3d.internal.camera.Camera;
 import org.baderlab.cy3d.internal.data.GraphicsData;
@@ -11,8 +9,8 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.handler.MouseWheelCommand;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyTableUtil;
-import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
+import org.cytoscape.view.model.ReadableView;
 
 public class CameraZoomCommand implements MouseWheelCommand {
 
@@ -29,24 +27,15 @@ public class CameraZoomCommand implements MouseWheelCommand {
 		Camera camera = graphicsData.getCamera();
 		
 		GraphicsSelectionData selectionData = graphicsData.getSelectionData();
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		
 		// Varying distance between camera and camera's target point
 		if (dWheel != 0) {
 			camera.moveForward(-dWheel);
 			
-			// MKTODO the underlying model is still mutable, there should be a better way to get selection
-			
-			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(networkView.getModel(), "selected", true);
-			
+			Collection<ReadableView<CyNode>> selectedNodes = networkView.getSelectedNodes();
 			if (!selectedNodes.isEmpty()) {
-				Set<Long> selectedNodeIndices = new HashSet<Long>();
-				
-				for (CyNode node : selectedNodes) {
-					selectedNodeIndices.add(node.getSUID());
-				}
-				
-				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodeIndices, networkView, GraphicsData.DISTANCE_SCALE);
+				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodes, networkView, GraphicsData.DISTANCE_SCALE);
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));
 			}
 		}

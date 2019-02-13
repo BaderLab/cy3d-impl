@@ -16,8 +16,8 @@ import org.baderlab.cy3d.internal.rendering.shapes.ScalableShapeDrawer.Shape;
 import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
+import org.cytoscape.view.model.ReadableView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.values.NodeShape;
@@ -66,13 +66,13 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, FloatBuffer.wrap(specularReflection));
 		gl.glMateriali(GL2.GL_FRONT, GL2.GL_SHININESS, 13);
 		
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		
 		float distanceScale = GraphicsData.DISTANCE_SCALE;
 		float nodeSizeScale = 60;
 
 		// networkView.updateView();
-		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+		for (ReadableView<CyNode> nodeView : networkView.getNodeViews()) {
 			if(nodeView == null) {
 				// MKTODO why does this happen?
 				System.err.println("nodeView is null: networkView.getNodeViews() returns: " + networkView.getNodeViews());
@@ -99,7 +99,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData .getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
-				long suid = nodeView.getModel().getSUID();
+				long suid = nodeView.getSUID();
 				
 				// glLoadName() and glPushName() only support int, so we need to break the long SUID into two parts
 				int upper = SUIDToolkit.upperInt(suid);
@@ -134,7 +134,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		}
 	}
 	
-	private void chooseColor(GL2 gl, View<CyNode> nodeView, GraphicsData graphicsData) {
+	private void chooseColor(GL2 gl, ReadableView<CyNode> nodeView, GraphicsData graphicsData) {
 		Color visualPropertyColor = null;
 		visualPropertyColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);
 		
@@ -146,7 +146,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 					(double) visualPropertyColor.getBlue() / 255);
 		}
 		
-		Long suid = nodeView.getModel().getSUID();
+		Long suid = nodeView.getSUID();
 		
 		if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
 			// Make selected nodes appear greener

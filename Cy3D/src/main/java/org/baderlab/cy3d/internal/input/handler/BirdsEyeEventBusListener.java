@@ -12,7 +12,7 @@ import org.baderlab.cy3d.internal.eventbus.MainCameraChangeEvent;
 import org.baderlab.cy3d.internal.rendering.RenderBoundingBoxProcedure;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.ReadableView;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -39,7 +39,7 @@ public class BirdsEyeEventBusListener {
 	public void handleFitInViewEvent(FitInViewEvent e) {
 		Camera camera = graphicsData.getCamera();
 		// ignore selected node views, always use all of them
-		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
+		Collection<? extends ReadableView<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
 		NetworkToolkit.fitInView(camera, nodeViews, GraphicsData.DISTANCE_SCALE, 3.0, 5.0);
 	}
 

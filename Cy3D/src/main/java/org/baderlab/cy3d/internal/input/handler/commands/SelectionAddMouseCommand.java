@@ -5,7 +5,7 @@ import org.baderlab.cy3d.internal.data.GraphicsSelectionData;
 import org.baderlab.cy3d.internal.data.PickingData;
 import org.baderlab.cy3d.internal.input.handler.MouseCommandAdapter;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
-import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.CyNetworkViewSnapshot;
 
 public class SelectionAddMouseCommand extends MouseCommandAdapter {
 
@@ -24,7 +24,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	
 	@Override
 	public void clicked(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
 
@@ -33,22 +33,9 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 		
 		if (!selectionData.isDragSelectMode()) {
 			if (newHoverNodeIndex != NO_INDEX) {
-				if (NetworkToolkit.checkNodeSelected(newHoverNodeIndex, networkView)) {
-					// Deselect the node if it was already selected
-					NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, false);
-				} else {
-					// Select the node if it was not selected
-					NetworkToolkit.setNodeSelected(newHoverNodeIndex, networkView, true);
-				}
-				
+				NetworkToolkit.flipNodeSelection(newHoverNodeIndex, networkView.getMutableNetworkView());
 			} else if (newHoverEdgeIndex != NO_INDEX) {
-				if (NetworkToolkit.checkEdgeSelected(newHoverEdgeIndex, networkView)) {
-					// Deselect the edge if it was already selected
-					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, false);
-				} else {
-					// Select the edge if it was not selected
-					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, true);
-				}
+				NetworkToolkit.flipEdgeSelection(newHoverEdgeIndex, networkView.getMutableNetworkView());
 			}
 		}
 	}
@@ -75,17 +62,17 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void dragEnd(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkSnapshot();
+		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		PickingData pickingData = graphicsData.getPickingData();
 		
 		selectionData.setDragSelectMode(false);
 		selectionData.setSelectTopLeftFound(false);
 		
 		for (long index : pickingData.getPickedNodeIndices()) {
-			NetworkToolkit.setNodeSelected(index, networkView, true);
+			NetworkToolkit.setNodeSelection(index, networkView.getMutableNetworkView(), true);
 		}
 		for (long index : pickingData.getPickedEdgeIndices()) {
-			NetworkToolkit.setEdgeSelected(index, networkView, true);
+			NetworkToolkit.setNodeSelection(index, networkView.getMutableNetworkView(), true);
 		}
 		
 		pickingData.getPickedNodeIndices().clear();
