@@ -10,7 +10,7 @@ import org.baderlab.cy3d.internal.input.handler.MouseWheelCommand;
 import org.baderlab.cy3d.internal.tools.NetworkToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.View;
 
 public class CameraZoomCommand implements MouseWheelCommand {
 
@@ -33,7 +33,7 @@ public class CameraZoomCommand implements MouseWheelCommand {
 		if (dWheel != 0) {
 			camera.moveForward(-dWheel);
 			
-			Collection<ReadableView<CyNode>> selectedNodes = networkView.getSelectedNodes();
+			Collection<View<CyNode>> selectedNodes = networkView.getSelectedNodes();
 			if (!selectedNodes.isEmpty()) {
 				Vector3 averagePosition = NetworkToolkit.findCenter(selectedNodes, networkView, GraphicsData.DISTANCE_SCALE);
 				selectionData.setSelectProjectionDistance(averagePosition.distance(camera.getPosition()));

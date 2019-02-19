@@ -16,8 +16,8 @@ import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
 import org.cytoscape.view.model.SnapshotEdgeInfo;
+import org.cytoscape.view.model.View;
 
 /**
  * This procedure renders edges in a simplified form for the bird's eye view.
@@ -43,9 +43,9 @@ public class RenderSimplifiedEdgesProcedure implements GraphicsProcedure {
 		
 		// A set containing all pairs of nodes that have had an edge drawn between them
 		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
-		ReadableView<CyNode> source, target;
+		View<CyNode> source, target;
 		
-		for (ReadableView<CyEdge> edgeView : networkView.getEdgeViews()) {
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
 			SnapshotEdgeInfo edgeInfo = networkView.getEdgeInfo(edgeView);
 			source = edgeInfo.getSourceNodeView();
 			target = edgeInfo.getTargetNodeView();

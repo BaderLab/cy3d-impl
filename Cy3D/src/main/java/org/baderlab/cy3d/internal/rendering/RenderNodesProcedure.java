@@ -17,7 +17,7 @@ import org.baderlab.cy3d.internal.tools.RenderColor;
 import org.baderlab.cy3d.internal.tools.SUIDToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.values.NodeShape;
@@ -72,7 +72,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		float nodeSizeScale = 60;
 
 		// networkView.updateView();
-		for (ReadableView<CyNode> nodeView : networkView.getNodeViews()) {
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			if(nodeView == null) {
 				// MKTODO why does this happen?
 				System.err.println("nodeView is null: networkView.getNodeViews() returns: " + networkView.getNodeViews());
@@ -134,7 +134,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 		}
 	}
 	
-	private void chooseColor(GL2 gl, ReadableView<CyNode> nodeView, GraphicsData graphicsData) {
+	private void chooseColor(GL2 gl, View<CyNode> nodeView, GraphicsData graphicsData) {
 		Color visualPropertyColor = null;
 		visualPropertyColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);
 		

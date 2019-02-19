@@ -12,7 +12,6 @@ import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
@@ -27,11 +26,11 @@ public class NetworkToolkit {
 	 * @param distanceScale The distance scaling used to convert between Cytoscape and renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findCenter(Collection<ReadableView<CyNode>> selectedNodes, CyNetworkViewSnapshot networkView, double distanceScale) {		
+	public static Vector3 findCenter(Collection<View<CyNode>> selectedNodes, CyNetworkViewSnapshot networkView, double distanceScale) {		
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		
-		for (ReadableView<CyNode> nodeView : selectedNodes) {
+		for (View<CyNode> nodeView : selectedNodes) {
 			if (nodeView != null) {
 				x += nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
 				y += nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
@@ -59,7 +58,7 @@ public class NetworkToolkit {
 	 * @param distanceFactor The multiplier against the distance from the center of the nodes to the farthest node used to place the camera
 	 * @param minDistance The minimum distance between the camera and the average node position.
 	 */
-	public static void fitInView(Camera camera, Collection<? extends ReadableView<CyNode>> nodeViews, 
+	public static void fitInView(Camera camera, Collection<? extends View<CyNode>> nodeViews, 
 			double distanceScale, double distanceFactor, double minDistance) {
 		Vector3 center = NetworkToolkit.findCenter(nodeViews, distanceScale);
 		Vector3 farthestNode = NetworkToolkit.findFarthestNodeFromCenter(nodeViews, center, distanceScale);
@@ -86,11 +85,11 @@ public class NetworkToolkit {
 	 * are divided by this scale to obtain renderer coordinates.
 	 * @return The average position
 	 */
-	public static Vector3 findCenter(Collection<? extends ReadableView<CyNode>> nodeViews, double distanceScale) {
+	public static Vector3 findCenter(Collection<? extends View<CyNode>> nodeViews, double distanceScale) {
 		double x = 0, y = 0, z = 0;
 		int visitedCount = 0;
 		
-		for (ReadableView<CyNode> nodeView : nodeViews) {
+		for (View<CyNode> nodeView : nodeViews) {
 			
 			if (nodeView != null) {
 				x += nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
@@ -151,14 +150,14 @@ public class NetworkToolkit {
 	 * are divided by this scale to obtain renderer coordinates.
 	 * @return The position of the farthest node
 	 */
-	public static Vector3 findFarthestNodeFromCenter(Collection<? extends ReadableView<CyNode>> nodeViews, Vector3 networkCenter, double distanceScale) {
+	public static Vector3 findFarthestNodeFromCenter(Collection<? extends View<CyNode>> nodeViews, Vector3 networkCenter, double distanceScale) {
 		double currentDistanceSquared;
 		double maxDistanceSquared = -1;
 		
 		Vector3 currentPosition = new Vector3();
 		Vector3 maxPosition = new Vector3();
 		
-		for (ReadableView<CyNode> nodeView : nodeViews) {
+		for (View<CyNode> nodeView : nodeViews) {
 			
 			if (nodeView != null) {
 			
@@ -343,7 +342,7 @@ public class NetworkToolkit {
 	 * @return A {@link Vector3} object containing the coordinates, or <code>null</code> otherwise, such
 	 * as if no such node was found.
 	 */
-	public static Vector3 obtainNodeCoordinates(ReadableView<CyNode> nodeView, CyNetworkViewSnapshot networkView, double distanceScale) {
+	public static Vector3 obtainNodeCoordinates(View<CyNode> nodeView, CyNetworkViewSnapshot networkView, double distanceScale) {
 		Vector3 coordinates = null;
 		if (nodeView != null) {
 			double x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION) / distanceScale;

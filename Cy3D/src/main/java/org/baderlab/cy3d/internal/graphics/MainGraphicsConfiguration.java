@@ -21,7 +21,7 @@ import org.baderlab.cy3d.internal.rendering.RenderNodesProcedure;
 import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.View;
 
 import com.google.common.eventbus.EventBus;
 
@@ -52,7 +52,6 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		add(new RenderNodeLabelsProcedure());
 	}
 	
-	
 	@Override
 	public void initializeFrame(JComponent component, JComponent inputComponent) {
 		this.frame = component;
@@ -81,7 +80,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		eventBus.register(mouseZoneListener);
 		
 		// Manually fit the network into the view for the first frame
-		Collection<? extends ReadableView<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
+		Collection<? extends View<CyNode>> nodeViews = graphicsData.getNetworkSnapshot().getNodeViews(); 
 		eventBusListener.handleFitInViewEvent(new FitInViewEvent(nodeViews));
 	}
 	

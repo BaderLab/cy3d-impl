@@ -10,7 +10,7 @@ import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.tools.RenderToolkit;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -78,7 +78,7 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 		
 		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 		// textRenderer.createString(gl, null, 0, "test").
-		for (ReadableView<CyNode> nodeView : networkView.getNodeViews()) {
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
 			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
 			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
 			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;

@@ -14,8 +14,8 @@ import org.baderlab.cy3d.internal.tools.PairIdentifier;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewSnapshot;
-import org.cytoscape.view.model.ReadableView;
 import org.cytoscape.view.model.SnapshotEdgeInfo;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
 
@@ -71,15 +71,15 @@ public class EdgeAnalyser {
 		long sourceIndex, targetIndex;
 		int edgeNumber;
 		
-		for (ReadableView<CyEdge> edgeView : networkView.getEdgeViews()) {
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
 			
 			AugmentedEdgeContainer edgeContainer = new AugmentedEdgeContainer(edgeView);
 			edgeContainers.add(edgeContainer);
 			
 			SnapshotEdgeInfo edgeInfo = networkView.getEdgeInfo(edgeView);
 			
-			sourceIndex = edgeInfo.getSourceSUID();
-			targetIndex = edgeInfo.getTargetSUID();
+			sourceIndex = edgeInfo.getSourceViewSUID();
+			targetIndex = edgeInfo.getTargetViewSUID();
 			
 			// Assign an identifier to each pair of nodes
 			
@@ -244,7 +244,7 @@ public class EdgeAnalyser {
 			// Only perform coordinate calculations if the edge has sufficient length
 			if (edgeContainer.isSufficientLength()) {
 				
-				ReadableView<CyEdge> edgeView = edgeContainer.getEdgeView();
+				View<CyEdge> edgeView = edgeContainer.getEdgeView();
 				
 				start = edgeContainer.getStart();
 				end = edgeContainer.getEnd();
