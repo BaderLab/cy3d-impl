@@ -29,9 +29,10 @@ import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
+import org.cytoscape.view.model.CyNetworkViewConfig;
 import org.cytoscape.view.model.CyNetworkViewFactory;
+import org.cytoscape.view.model.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TunableSetter;
@@ -75,7 +76,9 @@ public class CyActivator extends AbstractCyActivator {
 		EventBusProvider eventBusProvider = new EventBusProvider();
 		
 		CyNetworkViewFactoryFactory netViewFactoryFactory = getService(bc, CyNetworkViewFactoryFactory.class);
-		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID);
+		CyNetworkViewConfig config = netViewFactoryFactory.createConfig(cy3dVisualLexicon);
+		config.setEnableSpacialIndex2D(false);
+		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID, config);
 		
 		System.out.println("Cy3D: netViewFactory: " + netViewFactory);
 		
