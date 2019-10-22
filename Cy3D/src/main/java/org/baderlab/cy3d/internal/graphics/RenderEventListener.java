@@ -60,7 +60,6 @@ public class RenderEventListener implements GLEventListener {
 	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		System.out.println("RenderEventListener.init()");
 		GL2 gl = drawable.getGL().getGL2();
 		
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);

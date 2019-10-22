@@ -34,6 +34,7 @@ import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewFactoryFactory;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TunableSetter;
 import org.cytoscape.work.swing.DialogTaskManager;
@@ -77,10 +78,8 @@ public class CyActivator extends AbstractCyActivator {
 		
 		CyNetworkViewFactoryFactory netViewFactoryFactory = getService(bc, CyNetworkViewFactoryFactory.class);
 		CyNetworkViewConfig config = netViewFactoryFactory.createConfig(cy3dVisualLexicon);
-		config.setEnableSpacialIndex2D(false);
+		config.addNonClearableVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
 		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID, config);
-		
-		System.out.println("Cy3D: netViewFactory: " + netViewFactory);
 		
 		Properties cy3dNetworkViewFactoryProps = new Properties();
 		cy3dNetworkViewFactoryProps.setProperty("serviceType", "factory");

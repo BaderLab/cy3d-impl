@@ -72,7 +72,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 			NetworkToolkit.setNodeSelection(index, networkView.getMutableNetworkView(), true);
 		}
 		for (long index : pickingData.getPickedEdgeIndices()) {
-			NetworkToolkit.setNodeSelection(index, networkView.getMutableNetworkView(), true);
+			NetworkToolkit.setEdgeSelection(index, networkView.getMutableNetworkView(), true);
 		}
 		
 		pickingData.getPickedNodeIndices().clear();

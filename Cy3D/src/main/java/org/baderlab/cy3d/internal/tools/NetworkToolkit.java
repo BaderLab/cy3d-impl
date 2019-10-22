@@ -265,21 +265,29 @@ public class NetworkToolkit {
 	
 	// Sets data in CyTable as well as View<CyNode>
 	public static void flipNodeSelection(long suid, CyNetworkView networkView) {
-		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultNodeTable();
-		CyRow row = table.getRow(network.getNode(suid).getSUID());
+		CyRow row = getNodeRow(suid, networkView);
 		boolean isSelected = Boolean.TRUE.equals(row.get(CyNetwork.SELECTED, Boolean.class));
 		row.set(CyNetwork.SELECTED, !isSelected);
 	}
 	
 	// Sets data in CyTable as well as View<CyNode>
 	public static void setNodeSelection(long suid, CyNetworkView networkView, boolean selected) {
-		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultNodeTable();
-		CyRow row = table.getRow(network.getNode(suid).getSUID());
+		CyRow row = getNodeRow(suid, networkView);
 		row.set(CyNetwork.SELECTED, selected);
 	}
 
+	private static CyRow getNodeRow(long suid, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultNodeTable();
+		CyNode node;
+		var nodeView = networkView.getNodeView(suid);
+		if(nodeView != null) {
+			node = nodeView.getModel();
+		} else {
+			node = network.getNode(suid);
+		}
+		return table.getRow(node.getSUID());	
+	}
 	
 	// Updates data in CyTable as well as View<CyNode>
 	public static void deselectEdges(Set<CyEdge> edges, CyNetworkView networkView) {
@@ -305,20 +313,29 @@ public class NetworkToolkit {
 	
 	// Sets data in CyTable as well as View<CyNode>
 	public static void flipEdgeSelection(long suid, CyNetworkView networkView) {
-		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultEdgeTable();
-		CyRow row = table.getRow(network.getEdge(suid).getSUID());
+		CyRow row = getEdgeRow(suid, networkView);
 		boolean isSelected = Boolean.TRUE.equals(row.get(CyNetwork.SELECTED, Boolean.class));
 		row.set(CyNetwork.SELECTED, !isSelected);
 	}
 	
 	// Sets data in CyTable as well as View<CyNode>
 	public static void setEdgeSelection(long suid, CyNetworkView networkView, boolean selected) {
-		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultEdgeTable();
-		CyRow row = table.getRow(network.getEdge(suid).getSUID());
+		CyRow row = getEdgeRow(suid, networkView);
 		row.set(CyNetwork.SELECTED, selected);
 	}
+	private static CyRow getEdgeRow(long suid, CyNetworkView networkView) {
+		CyNetwork network = networkView.getModel();
+		CyTable table = network.getDefaultEdgeTable();
+		CyEdge edge;
+		var edgeView = networkView.getEdgeView(suid);
+		if(edgeView != null) {
+			edge = edgeView.getModel();
+		} else {
+			edge = network.getEdge(suid);
+		}
+		return table.getRow(edge.getSUID());	
+	}
+	
 
 	public static boolean checkEdgeSelected(long index, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
