@@ -29,6 +29,8 @@ import org.cytoscape.view.presentation.property.NullVisualProperty;
 
 public class Cy3DVisualLexicon extends BasicVisualLexicon {
 
+	public static final String CONFIG_PROP_SELECTED_NODES = "SELECTED_NODES";
+	
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CY3D_ROOT", "cy3d Rendering Engine Root Visual Property");
 	

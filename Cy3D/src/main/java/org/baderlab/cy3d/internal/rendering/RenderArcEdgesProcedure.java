@@ -87,7 +87,8 @@ public class RenderArcEdgesProcedure implements GraphicsProcedure {
 				chooseColor(gl, edgeView, graphicsData);
 				
 				// Load name for edge picking
-				long suid = edgeView.getSUID();
+				long suid = networkView.getEdgeInfo(edgeView).getModelSUID();
+				
 				int upper = SUIDToolkit.upperInt(suid);
 				int lower = SUIDToolkit.lowerInt(suid);
 				

@@ -79,6 +79,7 @@ public class CyActivator extends AbstractCyActivator {
 		CyNetworkViewFactoryFactory netViewFactoryFactory = getService(bc, CyNetworkViewFactoryFactory.class);
 		CyNetworkViewConfig config = netViewFactoryFactory.createConfig(cy3dVisualLexicon);
 		config.addNonClearableVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
+		config.addTrackedVisualProperty(Cy3DVisualLexicon.CONFIG_PROP_SELECTED_NODES, BasicVisualLexicon.NODE_SELECTED, Boolean.TRUE::equals);
 		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID, config);
 		
 		Properties cy3dNetworkViewFactoryProps = new Properties();

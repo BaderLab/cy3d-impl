@@ -99,7 +99,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData .getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
-				long suid = nodeView.getSUID();
+				long suid = networkView.getNodeInfo(nodeView).getModelSUID();
 				
 				// glLoadName() and glPushName() only support int, so we need to break the long SUID into two parts
 				int upper = SUIDToolkit.upperInt(suid);
