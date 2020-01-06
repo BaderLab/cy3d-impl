@@ -29,9 +29,9 @@ import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
-import org.cytoscape.view.model.CyNetworkViewConfig;
+import org.cytoscape.view.model.CyNetworkViewFactoryConfig;
 import org.cytoscape.view.model.CyNetworkViewFactory;
-import org.cytoscape.view.model.CyNetworkViewFactoryFactory;
+import org.cytoscape.view.model.CyNetworkViewFactoryProvider;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -76,8 +76,8 @@ public class CyActivator extends AbstractCyActivator {
 		// Cy3D NetworkView factory
 		EventBusProvider eventBusProvider = new EventBusProvider();
 		
-		CyNetworkViewFactoryFactory netViewFactoryFactory = getService(bc, CyNetworkViewFactoryFactory.class);
-		CyNetworkViewConfig config = netViewFactoryFactory.createConfig(cy3dVisualLexicon);
+		CyNetworkViewFactoryProvider netViewFactoryFactory = getService(bc, CyNetworkViewFactoryProvider.class);
+		CyNetworkViewFactoryConfig config = netViewFactoryFactory.createConfig(cy3dVisualLexicon);
 		config.addNonClearableVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION);
 		config.addTrackedVisualProperty(Cy3DVisualLexicon.CONFIG_PROP_SELECTED_NODES, BasicVisualLexicon.NODE_SELECTED, Boolean.TRUE::equals);
 		CyNetworkViewFactory netViewFactory = netViewFactoryFactory.createNetworkViewFactory(cy3dVisualLexicon, Cy3DNetworkViewRenderer.ID, config);

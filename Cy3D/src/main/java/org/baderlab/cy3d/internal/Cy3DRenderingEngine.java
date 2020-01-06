@@ -115,7 +115,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		// Check if the view model has changed approximately 60 times per second
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(() -> {
-			if(networkView.isDirty(true)) {
+			if(networkView.dirty(true)) {
 				panel.repaint();
 			}
 		}, 0, 20, TimeUnit.MILLISECONDS);
