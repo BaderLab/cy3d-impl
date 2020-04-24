@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.DiscreteRange;
@@ -33,7 +34,6 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 	
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CY3D_ROOT", "cy3d Rendering Engine Root Visual Property");
-	
 	public static final VisualProperty<DetailLevel> DETAIL_LEVEL = new DetailLevelVisualProperty("DETAIL_LEVEL", "Detail Level", CyNetwork.class);
 	
 	private final Set<VisualProperty<?>> supportedProps = new HashSet<>();
@@ -42,39 +42,40 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 	
 	public Cy3DVisualLexicon() {
 		super(ROOT);
-		
-		addVisualProperty(DETAIL_LEVEL, BasicVisualLexicon.NETWORK);
-		
+		addVisualProperty(DETAIL_LEVEL, NETWORK);
 		initSupportedProps();
 	}
 	
 	private void initSupportedProps() {
-		supportedProps.add(BasicVisualLexicon.NETWORK);
-		supportedProps.add(BasicVisualLexicon.NODE);
+		supportedProps.add(NETWORK);
+		supportedProps.add(NODE);
 		
-		supportedProps.add(BasicVisualLexicon.EDGE);
+		supportedProps.add(EDGE);
 		
-		supportedProps.add(BasicVisualLexicon.NETWORK_BACKGROUND_PAINT);
-		supportedProps.add(BasicVisualLexicon.NETWORK_WIDTH);
-		supportedProps.add(BasicVisualLexicon.NETWORK_HEIGHT);
+		supportedProps.add(NETWORK_BACKGROUND_PAINT);
+		supportedProps.add(NETWORK_WIDTH);
+		supportedProps.add(NETWORK_HEIGHT);
 		
-		supportedProps.add(BasicVisualLexicon.NODE_X_LOCATION);
-		supportedProps.add(BasicVisualLexicon.NODE_Y_LOCATION);
-		supportedProps.add(BasicVisualLexicon.NODE_Z_LOCATION);
-		supportedProps.add(BasicVisualLexicon.NODE_SELECTED);
-		supportedProps.add(BasicVisualLexicon.NODE_FILL_COLOR);
-		supportedProps.add(BasicVisualLexicon.NODE_LABEL);
-		supportedProps.add(BasicVisualLexicon.NODE_VISIBLE);
-		supportedProps.add(BasicVisualLexicon.NODE_SHAPE);
+		supportedProps.add(NODE_X_LOCATION);
+		supportedProps.add(NODE_Y_LOCATION);
+		supportedProps.add(NODE_Z_LOCATION);
+		supportedProps.add(NODE_SELECTED);
+		supportedProps.add(NODE_FILL_COLOR);
+		supportedProps.add(NODE_LABEL);
+		supportedProps.add(NODE_VISIBLE);
+		supportedProps.add(NODE_SHAPE);
+		supportedProps.add(NODE_LABEL_COLOR);
+		supportedProps.add(NODE_LABEL_FONT_SIZE);
+		supportedProps.add(NODE_LABEL_FONT_FACE);
 		
-		supportedProps.add(BasicVisualLexicon.NODE_SIZE);
-		supportedProps.add(BasicVisualLexicon.NODE_DEPTH);
-		supportedProps.add(BasicVisualLexicon.NODE_WIDTH);
-		supportedProps.add(BasicVisualLexicon.NODE_HEIGHT);
+		supportedProps.add(NODE_SIZE);
+		supportedProps.add(NODE_DEPTH);
+		supportedProps.add(NODE_WIDTH);
+		supportedProps.add(NODE_HEIGHT);
 		
-		supportedProps.add(BasicVisualLexicon.EDGE_VISIBLE);
-		supportedProps.add(BasicVisualLexicon.EDGE_LINE_TYPE);
-		supportedProps.add(BasicVisualLexicon.EDGE_SELECTED);
+		supportedProps.add(EDGE_VISIBLE);
+		supportedProps.add(EDGE_LINE_TYPE);
+		supportedProps.add(EDGE_SELECTED);
 		
 		supportedProps.add(DETAIL_LEVEL);
 		
@@ -90,22 +91,26 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 	
 	@Override
 	public <T> Set<T> getSupportedValueRange(VisualProperty<T> vp) {
-		if (vp.getRange() instanceof DiscreteRange) {
-			final DiscreteRange<T> range = (DiscreteRange<T>) vp.getRange();
-			final Collection<?> supportedList = supportedValuesMap.get(vp);
-			
-			if (supportedList != null) {
-				final Set<T> set = new LinkedHashSet<>();
-				
-				for (T value : range.values()) {
-					if (supportedList.contains(value))
-						set.add(value);
-				}
-				
-				return set;
+		if(vp.getRange() instanceof DiscreteRange) {
+			DiscreteRange<T> range = (DiscreteRange<T>) vp.getRange();
+			Collection<?> supportedList = supportedValuesMap.get(vp); // may be null
+			if(supportedList == null) {
+				return rangeToSet(range, null);
+			} else {
+				return rangeToSet(range, supportedList::contains);
 			}
 		}
-		
 		return Collections.emptySet();
+	}
+	
+	
+	private static <T> Set<T> rangeToSet(DiscreteRange<T> range, Predicate<T> filter) {
+		Set<T> set = new LinkedHashSet<>();
+		for(T value : range.values()) {
+			if(filter == null || filter.test(value)) {
+				set.add(value);
+			}
+		}
+		return set;
 	}
 }

@@ -1,7 +1,11 @@
 package org.baderlab.cy3d.internal.rendering;
 
+import static org.cytoscape.view.presentation.property.BasicVisualLexicon.NODE_LABEL_FONT_FACE;
+import static org.cytoscape.view.presentation.property.BasicVisualLexicon.NODE_LABEL_FONT_SIZE;
+
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 
 import javax.media.opengl.GL2;
 
@@ -31,22 +35,14 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 	
 	private static final Font TEXT_DEFAULT_FONT = new Font(DEFAULT_FONT_NAME, Font.PLAIN, TEXT_FONT_SIZE);
 	
-	private TextRenderer textRenderer;
+	private final TextRendererCache textRendererCache = new TextRendererCache();
+	
 	
 	public RenderNodeLabelsProcedure() {		
 	}
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
-//		GL2 gl = graphicsData.getGlContext();
-		
-		textRenderer = new TextRenderer(TEXT_DEFAULT_FONT);
-		
-		// Increase rendering efficiency; can set to true if desired
-		// textRenderer.setSmoothing(false);
-		
-		// Temporarily removed -- pausing JOGL update to 2.0-b45-20111219
-//		textRenderer = TextRenderer.create(RenderState.getRenderState(gl), GLRegion.TWO_PASS_DEFAULT_TEXTURE_UNIT);
 	}
 
 	@Override
@@ -58,7 +54,6 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 		
 		CyNetworkViewSnapshot networkView = graphicsData.getNetworkSnapshot();
 		float distanceScale = GraphicsData.DISTANCE_SCALE;
-		float x, y, z;
 
 		// Store the current modelview, projection, and viewport matrices
 		double modelView[] = new double[16];
@@ -69,75 +64,69 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
         gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
 		
-		String text;
-		Color textColor;
-
 		gl.glPushMatrix();
-		textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
-		// textRenderer.drawString3D(arg0, arg1, arg2, arg3, arg4, arg5)
 		
-		// textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
-		// textRenderer.createString(gl, null, 0, "test").
-		for (View<CyNode> nodeView : networkView.getNodeViews()) {
-			x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
-			y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
-			z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
-			
-			y = -y; // Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
-
+		
+		for(View<CyNode> nodeView : networkView.getNodeViews()) {
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
-				
-				text = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL);
-				
-				if (text != null) {
-					
+				float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue() / distanceScale;
+				float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue() / distanceScale;
+				float z = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Z_LOCATION).floatValue() / distanceScale;
+				y = -y; // Cytoscape measures Y down from the top, OpenGL measures Y up from the bottom
+
+				String text = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL);
+				if(text != null) {
 					Vector3 text3dPosition = new Vector3(x, y, z);
 					Vector3 screenCoordinates = RenderToolkit.convert3dToScreen(gl, text3dPosition, modelView, projection, viewPort);
-
 					Vector3 offsetFromCamera = text3dPosition.subtract(graphicsData.getCamera().getPosition());
 					
 					// Only draw the text if the front side of the camera faces it
-					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL 
-							&& graphicsData.getViewingVolume().inside(text3dPosition, GraphicsData.NEAR_Z / 2)) {
+					if (offsetFromCamera.magnitudeSquared() > Double.MIN_NORMAL && graphicsData.getViewingVolume().inside(text3dPosition, GraphicsData.NEAR_Z / 2)) {
+						Font font = getLabelFont(nodeView);
+						Color color = getLabelColor(nodeView);
 						
-						// TODO: Check if there is a way around this cast
-						textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
-						if (textColor == null) {
-							
-							// Use black as default if no node label color was found
-							textColor = TEXT_DEFAULT_COLOR;
+						TextRenderer textRenderer = textRendererCache.get(font);
+						textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
+						try {
+							textRenderer.setColor(color);
+							textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(textRenderer, text) / 2, (int) screenCoordinates.y());
+						} finally {
+							// textRenderer.flush();
+							textRenderer.endRendering();
 						}
-			
-
-						textRenderer.setColor(textColor);
-						textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(text) / 2, (int) screenCoordinates.y());		
 					}
 				}
 			}
 		}
 		
-//		if (graphicsData.getShowFPS()) {
-//			float frameRate = graphicsData.getFrameRateTracker().getFPS();
-//			int width = graphicsData.getScreenWidth();
-//			int height = graphicsData.getScreenHeight();
-//			String message = String.format("%dx%d FPS:%d", width, height, (int)frameRate);
-//			textRenderer.draw(message, 1, 1);
-//		}
-		
-		// textRenderer.flush();
-		textRenderer.endRendering();
 		gl.glPopMatrix();
-		
 	}
 	
-	private int findTextScreenWidth(String text) {
+	
+	private static Color getLabelColor(View<CyNode> nodeView) {
+		Paint textPaint = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
+		if(textPaint instanceof Color) {
+			return (Color) textPaint;
+		}
+		return TEXT_DEFAULT_COLOR; // Use black as default if no node label color was found
+	}
+	
+	private static Font getLabelFont(View<CyNode> nodeView) {
+		Font font = nodeView.getVisualProperty(NODE_LABEL_FONT_FACE);
+		if(font == null)
+			return TEXT_DEFAULT_FONT;
+		Number size = nodeView.getVisualProperty(NODE_LABEL_FONT_SIZE);
+		if(size == null)
+			return font;
+		return font.deriveFont(size.floatValue());
+	}
+	
+	private static int findTextScreenWidth(TextRenderer textRenderer, String text) {
 		int width = 0;
-		
 		for (int i = 0; i < text.length(); i++) {
 			width += textRenderer.getCharWidth(text.charAt(i));
 		}
-		
 		return width;
 	}
 }
