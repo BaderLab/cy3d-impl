@@ -101,3 +101,18 @@ Flatten Network
 Center Network
   Computes the centroid of all the nodes and translates the graph so that the centroid is the new origin.
 
+
+Visual Properties
+-----------------
+
+.. image:: images/vpmenu.png
+   :width: 45%
+   :align: right
+
+To view the complete list of visual styles that are supported by Cy3D...
+
+  * Go to the *Style* panel
+  * Click on the *Properties* drop down menu.
+  * Select *Show All*
+  * This can be done for each of the *Node*, *Edge*, and *Network* tabs.
+

@@ -1,14 +1,14 @@
-Cy3D Cytoscape App 1.0
-======================
+Cy3D Cytoscape App 1.1.0
+========================
 
 A 3D Renderer App for Cytoscape
 
 |ss1| |ss2|
 
-.. |ss1| image:: images/ss1.png
+.. |ss1| image:: images/ss3.png
    :width: 45%
 
-.. |ss2| image:: images/ss2.png
+.. |ss2| image:: images/ss4.png
    :width: 45%
 
 
