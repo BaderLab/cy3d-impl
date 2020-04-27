@@ -132,4 +132,8 @@ public class OriginOrbitCamera implements Camera {
 		
 		position.set(x, y, z);		
 	}
+	
+	public void setTarget(Vector3 target) {
+		this.target.set(target);
+	}
 }

@@ -1,5 +1,7 @@
 package org.baderlab.cy3d.internal.geometric;
 
+import java.util.Objects;
+
 /**
  * This class represents a 3-dimensional vector object, which can be useful
  * for certain vector calculations
@@ -484,4 +486,24 @@ public class Vector3 {
 	public Vector3 copy() {
 		return new Vector3(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Vector3))
+			return false;
+		Vector3 other = (Vector3) obj;
+		return Double.doubleToLongBits(x) == Double.doubleToLongBits(other.x)
+				&& Double.doubleToLongBits(y) == Double.doubleToLongBits(other.y)
+				&& Double.doubleToLongBits(z) == Double.doubleToLongBits(other.z);
+	}
+	
+	
+	
 }

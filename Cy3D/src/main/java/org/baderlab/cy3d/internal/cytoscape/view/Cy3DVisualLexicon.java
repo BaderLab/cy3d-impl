@@ -25,6 +25,7 @@ import org.cytoscape.view.model.DiscreteRange;
 import org.cytoscape.view.model.NullDataType;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.DoubleVisualProperty;
 import org.cytoscape.view.presentation.property.NullVisualProperty;
 
 
@@ -32,17 +33,33 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 
 	public static final String CONFIG_PROP_SELECTED_NODES = "SELECTED_NODES";
 	
-	/** The root visual property */
-	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CY3D_ROOT", "cy3d Rendering Engine Root Visual Property");
-	public static final VisualProperty<DetailLevel> DETAIL_LEVEL = new DetailLevelVisualProperty("DETAIL_LEVEL", "Detail Level", CyNetwork.class);
-	
 	private final Set<VisualProperty<?>> supportedProps = new HashSet<>();
 	private final Map<VisualProperty<?>, Collection<?>> supportedValuesMap = new HashMap<>();
+	
+	
+	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty("CY3D_ROOT", 
+			"cy3d Rendering Engine Root Visual Property");
+	
+	public static final VisualProperty<DetailLevel> DETAIL_LEVEL = new DetailLevelVisualProperty(
+			"DETAIL_LEVEL", "Detail Level", CyNetwork.class);
+	
+	public static final VisualProperty<Double> NETWORK_CAMERA_ORIGIN_X = new DoubleVisualProperty(0.0, 
+			ARBITRARY_DOUBLE_RANGE, "NETWORK_CAMERA_ORIGIN_X", "Camera Center X", CyNetwork.class);
+	
+	public static final VisualProperty<Double> NETWORK_CAMERA_ORIGIN_Y = new DoubleVisualProperty(0.0, 
+			ARBITRARY_DOUBLE_RANGE, "NETWORK_CAMERA_ORIGIN_Y", "Camera Center Y", CyNetwork.class);
+	
+	public static final VisualProperty<Double> NETWORK_CAMERA_ORIGIN_Z = new DoubleVisualProperty(0.0, 
+			ARBITRARY_DOUBLE_RANGE, "NETWORK_CAMERA_ORIGIN_Z", "Camera Center Z", CyNetwork.class);
+	
 	
 	
 	public Cy3DVisualLexicon() {
 		super(ROOT);
 		addVisualProperty(DETAIL_LEVEL, NETWORK);
+		addVisualProperty(NETWORK_CAMERA_ORIGIN_X, NETWORK);
+		addVisualProperty(NETWORK_CAMERA_ORIGIN_Y, NETWORK);
+		addVisualProperty(NETWORK_CAMERA_ORIGIN_Z, NETWORK);
 		initSupportedProps();
 	}
 	
@@ -78,6 +95,9 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 		supportedProps.add(EDGE_SELECTED);
 		
 		supportedProps.add(DETAIL_LEVEL);
+		supportedProps.add(NETWORK_CAMERA_ORIGIN_X);
+		supportedProps.add(NETWORK_CAMERA_ORIGIN_Y);
+		supportedProps.add(NETWORK_CAMERA_ORIGIN_Z);
 		
 		supportedValuesMap.put(NODE_SHAPE, asList(RECTANGLE, ELLIPSE, TRIANGLE));
 		supportedValuesMap.put(EDGE_LINE_TYPE, asList(SOLID, DOT, EQUAL_DASH));

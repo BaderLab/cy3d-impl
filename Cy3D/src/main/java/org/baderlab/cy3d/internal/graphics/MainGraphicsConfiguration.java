@@ -5,8 +5,11 @@ import java.util.Collection;
 import javax.swing.JComponent;
 import javax.swing.RootPaneContainer;
 
+import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;
+import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.eventbus.FitInViewEvent;
+import org.baderlab.cy3d.internal.geometric.Vector3;
 import org.baderlab.cy3d.internal.input.handler.InputEventListener;
 import org.baderlab.cy3d.internal.input.handler.MainEventBusListener;
 import org.baderlab.cy3d.internal.input.handler.MainInputEventListener;
@@ -22,6 +25,7 @@ import org.baderlab.cy3d.internal.rendering.RenderSelectionBoxProcedure;
 import org.baderlab.cy3d.internal.rendering.ResetSceneProcedure;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.VisualProperty;
 
 import com.google.common.eventbus.EventBus;
 
@@ -84,9 +88,26 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		eventBusListener.handleFitInViewEvent(new FitInViewEvent(nodeViews));
 	}
 	
+	private void updateCameraOrigin() {
+		double x = getCameraValue(Cy3DVisualLexicon.NETWORK_CAMERA_ORIGIN_X);
+		double y = getCameraValue(Cy3DVisualLexicon.NETWORK_CAMERA_ORIGIN_Y);
+		double z = getCameraValue(Cy3DVisualLexicon.NETWORK_CAMERA_ORIGIN_Z);
+		Vector3 vpOrigin = new Vector3(x,y,z);
+		
+		OriginOrbitCamera camera = graphicsData.getCamera();
+		if(!camera.getTarget().equals(vpOrigin)) {
+			camera.setTarget(vpOrigin);
+		}
+	}
+	
+	private double getCameraValue(VisualProperty<Double> vp) {
+		Double x = graphicsData.getNetworkSnapshot().getVisualProperty(vp);
+		return x == null ? 0.0 : x;
+	}
 	
 	@Override
 	public void update() {
+		updateCameraOrigin();
 		shapePickingProcessor.processPicking(graphicsData);
 	}
 
