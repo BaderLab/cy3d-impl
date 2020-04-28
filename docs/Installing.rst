@@ -4,7 +4,7 @@ Installing
 Requirements
 ~~~~~~~~~~~~
 
-Requires Cytoscape 3.3 or higher.
+Requires Cytoscape 3.8 or higher.
 
 
 Installation
