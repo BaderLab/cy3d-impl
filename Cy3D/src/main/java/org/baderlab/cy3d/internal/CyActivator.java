@@ -1,5 +1,8 @@
 package org.baderlab.cy3d.internal;
 
+import static org.cytoscape.work.ServiceProperties.COMMAND;
+import static org.cytoscape.work.ServiceProperties.COMMAND_LONG_DESCRIPTION;
+import static org.cytoscape.work.ServiceProperties.COMMAND_NAMESPACE;
 import static org.cytoscape.work.ServiceProperties.ID;
 import static org.cytoscape.work.ServiceProperties.INSERT_SEPARATOR_AFTER;
 import static org.cytoscape.work.ServiceProperties.INSERT_SEPARATOR_BEFORE;
@@ -9,6 +12,8 @@ import static org.cytoscape.work.ServiceProperties.TITLE;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.baderlab.cy3d.internal.command.GetDefaultRendererCommandTaskFactory;
+import org.baderlab.cy3d.internal.command.SetDefaultRendererCommandTaskFactory;
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.eventbus.EventBusProvider;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfigurationFactory;
@@ -19,6 +24,7 @@ import org.baderlab.cy3d.internal.layouts.FlattenLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.GridLayoutAlgorithm;
 import org.baderlab.cy3d.internal.layouts.SphericalLayoutAlgorithm;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
+import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.service.util.AbstractCyActivator;
@@ -29,13 +35,13 @@ import org.cytoscape.task.NodeViewTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
-import org.cytoscape.view.model.CyNetworkViewFactoryConfig;
 import org.cytoscape.view.model.CyNetworkViewFactory;
+import org.cytoscape.view.model.CyNetworkViewFactoryConfig;
 import org.cytoscape.view.model.CyNetworkViewFactoryProvider;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.TunableSetter;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
@@ -48,10 +54,10 @@ import org.osgi.framework.BundleContext;
 public class CyActivator extends AbstractCyActivator {
 
 	public void start(BundleContext bc) {
+		CyApplicationManager applicationManager = getService(bc, CyApplicationManager.class);
 		CySwingApplication application = getService(bc, CySwingApplication.class);
 		OpenBrowser openBrowser = getService(bc, OpenBrowser.class);
 		RenderingEngineManager renderingEngineManager = getService(bc, RenderingEngineManager.class);
-		VisualMappingManager visualMappingManagerService = getService(bc, VisualMappingManager.class);
 		UndoSupport undoSupport = getService(bc, UndoSupport.class);
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(bc, CyLayoutAlgorithmManager.class);
 		TunableSetter tunableSetter = getService(bc, TunableSetter.class);
@@ -124,6 +130,22 @@ public class CyActivator extends AbstractCyActivator {
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);
 		aboutDialogAction.setPreferredMenu("Apps.Cy3D");
 		registerAllServices(bc, aboutDialogAction, new Properties());
+		
+		// Commands
+		{
+			Properties props = new Properties();
+			props.put(COMMAND, "set renderer");
+			props.put(COMMAND_NAMESPACE, "cy3d");
+			props.put(COMMAND_LONG_DESCRIPTION, "Sets the default renderer used by Cytoscape when creating new network views.");
+			registerService(bc, new SetDefaultRendererCommandTaskFactory(applicationManager), TaskFactory.class, props);
+		}
+		{
+			Properties props = new Properties();
+			props.put(COMMAND, "get renderer");
+			props.put(COMMAND_NAMESPACE, "cy3d");
+			props.put(COMMAND_LONG_DESCRIPTION, "Returns the renderer ID for the current default renderer.");
+			registerService(bc, new GetDefaultRendererCommandTaskFactory(applicationManager), TaskFactory.class, props);
+		}
 		
 		
 		// Special handling for JOGL library
