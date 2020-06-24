@@ -1,5 +1,5 @@
 ## Cy3D - A 3D Renderer App for Cytoscape.
 
-Requires Cytoscape 3.3.
+[App store](https://apps.cytoscape.org/apps/cy3d)
 
-Please visit the [User Guide](http://cy3d.readthedocs.io)
+[User Guide](http://cy3d.readthedocs.io)
