@@ -93,6 +93,7 @@ public class Cy3DVisualLexicon extends BasicVisualLexicon {
 		supportedProps.add(EDGE_VISIBLE);
 		supportedProps.add(EDGE_LINE_TYPE);
 		supportedProps.add(EDGE_SELECTED);
+		supportedProps.add(EDGE_STROKE_UNSELECTED_PAINT);
 		
 		supportedProps.add(DETAIL_LEVEL);
 		supportedProps.add(NETWORK_CAMERA_ORIGIN_X);
