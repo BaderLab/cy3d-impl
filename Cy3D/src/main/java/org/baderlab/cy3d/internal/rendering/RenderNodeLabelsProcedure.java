@@ -6,6 +6,10 @@ import static org.cytoscape.view.presentation.property.BasicVisualLexicon.NODE_L
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.media.opengl.GL2;
 
@@ -90,7 +94,8 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 						textRenderer.beginRendering(graphicsData.getScreenWidth(), graphicsData.getScreenHeight(), true);
 						try {
 							textRenderer.setColor(color);
-							textRenderer.draw(text, (int) screenCoordinates.x() - findTextScreenWidth(textRenderer, text) / 2, (int) screenCoordinates.y());
+							int width = findTextScreenWidth(textRenderer, font, text);
+							textRenderer.draw(text, (int) screenCoordinates.x() - width / 2, (int) screenCoordinates.y());
 						} finally {
 							// textRenderer.flush();
 							textRenderer.endRendering();
@@ -122,11 +127,36 @@ public class RenderNodeLabelsProcedure implements GraphicsProcedure {
 		return font.deriveFont(size.floatValue());
 	}
 	
-	private static int findTextScreenWidth(TextRenderer textRenderer, String text) {
+	private static int findTextScreenWidth(TextRenderer textRenderer, Font font, String text) {
 		int width = 0;
-		for (int i = 0; i < text.length(); i++) {
-			width += textRenderer.getCharWidth(text.charAt(i));
+		for(int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i);
+			try {
+				width += fastGetWidth(textRenderer, font, c);
+			} catch (InternalError e) {
+				// workaround for bug in jogl, see http://forum.jogamp.org/FontRenderContext-td4035841.html
+				width += slowGetWidth(textRenderer, font, c);
+			}
 		}
 		return width;
+	}
+	
+	private static int fastGetWidth(TextRenderer textRenderer, Font font, char c) {
+		return (int) textRenderer.getCharWidth(c);
+	}
+	
+	private static int slowGetWidth(TextRenderer textRenderer, Font font, char c) {
+		FontRenderContext fontRenderContext;
+		try {
+			Method method = textRenderer.getClass().getDeclaredMethod("getFontRenderContext");
+			method.setAccessible(true);
+			fontRenderContext = (FontRenderContext) method.invoke(textRenderer);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			return 10;
+		}
+		
+		int[] singleUnicode = { c };
+		GlyphVector gv = font.createGlyphVector(fontRenderContext, singleUnicode);
+		return (int) gv.getGlyphMetrics(0).getAdvance();
 	}
 }
