@@ -25,6 +25,7 @@ import org.baderlab.cy3d.internal.eventbus.UpdateNetworkViewEvent;
 import org.baderlab.cy3d.internal.graphics.GraphicsConfiguration;
 import org.baderlab.cy3d.internal.graphics.RenderEventListener;
 import org.baderlab.cy3d.internal.task.TaskFactoryListener;
+import org.cytoscape.ding.icon.VisualPropertyIconFactory;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
@@ -164,8 +165,8 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 	}
 
 	@Override
-	public <V> Icon createIcon(VisualProperty<V> vp, V value, int width, int height) {
-		return null;
+	public <V> Icon createIcon(VisualProperty<V> vp, V value, int w, int h) {
+		return VisualPropertyIconFactory.createIcon(value, w, h);
 	}
 
 	@Override
