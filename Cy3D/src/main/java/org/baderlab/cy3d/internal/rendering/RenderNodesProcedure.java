@@ -3,8 +3,6 @@ package org.baderlab.cy3d.internal.rendering;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL2;
-
 import org.baderlab.cy3d.internal.cytoscape.view.Cy3DVisualLexicon;
 import org.baderlab.cy3d.internal.cytoscape.view.DetailLevel;
 import org.baderlab.cy3d.internal.cytoscape.view.DetailLevelVisualProperty;
@@ -21,6 +19,8 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.values.NodeShape;
+
+import com.jogamp.opengl.GL2;
 
 public class RenderNodesProcedure implements GraphicsProcedure {
 
@@ -97,7 +97,7 @@ public class RenderNodesProcedure implements GraphicsProcedure {
 			}
 			
 			// Draw it only if the visual property says it is visible
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData .getViewingVolume().inside(new Vector3(x, y, z), 1)) {
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE) && graphicsData.getViewingVolume().inside(new Vector3(x, y, z), 1)) {
 				
 				long suid = networkView.getNodeInfo(nodeView).getModelSUID();
 				

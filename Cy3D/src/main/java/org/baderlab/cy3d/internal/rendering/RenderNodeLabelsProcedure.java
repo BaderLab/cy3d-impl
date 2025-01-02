@@ -11,7 +11,7 @@ import java.awt.font.GlyphVector;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;

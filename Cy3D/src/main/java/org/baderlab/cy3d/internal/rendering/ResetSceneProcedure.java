@@ -2,8 +2,8 @@ package org.baderlab.cy3d.internal.rendering;
 
 import java.awt.Color;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;

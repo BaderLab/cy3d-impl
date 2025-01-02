@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.Collection;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.baderlab.cy3d.internal.cytoscape.edges.AugmentedEdgeContainer;
 import org.baderlab.cy3d.internal.data.GraphicsData;

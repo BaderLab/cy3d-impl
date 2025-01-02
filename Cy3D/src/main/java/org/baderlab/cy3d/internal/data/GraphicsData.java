@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.data;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.camera.OriginOrbitCamera;

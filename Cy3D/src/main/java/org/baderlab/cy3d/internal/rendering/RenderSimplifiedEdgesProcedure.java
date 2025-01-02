@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;
 import org.baderlab.cy3d.internal.geometric.Vector3;

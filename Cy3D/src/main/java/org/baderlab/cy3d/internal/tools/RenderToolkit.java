@@ -1,7 +1,7 @@
 package org.baderlab.cy3d.internal.tools;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 
 import org.baderlab.cy3d.internal.geometric.Vector3;
 

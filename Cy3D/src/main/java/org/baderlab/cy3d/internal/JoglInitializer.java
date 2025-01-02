@@ -28,10 +28,12 @@ import com.jogamp.common.util.JarUtil;
  */
 public class JoglInitializer {
 	
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	
-	private static final String GLUEGEN_JAR = "gluegen-rt-2.2.4.jar";
-	private static final String JOGL_JAR    = "jogl-all-2.2.4.jar";
+	private static final String JOGL_VERSION = "2.5.0";
+	
+	private static final String GLUEGEN_JAR = "gluegen-rt-" + JOGL_VERSION + ".jar";
+	private static final String JOGL_JAR    = "jogl-all-" + JOGL_VERSION + ".jar";
 
 	private JoglInitializer() {}
 	

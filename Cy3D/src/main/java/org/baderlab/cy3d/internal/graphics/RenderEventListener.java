@@ -8,11 +8,11 @@
 package org.baderlab.cy3d.internal.graphics;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.glu.GLU;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;

@@ -1,7 +1,7 @@
 package org.baderlab.cy3d.internal.rendering;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;

@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.rendering.shapes;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 public class StringRenderer {
 	

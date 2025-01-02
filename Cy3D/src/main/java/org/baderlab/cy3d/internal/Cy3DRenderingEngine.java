@@ -12,9 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLJPanel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.RootPaneContainer;
@@ -38,6 +35,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.jogamp.common.util.awt.AWTEDTExecutor;
 import com.jogamp.nativewindow.awt.AWTPrintLifecycle;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLJPanel;
 
 /** 
  * This class represents a Cy3DRenderingEngine, responsible for
@@ -97,8 +97,7 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 		graphicsData.setTaskFactoryListener(taskFactoryListener);
 		graphicsData.setTaskManager(taskManager);
 		
-		RenderEventListener renderEventListener = new RenderEventListener(networkView, configuration, graphicsData);
-
+		var renderEventListener = new RenderEventListener(networkView, configuration, graphicsData);
 		panel.addGLEventListener(renderEventListener);
 		
 		if (container instanceof RootPaneContainer) {

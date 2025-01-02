@@ -3,7 +3,7 @@ package org.baderlab.cy3d.internal.data;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import javax.media.nativewindow.NativeSurface;
+import com.jogamp.nativewindow.NativeSurface;
 
 /**
  * Converts between window units and pixel units.

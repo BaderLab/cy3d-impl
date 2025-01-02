@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 import javax.swing.JComponent;
 
 import org.baderlab.cy3d.internal.data.GraphicsData;

@@ -1,6 +1,6 @@
 package org.baderlab.cy3d.internal.rendering;
 
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLU;
 
 import org.baderlab.cy3d.internal.camera.CameraPosition;
 import org.baderlab.cy3d.internal.data.GraphicsData;
