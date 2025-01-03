@@ -127,6 +127,9 @@ class Cy3DRenderingEngine implements RenderingEngine<CyNetwork> {
 				panel.repaint();
 			}
 		});
+		
+		Cy3DNetworkViewListener networkViewListener = new Cy3DNetworkViewListener(graphicsData, networkView);
+		networkView.addNetworkViewListener(networkViewListener);
 	}
 	
 	
