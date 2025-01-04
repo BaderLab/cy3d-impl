@@ -24,6 +24,7 @@ public class Cy3DNetworkViewListener implements CyNetworkViewListener {
 		if(snapshot != null) {
 			fire(new FitInViewEvent(snapshot.getNodeViews()));
 		}
+		netView.updateView();
 	}
 	
 	@Override
@@ -35,6 +36,7 @@ public class Cy3DNetworkViewListener implements CyNetworkViewListener {
 				fire(new FitInViewEvent(selectedNodes));
 			}
 		}
+		netView.updateView();
 	}
 	
 	private void fire(FitInViewEvent evt) {
